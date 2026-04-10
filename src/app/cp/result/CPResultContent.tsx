@@ -23,7 +23,7 @@ function CompatibilityRing({ value, size = 160, color }: { value: number; size?:
       <svg width={size} height={size} className="-rotate-90">
         <circle
           cx={size / 2} cy={size / 2} r={r}
-          fill="none" stroke="rgba(68,64,60,0.3)" strokeWidth={8}
+          fill="none" stroke="#EDE8E2" strokeWidth={8}
         />
         <motion.circle
           cx={size / 2} cy={size / 2} r={r}
@@ -266,7 +266,7 @@ export function CPResultContent() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5 }}
-          className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 sm:p-8"
+          className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 sm:p-8"
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
             配对速写
@@ -287,7 +287,7 @@ export function CPResultContent() {
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
             五大模型契合度
           </h2>
-          <div className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 space-y-4">
+          <div className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 space-y-4">
             {result.modelScores.map(ms => (
               <ModelBar key={ms.model} name={ms.name} score={ms.score} model={ms.model} />
             ))}
@@ -309,7 +309,7 @@ export function CPResultContent() {
             {result.insights.map((insight, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-border-subtle bg-bg-secondary/40 p-5"
+                className="rounded-xl border border-border-subtle bg-bg-elevated shadow-sm p-5"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-lg">{insight.emoji}</span>
@@ -334,7 +334,7 @@ export function CPResultContent() {
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
             15 维对比详情
           </h2>
-          <div className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-4 sm:p-6">
+          <div className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-4 sm:p-6">
             {/* Header */}
             <div className="flex items-center gap-2 pb-2 mb-2 border-b border-border text-[10px] text-text-muted font-mono tracking-wider">
               <span className="w-8 shrink-0">维度</span>
@@ -372,7 +372,7 @@ export function CPResultContent() {
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer"
               style={{
                 background: cpLinkCopied ? '#22c55e' : tierColor,
-                color: '#110f1c',
+                color: '#FFFFFF',
               }}
             >
               {cpLinkCopied ? '链接已复制 ✓' : '复制 CP 结果链接'}

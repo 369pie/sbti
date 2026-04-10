@@ -76,7 +76,7 @@ export default function TypesContent() {
               <Link
                 key={article.slug}
                 href={`/guide/${article.slug}`}
-                className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-5 hover:bg-bg-secondary/60 hover:border-border transition-all"
+                className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-5 hover:shadow-md hover:border-border transition-all"
               >
                 <span className="text-xs font-mono tracking-wider text-text-muted uppercase block mb-2">
                   {article.category}

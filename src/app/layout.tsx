@@ -112,15 +112,15 @@ export default function RootLayout({
             <div
               style={{
                 padding: '12px 16px',
-                background: '#e8729c',
-                color: '#110f1c',
+                background: '#e06088',
+                color: '#FFFFFF',
                 textAlign: 'center',
                 fontSize: '14px',
                 lineHeight: '1.6',
               }}
             >
               旧地址已迁移，请访问{' '}
-              <a href={getSiteUrl('/')} style={{ color: '#110f1c', fontWeight: 700, textDecoration: 'underline' }}>
+              <a href={getSiteUrl('/')} style={{ color: '#FFFFFF', fontWeight: 700, textDecoration: 'underline' }}>
                 {getSiteLabel()}
               </a>{' '}
               查看最新内容。

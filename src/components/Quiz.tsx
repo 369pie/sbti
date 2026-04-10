@@ -149,7 +149,7 @@ export function Quiz() {
         </div>
 
         {/* Progress bar */}
-        <div className="h-[3px] bg-bg-tertiary rounded-full overflow-hidden">
+        <div className="h-[3px] bg-border-subtle rounded-full overflow-hidden">
           <motion.div
             className="h-full rounded-full"
             style={{ background: `linear-gradient(90deg, ${modelColor.base}, ${modelColor.light})` }}
@@ -201,10 +201,10 @@ export function Quiz() {
                     onClick={() => handleAnswer(opt.value as Answer)}
                     disabled={isAnswerLocked || isFinishing}
                     whileTap={{ scale: 0.98 }}
-                    className={`group relative w-full py-4 px-6 rounded-xl text-left transition-all duration-200 cursor-pointer ${
+                    className={`group relative w-full py-4 px-6 rounded-2xl text-left transition-all duration-200 cursor-pointer ${
                       selected
-                        ? 'bg-bg-tertiary border-2'
-                        : 'bg-bg-secondary/60 border border-border-subtle hover:border-border hover:bg-bg-tertiary/50'
+                        ? 'bg-bg-elevated border-2 shadow-sm'
+                        : 'bg-bg-elevated border border-border-subtle hover:border-border hover:shadow-sm'
                     } disabled:cursor-not-allowed disabled:opacity-80`}
                     style={selected ? { borderColor: modelColor.base } : undefined}
                   >
@@ -213,8 +213,8 @@ export function Quiz() {
                         className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-mono transition-colors"
                         style={
                           selected
-                            ? { background: modelColor.base, color: '#110f1c' }
-                            : { background: 'rgba(68,64,60,0.5)', color: '#a8a29e' }
+                            ? { background: modelColor.base, color: '#FFFFFF' }
+                            : { background: '#EDE8E2', color: '#9C9590' }
                         }
                       >
                         {opt.key}
@@ -226,8 +226,8 @@ export function Quiz() {
                     {selected && (
                       <motion.div
                         layoutId="selected-ring"
-                        className="absolute inset-0 rounded-xl"
-                        style={{ boxShadow: `0 0 20px ${modelColor.bg}` }}
+                        className="absolute inset-0 rounded-2xl"
+                        style={{ boxShadow: `0 0 12px ${modelColor.bg}` }}
                         transition={{ duration: 0.2 }}
                       />
                     )}

@@ -132,7 +132,7 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 sm:p-8"
+          className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 sm:p-8"
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
             打工速写
@@ -153,7 +153,7 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
             {personality.code} 的五维画像
           </h2>
-          <div className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 sm:p-8 space-y-5">
+          <div className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 sm:p-8 space-y-5">
             {dimensionScores.map(ds => {
               const dim = WORK_DIMENSIONS.find(d => d.id === ds.id);
               if (!dim) return null;

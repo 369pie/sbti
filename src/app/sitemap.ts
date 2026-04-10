@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { getSiteUrl } from '@/lib/site';
 import { getAllSlugs } from '@/lib/personalities';
 import { WORK_PERSONALITY_TYPES } from '@/lib/work/personalities';
+import { LOVE_PERSONALITY_TYPES } from '@/lib/love/personalities';
 import { DAILY_STATUS_TYPES } from '@/lib/daily/statuses';
 import { GUIDE_ARTICLES } from '@/lib/guides';
 
@@ -20,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: getSiteUrl('/types/'), lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: getSiteUrl('/cp/'), lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: getSiteUrl('/work/'), lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: getSiteUrl('/love/'), lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: getSiteUrl('/daily/'), lastModified: now, changeFrequency: 'daily', priority: 0.7 },
   ];
 
@@ -44,6 +46,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
+  const loveResultPages: MetadataRoute.Sitemap = LOVE_PERSONALITY_TYPES.map((p) => ({
+    url: getSiteUrl(`/love/result/${p.slug}/`),
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }));
+
   const dailyResultPages: MetadataRoute.Sitemap = DAILY_STATUS_TYPES.map((s) => ({
     url: getSiteUrl(`/daily/result/${s.slug}/`),
     lastModified: now,
@@ -51,5 +60,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }));
 
-  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...dailyResultPages];
+  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...dailyResultPages];
 }

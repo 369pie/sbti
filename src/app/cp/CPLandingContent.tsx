@@ -31,7 +31,7 @@ export default function CPLandingContent() {
         >
           <div className="text-5xl mb-6">💕</div>
           <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-4">
-            <span className="gradient-text">CP 配对</span>测试
+            <span className="text-accent">CP 配对</span>测试
           </h1>
           <p className="text-text-secondary text-base mb-4 max-w-md mx-auto leading-relaxed">
             先完成 SBTI 人格测试，获取结果后即可邀请好友来测 CP 契合度。
@@ -60,21 +60,21 @@ export default function CPLandingContent() {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 text-left"
         >
-          <div className="rounded-xl border border-border-subtle bg-bg-secondary/40 p-5">
+          <div className="rounded-xl border border-border-subtle bg-bg-elevated shadow-sm p-5">
             <div className="text-2xl mb-3">①</div>
             <h3 className="text-sm font-medium mb-1">你先测</h3>
             <p className="text-xs text-text-muted leading-relaxed">
               完成 31 道题的 SBTI 人格测试，得到你的人格类型。
             </p>
           </div>
-          <div className="rounded-xl border border-border-subtle bg-bg-secondary/40 p-5">
+          <div className="rounded-xl border border-border-subtle bg-bg-elevated shadow-sm p-5">
             <div className="text-2xl mb-3">②</div>
             <h3 className="text-sm font-medium mb-1">发链接</h3>
             <p className="text-xs text-text-muted leading-relaxed">
               在结果页点击「邀请好友测 CP」，复制专属邀请链接发给 TA。
             </p>
           </div>
-          <div className="rounded-xl border border-border-subtle bg-bg-secondary/40 p-5">
+          <div className="rounded-xl border border-border-subtle bg-bg-elevated shadow-sm p-5">
             <div className="text-2xl mb-3">③</div>
             <h3 className="text-sm font-medium mb-1">看结果</h3>
             <p className="text-xs text-text-muted leading-relaxed">
@@ -109,7 +109,7 @@ export default function CPLandingContent() {
                 >
                   <Link
                     href={`/cp/result?a=${typeA.slug}&b=${typeB.slug}`}
-                    className="block rounded-2xl border border-border-subtle bg-bg-secondary/40 hover:bg-bg-secondary/60 hover:border-border transition-all p-5"
+                    className="block rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm hover:shadow-md hover:border-border transition-all p-5"
                   >
                     <div className="flex items-center justify-between mb-4">
                       {/* Type A */}

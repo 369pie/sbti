@@ -64,7 +64,6 @@ export default function HomeContent() {
     <div className="min-h-screen">
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[radial-gradient(ellipse,rgba(249,115,22,0.08),transparent_70%)] pointer-events-none" />
 
         <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
           <motion.div
@@ -90,7 +89,7 @@ export default function HomeContent() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/test"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-accent text-bg-primary font-medium text-base hover:brightness-110 transition-all duration-200 shadow-[0_0_30px_rgba(249,115,22,0.2)]"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-white font-medium text-base hover:bg-accent/90 transition-all duration-200"
               >
                 开始测试
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -111,14 +110,14 @@ export default function HomeContent() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="mt-16 grid grid-cols-3 gap-px bg-border-subtle rounded-2xl overflow-hidden"
+            className="mt-16 grid grid-cols-3 gap-3"
           >
             {[
               { value: '15 维', label: '人格维度' },
               { value: '27 种', label: '结果类型' },
               { value: '~32 题', label: '含隐藏分支' },
             ].map(stat => (
-              <div key={stat.label} className="bg-bg-secondary/60 px-4 py-6 text-center">
+              <div key={stat.label} className="bg-bg-elevated rounded-2xl border border-border-subtle px-4 py-6 text-center shadow-sm">
                 <div className="text-2xl font-semibold text-text-primary font-mono tracking-tight">{stat.value}</div>
                 <div className="text-xs text-text-muted mt-1">{stat.label}</div>
               </div>
@@ -155,7 +154,7 @@ export default function HomeContent() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08 }}
-                  className="rounded-xl border border-border-subtle bg-bg-secondary/40 p-5 hover:bg-bg-secondary/60 transition-colors"
+                  className="rounded-xl border border-border-subtle bg-bg-elevated shadow-sm p-5 hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <div
@@ -205,7 +204,7 @@ export default function HomeContent() {
               >
                 <Link
                   href={`/result/${p.slug}`}
-                  className="group block rounded-xl border border-border-subtle hover:border-border bg-bg-secondary/30 hover:bg-bg-secondary/60 transition-all p-4 sm:p-5"
+                  className="group block rounded-2xl border border-border-subtle hover:border-border bg-bg-elevated hover:shadow-md transition-all p-4 sm:p-5"
                 >
                   <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden mb-3" style={{ background: `${p.color}15` }}>
                     <NextImage
@@ -262,7 +261,7 @@ export default function HomeContent() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="block rounded-2xl border border-border-subtle bg-bg-secondary/40 p-5 hover:bg-bg-secondary/60 hover:border-border transition-all"
+                className="block rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-5 hover:shadow-md hover:border-border transition-all"
               >
                 <h3 className="text-lg font-medium text-text-primary">{item.title}</h3>
                 <p className="text-sm text-text-secondary leading-6 mt-2">{item.description}</p>
@@ -295,9 +294,43 @@ export default function HomeContent() {
             </p>
             <Link
               href="/work"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-indigo-500 text-white font-medium text-base hover:brightness-110 transition-all duration-200 shadow-[0_0_30px_rgba(99,102,241,0.2)]"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-indigo-500 text-white font-medium text-base hover:bg-indigo-600 transition-all duration-200"
             >
               去测打工人格
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Love Personality Test promo */}
+      <section className="py-20 px-6 border-t border-border-subtle">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-pink-500/20 bg-pink-500/5 p-8 sm:p-10 text-center"
+          >
+            <div className="text-4xl mb-4">💕</div>
+            <span className="inline-block text-xs font-mono tracking-[0.2em] text-pink-400 uppercase mb-3">
+              LPTI · New
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">
+              恋爱人格测试
+            </h2>
+            <p className="text-text-secondary leading-relaxed max-w-md mx-auto mb-6">
+              5 个恋爱维度 · 15 道灵魂拷问 · 16 种恋爱人格
+              <br />
+              三分钟测出你在感情里的真面目。
+            </p>
+            <Link
+              href="/love"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-pink-500 text-white font-medium text-base hover:bg-pink-600 transition-all duration-200"
+            >
+              去测恋爱人格
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -329,7 +362,7 @@ export default function HomeContent() {
             </p>
             <Link
               href="/daily"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-teal-500 text-white font-medium text-base hover:brightness-110 transition-all duration-200 shadow-[0_0_30px_rgba(20,184,166,0.2)]"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-teal-500 text-white font-medium text-base hover:bg-teal-600 transition-all duration-200"
             >
               测一测今天的状态
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -356,7 +389,7 @@ export default function HomeContent() {
             {FAQS.map((item) => (
               <article
                 key={item.question}
-                className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 hover:bg-bg-secondary/60 transition-colors"
+                className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 hover:shadow-md transition-shadow"
               >
                 <h3 className="text-lg font-medium text-text-primary leading-7">{item.question}</h3>
                 <p className="text-sm sm:text-base text-text-secondary leading-7 mt-3">{item.answer}</p>
@@ -391,7 +424,7 @@ export default function HomeContent() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 text-center hover:bg-bg-secondary/60 transition-colors"
+              className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 text-center hover:shadow-md transition-shadow"
             >
               <div className="inline-flex items-center gap-2 mb-4">
                 <svg className="w-5 h-5 text-[#07C160]" viewBox="0 0 24 24" fill="currentColor">
@@ -421,7 +454,7 @@ export default function HomeContent() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 text-center hover:bg-bg-secondary/60 transition-colors"
+              className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 text-center hover:shadow-md transition-shadow"
             >
               <div className="inline-flex items-center gap-2 mb-4">
                 <svg className="w-5 h-5 text-[#12B7F5]" viewBox="0 0 24 24" fill="currentColor">
@@ -429,7 +462,7 @@ export default function HomeContent() {
                 </svg>
                 <span className="font-medium text-text-primary">QQ 群</span>
               </div>
-              <div className="rounded-xl overflow-hidden bg-[#2b2b2b] p-2 inline-block">
+              <div className="rounded-xl overflow-hidden bg-bg-secondary p-2 inline-block">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={withBasePath('/images/qr-qq.png')}
@@ -459,7 +492,7 @@ export default function HomeContent() {
           </p>
           <Link
             href="/test"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-accent text-bg-primary font-medium hover:brightness-110 transition-all shadow-[0_0_30px_rgba(249,115,22,0.15)]"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-white font-medium hover:bg-accent/90 transition-all"
           >
             开始测试 →
           </Link>

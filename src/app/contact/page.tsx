@@ -18,7 +18,7 @@ export default function ContactPage() {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <section className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 text-center">
+        <section className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 text-center">
           <h2 className="text-lg font-medium text-text-primary mb-4">微信群</h2>
           <div className="rounded-xl overflow-hidden bg-white p-2 inline-block">
             <NextImage
@@ -34,9 +34,9 @@ export default function ContactPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 text-center">
+        <section className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 text-center">
           <h2 className="text-lg font-medium text-text-primary mb-4">QQ 群</h2>
-          <div className="rounded-xl overflow-hidden bg-[#2b2b2b] p-2 inline-block">
+          <div className="rounded-xl overflow-hidden bg-bg-secondary p-2 inline-block">
             <NextImage
               src={withBasePath('/images/qr-qq.png')}
               alt="SBTI QQ 群二维码"

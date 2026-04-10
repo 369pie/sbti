@@ -13,14 +13,13 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getRunningHubConfig } from './runninghub-config.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const API_KEY = process.env.RUNNINGHUB_API_KEY;
-const API_BASE = 'https://www.runninghub.cn/openapi/v2';
-const EDIT_ENDPOINT = process.env.RUNNINGHUB_EDIT_ENDPOINT || '/rhart-image-v1-official/edit';
-const ASPECT_RATIO = process.env.RUNNINGHUB_ASPECT_RATIO || 'auto';
+const { apiKey: API_KEY, apiBase: API_BASE, editEndpoint: EDIT_ENDPOINT, aspectRatio: ASPECT_RATIO } =
+  getRunningHubConfig();
 const TYPES_DIR = path.join(__dirname, '../public/images/types');
 
 // ── Style prefix for all prompts ──────────────────────────────────────────────

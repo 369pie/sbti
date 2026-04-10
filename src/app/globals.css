@@ -4,35 +4,30 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Soft midnight palette */
-  --color-bg-primary: #110f1c;
-  --color-bg-secondary: #1a1728;
-  --color-bg-tertiary: #252238;
-  --color-bg-elevated: #302c44;
+  /* Warm light palette — cream + warm neutrals */
+  --color-bg-primary: #FAF8F5;
+  --color-bg-secondary: #F2EFEA;
+  --color-bg-tertiary: #EDE8E2;
+  --color-bg-elevated: #FFFFFF;
 
-  --color-text-primary: #f5f2fa;
-  --color-text-secondary: #b0a8c4;
-  --color-text-muted: #7d759c;
+  --color-text-primary: #2D2A26;
+  --color-text-secondary: #6B6560;
+  --color-text-muted: #9C9590;
 
-  --color-border: #3a3458;
-  --color-border-subtle: #26204a;
+  --color-border: #DDD8D1;
+  --color-border-subtle: #EDE8E2;
 
-  /* Accent — soft rose */
-  --color-accent: #e8729c;
+  /* Accent — warm rose */
+  --color-accent: #e06088;
   --color-accent-light: #f09abc;
-  --color-accent-dim: rgba(232, 114, 156, 0.15);
+  --color-accent-dim: rgba(224, 96, 136, 0.1);
 
   /* Model colors */
-  --color-model-self: #f59e0b;
-  --color-model-emotion: #f43f5e;
-  --color-model-attitude: #10b981;
-  --color-model-action: #8b5cf6;
-  --color-model-social: #06b6d4;
-}
-
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #3a3458 transparent;
+  --color-model-self: #e5940a;
+  --color-model-emotion: #e03a55;
+  --color-model-attitude: #0ea572;
+  --color-model-action: #7c4ddb;
+  --color-model-social: #0ea5c4;
 }
 
 body {
@@ -42,21 +37,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Subtle noise texture overlay */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-}
-
 /* Custom selection */
 ::selection {
-  background: rgba(232, 114, 156, 0.3);
-  color: #f5f2fa;
+  background: rgba(224, 96, 136, 0.2);
+  color: #2D2A26;
 }
 
 /* Focus ring */
@@ -70,33 +54,25 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Glass card */
-.glass {
-  background: rgba(26, 23, 40, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(58, 52, 88, 0.5);
-}
-
-/* Gradient text */
+/* Gradient text — kept for rare decorative use */
 .gradient-text {
-  background: linear-gradient(135deg, #e8729c, #c084fc, #f9a8d4);
+  background: linear-gradient(135deg, #e06088, #c084fc, #f472b6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Model gradient backgrounds */
-.model-self { --model-color: #f59e0b; }
-.model-emotion { --model-color: #f43f5e; }
-.model-attitude { --model-color: #10b981; }
-.model-action { --model-color: #8b5cf6; }
-.model-social { --model-color: #06b6d4; }
+/* Model subtle tints */
+.model-self { --model-color: #e5940a; }
+.model-emotion { --model-color: #e03a55; }
+.model-attitude { --model-color: #0ea572; }
+.model-action { --model-color: #7c4ddb; }
+.model-social { --model-color: #0ea5c4; }
 
 .model-glow {
   background: radial-gradient(
     ellipse at 50% 0%,
-    color-mix(in srgb, var(--model-color) 8%, transparent),
-    transparent 70%
+    color-mix(in srgb, var(--model-color) 4%, transparent),
+    transparent 60%
   );
 }

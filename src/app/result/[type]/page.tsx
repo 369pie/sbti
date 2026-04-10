@@ -5,7 +5,6 @@ import type { DimensionLevel } from '@/lib/dimensions';
 import { ResultContent } from './ResultContent';
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
-import { buildPersonalityGuide } from '@/lib/result-guide';
 
 type PageProps = {
   params: Promise<{ type: string }>;
@@ -42,7 +41,6 @@ export default async function ResultPage({ params }: PageProps) {
   const { type } = await params;
   const personality = getPersonalityBySlug(type);
   if (!personality) notFound();
-  const guide = buildPersonalityGuide(personality);
 
   // Build dimension scores from the personality profile for display
   const dimensionScores = DIMENSIONS.map(dim => {
@@ -51,5 +49,5 @@ export default async function ResultPage({ params }: PageProps) {
     return { id: dim.id, score, level };
   });
 
-  return <ResultContent personality={personality} dimensionScores={dimensionScores} guide={guide} />;
+  return <ResultContent personality={personality} dimensionScores={dimensionScores} />;
 }

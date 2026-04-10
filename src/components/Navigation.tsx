@@ -9,25 +9,21 @@ const NAV_ITEMS = [
   { href: '/types', label: '人格图鉴' },
   { href: '/cp', label: 'CP配对' },
   { href: '/work', label: '打工人格' },
+  { href: '/love', label: '恋爱人格' },
   { href: '/daily', label: '今日状态' },
 ];
 
 export function Navigation() {
   const pathname = usePathname();
-  const isTestPage = pathname === '/test';
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        isTestPage
-          ? 'bg-bg-primary/80 backdrop-blur-xl border-b border-border-subtle'
-          : 'bg-bg-primary/60 backdrop-blur-xl border-b border-border-subtle'
-      }`}
+      className="sticky top-0 z-50 bg-bg-elevated/90 backdrop-blur-md border-b border-border-subtle"
     >
       <nav className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
         <Link
           href="/"
-          className="font-mono text-sm tracking-widest text-text-secondary hover:text-accent transition-colors"
+          className="text-sm font-semibold tracking-widest text-accent hover:text-accent/80 transition-colors"
         >
           SBTI
         </Link>

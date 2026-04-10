@@ -23,7 +23,6 @@ export default function DailyHomeContent() {
     <div className="min-h-screen">
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[radial-gradient(ellipse,rgba(20,184,166,0.12),transparent_70%)] pointer-events-none" />
 
         <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
           <motion.div
@@ -50,7 +49,7 @@ export default function DailyHomeContent() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/daily/test"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-teal-500 text-white font-medium text-base hover:brightness-110 transition-all duration-200 shadow-[0_0_30px_rgba(20,184,166,0.25)]"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-teal-500 text-white font-medium text-base hover:bg-teal-600 transition-all duration-200"
               >
                 测一测今天的状态
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -107,7 +106,7 @@ export default function DailyHomeContent() {
                   initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 + i * 0.08, duration: 0.4 }}
-                  className="flex items-center gap-4 px-5 py-4 rounded-xl border border-border-subtle bg-bg-secondary/40"
+                  className="flex items-center gap-4 px-5 py-4 rounded-xl border border-border-subtle bg-bg-elevated shadow-sm"
                 >
                   <span
                     className="w-2 h-2 rounded-full flex-shrink-0"

@@ -18,7 +18,7 @@ interface Props {
 }
 
 const CARD_WIDTH = 540;
-const CARD_HEIGHT = 960;
+const CARD_HEIGHT = 1060;
 const CARD_SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
@@ -129,15 +129,10 @@ function drawImageContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
 }
 
 async function renderWorkShareImage(personality: WorkPersonalityType, dimensionScores: WorkDimensionScore[]) {
-  const BG = '#FFF9F2';
-  const DARK = '#2d2236';
-  const MED = '#6b6380';
-  const DIV = '#e8e0d6';
-
   const [personalityImage, qrImage] = await Promise.all([
     getCachedImage(getWorkTypeImage(personality.slug)).catch(() => null),
     QRCode.toDataURL(WORK_SHARE_URL, {
-      width: 200, margin: 1, color: { dark: DARK, light: BG + 'ff' }, errorCorrectionLevel: 'M',
+      width: 200, margin: 1, color: { dark: '#2d2236', light: '#FFF9F2' }, errorCorrectionLevel: 'M',
     }).then(url => getCachedImage(url)).catch(() => null),
   ]);
 
@@ -151,21 +146,27 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   ctx.textBaseline = 'top';
 
   // ========== Cream background ==========
+  const BG = '#FFF9F2';
+  const DARK = '#2D2A26';
+  const MED = '#6B6560';
+  const DIV = '#e8e0d6';
+
   ctx.fillStyle = BG;
   ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-  const wash = ctx.createRadialGradient(CARD_WIDTH / 2, 220, 0, CARD_WIDTH / 2, 220, 300);
-  wash.addColorStop(0, hexToRgba(personality.color, 0.09));
+  // Subtle color wash
+  const wash = ctx.createRadialGradient(270, 280, 0, 270, 280, 300);
+  wash.addColorStop(0, hexToRgba(personality.color, 0.08));
   wash.addColorStop(1, hexToRgba(personality.color, 0));
   ctx.fillStyle = wash;
-  ctx.fillRect(0, 0, CARD_WIDTH, 460);
+  ctx.fillRect(0, 0, CARD_WIDTH, 500);
 
   // Card border
-  strokeRoundedRect(ctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 24, hexToRgba(personality.color, 0.4), 2.5);
-  strokeRoundedRect(ctx, 22, 22, CARD_WIDTH - 44, CARD_HEIGHT - 44, 18, hexToRgba(personality.color, 0.1), 1);
+  strokeRoundedRect(ctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 24, hexToRgba(personality.color, 0.25), 2.5);
+  strokeRoundedRect(ctx, 22, 22, CARD_WIDTH - 44, CARD_HEIGHT - 44, 18, hexToRgba(personality.color, 0.08), 1);
 
   // Corner ornaments
-  ctx.fillStyle = hexToRgba(personality.color, 0.45);
+  ctx.fillStyle = hexToRgba(personality.color, 0.35);
   ctx.font = `14px ${FONT_SANS}`;
   ctx.textAlign = 'center';
   ctx.fillText('✦', 36, 28);
@@ -173,40 +174,44 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   ctx.fillText('✦', 36, CARD_HEIGHT - 44);
   ctx.fillText('✦', CARD_WIDTH - 36, CARD_HEIGHT - 44);
 
-  // ========== Header ==========
+  // Header
   ctx.fillStyle = personality.color;
   ctx.font = `600 12px ${FONT_MONO}`;
-  ctx.fillText('WPTI 打工人格鉴定', CARD_WIDTH / 2, 48);
+  ctx.fillText('WPTI 打工人格报告', CARD_WIDTH / 2, 46);
 
-  // ========== Character image ==========
-  const imgX = 100;
-  const imgY = 78;
-  const imgW = CARD_WIDTH - 200;
-  const imgH = 300;
+  ctx.fillStyle = MED;
+  ctx.font = `13px ${FONT_SANS}`;
+  ctx.fillText('在打工人格测试中，我被鉴定为', CARD_WIDTH / 2, 68);
 
-  fillRoundedRect(ctx, imgX, imgY, imgW, imgH, 20, '#ffffff');
-  strokeRoundedRect(ctx, imgX, imgY, imgW, imgH, 20, hexToRgba(personality.color, 0.18));
-
+  // ============ HERO CHARACTER IMAGE ============
+  const avatarX = 100;
+  const avatarY = 100;
+  const avatarW = CARD_WIDTH - 200;
+  const avatarH = 320;
+  fillRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 24, '#ffffff');
+  strokeRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 24, hexToRgba(personality.color, 0.25));
   if (personalityImage) {
     ctx.save();
-    roundRectPath(ctx, imgX + 4, imgY + 4, imgW - 8, imgH - 8, 16);
+    roundRectPath(ctx, avatarX + 4, avatarY + 4, avatarW - 8, avatarH - 8, 20);
     ctx.clip();
-    drawImageContain(ctx, personalityImage, imgX + 12, imgY + 12, imgW - 24, imgH - 24);
+    drawImageContain(ctx, personalityImage, avatarX + 20, avatarY + 15, avatarW - 40, avatarH - 30);
     ctx.restore();
   } else {
-    ctx.font = `120px ${FONT_SANS}`;
-    ctx.fillText(personality.emoji, CARD_WIDTH / 2, imgY + 70);
+    ctx.fillStyle = DARK;
+    ctx.font = `140px ${FONT_SANS}`;
+    ctx.fillText(personality.emoji, CARD_WIDTH / 2, avatarY + 70);
   }
 
-  // ========== Name + Code ==========
-  const nameY = imgY + imgH + 20;
+  // Name
+  const nameY = avatarY + avatarH + 24;
   ctx.fillStyle = DARK;
-  ctx.font = `700 40px ${FONT_SANS}`;
+  ctx.font = `700 48px ${FONT_SANS}`;
   ctx.fillText(personality.name, CARD_WIDTH / 2, nameY);
 
+  // Code
   ctx.fillStyle = personality.color;
-  ctx.font = `600 16px ${FONT_MONO}`;
-  ctx.fillText(personality.code, CARD_WIDTH / 2, nameY + 50);
+  ctx.font = `600 18px ${FONT_MONO}`;
+  ctx.fillText(personality.code, CARD_WIDTH / 2, nameY + 60);
 
   // Rarity pill
   const workRarity = getWorkRarity(personality.slug);
@@ -214,90 +219,85 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   ctx.font = `600 13px ${FONT_SANS}`;
   const rarityW = ctx.measureText(rarityText).width + 28;
   const rarityX = (CARD_WIDTH - rarityW) / 2;
-  const rarityY = nameY + 78;
+  const rarityY = nameY + 86;
   fillRoundedRect(ctx, rarityX, rarityY, rarityW, 28, 14, hexToRgba(workRarity.color, 0.12));
   strokeRoundedRect(ctx, rarityX, rarityY, rarityW, 28, 14, hexToRgba(workRarity.color, 0.3));
   ctx.fillStyle = workRarity.color;
   ctx.fillText(rarityText, CARD_WIDTH / 2, rarityY + 7);
+
   ctx.textAlign = 'left';
 
-  // ========== Tagline ==========
-  const tagY = nameY + 116;
-  const tagW = CARD_WIDTH - 80;
-  fillRoundedRect(ctx, 40, tagY, tagW, 44, 14, hexToRgba(personality.color, 0.06));
-  strokeRoundedRect(ctx, 40, tagY, tagW, 44, 14, hexToRgba(personality.color, 0.15));
+  // Tagline card
+  const tagY = nameY + 124;
+  const tagW = CARD_WIDTH - 72;
+  fillRoundedRect(ctx, 36, tagY, tagW, 56, 16, hexToRgba(personality.color, 0.04));
+  strokeRoundedRect(ctx, 36, tagY, tagW, 56, 16, hexToRgba(personality.color, 0.10));
   ctx.fillStyle = personality.color;
-  ctx.font = `600 14px ${FONT_SANS}`;
+  ctx.font = `600 15px ${FONT_SANS}`;
   ctx.textAlign = 'center';
-  ctx.fillText(`「${personality.tagline}」`, CARD_WIDTH / 2, tagY + 14);
+  ctx.fillText(`"${personality.tagline}"`, CARD_WIDTH / 2, tagY + 18);
   ctx.textAlign = 'left';
 
-  // ========== Description ==========
-  const descY = tagY + 58;
-  ctx.fillStyle = MED;
-  ctx.font = `13px ${FONT_SANS}`;
-  const lines = wrapText(ctx, personality.description, CARD_WIDTH - 80, 3);
-  ctx.textAlign = 'center';
-  lines.forEach((line, i) => ctx.fillText(line, CARD_WIDTH / 2, descY + i * 22));
-  ctx.textAlign = 'left';
+  // Description
+  const descY = tagY + 72;
+  ctx.fillStyle = DARK;
+  ctx.font = `14px ${FONT_SANS}`;
+  const lines = wrapText(ctx, personality.description, CARD_WIDTH - 72, 3);
+  lines.forEach((line, i) => ctx.fillText(line, 36, descY + i * 24));
 
-  // ========== Dimension bars ==========
-  const barY = descY + lines.length * 22 + 18;
+  // Dimension bars
+  const barY = descY + lines.length * 24 + 20;
   ctx.fillStyle = MED;
-  ctx.font = `11px ${FONT_MONO}`;
-  ctx.fillText('五维画像', 44, barY);
+  ctx.font = `12px ${FONT_SANS}`;
+  ctx.fillText('五维画像', 36, barY);
 
   dimensionScores.forEach((score, i) => {
     const dim = WORK_DIMENSIONS.find(d => d.id === score.id);
     if (!dim) return;
     const color = WORK_MODEL_COLORS[dim.model].base;
-    const rowY = barY + 24 + i * 28;
+    const rowY = barY + 30 + i * 32;
     const barX = 120;
-    const barW = 330;
+    const barW = 336;
     const pct = ((score.score - 1) / 2);
     const pw = Math.max(36, pct * barW);
 
     ctx.fillStyle = DARK;
     ctx.font = `13px ${FONT_SANS}`;
-    ctx.fillText(dim.name, 44, rowY);
+    ctx.fillText(dim.name, 36, rowY);
 
-    fillRoundedRect(ctx, barX, rowY + 6, barW, 7, 999, DIV);
-    fillRoundedRect(ctx, barX, rowY + 6, pw, 7, 999, color);
+    fillRoundedRect(ctx, barX, rowY + 6, barW, 8, 999, DIV);
+    fillRoundedRect(ctx, barX, rowY + 6, pw, 8, 999, color);
 
     ctx.fillStyle = color;
-    ctx.font = `600 12px ${FONT_MONO}`;
+    ctx.font = `600 13px ${FONT_MONO}`;
     ctx.textAlign = 'right';
-    ctx.fillText(score.level, 488, rowY);
+    ctx.fillText(score.level, 492, rowY);
     ctx.textAlign = 'left';
   });
 
-  // ========== Divider ==========
-  const footerY = barY + 24 + dimensionScores.length * 28 + 18;
+  // Divider
+  const footerY = barY + 30 + dimensionScores.length * 32 + 16;
   ctx.strokeStyle = DIV;
-  ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(60, footerY);
-  ctx.lineTo(CARD_WIDTH - 60, footerY);
+  ctx.moveTo(36, footerY);
+  ctx.lineTo(CARD_WIDTH - 36, footerY);
   ctx.stroke();
 
-  // ========== Footer ==========
-  const ftY = footerY + 18;
+  // CTA
   ctx.fillStyle = DARK;
-  ctx.font = `600 14px ${FONT_SANS}`;
-  ctx.fillText('测测你是哪种打工人？', 48, ftY);
+  ctx.font = `600 16px ${FONT_SANS}`;
+  ctx.fillText('测测你是哪种打工人？', 36, footerY + 20);
 
   ctx.fillStyle = personality.color;
-  ctx.font = `11px ${FONT_MONO}`;
-  ctx.fillText(WORK_SHARE_URL, 48, ftY + 24);
+  ctx.font = `12px ${FONT_MONO}`;
+  ctx.fillText(WORK_SHARE_URL, 36, footerY + 50);
 
   // QR
-  const qrS = 60;
-  const qrX = CARD_WIDTH - 48 - qrS;
-  const qrY = ftY - 4;
-  fillRoundedRect(ctx, qrX - 3, qrY - 3, qrS + 6, qrS + 6, 10, '#ffffff');
-  strokeRoundedRect(ctx, qrX - 3, qrY - 3, qrS + 6, qrS + 6, 10, DIV);
+  fillRoundedRect(ctx, 424, footerY + 10, 80, 80, 12, '#ffffff');
   if (qrImage) {
-    drawImageContain(ctx, qrImage, qrX, qrY, qrS, qrS);
+    drawImageContain(ctx, qrImage, 428, footerY + 14, 72, 72);
+  } else {
+    fillRoundedRect(ctx, 432, footerY + 18, 64, 64, 8, DIV);
   }
 
   return canvas.toDataURL('image/png');
@@ -407,7 +407,7 @@ export const WorkShareImageGenerator = forwardRef<WorkShareImageGeneratorHandle,
                 <img src={previewUrl} alt="分享图片" className="w-full" />
               </div>
 
-              <p className="text-center text-xs text-text-muted mb-3 sm:hidden">
+              <p className="text-center text-xs text-white/60 mb-3 sm:hidden">
                 💡 长按上方图片可直接保存到相册
               </p>
 
@@ -420,7 +420,7 @@ export const WorkShareImageGenerator = forwardRef<WorkShareImageGeneratorHandle,
               <div className="flex gap-3">
                 <button
                   onClick={handleDownload}
-                  className="flex-1 py-3 rounded-xl border border-border text-sm text-text-primary hover:bg-bg-secondary/50 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-xl border border-white/30 text-sm text-white hover:bg-white/10 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -438,7 +438,7 @@ export const WorkShareImageGenerator = forwardRef<WorkShareImageGeneratorHandle,
                 </button>
               </div>
 
-              <p className="text-center text-xs text-text-muted mt-4">
+              <p className="text-center text-xs text-white/60 mt-4">
                 点击空白处关闭
               </p>
             </div>

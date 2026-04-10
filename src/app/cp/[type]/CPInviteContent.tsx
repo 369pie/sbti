@@ -15,7 +15,7 @@ export function CPInviteContent({ personality }: Props) {
     <div className="min-h-screen">
       {/* Background glow */}
       <div
-        className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] pointer-events-none"
+        className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] pointer-events-none opacity-30"
         style={{
           background: `radial-gradient(ellipse, ${personality.color}10, transparent 70%)`,
         }}
@@ -34,7 +34,7 @@ export function CPInviteContent({ personality }: Props) {
           </div>
 
           {/* Inviter's personality card */}
-          <div className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-8 mb-8">
+          <div className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-8 mb-8">
             <div
               className="w-24 h-24 mx-auto mb-4 rounded-2xl overflow-hidden"
               style={{ background: `${personality.color}15` }}
@@ -65,7 +65,7 @@ export function CPInviteContent({ personality }: Props) {
 
           {/* Invitation text */}
           <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-4">
-            <span className="gradient-text">来测测</span>我们的 CP 值
+            <span className="text-accent">来测测</span>我们的 CP 值
           </h1>
 
           <p className="text-text-secondary text-base mb-10 max-w-md mx-auto leading-relaxed">

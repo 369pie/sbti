@@ -19,8 +19,8 @@ export function createSocialImageResponse() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background: 'linear-gradient(135deg, #0f172a 0%, #111827 55%, #1f2937 100%)',
-          color: '#f8fafc',
+          background: 'linear-gradient(135deg, #FAF8F5 0%, #F2EFEA 55%, #EDE8E2 100%)',
+          color: '#2D2A26',
           padding: '52px 56px',
           position: 'relative',
           overflow: 'hidden',
@@ -34,7 +34,7 @@ export function createSocialImageResponse() {
             width: '380px',
             height: '380px',
             borderRadius: '999px',
-            background: 'rgba(232, 114, 156, 0.18)',
+            background: 'rgba(224, 96, 136, 0.08)',
           }}
         />
         <div
@@ -45,7 +45,7 @@ export function createSocialImageResponse() {
             width: '320px',
             height: '320px',
             borderRadius: '999px',
-            background: 'rgba(34, 211, 238, 0.12)',
+            background: 'rgba(14, 165, 196, 0.06)',
           }}
         />
 
@@ -56,12 +56,14 @@ export function createSocialImageResponse() {
               alignItems: 'center',
               alignSelf: 'flex-start',
               borderRadius: '999px',
-              border: '1px solid rgba(255,255,255,0.14)',
-              background: 'rgba(15, 23, 42, 0.55)',
+              border: '1px solid #DDD8D1',
+              background: '#FFFFFF',
               padding: '12px 18px',
               fontSize: '24px',
               letterSpacing: '0.22em',
               textTransform: 'uppercase',
+              color: '#e06088',
+              fontWeight: 600,
             }}
           >
             SBTI
@@ -92,7 +94,7 @@ export function createSocialImageResponse() {
                 marginTop: '16px',
                 fontSize: '34px',
                 lineHeight: 1.3,
-                color: '#cbd5e1',
+                color: '#6B6560',
               }}
             >
               5 models, 15 dimensions, 27 personality results.
@@ -114,11 +116,11 @@ export function createSocialImageResponse() {
                   display: 'flex',
                   alignItems: 'center',
                   borderRadius: '999px',
-                  background: 'rgba(232, 114, 156, 0.14)',
-                  border: '1px solid rgba(232, 114, 156, 0.45)',
+                  background: 'rgba(224, 96, 136, 0.1)',
+                  border: '1px solid rgba(224, 96, 136, 0.3)',
                   padding: '10px 16px',
                   fontSize: '22px',
-                  color: '#f09abc',
+                  color: '#e06088',
                 }}
               >
                 27 results
@@ -128,11 +130,11 @@ export function createSocialImageResponse() {
                   display: 'flex',
                   alignItems: 'center',
                   borderRadius: '999px',
-                  background: 'rgba(34, 211, 238, 0.14)',
-                  border: '1px solid rgba(34, 211, 238, 0.4)',
+                  background: 'rgba(14, 165, 196, 0.1)',
+                  border: '1px solid rgba(14, 165, 196, 0.3)',
                   padding: '10px 16px',
                   fontSize: '22px',
-                  color: '#67e8f9',
+                  color: '#0ea5c4',
                 }}
               >
                 15 dimensions
@@ -142,11 +144,11 @@ export function createSocialImageResponse() {
                   display: 'flex',
                   alignItems: 'center',
                   borderRadius: '999px',
-                  background: 'rgba(16, 185, 129, 0.14)',
-                  border: '1px solid rgba(16, 185, 129, 0.4)',
+                  background: 'rgba(14, 165, 114, 0.1)',
+                  border: '1px solid rgba(14, 165, 114, 0.3)',
                   padding: '10px 16px',
                   fontSize: '22px',
-                  color: '#6ee7b7',
+                  color: '#0ea572',
                 }}
               >
                 Pure frontend
@@ -157,7 +159,7 @@ export function createSocialImageResponse() {
                 display: 'flex',
                 marginTop: '24px',
                 fontSize: '22px',
-                color: '#94a3b8',
+                color: '#9C9590',
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
               }}
@@ -173,15 +175,15 @@ export function createSocialImageResponse() {
               alignItems: 'flex-end',
               padding: '22px 24px',
               borderRadius: '28px',
-              background: 'rgba(15, 23, 42, 0.75)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              background: '#FFFFFF',
+              border: '1px solid #DDD8D1',
             }}
           >
             <div
               style={{
                 display: 'flex',
                 fontSize: '18px',
-                color: '#94a3b8',
+                color: '#9C9590',
                 textTransform: 'uppercase',
                 letterSpacing: '0.12em',
               }}
@@ -205,7 +207,7 @@ export function createSocialImageResponse() {
                         : index === 1
                           ? 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)'
                           : 'linear-gradient(135deg, #22c55e 0%, #06b6d4 100%)',
-                    color: '#020617',
+                    color: '#FFFFFF',
                     fontSize: '21px',
                     fontWeight: 800,
                   }}

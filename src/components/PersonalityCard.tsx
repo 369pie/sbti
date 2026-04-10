@@ -23,7 +23,7 @@ export function PersonalityCard({ personality, index = 0, compact = false }: Pro
     >
       <Link
         href={`/result/${personality.slug}`}
-        className="group block rounded-2xl border border-border-subtle hover:border-border bg-bg-secondary/40 hover:bg-bg-secondary/80 transition-all duration-300 overflow-hidden"
+        className="group block rounded-2xl border border-border-subtle hover:border-border bg-bg-elevated hover:shadow-md transition-all duration-300 overflow-hidden"
       >
         {/* Image area — large, centered */}
         <div
@@ -60,7 +60,7 @@ export function PersonalityCard({ personality, index = 0, compact = false }: Pro
               >
                 {personality.code}
               </span>
-              <h3 className="text-base font-medium text-text-primary group-hover:text-white transition-colors truncate">
+              <h3 className="text-base font-medium text-text-primary transition-colors truncate">
                 {personality.name}
               </h3>
             </div>

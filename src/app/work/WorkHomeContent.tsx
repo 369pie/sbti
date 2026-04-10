@@ -22,7 +22,6 @@ export default function WorkHomeContent() {
     <div className="min-h-screen">
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[radial-gradient(ellipse,rgba(99,102,241,0.1),transparent_70%)] pointer-events-none" />
 
         <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
           <motion.div
@@ -49,7 +48,7 @@ export default function WorkHomeContent() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/work/test"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-indigo-500 text-white font-medium text-base hover:brightness-110 transition-all duration-200 shadow-[0_0_30px_rgba(99,102,241,0.25)]"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-indigo-500 text-white font-medium text-base hover:bg-indigo-600 transition-all duration-200"
               >
                 开始测试
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -109,7 +108,7 @@ export default function WorkHomeContent() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08 }}
-                  className="flex items-center gap-4 p-4 rounded-xl border border-border-subtle bg-bg-secondary/40 hover:bg-bg-secondary/60 transition-colors"
+                  className="flex items-center gap-4 p-4 rounded-xl border border-border-subtle bg-bg-elevated shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div
                     className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-mono font-semibold flex-shrink-0"
@@ -153,7 +152,7 @@ export default function WorkHomeContent() {
               >
                 <Link
                   href={`/work/result/${p.slug}`}
-                  className="block p-4 sm:p-5 rounded-2xl border border-border-subtle bg-bg-secondary/40 text-center hover:bg-bg-secondary/60 hover:border-border transition-all"
+                  className="block p-4 sm:p-5 rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm text-center hover:shadow-md hover:border-border transition-all"
                 >
                   <WorkPersonalityAvatar
                     personality={p}

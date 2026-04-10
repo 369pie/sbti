@@ -45,7 +45,7 @@ export function DimensionRadar({ dimensions, size = 360 }: Props) {
       <ResponsiveContainer width={size} height={size} minWidth={0} minHeight={0}>
         <RechartsRadar cx="50%" cy="50%" outerRadius="75%" data={data}>
           <PolarGrid
-            stroke="rgba(68,64,60,0.4)"
+            stroke="#DDD8D1"
             strokeDasharray="2 4"
           />
           <PolarRadiusAxis
@@ -77,21 +77,21 @@ export function DimensionRadar({ dimensions, size = 360 }: Props) {
           <Radar
             name="你的维度"
             dataKey="value"
-            stroke="#e8729c"
+            stroke="#e06088"
             strokeWidth={2}
             fill="url(#radarGradient)"
             fillOpacity={0.3}
             dot={{
               r: 3,
-              fill: '#e8729c',
-              stroke: '#110f1c',
+              fill: '#e06088',
+              stroke: '#FFFFFF',
               strokeWidth: 1.5,
             }}
           />
           <defs>
             <radialGradient id="radarGradient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#e8729c" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#f43f5e" stopOpacity={0.1} />
+              <stop offset="0%" stopColor="#e06088" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#e03a55" stopOpacity={0.1} />
             </radialGradient>
           </defs>
         </RechartsRadar>
@@ -136,7 +136,7 @@ export function DimensionBars({ dimensionScores }: DimensionBarProps) {
                 {level}
               </span>
             </div>
-            <div className="h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
+            <div className="h-1.5 bg-border-subtle rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-700 ease-out"
                 style={{
