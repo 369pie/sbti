@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import { useCallback, useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { toPng } from 'html-to-image';
 import QRCode from 'qrcode';
 import type { PersonalityType } from '@/lib/personalities';
@@ -19,19 +19,109 @@ interface Props {
   dimensionScores: DimensionScore[];
 }
 
+const TRANSPARENT_PIXEL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+const shareAssetCache = new Map<string, Promise<string>>();
+
 async function imageToDataUrl(src: string): Promise<string> {
   const img = new window.Image();
   img.crossOrigin = 'anonymous';
-  img.src = src;
+
   await new Promise<void>((resolve, reject) => {
-    img.onload = () => resolve();
-    img.onerror = () => reject(new Error('Image load failed'));
+    const handleLoad = () => {
+      cleanup();
+      resolve();
+    };
+    const handleError = () => {
+      cleanup();
+      reject(new Error(`Image load failed: ${src}`));
+    };
+    const cleanup = () => {
+      img.removeEventListener('load', handleLoad);
+      img.removeEventListener('error', handleError);
+    };
+
+    img.addEventListener('load', handleLoad);
+    img.addEventListener('error', handleError);
+    img.src = src;
+
+    if (img.complete && img.naturalWidth > 0) {
+      cleanup();
+      resolve();
+    }
   });
+
+  try {
+    await img.decode();
+  } catch {
+    // Some browsers reject decode() for already-decoded images; the loaded bitmap is still usable.
+  }
+
   const canvas = document.createElement('canvas');
   canvas.width = img.naturalWidth;
   canvas.height = img.naturalHeight;
   canvas.getContext('2d')!.drawImage(img, 0, 0);
   return canvas.toDataURL('image/png');
+}
+
+function getCachedImageDataUrl(src: string): Promise<string> {
+  const cached = shareAssetCache.get(src);
+  if (cached) return cached;
+
+  const promise = imageToDataUrl(src).catch(error => {
+    shareAssetCache.delete(src);
+    throw error;
+  });
+
+  shareAssetCache.set(src, promise);
+  return promise;
+}
+
+async function waitForImageElement(img: HTMLImageElement | null, src: string): Promise<void> {
+  if (!img) {
+    throw new Error('Missing share-card image node');
+  }
+
+  if (img.src === src && img.complete && img.naturalWidth > 0) {
+    return;
+  }
+
+  await new Promise<void>((resolve, reject) => {
+    const handleLoad = () => {
+      cleanup();
+      resolve();
+    };
+    const handleError = () => {
+      cleanup();
+      reject(new Error('Share-card image render failed'));
+    };
+    const cleanup = () => {
+      img.removeEventListener('load', handleLoad);
+      img.removeEventListener('error', handleError);
+    };
+
+    img.addEventListener('load', handleLoad);
+    img.addEventListener('error', handleError);
+    img.src = src;
+
+    if (img.complete && img.naturalWidth > 0) {
+      cleanup();
+      resolve();
+    }
+  });
+
+  try {
+    await img.decode();
+  } catch {
+    // decode() is best-effort here; load completion is the actual correctness gate.
+  }
+}
+
+async function waitForPaint(): Promise<void> {
+  await new Promise<void>(resolve => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
 }
 
 function isMobile() {
@@ -41,10 +131,10 @@ function isMobile() {
 export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
   function ShareImageGenerator({ personality, dimensionScores }, ref) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const typeImageRef = useRef<HTMLImageElement>(null);
+  const qrImageRef = useRef<HTMLImageElement>(null);
   const [generating, setGenerating] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const [typeImageDataUrl, setTypeImageDataUrl] = useState<string | null>(null);
   const siteLabel = SHARE_SITE_URL;
 
   const generateQR = useCallback(async () => {
@@ -57,25 +147,37 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
     return dataUrl;
   }, []);
 
+  const prepareAssets = useCallback(async () => {
+    const imageSrc = getTypeImage(personality.slug);
+    const [qr, typeImage] = await Promise.all([
+      generateQR(),
+      getCachedImageDataUrl(imageSrc),
+    ]);
+
+    return { qr, typeImage };
+  }, [generateQR, personality.slug]);
+
+  useEffect(() => {
+    void prepareAssets();
+  }, [prepareAssets]);
+
   const handleGenerate = useCallback(async () => {
     if (!cardRef.current || generating) return;
     setGenerating(true);
 
     try {
-      // Pre-load personality image as data URL (fixes html-to-image cross-origin issue)
-      const [qr, imgData] = await Promise.all([
-        generateQR(),
-        imageToDataUrl(getTypeImage(personality.slug)),
-      ]);
-      setQrDataUrl(qr);
-      setTypeImageDataUrl(imgData);
+      const { qr, typeImage } = await prepareAssets();
 
-      // Wait for data URLs to render in DOM
-      await new Promise(r => setTimeout(r, 200));
+      await Promise.all([
+        waitForImageElement(qrImageRef.current, qr),
+        waitForImageElement(typeImageRef.current, typeImage),
+      ]);
+      await waitForPaint();
 
       const dataUrl = await toPng(cardRef.current, {
         pixelRatio: 3,
         backgroundColor: '#0c0a09',
+        cacheBust: true,
       });
 
       setPreviewUrl(dataUrl);
@@ -84,7 +186,7 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
     } finally {
       setGenerating(false);
     }
-  }, [generating, generateQR, personality.slug]);
+  }, [generating, prepareAssets]);
 
   const handleDownload = useCallback(() => {
     if (!previewUrl) return;
@@ -227,7 +329,8 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={typeImageDataUrl || getTypeImage(personality.slug)}
+                ref={typeImageRef}
+                src={TRANSPARENT_PIXEL}
                 alt={personality.name}
                 width={220} height={220}
                 style={{ objectFit: 'contain', filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.4))' }}
@@ -303,12 +406,8 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
                 padding: 4
               }}
             >
-              {qrDataUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={qrDataUrl} alt="QR Code" width={72} height={72} />
-              ) : (
-                <div style={{ width: 72, height: 72, background: '#292524', borderRadius: 8 }} />
-              )}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img ref={qrImageRef} src={TRANSPARENT_PIXEL} alt="QR Code" width={72} height={72} />
             </div>
           </div>
 
