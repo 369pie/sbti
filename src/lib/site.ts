@@ -1,6 +1,8 @@
 const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const configuredSiteOrigin = process.env.NEXT_PUBLIC_SITE_ORIGIN ?? '';
 
+export const SHARE_SITE_URL = 'https://369pie.github.io/sbti/';
+
 function normalizeBasePath(value: string): string {
   if (!value || value === '/') return '';
   const prefixed = value.startsWith('/') ? value : `/${value}`;

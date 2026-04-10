@@ -6,7 +6,7 @@ import QRCode from 'qrcode';
 import type { PersonalityType } from '@/lib/personalities';
 import { getTypeImage } from '@/lib/personalities';
 import { DIMENSIONS, MODEL_COLORS } from '@/lib/dimensions';
-import { getSiteLabel, getSiteUrl } from '@/lib/site';
+import { SHARE_SITE_URL } from '@/lib/site';
 
 import type { DimensionScore } from '@/lib/scoring';
 
@@ -20,18 +20,17 @@ export function ShareImageGenerator({ personality, dimensionScores }: Props) {
   const [generating, setGenerating] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const siteLabel = getSiteLabel();
+  const siteLabel = SHARE_SITE_URL;
 
   const generateQR = useCallback(async () => {
-    const url = getSiteUrl(`/result/${personality.slug}/`);
-    const dataUrl = await QRCode.toDataURL(url, {
+    const dataUrl = await QRCode.toDataURL(SHARE_SITE_URL, {
       width: 200,
       margin: 1,
       color: { dark: '#000000', light: '#00000000' },
       errorCorrectionLevel: 'M',
     });
     return dataUrl;
-  }, [personality.slug]);
+  }, []);
 
   const handleGenerate = useCallback(async () => {
     if (!cardRef.current || generating) return;
@@ -148,7 +147,7 @@ export function ShareImageGenerator({ personality, dimensionScores }: Props) {
              <div style={{ fontSize: 13, letterSpacing: '0.2em', color: '#78716c', fontFamily: 'monospace' }}>
               SBTI 人格报告 //
              </div>
-             <div style={{ fontSize: 13, letterSpacing: '0.1em', color: '#a8a29e', fontFamily: 'monospace' }}>
+             <div style={{ fontSize: 11, letterSpacing: '0.02em', color: '#a8a29e', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
               {siteLabel}
              </div>
           </div>
@@ -245,8 +244,8 @@ export function ShareImageGenerator({ personality, dimensionScores }: Props) {
               <div style={{ fontSize: 16, fontWeight: 600, color: '#fafaf9', marginBottom: 6, letterSpacing: '0.05em' }}>
                 测测你的隐藏人格？
               </div>
-              <div style={{ fontSize: 13, color: '#78716c', display: 'flex', alignItems: 'center', gap: 8 }}>
-                长按扫码，直达测试页
+              <div style={{ fontSize: 12, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
+                {siteLabel}
               </div>
             </div>
             
