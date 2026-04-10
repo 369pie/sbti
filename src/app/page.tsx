@@ -5,6 +5,7 @@ import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import { PERSONALITY_TYPES, getTypeImage } from '@/lib/personalities';
 import { MODEL_NAMES, MODEL_COLORS } from '@/lib/dimensions';
+import { withBasePath } from '@/lib/site';
 import type { ModelType } from '@/lib/dimensions';
 
 const MODELS: { key: ModelType; dims: string[] }[] = [
@@ -192,6 +193,82 @@ export default function HomePage() {
             >
               查看全部 27 种 →
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Community */}
+      <section className="py-20 px-6 border-t border-border-subtle">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-10"
+          >
+            <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Community</span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+              加入 SBTI 社群
+            </h2>
+            <p className="text-text-secondary mt-3 leading-relaxed">
+              测完想找同类？来群里一起交流、玩耍、对线吧 🎉
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            {/* WeChat */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 text-center hover:bg-bg-secondary/60 transition-colors"
+            >
+              <div className="inline-flex items-center gap-2 mb-4">
+                <svg className="w-5 h-5 text-[#07C160]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178A1.17 1.17 0 014.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 01-1.162 1.178 1.17 1.17 0 01-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 01.598.082l1.584.926a.272.272 0 00.14.045.247.247 0 00.242-.245c0-.06-.024-.12-.038-.177l-.327-1.233a.582.582 0 01-.023-.156.49.49 0 01.201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.952-7.062-6.122zM14.033 13.3c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 01-.969.983.976.976 0 01-.969-.983c0-.542.434-.982.97-.982z"/>
+                </svg>
+                <span className="font-medium text-text-primary">微信群</span>
+              </div>
+              <div className="rounded-xl overflow-hidden bg-white p-2 inline-block">
+                <NextImage
+                  src={withBasePath('/images/qr-wechat.png')}
+                  alt="SBTI 微信交流群二维码"
+                  width={200}
+                  height={200}
+                  className="w-48 h-48 object-contain"
+                  unoptimized
+                />
+              </div>
+              <p className="text-xs text-text-muted mt-4">SBTI交流玩耍群</p>
+            </motion.div>
+
+            {/* QQ */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 text-center hover:bg-bg-secondary/60 transition-colors"
+            >
+              <div className="inline-flex items-center gap-2 mb-4">
+                <svg className="w-5 h-5 text-[#12B7F5]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21.395 15.035a39.548 39.548 0 00-1.24-2.675c-.066-.131-.132-.266-.2-.401-.15-.303-.298-.605-.445-.907l-.003-.006a1.735 1.735 0 00-.159-.291c-.03-.044-.06-.087-.092-.13a2.86 2.86 0 00-.204-.26c-.108-.122-.225-.24-.359-.348a3.33 3.33 0 00-.748-.487c-.058-.03-.118-.053-.178-.08l-.121-.053c-.071-.03-.143-.058-.215-.083-.013-.005-.026-.008-.038-.012-1.21-.42-2.006-.534-2.375-.55l-.033-.001c-.024-.001-.044-.001-.064-.002h-.04c-.016-.001-.033 0-.05 0-.058.001-.12.006-.178.013-.238.03-.588.126-.845.248-.1.047-.228.142-.318.213-.236.186-.456.407-.634.682l-.007.01c-.072.11-.13.225-.18.35-.048.115-.08.237-.11.358-.02.074-.04.148-.052.226-.016.102-.032.204-.041.306-.005.053-.009.107-.012.141a1.053 1.053 0 00-.008.127l.001.033v.019c.003.092.008.183.017.273.014.15.036.3.064.447.054.3.13.599.225.89.097.296.213.586.344.87.151.325.32.644.502.952.098.166.2.33.306.49.152.228.312.45.478.665.062.08.126.16.192.237.019.022.038.044.056.066.147.176.293.362.443.538.063.073.12.149.185.22.027.03.054.06.082.091.12.134.242.268.366.398l.032.034c.125.131.25.259.372.384l.013.012c.12.123.233.245.346.37l.028.032c.11.121.218.244.323.37.055.065.057.108-.003.165l-.055.056-.08.073c-.044.033-.088.074-.133.107-.073.056-.148.11-.196.135-.08.04-.165.075-.223.098l-.1.042c-.176.072-.358.162-.548.272-.123.07-.249.148-.382.239l-.041.026c-.17.101-.34.21-.506.328-.217.153-.418.32-.607.5-.186.176-.357.364-.51.563-.24.312-.433.655-.56 1.02-.041.117-.094.273-.108.378-.008.064-.008.13 0 .194.023.202.083.374.186.515.226.31.69.449 1.12.498.468.054 1.063.026 1.7-.06.72-.097 1.5-.265 2.276-.463.48-.123.955-.258 1.416-.393l.037-.011c.11-.032.22-.065.33-.097l.033-.009c.133-.04.265-.078.396-.115l.02-.006c.253-.074.5-.147.73-.22.087-.026.174-.053.26-.08l.032-.01c.167-.054.332-.107.485-.16l.073-.024c.146-.05.255-.09.389-.142.058-.023.117-.046.177-.07l.091-.037c.084-.034.168-.069.253-.104l.026-.01c.12-.052.241-.104.362-.158.077-.034.154-.07.23-.107l.02-.01c.126-.06.253-.122.377-.186l.016-.008a15.8 15.8 0 00.69-.375c.11-.064.22-.13.328-.198l.006-.004c.18-.112.35-.226.51-.345.109-.08.212-.163.309-.248l.098-.087c.164-.147.314-.3.436-.459.1-.132.19-.271.256-.416.064-.14.104-.288.132-.441.038-.208.042-.433.007-.674l-.005-.03a2.73 2.73 0 00-.08-.34c-.056-.182-.13-.361-.22-.532-.16-.302-.37-.587-.615-.86-.375-.42-.82-.81-1.326-1.172-.127-.091-.258-.18-.393-.268l-.094-.063z"/>
+                </svg>
+                <span className="font-medium text-text-primary">QQ 群</span>
+              </div>
+              <div className="rounded-xl overflow-hidden bg-[#2b2b2b] p-2 inline-block">
+                <NextImage
+                  src={withBasePath('/images/qr-qq.png')}
+                  alt="SBTI QQ群二维码"
+                  width={200}
+                  height={200}
+                  className="w-48 h-48 object-contain"
+                  unoptimized
+                />
+              </div>
+              <p className="text-xs text-text-muted mt-4">SBTI交友玩耍群 · 群号 962576932</p>
+            </motion.div>
           </div>
         </div>
       </section>
