@@ -4,7 +4,7 @@ import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import type { PersonalityType } from '@/lib/personalities';
-import { getTypeImage } from '@/lib/personalities';
+import { getTypeImage, getRarity } from '@/lib/personalities';
 
 interface Props {
   personality: PersonalityType;
@@ -13,6 +13,8 @@ interface Props {
 }
 
 export function PersonalityCard({ personality, index = 0, compact = false }: Props) {
+  const rarity = getRarity(personality.slug);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -40,6 +42,12 @@ export function PersonalityCard({ personality, index = 0, compact = false }: Pro
               特殊
             </span>
           )}
+          <span
+            className="absolute top-3 left-3 text-[10px] font-medium px-2 py-0.5 rounded-full backdrop-blur-sm"
+            style={{ color: rarity.color, background: rarity.bgColor }}
+          >
+            {rarity.label}
+          </span>
         </div>
 
         {/* Info */}

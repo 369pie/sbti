@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s | SBTI",
   },
   description: "SBTI (Silly Behavioral Type Indicator) 是一个轻松向的人格测试。5 组切面、15 个维度、27 种人格，找到最像你的那一个。",
-  keywords: ["SBTI", "人格测试", "性格测试", "抽象人格", "MBTI", "打工人格", "CP配对", "心理测试"],
+  keywords: ["SBTI", "SBTI 人格测试", "SBTI 在线测试", "SBTI 人格测试在线测试", "人格测试", "性格测试", "抽象人格", "MBTI", "打工人格", "CP配对", "心理测试"],
   robots: isLegacyPagesBuild
     ? {
         index: false,
@@ -80,11 +81,22 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
-              '@type': 'WebSite',
-              name: 'SBTI 人格测试',
-              url: getSiteUrl('/'),
-              description: 'SBTI (Silly Behavioral Type Indicator) 是一个轻松向的人格测试。5 组切面、15 个维度、27 种人格，找到最像你的那一个。',
-              inLanguage: 'zh-CN',
+              '@graph': [
+                {
+                  '@type': 'WebSite',
+                  name: 'SBTI 人格测试',
+                  url: getSiteUrl('/'),
+                  description: 'SBTI (Silly Behavioral Type Indicator) 是一个轻松向的人格测试。5 组切面、15 个维度、27 种人格，找到最像你的那一个。',
+                  inLanguage: 'zh-CN',
+                },
+                {
+                  '@type': 'Organization',
+                  name: 'SBTI 人格测试',
+                  url: getSiteUrl('/'),
+                  logo: getSiteUrl('/favicon.ico'),
+                  description: '一个轻松向的人格测试站点，提供 SBTI、打工人格和今日状态等测试内容。',
+                },
+              ],
             }),
           }}
         />
@@ -115,8 +127,17 @@ export default function RootLayout({
         <Navigation />
         <main className="flex-1">{children}</main>
         <footer className="border-t border-border-subtle py-8 px-6 text-center text-text-muted text-sm">
-          <p>SBTI 更适合拿来娱乐和自我观察，不适合作为严肃的心理诊断结果。</p>
-          <p className="mt-2 opacity-60">Silly Behavioral Type Indicator</p>
+          <div className="max-w-5xl mx-auto">
+            <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
+              <Link href="/about" className="hover:text-text-primary transition-colors">关于测试</Link>
+              <Link href="/types" className="hover:text-text-primary transition-colors">人格图鉴</Link>
+              <Link href="/contact" className="hover:text-text-primary transition-colors">联系与社群</Link>
+              <Link href="/privacy" className="hover:text-text-primary transition-colors">隐私说明</Link>
+              <Link href="/terms" className="hover:text-text-primary transition-colors">使用条款</Link>
+            </div>
+            <p>SBTI 更适合拿来娱乐和自我观察，不适合作为严肃的心理诊断结果。</p>
+            <p className="mt-2 opacity-60">Silly Behavioral Type Indicator</p>
+          </div>
         </footer>
       </body>
     </html>

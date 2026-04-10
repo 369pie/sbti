@@ -18,6 +18,47 @@ const MODELS: { key: ModelType; dims: string[] }[] = [
 
 const FEATURED = PERSONALITY_TYPES.slice(0, 6);
 
+const LEARN_MORE_LINKS = [
+  {
+    href: '/test',
+    title: '开始在线测试',
+    description: '直接进入 SBTI 人格测试题目页，答完即可获得人格结果。',
+  },
+  {
+    href: '/types',
+    title: '查看 27 种人格',
+    description: '先看全部人格类型和结果标签，再决定要不要开始测试。',
+  },
+  {
+    href: '/about',
+    title: '了解测试说明',
+    description: '查看 SBTI 的五组切面、十五维结构和结果解释方式。',
+  },
+];
+
+const FAQS = [
+  {
+    question: 'SBTI 人格测试是什么？',
+    answer:
+      'SBTI 是一个轻松向的人格测试。它不只给你一个标签，还会结合自我、情感、态度、行动和社交五组切面，帮你看到自己在十五个维度上的落点。',
+  },
+  {
+    question: 'SBTI 和 MBTI 有什么区别？',
+    answer:
+      'MBTI 更像经典人格框架，SBTI 更贴近日常表达和中文互联网语境。你在这里看到的是更接近生活反应、关系状态和行为习惯的一面。',
+  },
+  {
+    question: '做完测试后能看到什么？',
+    answer:
+      '完成测试后，你会拿到一个专属人格结果页，里面有人格名称、十五维落点、结果解读，以及其他人格类型的入口，适合继续对照和分享。',
+  },
+  {
+    question: '这个结果适合拿来做严肃诊断吗？',
+    answer:
+      '不适合。SBTI 更适合娱乐、自我观察和朋友之间对照，不应该替代专业心理评估或临床判断。',
+  },
+];
+
 export default function HomeContent() {
   return (
     <div className="min-h-screen">
@@ -36,15 +77,14 @@ export default function HomeContent() {
             </span>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
-              测测你到底是
-              <br />
-              <span className="gradient-text">哪种抽象人格</span>
+              <span className="block">SBTI 人格测试</span>
+              <span className="gradient-text">测测你到底是哪种抽象人格</span>
             </h1>
 
             <p className="text-text-secondary text-lg sm:text-xl leading-relaxed max-w-xl mx-auto mb-10">
-              5 组切面 · 15 个维度 · 27 种结果
+              SBTI 人格测试在线测试，从自我、情感、态度、行动和社交 5 组切面切入。
               <br />
-              不套术语，只看你平时怎么想、怎么爱、怎么活。
+              15 个维度、27 种结果，不套术语，只看你平时怎么想、怎么爱、怎么活。
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -197,6 +237,41 @@ export default function HomeContent() {
         </div>
       </section>
 
+      <section className="py-20 px-6 border-t border-border-subtle">
+        <div className="max-w-5xl mx-auto grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+          <div>
+            <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">About SBTI</span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-4">
+              SBTI 人格测试是什么？
+            </h2>
+            <div className="space-y-4 text-text-secondary leading-8 text-[15px] sm:text-base">
+              <p>
+                SBTI 人格测试是一套更贴近中文互联网语境的人格测试。它不像传统测试那样只给出一串抽象字母，而是用更容易理解的人格标签，帮你快速定位自己在关系、行动、表达和生活状态上的典型反应。
+              </p>
+              <p>
+                这套测试会先从自我模型、情感模型、态度模型、行动驱力模型和社交模型五组切面出发，再落到十五个维度上。也就是说，你拿到的不是一个孤立结果，而是一整张更细的性格画像，适合拿来做自我观察、朋友对照和内容分享。
+              </p>
+              <p>
+                如果你搜索的是 “SBTI 人格测试” 或 “SBTI 在线测试”，通常关心的就是三件事：这是什么、测完会得到什么、结果像不像自己。首页现在把这三件事都展开了，你可以先了解，再决定要不要开始答题。
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {LEARN_MORE_LINKS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="block rounded-2xl border border-border-subtle bg-bg-secondary/40 p-5 hover:bg-bg-secondary/60 hover:border-border transition-all"
+              >
+                <h3 className="text-lg font-medium text-text-primary">{item.title}</h3>
+                <p className="text-sm text-text-secondary leading-6 mt-2">{item.description}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Work Personality Test promo */}
       <section className="py-20 px-6 border-t border-border-subtle">
         <div className="max-w-3xl mx-auto">
@@ -262,6 +337,32 @@ export default function HomeContent() {
               </svg>
             </Link>
           </motion.div>
+        </div>
+      </section>
+
+      <section className="py-20 px-6 border-t border-border-subtle">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">FAQ</span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+              关于 SBTI 人格测试的常见问题
+            </h2>
+            <p className="text-text-secondary mt-3 leading-relaxed max-w-2xl mx-auto">
+              如果你是第一次接触 SBTI，可以先把这几件事看完，再开始测试。
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {FAQS.map((item) => (
+              <article
+                key={item.question}
+                className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 hover:bg-bg-secondary/60 transition-colors"
+              >
+                <h3 className="text-lg font-medium text-text-primary leading-7">{item.question}</h3>
+                <p className="text-sm sm:text-base text-text-secondary leading-7 mt-3">{item.answer}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 

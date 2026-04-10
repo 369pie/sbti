@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
 import QRCode from 'qrcode';
 import type { PersonalityType } from '@/lib/personalities';
-import { getTypeImage } from '@/lib/personalities';
+import { getTypeImage, getRarity } from '@/lib/personalities';
 import { DIMENSIONS, MODEL_COLORS } from '@/lib/dimensions';
 import { SHARE_SITE_URL } from '@/lib/site';
 
@@ -325,11 +325,32 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   ctx.fillStyle = personality.color;
   ctx.font = `600 18px ${FONT_MONO}`;
   ctx.fillText(personality.code, CARD_WIDTH / 2, nameY + 60);
+
+  // Rarity badge + population %
+  const rarity = getRarity(personality.slug);
+  const rarityY = nameY + 90;
+  const rarityText = rarity.label;
+  ctx.font = `600 13px ${FONT_SANS}`;
+  const rarityW = ctx.measureText(rarityText).width + 28;
+  const pctText = `仅 ${rarity.populationPct}% 的测试者`;
+  ctx.font = `12px ${FONT_SANS}`;
+  const pctW = ctx.measureText(pctText).width;
+  const totalBadgeW = rarityW + 8 + pctW;
+  const badgeStartX = (CARD_WIDTH - totalBadgeW) / 2;
+  // rarity pill
+  fillRoundedRect(ctx, badgeStartX, rarityY, rarityW, 24, 12, rarity.bgColor);
+  ctx.fillStyle = rarity.color;
+  ctx.font = `600 13px ${FONT_SANS}`;
+  ctx.fillText(rarityText, badgeStartX + rarityW / 2, rarityY + 5);
+  // population text
+  ctx.fillStyle = '#a8a29e';
+  ctx.font = `12px ${FONT_SANS}`;
+  ctx.fillText(pctText, badgeStartX + rarityW + 8 + pctW / 2, rarityY + 6);
   ctx.textAlign = 'left';
 
   // Tagline + description card
   const descX = 36;
-  const descY = nameY + 100;
+  const descY = nameY + 130;
   const descWidth = CARD_WIDTH - 72;
   const descHeight = 120;
   fillRoundedRect(ctx, descX, descY, descWidth, descHeight, 16, 'rgba(255, 255, 255, 0.04)');

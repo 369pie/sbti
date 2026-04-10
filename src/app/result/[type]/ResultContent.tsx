@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { DimensionRadar, DimensionBars } from '@/components/DimensionChart';
 import { ShareImageGenerator } from '@/components/ShareImageGenerator';
 import type { ShareImageGeneratorHandle } from '@/components/ShareImageGenerator';
-import { PERSONALITY_TYPES, getTypeImage } from '@/lib/personalities';
+import { PERSONALITY_TYPES, getTypeImage, getRarity } from '@/lib/personalities';
 import { DIMENSIONS, MODEL_NAMES, MODEL_COLORS } from '@/lib/dimensions';
 import type { PersonalityType } from '@/lib/personalities';
 import type { DimensionScore } from '@/lib/scoring';
@@ -37,6 +37,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
   }, [personality.slug]);
 
   const others = PERSONALITY_TYPES.filter(p => p.slug !== personality.slug).slice(0, 3);
+  const rarity = getRarity(personality.slug);
 
   return (
     <div className="min-h-screen">
@@ -72,13 +73,13 @@ export function ResultContent({ personality, dimensionScores }: Props) {
             </div>
 
             {/* Type image */}
-            <div className="w-28 h-28 mx-auto mb-4 rounded-2xl overflow-hidden" style={{ background: `${personality.color}15` }}>
+            <div className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-6 rounded-2xl overflow-hidden" style={{ background: `${personality.color}15` }}>
               <NextImage
                 src={getTypeImage(personality.slug)}
                 alt={personality.name}
-                width={112}
-                height={112}
-                className="w-full h-full object-cover"
+                width={192}
+                height={192}
+                className="w-full h-full object-contain p-2"
                 priority
               />
             </div>
@@ -95,6 +96,21 @@ export function ResultContent({ personality, dimensionScores }: Props) {
             <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mb-4">
               {personality.name}
             </h1>
+
+            {/* Rarity + population badge */}
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <span
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border"
+                style={{ color: rarity.color, background: rarity.bgColor, borderColor: `${rarity.color}30` }}
+              >
+                {rarity.tier === 'legendary' && '✦ '}
+                {rarity.tier === 'epic' && '◆ '}
+                {rarity.label}
+              </span>
+              <span className="text-xs text-text-muted">
+                仅 {rarity.populationPct}% 的测试者是此人格
+              </span>
+            </div>
 
             {/* Tagline */}
             <p className="text-xl text-text-secondary max-w-md mx-auto">
@@ -226,27 +242,36 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           还可以看看其他人格
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {others.map(p => (
+          {others.map(p => {
+            const r = getRarity(p.slug);
+            return (
             <Link
               key={p.slug}
               href={`/result/${p.slug}`}
               className="group rounded-xl border border-border-subtle hover:border-border bg-bg-secondary/30 hover:bg-bg-secondary/60 transition-all p-4"
             >
-              <div className="w-10 h-10 rounded-lg overflow-hidden mb-2" style={{ background: `${p.color}15` }}>
+              <div className="w-16 h-16 rounded-lg overflow-hidden mb-2" style={{ background: `${p.color}15` }}>
                 <NextImage
                   src={getTypeImage(p.slug)}
                   alt={p.name}
-                  width={40}
-                  height={40}
-                  className="w-full h-full object-cover"
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-contain p-1"
                 />
               </div>
               <span className="text-xs font-mono tracking-wider block mb-1" style={{ color: p.color }}>
                 {p.code}
               </span>
               <span className="text-sm font-medium text-text-primary">{p.name}</span>
+              <span
+                className="inline-block mt-1.5 text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+                style={{ color: r.color, background: r.bgColor }}
+              >
+                {r.label}
+              </span>
             </Link>
-          ))}
+            );
+          })}
         </div>
         <div className="mt-6 text-center">
           <Link href="/types" className="text-sm text-text-muted hover:text-accent transition-colors">

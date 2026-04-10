@@ -1,6 +1,67 @@
 import type { DimensionLevel } from './dimensions';
 import { withBasePath } from './site';
 
+export type RarityTier = 'legendary' | 'epic' | 'rare' | 'uncommon' | 'common';
+
+export interface RarityInfo {
+  tier: RarityTier;
+  label: string;
+  color: string;
+  bgColor: string;
+  populationPct: number; // estimated % of test-takers matching this type
+}
+
+const RARITY_CONFIG: Record<RarityTier, Omit<RarityInfo, 'tier' | 'populationPct'>> = {
+  legendary: { label: '传说级', color: '#fbbf24', bgColor: 'rgba(251,191,36,0.12)' },
+  epic:      { label: '超稀有', color: '#a78bfa', bgColor: 'rgba(167,139,250,0.12)' },
+  rare:      { label: '稀有',   color: '#60a5fa', bgColor: 'rgba(96,165,250,0.12)' },
+  uncommon:  { label: '较少见', color: '#34d399', bgColor: 'rgba(52,211,153,0.12)' },
+  common:    { label: '常见',   color: '#a8a29e', bgColor: 'rgba(168,162,158,0.12)' },
+};
+
+// Rarity assignment based on profile extremity (H/L count out of 15 dims)
+// More extreme profiles → harder to match → rarer
+const SLUG_RARITY: Record<string, { tier: RarityTier; pct: number }> = {
+  // 12 extreme dims — legendary (~1.5%)
+  boss:    { tier: 'legendary', pct: 1.2 },
+  nerd:    { tier: 'legendary', pct: 1.8 },
+  // 11 extreme dims — epic (~2-3%)
+  ctrl:    { tier: 'epic', pct: 2.1 },
+  mum:     { tier: 'epic', pct: 2.5 },
+  simp:    { tier: 'epic', pct: 2.8 },
+  solo:    { tier: 'epic', pct: 2.3 },
+  sleep:   { tier: 'epic', pct: 3.0 },
+  'game-r':{ tier: 'epic', pct: 2.6 },
+  drunk:   { tier: 'epic', pct: 1.9 },
+  // 10 extreme dims — rare (~3-4%)
+  'oh-no': { tier: 'rare', pct: 3.5 },
+  'thin-k':{ tier: 'rare', pct: 3.2 },
+  drama:   { tier: 'rare', pct: 3.8 },
+  chill:   { tier: 'rare', pct: 4.0 },
+  emo:     { tier: 'rare', pct: 3.6 },
+  // 8-9 extreme dims — uncommon (~4-6%)
+  'atm-er':{ tier: 'uncommon', pct: 4.5 },
+  'dior-s':{ tier: 'uncommon', pct: 5.2 },
+  sexy:    { tier: 'uncommon', pct: 4.8 },
+  malo:    { tier: 'uncommon', pct: 5.5 },
+  'luck-y':{ tier: 'uncommon', pct: 4.2 },
+  shy:     { tier: 'uncommon', pct: 5.0 },
+  rebel:   { tier: 'uncommon', pct: 4.6 },
+  // 6-7 extreme dims — common (~5-8%)
+  'than-k':{ tier: 'common', pct: 5.8 },
+  woc:     { tier: 'common', pct: 6.2 },
+  party:   { tier: 'common', pct: 6.5 },
+  'talk-er':{ tier: 'common', pct: 7.0 },
+  'love-r':{ tier: 'common', pct: 7.5 },
+  'food-ie':{ tier: 'common', pct: 8.0 },
+};
+
+export function getRarity(slug: string): RarityInfo {
+  const entry = SLUG_RARITY[slug] ?? { tier: 'common' as RarityTier, pct: 5.0 };
+  const config = RARITY_CONFIG[entry.tier];
+  return { tier: entry.tier, populationPct: entry.pct, ...config };
+}
+
 export interface PersonalityType {
   slug: string;
   code: string;
