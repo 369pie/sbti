@@ -8,9 +8,10 @@ import { getPersonalityBySlug, getTypeImage } from '@/lib/personalities';
 import { MODEL_COLORS } from '@/lib/dimensions';
 import { calculateCP, getTierColor, getTierEmoji } from '@/lib/cp-matching';
 import type { CPResult, DimensionComparison } from '@/lib/cp-matching';
-import { useRef } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { CPShareImageGenerator } from '@/components/CPShareImageGenerator';
 import type { CPShareImageGeneratorHandle } from '@/components/CPShareImageGenerator';
+import { SHARE_SITE_URL } from '@/lib/site';
 
 function CompatibilityRing({ value, size = 160, color }: { value: number; size?: number; color: string }) {
   const r = (size - 16) / 2;
@@ -145,6 +146,15 @@ export function CPResultContent() {
       </div>
     );
   }
+
+  const [cpLinkCopied, setCpLinkCopied] = useState(false);
+
+  const copyCPResultLink = useCallback(() => {
+    const url = `${SHARE_SITE_URL}cp/result/?a=${slugA}&b=${slugB}`;
+    navigator.clipboard.writeText(url);
+    setCpLinkCopied(true);
+    setTimeout(() => setCpLinkCopied(false), 2000);
+  }, [slugA, slugB]);
 
   const result = calculateCP(typeA, typeB);
   const tierColor = getTierColor(result.tier);
@@ -341,12 +351,47 @@ export function CPResultContent() {
         </motion.div>
       </section>
 
-      {/* Share section */}
+      {/* Send to partner */}
       <section className="max-w-2xl mx-auto px-6 pb-10">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.5 }}
+        >
+          <div
+            className="rounded-2xl border p-6 sm:p-8 text-center"
+            style={{ borderColor: `${tierColor}30`, background: `${tierColor}08` }}
+          >
+            <div className="text-3xl mb-3">📩</div>
+            <h3 className="text-lg font-semibold mb-2">发给 TA 看结果</h3>
+            <p className="text-sm text-text-secondary mb-5 max-w-sm mx-auto">
+              复制这个链接发给对方，TA 打开就能看到你们的 CP 配对报告！
+            </p>
+            <button
+              onClick={copyCPResultLink}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer"
+              style={{
+                background: cpLinkCopied ? '#22c55e' : tierColor,
+                color: '#0c0a09',
+              }}
+            >
+              {cpLinkCopied ? '链接已复制 ✓' : '复制 CP 结果链接'}
+              {!cpLinkCopied && (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Share section */}
+      <section className="max-w-2xl mx-auto px-6 pb-10">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4 text-center">
             分享你们的 CP 结果
