@@ -16,8 +16,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: getSiteOrigin() ? new URL(getSiteOrigin()) : undefined,
-  title: "SBTI 人格测试 — 测测你是哪种抽象人格",
+  title: {
+    default: "SBTI 人格测试 — 测测你是哪种抽象人格",
+    template: "%s | SBTI",
+  },
   description: "SBTI (Silly Behavioral Type Indicator) 是一个轻松向的人格测试。5 组切面、15 个维度、27 种人格，找到最像你的那一个。",
+  keywords: ["SBTI", "人格测试", "性格测试", "抽象人格", "MBTI", "打工人格", "CP配对", "心理测试"],
   robots: isLegacyPagesBuild
     ? {
         index: false,
@@ -30,11 +34,32 @@ export const metadata: Metadata = {
           'max-snippet': -1,
         },
       }
-    : undefined,
+    : {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'large',
+          'max-snippet': -1,
+        },
+      },
   openGraph: {
-    title: "SBTI 人格测试",
-    description: "测测你到底是哪种抽象人格？27 种结果等你来解锁。",
+    title: "SBTI 人格测试 — 测测你是哪种抽象人格",
+    description: "5 组切面 · 15 个维度 · 27 种人格，不套术语，只看你平时怎么想、怎么爱、怎么活。",
     type: "website",
+    siteName: "SBTI 人格测试",
+    locale: "zh_CN",
+    url: getSiteUrl('/'),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SBTI 人格测试 — 测测你是哪种抽象人格",
+    description: "5 组切面 · 15 个维度 · 27 种人格，不套术语，只看你平时怎么想、怎么爱、怎么活。",
+  },
+  alternates: {
+    canonical: '/',
   },
 };
 
@@ -50,6 +75,19 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'SBTI 人格测试',
+              url: getSiteUrl('/'),
+              description: 'SBTI (Silly Behavioral Type Indicator) 是一个轻松向的人格测试。5 组切面、15 个维度、27 种人格，找到最像你的那一个。',
+              inLanguage: 'zh-CN',
+            }),
+          }}
+        />
         <script
           id="legacy-github-pages-redirect"
           dangerouslySetInnerHTML={{ __html: getLegacyRedirectScript() }}

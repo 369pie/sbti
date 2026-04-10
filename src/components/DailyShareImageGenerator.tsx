@@ -1,29 +1,29 @@
 'use client';
 
-import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
+import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import QRCode from 'qrcode';
-import { getWorkTypeImage } from '@/lib/work/personalities';
-import type { WorkPersonalityType } from '@/lib/work/personalities';
-import { WORK_DIMENSIONS, WORK_MODEL_COLORS } from '@/lib/work/dimensions';
+import type { DailyStatusType } from '@/lib/daily/statuses';
+import { getDailyTypeImage } from '@/lib/daily/statuses';
+import { DAILY_DIMENSIONS, DAILY_MODEL_COLORS } from '@/lib/daily/dimensions';
 import { SHARE_SITE_URL } from '@/lib/site';
-import type { WorkDimensionScore } from '@/lib/work/scoring';
+import type { DailyDimensionScore } from '@/lib/daily/scoring';
 
-export interface WorkShareImageGeneratorHandle {
+export interface DailyShareImageGeneratorHandle {
   generate: () => void;
 }
 
 interface Props {
-  personality: WorkPersonalityType;
-  dimensionScores: WorkDimensionScore[];
+  status: DailyStatusType;
+  dimensionScores: DailyDimensionScore[];
 }
 
 const CARD_WIDTH = 540;
-const CARD_HEIGHT = 1060;
+const CARD_HEIGHT = 960;
 const CARD_SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
 
-const WORK_SHARE_URL = SHARE_SITE_URL + 'work/';
+const DAILY_SHARE_URL = SHARE_SITE_URL + 'daily/';
 
 function isMobile() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -93,8 +93,6 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number,
   return lines;
 }
 
-const imageCache = new Map<string, Promise<HTMLImageElement>>();
-
 async function loadImage(src: string): Promise<HTMLImageElement> {
   const img = new window.Image();
   img.crossOrigin = 'anonymous';
@@ -111,14 +109,6 @@ async function loadImage(src: string): Promise<HTMLImageElement> {
   return img;
 }
 
-function getCachedImage(src: string) {
-  const cached = imageCache.get(src);
-  if (cached) return cached;
-  const p = loadImage(src).catch(e => { imageCache.delete(src); throw e; });
-  imageCache.set(src, p);
-  return p;
-}
-
 function drawImageContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number) {
   const sw = img.naturalWidth || img.width;
   const sh = img.naturalHeight || img.height;
@@ -128,12 +118,12 @@ function drawImageContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
   ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
 }
 
-async function renderWorkShareImage(personality: WorkPersonalityType, dimensionScores: WorkDimensionScore[]) {
-  const [personalityImage, qrImage] = await Promise.all([
-    getCachedImage(getWorkTypeImage(personality.slug)).catch(() => null),
-    QRCode.toDataURL(WORK_SHARE_URL, {
+async function renderDailyShareImage(status: DailyStatusType, dimensionScores: DailyDimensionScore[]) {
+  const [qrImage, charImage] = await Promise.all([
+    QRCode.toDataURL(DAILY_SHARE_URL, {
       width: 200, margin: 1, color: { dark: '#000000', light: '#ffffffff' }, errorCorrectionLevel: 'M',
-    }).then(url => getCachedImage(url)).catch(() => null),
+    }).then(url => loadImage(url)).catch(() => null),
+    loadImage(getDailyTypeImage(status.slug)).catch(() => null),
   ]);
 
   const canvas = document.createElement('canvas');
@@ -155,88 +145,86 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   for (let p = 0; p <= CARD_WIDTH; p += 30) { ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, CARD_HEIGHT); ctx.stroke(); }
   for (let p = 0; p <= CARD_HEIGHT; p += 30) { ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(CARD_WIDTH, p); ctx.stroke(); }
 
-  // Glow — centered on character
+  // Glow — larger, centered on character
   const glow = ctx.createRadialGradient(270, 280, 0, 270, 280, 300);
-  glow.addColorStop(0, hexToRgba(personality.color, 0.25));
+  glow.addColorStop(0, hexToRgba(status.color, 0.25));
   glow.addColorStop(1, 'rgba(12, 10, 9, 0)');
   ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, CARD_WIDTH, 500);
+  ctx.fillRect(0, 0, CARD_WIDTH, 560);
 
-  // Top bar
+  // Date header
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+
   ctx.fillStyle = '#78716c';
   ctx.font = `13px ${FONT_MONO}`;
-  ctx.fillText('WPTI 打工人格报告 //', 36, 32);
+  ctx.fillText(`今日状态报告 // ${dateStr}`, 36, 32);
 
   ctx.textAlign = 'right';
   ctx.fillStyle = '#a8a29e';
   ctx.font = `11px ${FONT_MONO}`;
-  ctx.fillText(WORK_SHARE_URL, CARD_WIDTH - 36, 32);
+  ctx.fillText(DAILY_SHARE_URL, CARD_WIDTH - 36, 32);
   ctx.textAlign = 'left';
 
   // Subtitle
   ctx.fillStyle = '#a8a29e';
   ctx.font = `16px ${FONT_SANS}`;
   ctx.textAlign = 'center';
-  ctx.fillText('在打工人格测试中，我被鉴定为', CARD_WIDTH / 2, 70);
+  ctx.fillText('今天的我被鉴定为', CARD_WIDTH / 2, 70);
 
   // ============ HERO CHARACTER IMAGE (dominant visual) ============
-  const avatarX = 100;
-  const avatarY = 100;
-  const avatarW = CARD_WIDTH - 200;
-  const avatarH = 320;
-  fillRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 24, hexToRgba(personality.color, 0.08));
-  strokeRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 24, hexToRgba(personality.color, 0.18));
-  if (personalityImage) {
+  const charAreaY = 100;
+  const charAreaH = 320;
+  // Colored card behind character
+  const cardX = 100;
+  const cardW = CARD_WIDTH - 200;
+  fillRoundedRect(ctx, cardX, charAreaY, cardW, charAreaH, 28, hexToRgba(status.color, 0.08));
+  strokeRoundedRect(ctx, cardX, charAreaY, cardW, charAreaH, 28, hexToRgba(status.color, 0.18));
+
+  if (charImage) {
     ctx.save();
     ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
     ctx.shadowBlur = 20;
-    drawImageContain(ctx, personalityImage, avatarX + 20, avatarY + 15, avatarW - 40, avatarH - 30);
+    drawImageContain(ctx, charImage, cardX + 20, charAreaY + 15, cardW - 40, charAreaH - 30);
     ctx.restore();
   } else {
-    ctx.font = `140px ${FONT_SANS}`;
-    ctx.fillText(personality.emoji, CARD_WIDTH / 2, avatarY + 70);
+    ctx.font = `160px ${FONT_SANS}`;
+    ctx.fillText(status.emoji, CARD_WIDTH / 2, charAreaY + 60);
   }
 
-  // Name
-  const nameY = avatarY + avatarH + 24;
+  // Name — large
+  const nameY = charAreaY + charAreaH + 24;
   ctx.fillStyle = '#fafaf9';
   ctx.font = `700 48px ${FONT_SANS}`;
-  ctx.fillText(personality.name, CARD_WIDTH / 2, nameY);
+  ctx.fillText(status.name, CARD_WIDTH / 2, nameY);
 
   // Code
-  ctx.fillStyle = personality.color;
+  ctx.fillStyle = status.color;
   ctx.font = `600 18px ${FONT_MONO}`;
-  ctx.fillText(personality.code, CARD_WIDTH / 2, nameY + 60);
+  ctx.fillText(status.code, CARD_WIDTH / 2, nameY + 60);
   ctx.textAlign = 'left';
 
   // Tagline card
   const tagY = nameY + 100;
   const tagW = CARD_WIDTH - 72;
-  fillRoundedRect(ctx, 36, tagY, tagW, 56, 16, 'rgba(255,255,255,0.04)');
-  strokeRoundedRect(ctx, 36, tagY, tagW, 56, 16, 'rgba(255,255,255,0.07)');
-  ctx.fillStyle = personality.color;
+  fillRoundedRect(ctx, 36, tagY, tagW, 50, 16, 'rgba(255,255,255,0.04)');
+  strokeRoundedRect(ctx, 36, tagY, tagW, 50, 16, 'rgba(255,255,255,0.07)');
+  ctx.fillStyle = status.color;
   ctx.font = `600 15px ${FONT_SANS}`;
   ctx.textAlign = 'center';
-  ctx.fillText(`"${personality.tagline}"`, CARD_WIDTH / 2, tagY + 18);
+  ctx.fillText(`"${status.tagline}"`, CARD_WIDTH / 2, tagY + 16);
   ctx.textAlign = 'left';
 
-  // Description
-  const descY = tagY + 72;
-  ctx.fillStyle = '#d6d3d1';
-  ctx.font = `14px ${FONT_SANS}`;
-  const lines = wrapText(ctx, personality.description, CARD_WIDTH - 72, 3);
-  lines.forEach((line, i) => ctx.fillText(line, 36, descY + i * 24));
-
-  // Dimension bars
-  const barY = descY + lines.length * 24 + 20;
+  // Dimension bars (compact)
+  const barY = tagY + 72;
   ctx.fillStyle = '#78716c';
   ctx.font = `12px ${FONT_SANS}`;
-  ctx.fillText('五维画像', 36, barY);
+  ctx.fillText('五维数据', 36, barY);
 
   dimensionScores.forEach((score, i) => {
-    const dim = WORK_DIMENSIONS.find(d => d.id === score.id);
+    const dim = DAILY_DIMENSIONS.find(d => d.id === score.id);
     if (!dim) return;
-    const color = WORK_MODEL_COLORS[dim.model].base;
+    const color = DAILY_MODEL_COLORS[dim.model].base;
     const rowY = barY + 30 + i * 32;
     const barX = 120;
     const barW = 336;
@@ -258,35 +246,34 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   });
 
   // Divider
-  const footerY = barY + 30 + dimensionScores.length * 32 + 16;
   ctx.strokeStyle = 'rgba(255,255,255,0.08)';
   ctx.beginPath();
-  ctx.moveTo(36, footerY);
-  ctx.lineTo(CARD_WIDTH - 36, footerY);
+  ctx.moveTo(36, 850);
+  ctx.lineTo(CARD_WIDTH - 36, 850);
   ctx.stroke();
 
   // CTA
   ctx.fillStyle = '#fafaf9';
   ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText('测测你是哪种打工人？', 36, footerY + 20);
+  ctx.fillText('测测你今天是什么状态？', 36, 870);
 
-  ctx.fillStyle = '#6366f1';
+  ctx.fillStyle = '#14b8a6';
   ctx.font = `12px ${FONT_MONO}`;
-  ctx.fillText(WORK_SHARE_URL, 36, footerY + 50);
+  ctx.fillText(DAILY_SHARE_URL, 36, 900);
 
   // QR
-  fillRoundedRect(ctx, 424, footerY + 10, 80, 80, 12, '#ffffff');
+  fillRoundedRect(ctx, 424, 848, 80, 80, 12, '#ffffff');
   if (qrImage) {
-    drawImageContain(ctx, qrImage, 428, footerY + 14, 72, 72);
+    drawImageContain(ctx, qrImage, 428, 852, 72, 72);
   } else {
-    fillRoundedRect(ctx, 432, footerY + 18, 64, 64, 8, '#292524');
+    fillRoundedRect(ctx, 432, 856, 64, 64, 8, '#292524');
   }
 
   return canvas.toDataURL('image/png');
 }
 
-export const WorkShareImageGenerator = forwardRef<WorkShareImageGeneratorHandle, Props>(
-  function WorkShareImageGenerator({ personality, dimensionScores }, ref) {
+export const DailyShareImageGenerator = forwardRef<DailyShareImageGeneratorHandle, Props>(
+  function DailyShareImageGenerator({ status, dimensionScores }, ref) {
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
@@ -296,20 +283,20 @@ export const WorkShareImageGenerator = forwardRef<WorkShareImageGeneratorHandle,
       setGenerating(true);
       setSaveHint(null);
       try {
-        const dataUrl = await renderWorkShareImage(personality, dimensionScores);
+        const dataUrl = await renderDailyShareImage(status, dimensionScores);
         setPreviewUrl(dataUrl);
       } catch (err) {
         console.error('Failed to generate share image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [dimensionScores, generating, personality]);
+    }, [dimensionScores, generating, status]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `WPTI-${personality.code}.png`, { type: 'image/png' });
-    }, [personality.code, previewUrl]);
+      return new File([blob], `DAILY-${status.code}.png`, { type: 'image/png' });
+    }, [status.code, previewUrl]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -318,7 +305,7 @@ export const WorkShareImageGenerator = forwardRef<WorkShareImageGeneratorHandle,
           const file = await createPreviewFile();
           if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
             setSaveHint('请在系统菜单里选择"保存到照片"或"存储到文件"。');
-            await navigator.share({ files: [file], title: `WPTI-${personality.code}.png` });
+            await navigator.share({ files: [file], title: `DAILY-${status.code}.png` });
             return;
           }
         } catch (error) {
@@ -332,24 +319,24 @@ export const WorkShareImageGenerator = forwardRef<WorkShareImageGeneratorHandle,
         return;
       }
       const link = document.createElement('a');
-      link.download = `WPTI-${personality.code}.png`;
+      link.download = `DAILY-${status.code}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, personality.code, previewUrl]);
+    }, [createPreviewFile, status.code, previewUrl]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
       try {
         const file = await createPreviewFile();
         if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `我的打工人格：${personality.name}` });
+          await navigator.share({ files: [file], title: `我的今日状态：${status.name}` });
         } else {
           await handleDownload();
         }
       } catch {
         await handleDownload();
       }
-    }, [createPreviewFile, handleDownload, personality.name, previewUrl]);
+    }, [createPreviewFile, handleDownload, status.name, previewUrl]);
 
     useImperativeHandle(ref, () => ({ generate: handleGenerate }), [handleGenerate]);
 
@@ -358,7 +345,7 @@ export const WorkShareImageGenerator = forwardRef<WorkShareImageGeneratorHandle,
         <button
           onClick={handleGenerate}
           disabled={generating}
-          className="w-full py-3.5 rounded-xl bg-indigo-500 text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full py-3.5 rounded-xl bg-teal-500 text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {generating ? (
             <>
@@ -394,7 +381,7 @@ export const WorkShareImageGenerator = forwardRef<WorkShareImageGeneratorHandle,
               </p>
 
               {saveHint && (
-                <p className="text-center text-xs text-indigo-400 mb-3 px-4 leading-5">
+                <p className="text-center text-xs text-teal-400 mb-3 px-4 leading-5">
                   {saveHint}
                 </p>
               )}
@@ -411,7 +398,7 @@ export const WorkShareImageGenerator = forwardRef<WorkShareImageGeneratorHandle,
                 </button>
                 <button
                   onClick={handleShare}
-                  className="flex-1 py-3 rounded-xl bg-indigo-500 text-white text-sm font-medium hover:brightness-110 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-xl bg-teal-500 text-white text-sm font-medium hover:brightness-110 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />

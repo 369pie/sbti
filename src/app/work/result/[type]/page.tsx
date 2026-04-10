@@ -19,8 +19,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!p) return {};
   return {
     title: `${p.code}（${p.name}）— 打工人格测试结果`,
-    description: p.tagline,
+    description: `${p.tagline} — WPTI 打工人格测试结果：${p.name}，五维度职场画像。`,
+    alternates: { canonical: `/work/result/${type}/` },
     openGraph: {
+      title: `我的打工人格是 ${p.code}（${p.name}）`,
+      description: p.tagline,
+    },
+    twitter: {
+      card: 'summary',
       title: `我的打工人格是 ${p.code}（${p.name}）`,
       description: p.tagline,
     },

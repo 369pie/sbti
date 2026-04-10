@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { href: '/types', label: '人格图鉴' },
   { href: '/cp', label: 'CP配对' },
   { href: '/work', label: '打工人格' },
+  { href: '/daily', label: '今日状态' },
 ];
 
 export function Navigation() {

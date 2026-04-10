@@ -261,11 +261,11 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
     ctx.stroke();
   }
 
-  const glow = ctx.createRadialGradient(270, 170, 0, 270, 170, 320);
-  glow.addColorStop(0, hexToRgba(personality.color, 0.24));
+  const glow = ctx.createRadialGradient(270, 300, 0, 270, 300, 340);
+  glow.addColorStop(0, hexToRgba(personality.color, 0.28));
   glow.addColorStop(1, 'rgba(12, 10, 9, 0)');
   ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, CARD_WIDTH, 420);
+  ctx.fillRect(0, 0, CARD_WIDTH, 560);
 
   ctx.fillStyle = '#78716c';
   ctx.font = `13px ${FONT_MONO}`;
@@ -279,20 +279,13 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
 
   ctx.fillStyle = '#a8a29e';
   ctx.font = `16px ${FONT_SANS}`;
-  ctx.fillText('在SBTI商业性格测定中，我被鉴定为', 36, 110);
+  ctx.textAlign = 'center';
+  ctx.fillText('在SBTI商业性格测定中，我被鉴定为', CARD_WIDTH / 2, 70);
 
-  ctx.fillStyle = '#fafaf9';
-  ctx.font = `700 54px ${FONT_SANS}`;
-  ctx.fillText(personality.name, 36, 154);
-
-  const nameWidth = ctx.measureText(personality.name).width;
-  ctx.fillStyle = personality.color;
-  ctx.font = `600 20px ${FONT_MONO}`;
-  ctx.fillText(personality.code, 36 + nameWidth + 18, 176);
-
-  const imageCardX = 36;
-  const imageCardY = 230;
-  const imageCardWidth = CARD_WIDTH - 72;
+  // ============ HERO CHARACTER IMAGE (dominant visual) ============
+  const imageCardX = 90;
+  const imageCardY = 100;
+  const imageCardWidth = CARD_WIDTH - 180;
   const imageCardHeight = 380;
   const imageGradient = ctx.createLinearGradient(imageCardX, imageCardY, imageCardX + imageCardWidth, imageCardY + imageCardHeight);
   imageGradient.addColorStop(0, hexToRgba(personality.color, 0.14));
@@ -304,19 +297,17 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
     ctx.save();
     ctx.shadowColor = 'rgba(0, 0, 0, 0.36)';
     ctx.shadowBlur = 24;
-    drawImageContain(ctx, typeImage, imageCardX + 84, imageCardY + 40, 300, 300);
+    drawImageContain(ctx, typeImage, imageCardX + 20, imageCardY + 20, imageCardWidth - 40, imageCardHeight - 40);
     ctx.restore();
   } else {
-    fillRoundedRect(ctx, imageCardX + 160, imageCardY + 108, 148, 148, 30, hexToRgba(personality.color, 0.12));
     ctx.fillStyle = '#fafaf9';
-    ctx.font = `700 82px ${FONT_SANS}`;
-    ctx.textAlign = 'center';
-    ctx.fillText(personality.emoji, imageCardX + imageCardWidth / 2, imageCardY + 134);
-    ctx.textAlign = 'left';
+    ctx.font = `700 120px ${FONT_SANS}`;
+    ctx.fillText(personality.emoji, imageCardX + imageCardWidth / 2, imageCardY + 120);
   }
 
   const badgeText = `#${personality.isSpecial ? '特殊人格' : '标准人格'}`;
   ctx.font = `12px ${FONT_MONO}`;
+  ctx.textAlign = 'left';
   const badgeWidth = ctx.measureText(badgeText).width + 24;
   const badgeX = imageCardX + imageCardWidth - badgeWidth - 16;
   const badgeY = imageCardY + imageCardHeight - 40;
@@ -324,23 +315,36 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   ctx.fillStyle = personality.color;
   ctx.fillText(badgeText, badgeX + 12, badgeY + 7);
 
+  // Name + Code centered
+  const nameY = imageCardY + imageCardHeight + 24;
+  ctx.fillStyle = '#fafaf9';
+  ctx.font = `700 48px ${FONT_SANS}`;
+  ctx.textAlign = 'center';
+  ctx.fillText(personality.name, CARD_WIDTH / 2, nameY);
+
+  ctx.fillStyle = personality.color;
+  ctx.font = `600 18px ${FONT_MONO}`;
+  ctx.fillText(personality.code, CARD_WIDTH / 2, nameY + 60);
+  ctx.textAlign = 'left';
+
+  // Tagline + description card
   const descX = 36;
-  const descY = 650;
+  const descY = nameY + 100;
   const descWidth = CARD_WIDTH - 72;
-  const descHeight = 146;
+  const descHeight = 120;
   fillRoundedRect(ctx, descX, descY, descWidth, descHeight, 16, 'rgba(255, 255, 255, 0.04)');
   strokeRoundedRect(ctx, descX, descY, descWidth, descHeight, 16, 'rgba(255, 255, 255, 0.07)');
 
   ctx.fillStyle = personality.color;
   ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText(`"${personality.tagline}"`, descX + 24, descY + 24);
+  ctx.fillText(`"${personality.tagline}"`, descX + 24, descY + 20);
 
   ctx.fillStyle = '#d6d3d1';
   ctx.font = `14px ${FONT_SANS}`;
-  drawWrappedText(ctx, personality.description, descX + 24, descY + 60, descWidth - 48, 24, 4);
+  drawWrappedText(ctx, personality.description, descX + 24, descY + 54, descWidth - 48, 24, 3);
 
   const topDimensionScores = dimensionScores.slice(0, 3);
-  const barSectionY = 830;
+  const barSectionY = descY + descHeight + 20;
   const barRowSpacing = 30;
   ctx.fillStyle = '#78716c';
   ctx.font = `12px ${FONT_SANS}`;

@@ -17,8 +17,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!p) return {};
   return {
     title: `${p.code}（${p.name}）邀请你测 CP — SBTI`,
-    description: `我是 ${p.code}（${p.name}），来测测我们的 CP 值吧！`,
+    description: `我是 ${p.code}（${p.name}），来测测我们的 CP 值吧！729 种配对组合等你解锁。`,
+    alternates: { canonical: `/cp/${type}/` },
     openGraph: {
+      title: `我是 ${p.code}，来测测我们的 CP 值！`,
+      description: `${p.tagline} — 来看看你和我的配对契合度`,
+    },
+    twitter: {
+      card: 'summary',
       title: `我是 ${p.code}，来测测我们的 CP 值！`,
       description: `${p.tagline} — 来看看你和我的配对契合度`,
     },

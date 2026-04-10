@@ -1,0 +1,167 @@
+'use client';
+
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { DAILY_MODEL_NAMES, DAILY_MODEL_COLORS } from '@/lib/daily/dimensions';
+import type { DailyModelType } from '@/lib/daily/dimensions';
+import { DAILY_STATUS_TYPES } from '@/lib/daily/statuses';
+import { DailyStatusAvatar } from '@/components/DailyStatusAvatar';
+
+const MODELS: { key: DailyModelType; label: string }[] = [
+  { key: 'energy', label: '你今天有多少电' },
+  { key: 'mood', label: '今天情绪温度如何' },
+  { key: 'social', label: '想不想跟人说话' },
+  { key: 'focus', label: '大脑今天转不转得动' },
+  { key: 'stress', label: '肩上的包袱有多重' },
+];
+
+export default function DailyHomeContent() {
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+
+  return (
+    <div className="min-h-screen">
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[radial-gradient(ellipse,rgba(20,184,166,0.12),transparent_70%)] pointer-events-none" />
+
+        <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+          >
+            <span className="inline-block text-xs font-mono tracking-[0.25em] text-text-muted mb-6 uppercase">
+              Daily Status Check · {dateStr}
+            </span>
+
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
+              今天的你
+              <br />
+              <span className="bg-gradient-to-r from-teal-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">是什么状态</span>
+            </h1>
+
+            <p className="text-text-secondary text-lg sm:text-xl leading-relaxed max-w-xl mx-auto mb-10">
+              5 个维度 · 6 道快问 · 12 种今日状态
+              <br />
+              一分钟测出你今天的真实状态。每天题目不一样。
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                href="/daily/test"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-teal-500 text-white font-medium text-base hover:brightness-110 transition-all duration-200 shadow-[0_0_30px_rgba(20,184,166,0.25)]"
+              >
+                测一测今天的状态
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:border-border hover:bg-bg-secondary/50 transition-all duration-200 text-base"
+              >
+                ← 返回首页
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="mt-16 grid grid-cols-3 gap-px bg-border-subtle rounded-2xl overflow-hidden"
+          >
+            {[
+              { value: '5 维', label: '状态维度' },
+              { value: '12 种', label: '今日状态' },
+              { value: '6 题', label: '约1分钟' },
+            ].map(stat => (
+              <div key={stat.label} className="bg-bg-secondary/60 px-4 py-6 text-center">
+                <div className="text-2xl font-semibold text-text-primary mb-1">{stat.value}</div>
+                <div className="text-xs text-text-muted">{stat.label}</div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 5 Dimensions */}
+      <section className="max-w-3xl mx-auto px-6 pb-20">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
+          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-8">
+            五大状态维度
+          </h2>
+
+          <div className="grid gap-3">
+            {MODELS.map((m, i) => {
+              const c = DAILY_MODEL_COLORS[m.key];
+              return (
+                <motion.div
+                  key={m.key}
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + i * 0.08, duration: 0.4 }}
+                  className="flex items-center gap-4 px-5 py-4 rounded-xl border border-border-subtle bg-bg-secondary/40"
+                >
+                  <span
+                    className="w-2 h-2 rounded-full flex-shrink-0"
+                    style={{ background: c.base }}
+                  />
+                  <div className="min-w-0">
+                    <span className="text-sm font-medium text-text-primary">
+                      {DAILY_MODEL_NAMES[m.key]}
+                    </span>
+                    <span className="text-text-muted text-sm ml-2">{m.label}</span>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Status types preview */}
+      <section className="max-w-3xl mx-auto px-6 pb-24">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+        >
+          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-8">
+            12 种今日状态
+          </h2>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {DAILY_STATUS_TYPES.map((s, i) => (
+              <motion.div
+                key={s.slug}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 + i * 0.04, duration: 0.3 }}
+                className="flex flex-col items-center gap-3 p-5 rounded-xl border border-border-subtle bg-bg-secondary/30 hover:bg-bg-secondary/60 transition-colors"
+              >
+                <DailyStatusAvatar
+                  status={s}
+                  alt=""
+                  sizes="(min-width: 768px) 96px, 80px"
+                  className="relative w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden"
+                  style={{ background: `${s.color}15` }}
+                  imageClassName="object-contain p-1"
+                  fallbackClassName="w-full h-full flex items-center justify-center text-4xl"
+                />
+                <span className="text-sm font-medium text-text-primary">{s.name}</span>
+                <span className="text-xs text-text-muted text-center leading-snug">{s.tagline}</span>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+    </div>
+  );
+}
