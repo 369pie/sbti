@@ -37,13 +37,13 @@ export default function DailyHomeContent() {
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
               今天的你
               <br />
-              <span className="bg-gradient-to-r from-teal-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">是什么状态</span>
+              <span className="bg-gradient-to-r from-teal-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">开了什么模式</span>
             </h1>
 
             <p className="text-text-secondary text-lg sm:text-xl leading-relaxed max-w-xl mx-auto mb-10">
-              5 个维度 · 6 道快问 · 12 种今日状态
+              5 个维度 · 6 道快问 · 12 张状态卡
               <br />
-              一分钟测出你今天的真实状态。每天题目不一样。
+              一分钟测出你今天开了什么模式。每天题目不一样。
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -51,7 +51,7 @@ export default function DailyHomeContent() {
                 href="/daily/test"
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-teal-500 text-white font-medium text-base hover:bg-teal-600 transition-all duration-200"
               >
-                测一测今天的状态
+                测一测今天开了什么模式
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -74,7 +74,7 @@ export default function DailyHomeContent() {
           >
             {[
               { value: '5 维', label: '状态维度' },
-              { value: '12 种', label: '今日状态' },
+              { value: '12 张', label: '状态卡' },
               { value: '6 题', label: '约1分钟' },
             ].map(stat => (
               <div key={stat.label} className="bg-bg-secondary/60 px-4 py-6 text-center">
@@ -133,7 +133,7 @@ export default function DailyHomeContent() {
           transition={{ delay: 0.6, duration: 0.5 }}
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-8">
-            12 种今日状态
+            12 张今日模式卡
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">

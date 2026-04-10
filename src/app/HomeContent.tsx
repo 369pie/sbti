@@ -26,8 +26,8 @@ const LEARN_MORE_LINKS = [
   },
   {
     href: '/types',
-    title: '查看 27 种人格',
-    description: '先看全部人格类型和结果标签，再决定要不要开始测试。',
+    title: '查看 27 张人设卡',
+    description: '先把全部人设卡和结果标签刷一遍，再决定要不要开始测试。',
   },
   {
     href: '/guide',
@@ -50,7 +50,7 @@ const FAQS = [
   {
     question: '做完测试后能看到什么？',
     answer:
-      '完成测试后，你会拿到一个专属人格结果页，里面有人格名称、十五维落点、结果解读，以及其他人格类型的入口，适合继续对照和分享。',
+      '完成测试后，你会拿到一个专属人格结果页，里面有人格名称、十五维落点、结果解读，以及其他人设卡的入口，适合继续对照和分享。',
   },
   {
     question: '这个结果适合拿来做严肃诊断吗？',
@@ -100,7 +100,7 @@ export default function HomeContent() {
                 href="/types"
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:border-border hover:bg-bg-secondary/50 transition-all duration-200 text-base"
               >
-                浏览 27 种人格
+                先刷 27 张人设卡
               </Link>
             </div>
           </motion.div>
@@ -189,7 +189,7 @@ export default function HomeContent() {
           <div className="mb-12">
             <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Types</span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-              部分人格一览
+              先刷几张人设卡
             </h2>
           </div>
 
@@ -204,22 +204,27 @@ export default function HomeContent() {
               >
                 <Link
                   href={`/result/${p.slug}`}
-                  className="group block rounded-2xl border border-border-subtle hover:border-border bg-bg-elevated hover:shadow-md transition-all p-4 sm:p-5"
+                  className="group block rounded-2xl border border-border-subtle hover:border-border bg-bg-elevated hover:shadow-md transition-all overflow-hidden"
                 >
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden mb-3" style={{ background: `${p.color}15` }}>
+                  <div
+                    className="relative w-full aspect-square flex items-center justify-center overflow-hidden"
+                    style={{ background: `linear-gradient(135deg, ${p.color}08, ${p.color}15)` }}
+                  >
                     <NextImage
                       src={getTypeImage(p.slug)}
                       alt={p.name}
-                      width={96}
-                      height={96}
-                      className="w-full h-full object-cover"
+                      width={200}
+                      height={200}
+                      className="w-[70%] h-[70%] object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
                     />
                   </div>
-                  <span className="text-xs font-mono tracking-wider block mb-1" style={{ color: p.color }}>
-                    {p.code}
-                  </span>
-                  <span className="text-base font-medium text-text-primary">{p.name}</span>
-                  <p className="text-xs text-text-muted mt-1 line-clamp-1">{p.tagline}</p>
+                  <div className="px-3.5 py-3">
+                    <span className="text-[11px] font-mono tracking-wider block mb-0.5" style={{ color: p.color }}>
+                      {p.code}
+                    </span>
+                    <span className="text-base font-medium text-text-primary">{p.name}</span>
+                    <p className="text-xs text-text-muted mt-0.5 line-clamp-1">{p.tagline}</p>
+                  </div>
                 </Link>
               </motion.div>
             ))}
@@ -285,10 +290,10 @@ export default function HomeContent() {
               WPTI · New
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">
-              打工人格测试
+              打工人设测试
             </h2>
             <p className="text-text-secondary leading-relaxed max-w-md mx-auto mb-6">
-              5 个职场维度 · 15 道灵魂拷问 · 16 种打工人格
+              5 个职场维度 · 15 道灵魂拷问 · 16 张打工人设卡
               <br />
               三分钟测出你的职场真面目。
             </p>
@@ -296,7 +301,7 @@ export default function HomeContent() {
               href="/work"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-indigo-500 text-white font-medium text-base hover:bg-indigo-600 transition-all duration-200"
             >
-              去测打工人格
+              去测打工人设
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -319,10 +324,10 @@ export default function HomeContent() {
               LPTI · New
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">
-              恋爱人格测试
+              恋爱人设测试
             </h2>
             <p className="text-text-secondary leading-relaxed max-w-md mx-auto mb-6">
-              5 个恋爱维度 · 15 道灵魂拷问 · 16 种恋爱人格
+              5 个恋爱维度 · 15 道灵魂拷问 · 16 张恋爱人设卡
               <br />
               三分钟测出你在感情里的真面目。
             </p>
@@ -330,7 +335,7 @@ export default function HomeContent() {
               href="/love"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-pink-500 text-white font-medium text-base hover:bg-pink-600 transition-all duration-200"
             >
-              去测恋爱人格
+              去测恋爱人设
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -353,18 +358,18 @@ export default function HomeContent() {
               Daily Status · New
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">
-              今日状态测试
+              今日模式测试
             </h2>
             <p className="text-text-secondary leading-relaxed max-w-md mx-auto mb-6">
-              5 个维度 · 6 道快问 · 12 种今日状态
+              5 个维度 · 6 道快问 · 12 张状态卡
               <br />
-              一分钟测出你今天的真实状态。每天题目不一样。
+              一分钟测出你今天开了什么模式。每天题目不一样。
             </p>
             <Link
               href="/daily"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-teal-500 text-white font-medium text-base hover:bg-teal-600 transition-all duration-200"
             >
-              测一测今天的状态
+              测一测今天开了什么模式
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>

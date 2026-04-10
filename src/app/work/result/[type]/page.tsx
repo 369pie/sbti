@@ -22,13 +22,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: `${p.tagline} — WPTI 打工人格测试结果：${p.name}，五维度职场画像。`,
     alternates: { canonical: `/work/result/${type}/` },
     openGraph: {
-      title: `我的打工人格是 ${p.code}（${p.name}）`,
+      title: `我的打工人设是 ${p.code}（${p.name}）`,
       description: p.tagline,
       images: [{ url: getWorkTypeImage(p.slug), width: 256, height: 256, alt: p.name }],
     },
     twitter: {
       card: 'summary',
-      title: `我的打工人格是 ${p.code}（${p.name}）`,
+      title: `我的打工人设是 ${p.code}（${p.name}）`,
       description: p.tagline,
     },
   };

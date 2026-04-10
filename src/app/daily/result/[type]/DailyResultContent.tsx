@@ -62,7 +62,7 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
           >
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border-subtle bg-bg-secondary/60 text-xs text-text-muted mb-6">
-              今日状态 · {dateStr}
+              今日模式 · {dateStr}
             </div>
 
             {/* Character avatar */}
@@ -107,7 +107,7 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
           className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 sm:p-8"
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
-            今日状态速写
+            今日模式速写
           </h2>
           <p className="text-text-secondary leading-[1.8] text-base">
             {status.description}
@@ -191,7 +191,7 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
           transition={{ delay: 0.6, duration: 0.5 }}
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4 text-center">
-            分享你的今日状态
+            分享你的今日模式
           </h2>
 
           <div className="space-y-3">
@@ -218,7 +218,7 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
       {/* Other statuses */}
       <section className="max-w-3xl mx-auto px-6 pb-24">
         <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
-          还有这些今日状态
+          还有这些状态卡
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {others.map(s => (

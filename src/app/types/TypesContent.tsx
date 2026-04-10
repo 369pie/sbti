@@ -22,10 +22,10 @@ export default function TypesContent() {
           All Types
         </span>
         <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight mb-2">
-          27 种人格类型总览
+          27 张抽象人设卡
         </h1>
         <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
-          五大模型十五维度交叉分析，每种人格都有独特的维度组合。你可以先把 27 种人格类型过一遍，再决定开始测试，或者拿结果回来做对照。
+          五大模型十五维度交叉分析，这 27 张人设卡各有各的离谱逻辑。你可以先把图鉴刷一遍，再决定开始测试，或者拿结果回来对号入座。
         </p>
       </motion.div>
 
@@ -44,9 +44,9 @@ export default function TypesContent() {
               Special
             </span>
             <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
-              特殊人格类型
+              隐藏款人格
             </h2>
-            <p className="text-xs sm:text-sm text-text-muted mt-1">需要触发特定条件才可能出现的结果。</p>
+            <p className="text-xs sm:text-sm text-text-muted mt-1">需要触发特定条件才会掉落的稀有结果。</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
             {special.map((p, i) => (
@@ -60,14 +60,14 @@ export default function TypesContent() {
         <div className="max-w-4xl">
           <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Guide</span>
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-4">
-            怎么看 SBTI 人格类型？
+            这些抽象名字到底咋看？
           </h2>
           <div className="space-y-4 text-text-secondary leading-8 text-sm sm:text-base">
             <p>
-              SBTI 的 27 种人格类型不是单纯的标签列表，它们本质上是五组切面和十五个维度的不同组合。也就是说，两个人看起来都很外向，最后也可能落到完全不同的人格上，因为他们在关系、行动、价值感和边界感上的侧重点并不一样。
+              SBTI 的 27 张人设卡不是随便起梗的标签列表，它们本质上是五组切面和十五个维度的不同组合。也就是说，两个人看起来都很外向，最后也可能落到完全不同的人设上，因为他们在关系、行动、价值感和边界感上的侧重点并不一样。
             </p>
             <p>
-              如果你是第一次接触这套测试，最好的顺序通常是：先快速浏览人格图鉴，再去做正式测试，然后回到结果页对照“人格类型解释”“适合人群”和“相近人格对比”。这样比只看一个结果名更容易理解自己为什么会落到那个类型。
+              如果你是第一次接触这套测试，最顺手的打开方式通常是：先快速刷一遍人设图鉴，再去做正式测试，然后回到结果页对照“人格类型解释”“适合人群”和“相近人格对比”。这样比只看一个结果名更容易理解自己为什么会落到那个类型。
             </p>
           </div>
 

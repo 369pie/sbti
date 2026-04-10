@@ -108,7 +108,7 @@ export const WORK_PERSONALITY_TYPES: WorkPersonalityType[] = [
     profile: { W1: 'L', W2: 'L', W3: 'M', W4: 'M', W5: 'L' },
   },
   {
-    slug: 'meet', code: 'MEET', name: '会议之王', tagline: '今天又开了八个会。',
+    slug: 'meet', code: 'MEET', name: '开会永动机', tagline: '这个会开完，还有下一个会。',
     color: '#6366f1', emoji: '📅',
     description: '你的日历比你的人生还满。上午三个会，下午四个会，晚上还有个复盘。你永远在"上一个会刚结束，下一个会马上开始"的状态里穿梭。你已经练就了在会议中同时回邮件、看文档、偷偷吃零食的多线程能力。你不一定喜欢开会，但你已经被练成了开会专家——至少你知道在什么时候点头、什么时候说"我同意"。',
     profile: { W1: 'M', W2: 'H', W3: 'M', W4: 'M', W5: 'M' },
@@ -120,7 +120,7 @@ export const WORK_PERSONALITY_TYPES: WorkPersonalityType[] = [
     profile: { W1: 'M', W2: 'M', W3: 'H', W4: 'H', W5: 'L' },
   },
   {
-    slug: 'zen', code: 'ZEN', name: '佛系打工人', tagline: '升不升职都行，别裁我。',
+    slug: 'zen', code: 'ZEN', name: '工位菩萨', tagline: '升职随缘，发薪准时就行。',
     color: '#78716c', emoji: '🧘',
     description: '升职？好的。不升？也行。加薪？不错。没加？够花就行。你是公司里最不焦虑的人，不是因为你没追求，而是你已经把"接受"这个技能点满了。你的同事在为KPI焦虑的时候，你在想中午吃什么。你的领导在讲愿景的时候，你在想周末去哪玩。佛系不是躺平，是你早就看透了——工作而已，没必要太上头。',
     profile: { W1: 'M', W2: 'M', W3: 'H', W4: 'M', W5: 'L' },
@@ -132,7 +132,7 @@ export const WORK_PERSONALITY_TYPES: WorkPersonalityType[] = [
     profile: { W1: 'L', W2: 'L', W3: 'L', W4: 'H', W5: 'L' },
   },
   {
-    slug: 'climb', code: 'CLIMB', name: '野心家', tagline: '这个位子迟早是我的。',
+    slug: 'climb', code: 'CLIMB', name: '升职猎人', tagline: '这个工位，只是我的起点。',
     color: '#eab308', emoji: '📈',
     description: '你不是来打工的，你是来升职的。每一次对话你都在有意无意地展示自己，每一个项目你都在计算能给履历加多少分。你的LinkedIn更新频率比朋友圈还高，你的学习清单比KPI清单还长。你的同事分三种：对你有用的、暂时没用的、和碍事的。你不是冷酷，你只是比大多数人都清楚自己要什么。',
     profile: { W1: 'H', W2: 'H', W3: 'M', W4: 'L', W5: 'H' },
@@ -156,7 +156,7 @@ export const WORK_PERSONALITY_TYPES: WorkPersonalityType[] = [
     profile: { W1: 'M', W2: 'H', W3: 'L', W4: 'M', W5: 'H' },
   },
   {
-    slug: 'ceo', code: 'CEO', name: '未来老板', tagline: '打工是暂时的，当老板才是归宿。',
+    slug: 'ceo', code: 'CEO', name: '老板胚子', tagline: '打工只是我的创业前传。',
     color: '#dc2626', emoji: '👔',
     description: '你打工的每一天都在为未来当老板做准备。你研究商业模式比研究KPI认真十倍，你在公司学到的最有价值的东西不是业务能力而是管理经验。你已经在脑海里注册了八百次公司，虽然还没迈出第一步。你的同事觉得你是个异类，但你知道——所有的伟大故事都是从给别人打工开始的。',
     profile: { W1: 'H', W2: 'M', W3: 'H', W4: 'L', W5: 'H' },

@@ -1,6 +1,36 @@
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { ImageResponse } from 'next/og';
 
-export const socialImageAlt = 'SBTI personality test preview image';
+const notoSansScRegular = readFile(
+  join(
+    process.cwd(),
+    'node_modules',
+    '@fontsource',
+    'noto-sans-sc',
+    'files',
+    'noto-sans-sc-chinese-simplified-400-normal.woff',
+  ),
+);
+
+const notoSansScBold = readFile(
+  join(
+    process.cwd(),
+    'node_modules',
+    '@fontsource',
+    'noto-sans-sc',
+    'files',
+    'noto-sans-sc-chinese-simplified-700-normal.woff',
+  ),
+);
+
+const featuredTypes = [
+  { code: 'CTRL', label: '拿捏者', background: 'linear-gradient(135deg, #f59e0b 0%, #fb923c 100%)' },
+  { code: 'BOSS', label: '控场王', background: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)' },
+  { code: 'CHILL', label: '无所谓', background: 'linear-gradient(135deg, #22c55e 0%, #06b6d4 100%)' },
+] as const;
+
+export const socialImageAlt = 'SBTI 人格测试预览图，使用中英双语展示测试信息';
 
 export const socialImageSize = {
   width: 1200,
@@ -9,7 +39,12 @@ export const socialImageSize = {
 
 export const socialImageContentType = 'image/png';
 
-export function createSocialImageResponse() {
+export async function createSocialImageResponse() {
+  const [chineseRegularFont, chineseBoldFont] = await Promise.all([
+    notoSansScRegular,
+    notoSansScBold,
+  ]);
+
   return new ImageResponse(
     (
       <div
@@ -80,7 +115,7 @@ export function createSocialImageResponse() {
             <div
               style={{
                 display: 'flex',
-                fontSize: '96px',
+                fontSize: '88px',
                 lineHeight: 1,
                 fontWeight: 800,
                 letterSpacing: '-0.04em',
@@ -91,13 +126,38 @@ export function createSocialImageResponse() {
             <div
               style={{
                 display: 'flex',
-                marginTop: '16px',
-                fontSize: '34px',
+                marginTop: '14px',
+                fontSize: '40px',
+                lineHeight: 1.2,
+                color: '#2D2A26',
+                fontFamily: 'Noto Sans SC',
+                fontWeight: 700,
+              }}
+            >
+              测测你是哪种抽象人格
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                marginTop: '18px',
+                fontSize: '30px',
                 lineHeight: 1.3,
                 color: '#6B6560',
               }}
             >
-              5 models, 15 dimensions, 27 personality results.
+              5 models, 15 dimensions, 27 results.
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                marginTop: '10px',
+                fontSize: '24px',
+                lineHeight: 1.3,
+                color: '#7A736D',
+                fontFamily: 'Noto Sans SC',
+              }}
+            >
+              五大模型 · 十五维度 · 二十七张人设卡
             </div>
           </div>
         </div>
@@ -114,57 +174,62 @@ export function createSocialImageResponse() {
               <div
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
                   borderRadius: '999px',
                   background: 'rgba(224, 96, 136, 0.1)',
                   border: '1px solid rgba(224, 96, 136, 0.3)',
-                  padding: '10px 16px',
-                  fontSize: '22px',
+                  padding: '10px 16px 12px',
                   color: '#e06088',
                 }}
               >
-                27 results
+                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>27 results</div>
+                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>27 张人设卡</div>
               </div>
               <div
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
                   borderRadius: '999px',
                   background: 'rgba(14, 165, 196, 0.1)',
                   border: '1px solid rgba(14, 165, 196, 0.3)',
-                  padding: '10px 16px',
-                  fontSize: '22px',
+                  padding: '10px 16px 12px',
                   color: '#0ea5c4',
                 }}
               >
-                15 dimensions
+                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>15 dimensions</div>
+                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>15 个维度</div>
               </div>
               <div
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
                   borderRadius: '999px',
                   background: 'rgba(14, 165, 114, 0.1)',
                   border: '1px solid rgba(14, 165, 114, 0.3)',
-                  padding: '10px 16px',
-                  fontSize: '22px',
+                  padding: '10px 16px 12px',
                   color: '#0ea572',
                 }}
               >
-                Pure frontend
+                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>Abstract quiz</div>
+                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>中文抽象人格测试</div>
               </div>
             </div>
             <div
               style={{
                 display: 'flex',
                 marginTop: '24px',
-                fontSize: '22px',
+                fontSize: '20px',
                 color: '#9C9590',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
+                alignItems: 'center',
               }}
             >
-              sbtinb.com
+              <span>sbtinb.com</span>
+              <span style={{ display: 'flex', marginLeft: '12px', fontFamily: 'Noto Sans SC', letterSpacing: 0 }}>
+                中文语境人格测试
+              </span>
             </div>
           </div>
 
@@ -182,7 +247,7 @@ export function createSocialImageResponse() {
             <div
               style={{
                 display: 'flex',
-                fontSize: '18px',
+                fontSize: '17px',
                 color: '#9C9590',
                 textTransform: 'uppercase',
                 letterSpacing: '0.12em',
@@ -190,29 +255,37 @@ export function createSocialImageResponse() {
             >
               Featured types
             </div>
+            <div
+              style={{
+                display: 'flex',
+                marginTop: '6px',
+                fontSize: '16px',
+                color: '#8D867F',
+                fontFamily: 'Noto Sans SC',
+              }}
+            >
+              热门人设
+            </div>
             <div style={{ display: 'flex', marginTop: '14px', gap: '10px' }}>
-              {['CTRL', 'BOSS', 'CHILL'].map((label, index) => (
+              {featuredTypes.map((type) => (
                 <div
-                  key={label}
+                  key={type.code}
                   style={{
                     display: 'flex',
+                    flexDirection: 'column',
                     width: '82px',
                     height: '82px',
                     borderRadius: '22px',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background:
-                      index === 0
-                        ? 'linear-gradient(135deg, #f59e0b 0%, #fb923c 100%)'
-                        : index === 1
-                          ? 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)'
-                          : 'linear-gradient(135deg, #22c55e 0%, #06b6d4 100%)',
+                    background: type.background,
                     color: '#FFFFFF',
-                    fontSize: '21px',
-                    fontWeight: 800,
                   }}
                 >
-                  {label}
+                  <div style={{ display: 'flex', fontSize: '20px', fontWeight: 800 }}>{type.code}</div>
+                  <div style={{ display: 'flex', marginTop: '4px', fontSize: '13px', fontFamily: 'Noto Sans SC' }}>
+                    {type.label}
+                  </div>
                 </div>
               ))}
             </div>
@@ -220,6 +293,22 @@ export function createSocialImageResponse() {
         </div>
       </div>
     ),
-    socialImageSize,
+    {
+      ...socialImageSize,
+      fonts: [
+        {
+          name: 'Noto Sans SC',
+          data: chineseRegularFont,
+          style: 'normal',
+          weight: 400,
+        },
+        {
+          name: 'Noto Sans SC',
+          data: chineseBoldFont,
+          style: 'normal',
+          weight: 700,
+        },
+      ],
+    },
   );
 }

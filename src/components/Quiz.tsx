@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { useState, useCallback, useMemo, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QUESTIONS, DEFAULT_OPTIONS, shuffleQuestions } from '@/lib/questions';
@@ -19,16 +19,16 @@ const MODEL_CLASS: Record<ModelType, string> = {
   social: 'model-social',
 };
 
+const emptySubscribe = () => () => {};
+
 export function Quiz() {
   const searchParams = useSearchParams();
   const cpPartner = searchParams.get('cp');
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [questions] = useState(() => {
     const main = shuffleQuestions(QUESTIONS.filter(q => !q.isDrinkBranch));
     return main;
   });
-
-  useEffect(() => { setMounted(true); }, []);
   const drinkBranch = useMemo(() => QUESTIONS.filter(q => q.isDrinkBranch), []);
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -38,6 +38,9 @@ export function Quiz() {
   const [direction, setDirection] = useState(1);
   const [isFinishing, setIsFinishing] = useState(false);
   const answerLockRef = useRef<number | null>(null);
+  const activeQuestionIdRef = useRef<number | null>(null);
+  const isFinishingRef = useRef(false);
+  const finishTimeoutRef = useRef<number | null>(null);
 
   const allQuestions = useMemo(() => {
     if (showDrinkBranch) return drinkBranch;
@@ -46,24 +49,61 @@ export function Quiz() {
 
   const idx = showDrinkBranch ? drinkBranchIndex : currentIndex;
   const currentQ = allQuestions[idx];
+  const currentQuestionId = currentQ?.id ?? null;
   const totalMain = questions.length;
   const progress = ((currentIndex + (showDrinkBranch ? drinkBranchIndex : 0)) / (totalMain + (showDrinkBranch ? drinkBranch.length : 0))) * 100;
-  const isAnswerLocked = currentQ ? answerLockRef.current === currentQ.id : false;
 
   const modelColor = currentQ ? MODEL_COLORS[currentQ.model] : MODEL_COLORS.self;
 
-  useEffect(() => {
-    if (currentQ) {
+  useLayoutEffect(() => {
+    activeQuestionIdRef.current = currentQuestionId;
+
+    if (currentQuestionId !== null) {
       answerLockRef.current = null;
     }
-  }, [currentQ?.id]);
+  }, [currentQuestionId]);
 
-  const handleAnswer = useCallback((value: Answer) => {
-    if (!currentQ || isFinishing || answerLockRef.current === currentQ.id) return;
-    answerLockRef.current = currentQ.id;
+  useEffect(() => {
+    isFinishingRef.current = isFinishing;
+  }, [isFinishing]);
+
+  useEffect(() => {
+    return () => {
+      if (finishTimeoutRef.current !== null) {
+        window.clearTimeout(finishTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const finishTest = useCallback((finalAnswers: Map<number, Answer>) => {
+    if (isFinishingRef.current) return;
+
+    isFinishingRef.current = true;
+    setIsFinishing(true);
+
+    const result = calculateResult(finalAnswers, QUESTIONS);
+
+    if (finishTimeoutRef.current !== null) {
+      window.clearTimeout(finishTimeoutRef.current);
+    }
+
+    finishTimeoutRef.current = window.setTimeout(() => {
+      if (cpPartner) {
+        window.location.href = `${basePath}/cp/result?a=${encodeURIComponent(cpPartner)}&b=${encodeURIComponent(result.personality.slug)}`;
+      } else {
+        window.location.href = `${basePath}/result/${encodeURIComponent(result.personality.slug)}/`;
+      }
+    }, 800);
+  }, [cpPartner]);
+
+  const handleAnswer = useCallback((questionId: number, value: Answer) => {
+    if (!currentQ) return;
+    if (isFinishingRef.current || questionId !== activeQuestionIdRef.current || answerLockRef.current === questionId) return;
+
+    answerLockRef.current = questionId;
 
     const newAnswers = new Map(answers);
-    newAnswers.set(currentQ.id, value);
+    newAnswers.set(questionId, value);
     setAnswers(newAnswers);
     setDirection(1);
 
@@ -90,15 +130,13 @@ export function Quiz() {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(i => i + 1);
     } else {
-      if (currentQ.isDrinkTrigger && value === 3) {
-        setShowDrinkBranch(true);
-      } else {
-        finishTest(newAnswers);
-      }
+      finishTest(newAnswers);
     }
-  }, [currentQ, answers, currentIndex, questions, showDrinkBranch, drinkBranchIndex, drinkBranch, isFinishing]);
+  }, [answers, currentIndex, currentQ, drinkBranch, drinkBranchIndex, finishTest, questions, showDrinkBranch]);
 
   const handleBack = useCallback(() => {
+    if (isFinishingRef.current || answerLockRef.current === currentQuestionId) return;
+
     if (showDrinkBranch && drinkBranchIndex > 0) {
       setDirection(-1);
       setDrinkBranchIndex(i => i - 1);
@@ -109,20 +147,24 @@ export function Quiz() {
       setDirection(-1);
       setCurrentIndex(i => i - 1);
     }
-  }, [currentIndex, showDrinkBranch, drinkBranchIndex]);
+  }, [currentIndex, currentQuestionId, drinkBranchIndex, showDrinkBranch]);
 
-  const finishTest = (finalAnswers: Map<number, Answer>) => {
-    setIsFinishing(true);
-    const result = calculateResult(finalAnswers, QUESTIONS);
-    // Brief delay for animation, then use hard navigation to avoid RSC fetch failures
-    setTimeout(() => {
-      if (cpPartner) {
-        window.location.href = `${basePath}/cp/result?a=${encodeURIComponent(cpPartner)}&b=${encodeURIComponent(result.personality.slug)}`;
-      } else {
-        window.location.href = `${basePath}/result/${encodeURIComponent(result.personality.slug)}/`;
-      }
-    }, 800);
-  };
+  useEffect(() => {
+    if (!mounted || currentQ || isFinishingRef.current || answers.size === 0) return;
+
+    const mainOutOfRange = !showDrinkBranch && currentIndex >= questions.length;
+    const branchOutOfRange = showDrinkBranch && drinkBranchIndex >= drinkBranch.length;
+
+    if (mainOutOfRange || branchOutOfRange) {
+      const timeoutId = window.setTimeout(() => {
+        finishTest(new Map(answers));
+      }, 0);
+
+      return () => {
+        window.clearTimeout(timeoutId);
+      };
+    }
+  }, [answers, currentIndex, currentQ, drinkBranch.length, drinkBranchIndex, finishTest, mounted, questions.length, showDrinkBranch]);
 
   const canGoBack = currentIndex > 0 || (showDrinkBranch && drinkBranchIndex >= 0);
 
@@ -198,8 +240,8 @@ export function Quiz() {
                 return (
                   <motion.button
                     key={opt.key}
-                    onClick={() => handleAnswer(opt.value as Answer)}
-                    disabled={isAnswerLocked || isFinishing}
+                    onClick={() => handleAnswer(currentQ.id, opt.value as Answer)}
+                    disabled={isFinishing}
                     whileTap={{ scale: 0.98 }}
                     className={`group relative w-full py-4 px-6 rounded-2xl text-left transition-all duration-200 cursor-pointer ${
                       selected

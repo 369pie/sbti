@@ -523,9 +523,19 @@ export const CPShareImageGenerator = forwardRef<CPShareImageGeneratorHandle, Pro
             onClick={() => setPreviewUrl(null)}
           >
             <div
-              className="w-full max-w-sm animate-in fade-in zoom-in-95 duration-200"
+              className="relative w-full max-w-sm animate-in fade-in zoom-in-95 duration-200"
               onClick={e => e.stopPropagation()}
             >
+              <button
+                onClick={() => setPreviewUrl(null)}
+                className="absolute -top-11 -right-1 p-2 text-white/50 hover:text-white transition-colors z-10"
+                aria-label="关闭"
+              >
+                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
               <div className="rounded-2xl overflow-hidden shadow-2xl mb-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={previewUrl} alt="CP 分享图片" className="w-full" />

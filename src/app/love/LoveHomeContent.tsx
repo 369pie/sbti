@@ -34,13 +34,13 @@ export default function LoveHomeContent() {
             </span>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
-              你是哪种
+              你谈恋爱时
               <br />
-              <span className="bg-gradient-to-r from-pink-400 via-rose-400 to-red-400 bg-clip-text text-transparent">恋爱人格</span>
+              <span className="bg-gradient-to-r from-pink-400 via-rose-400 to-red-400 bg-clip-text text-transparent">是哪张恋爱人设</span>
             </h1>
 
             <p className="text-text-secondary text-lg sm:text-xl leading-relaxed max-w-xl mx-auto mb-10">
-              5 个恋爱维度 · 15 道灵魂拷问 · 16 种恋爱人格
+              5 个恋爱维度 · 15 道灵魂拷问 · 16 张恋爱人设卡
               <br />
               三分钟测出你在感情里的真面目。
             </p>
@@ -73,7 +73,7 @@ export default function LoveHomeContent() {
           >
             {[
               { value: '5 维', label: '恋爱维度' },
-              { value: '16 种', label: '恋爱人格' },
+              { value: '16 张', label: '恋爱人设' },
               { value: '15 题', label: '约3分钟' },
             ].map(stat => (
               <div key={stat.label} className="bg-bg-secondary/60 px-4 py-6 text-center">
@@ -139,7 +139,7 @@ export default function LoveHomeContent() {
             className="mb-12"
           >
             <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Types</span>
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">16 种恋爱人格</h2>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">16 张恋爱人设卡</h2>
           </motion.div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {FEATURED.map((p, i) => (
@@ -183,7 +183,7 @@ export default function LoveHomeContent() {
             href="/love/test"
             className="inline-flex items-center gap-2 px-10 py-4 rounded-xl bg-pink-500 text-white font-medium text-lg hover:brightness-110 transition-all duration-200 shadow-[0_0_40px_rgba(236,72,153,0.2)]"
           >
-            开始恋爱人格测试
+            开始测恋爱人设
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>

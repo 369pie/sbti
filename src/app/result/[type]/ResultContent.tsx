@@ -220,6 +220,33 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         </motion.div>
       </section>
 
+      {/* Combo entry */}
+      <section className="max-w-2xl mx-auto px-6 pb-10">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.55, duration: 0.5 }}
+        >
+          <Link
+            href={`/combo?sbti=${personality.slug}`}
+            className="block rounded-2xl border p-6 sm:p-8 text-center transition-all hover:shadow-md"
+            style={{ borderColor: '#a78bfa30', background: 'rgba(167,139,250,0.06)' }}
+          >
+            <div className="text-3xl mb-3">🧩</div>
+            <h3 className="text-lg font-semibold mb-2">解锁你的人格拼盘</h3>
+            <p className="text-sm text-text-secondary mb-4 max-w-sm mx-auto">
+              SBTI × MBTI × 星座，三合一拼出你的专属称号和毒舌分析
+            </p>
+            <span
+              className="inline-flex items-center gap-1 px-5 py-2.5 rounded-xl text-sm font-medium text-white"
+              style={{ background: '#a78bfa' }}
+            >
+              去拼盘 →
+            </span>
+          </Link>
+        </motion.div>
+      </section>
+
       {/* Share section */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
         <motion.div

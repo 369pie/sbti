@@ -41,7 +41,7 @@ export default function HowToReadSbtiResultsGuidePage() {
 
       <div className="mt-12 flex flex-wrap gap-3">
         <Link href="/types" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:brightness-110 transition-all">
-          查看人格图鉴
+          查看人设图鉴
         </Link>
         <Link href="/guide/sbti-vs-mbti" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all">
           看 SBTI / MBTI 区别

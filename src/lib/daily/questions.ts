@@ -30,9 +30,9 @@ export const DAILY_QUESTIONS: DailyQuestion[] = [
   {
     id: 2, text: '你觉得今天你的电量大概是？', dimension: 'D1', model: 'energy', reversed: false,
     options: [
-      { value: 1, label: '15%，已经在弹低电量警告了。', key: 'A' },
+      { value: 1, label: '15%，已经切到省电模式了。', key: 'A' },
       { value: 2, label: '55%，够用但别太折腾。', key: 'B' },
-      { value: 3, label: '95%，满血复活的一天！', key: 'C' },
+      { value: 3, label: '95%，今天直接电量暴走！', key: 'C' },
     ],
   },
   {

@@ -177,11 +177,11 @@ async function renderLoveShareImage(personality: LovePersonalityType, dimensionS
   // Header
   ctx.fillStyle = personality.color;
   ctx.font = `600 12px ${FONT_MONO}`;
-  ctx.fillText('LPTI 恋爱人格报告', CARD_WIDTH / 2, 46);
+  ctx.fillText('LPTI 恋爱人设报告', CARD_WIDTH / 2, 46);
 
   ctx.fillStyle = MED;
   ctx.font = `13px ${FONT_SANS}`;
-  ctx.fillText('在恋爱人格测试中，我被鉴定为', CARD_WIDTH / 2, 68);
+  ctx.fillText('在恋爱人设测试里，我是这一挂', CARD_WIDTH / 2, 68);
 
   // ============ HERO CHARACTER IMAGE ============
   const avatarX = 100;
@@ -286,7 +286,7 @@ async function renderLoveShareImage(personality: LovePersonalityType, dimensionS
   // CTA
   ctx.fillStyle = DARK;
   ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText('测测你是哪种恋爱人格？', 36, footerY + 20);
+  ctx.fillText('测测你是哪张恋爱人设？', 36, footerY + 20);
 
   ctx.fillStyle = personality.color;
   ctx.font = `12px ${FONT_MONO}`;
@@ -360,7 +360,7 @@ export const LoveShareImageGenerator = forwardRef<LoveShareImageGeneratorHandle,
       try {
         const file = await createPreviewFile();
         if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `我的恋爱人格：${personality.name}` });
+          await navigator.share({ files: [file], title: `我的恋爱人设：${personality.name}` });
         } else {
           await handleDownload();
         }
@@ -399,15 +399,25 @@ export const LoveShareImageGenerator = forwardRef<LoveShareImageGeneratorHandle,
             onClick={() => setPreviewUrl(null)}
           >
             <div
-              className="w-full max-w-sm animate-in fade-in zoom-in-95 duration-200"
+              className="relative w-full max-w-sm animate-in fade-in zoom-in-95 duration-200"
               onClick={e => e.stopPropagation()}
             >
+              <button
+                onClick={() => setPreviewUrl(null)}
+                className="absolute -top-11 -right-1 p-2 text-white/50 hover:text-white transition-colors z-10"
+                aria-label="关闭"
+              >
+                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
               <div className="rounded-2xl overflow-hidden shadow-2xl mb-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={previewUrl} alt="分享图片" className="w-full" />
               </div>
 
-              <p className="text-center text-xs text-text-muted mb-3 sm:hidden">
+              <p className="text-center text-xs text-white/60 mb-3 sm:hidden">
                 💡 长按上方图片可直接保存到相册
               </p>
 
@@ -420,7 +430,7 @@ export const LoveShareImageGenerator = forwardRef<LoveShareImageGeneratorHandle,
               <div className="flex gap-3">
                 <button
                   onClick={handleDownload}
-                  className="flex-1 py-3 rounded-xl border border-border text-sm text-text-primary hover:bg-bg-secondary/50 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-xl border border-white/30 text-sm text-white hover:bg-white/10 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -438,7 +448,7 @@ export const LoveShareImageGenerator = forwardRef<LoveShareImageGeneratorHandle,
                 </button>
               </div>
 
-              <p className="text-center text-xs text-text-muted mt-4">
+              <p className="text-center text-xs text-white/60 mt-4">
                 点击空白处关闭
               </p>
             </div>

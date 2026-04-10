@@ -78,7 +78,7 @@ export const LOVE_PERSONALITY_TYPES: LovePersonalityType[] = [
     profile: { L1: 'M', L2: 'H', L3: 'M', L4: 'L', L5: 'H' },
   },
   {
-    slug: 'emperor', code: 'EMPEROR', name: '恋爱帝王', tagline: '在这段感情里，朕说了算。',
+    slug: 'emperor', code: 'EMPEROR', name: '朕系恋人', tagline: '这段关系，朕来定调。',
     color: '#dc2626', emoji: '👑',
     description: '你在恋爱里自带领导气场。不是控制欲强，而是你天生就知道自己想要什么、底线在哪。你的安全感不需要别人给——你自己就是自己的安全感。你对伴侣的要求是配合而不是服从，你能包容很多事，但绝不接受背叛和敷衍。你的爱是有分量的：给出去的时候很珍贵，收回来的时候也很果断。很少人能真正走进你心里，但走进去的那个人，会被你宠得很好。',
     profile: { L1: 'L', L2: 'L', L3: 'L', L4: 'H', L5: 'L' },
@@ -96,19 +96,19 @@ export const LOVE_PERSONALITY_TYPES: LovePersonalityType[] = [
     profile: { L1: 'M', L2: 'L', L3: 'H', L4: 'H', L5: 'L' },
   },
   {
-    slug: 'spy', code: 'SPY', name: '查岗专家', tagline: '你的定位已经被我标了三颗星。',
+    slug: 'spy', code: 'SPY', name: '人形雷达', tagline: '你在哪，我比北斗先知道。',
     color: '#7c3aed', emoji: '🔍',
     description: '你堪称恋爱界的FBI。对方的朋友圈动态你要逐条分析，微信运动步数你每天都看，连WiFi连接记录你都能推理出对方去了哪里。你不觉得这叫"控制"，你觉得这叫"关心"。你的查岗技能已经进化到了Art级别——不用翻手机也能通过对方的表情变化判断刚才谁发了消息。你知道自己有点过了，但你控制不住。因为你太害怕被骗了。',
     profile: { L1: 'H', L2: 'H', L3: 'H', L4: 'L', L5: 'M' },
   },
   {
-    slug: 'monk', code: 'MONK', name: '出家型', tagline: '阿弥陀佛，谈啥恋爱。',
+    slug: 'monk', code: 'MONK', name: '戒爱大师', tagline: '阿弥陀佛，恋爱随缘。',
     color: '#78716c', emoji: '🧘',
     description: '你对恋爱的态度是：可有可无，随缘就好。别人在纠结要不要表白的时候，你在想今晚吃什么。你不是不能爱，只是你觉得一个人生活也挺好的——不用迁就谁、不用报备行程、不用猜谁生气了。你的精神状态稳如泰山，内耗什么的跟你完全不沾边。唯一的问题是：你可能会让喜欢你的人觉得，你永远不会主动向前一步。',
     profile: { L1: 'L', L2: 'L', L3: 'L', L4: 'H', L5: 'L' },
   },
   {
-    slug: 'puppet', code: 'PUPPET', name: '提线木偶', tagline: '对方说什么我都觉得是对的。',
+    slug: 'puppet', code: 'PUPPET', name: '遥控恋人', tagline: 'TA 按一下，我动一下。',
     color: '#94a3b8', emoji: '🪆',
     description: '你在恋爱里完全没有自己的立场。对方说想吃火锅你就火锅，对方说想看恐怖片你也行。你不是没有想法，你只是觉得"听对方的就不会吵架"。你的退让一开始看起来很体贴，但时间久了会变成一种负担——对方会觉得你没个性、不真实，甚至会故意试探你的底线在哪。你需要知道：有自己的想法不等于不爱对方，一味迎合也不是爱。',
     profile: { L1: 'H', L2: 'L', L3: 'H', L4: 'L', L5: 'L' },
@@ -120,7 +120,7 @@ export const LOVE_PERSONALITY_TYPES: LovePersonalityType[] = [
     profile: { L1: 'H', L2: 'M', L3: 'H', L4: 'M', L5: 'M' },
   },
   {
-    slug: 'freeze', code: 'FREEZE', name: '3分钟冷却', tagline: '新鲜感一过，直接降温。',
+    slug: 'freeze', code: 'FREEZE', name: '热恋闪退', tagline: '上头三天，冷却三周。',
     color: '#06b6d4', emoji: '🧊',
     description: '你是恋爱界的"三分钟热度"专业户。追你的时候热情似火，追到手之后迅速降温。不是你渣，是你对"征服"这件事上头，对"维持"这件事提不起劲。你谈恋爱的节奏永远是同一个剧情：疯狂心动→确定关系→逐渐无聊→开始冷淡→放弃或被放弃。你也困惑：为什么每段感情都是这样？其实你真正上瘾的不是爱情，是暧昧期的多巴胺。',
     profile: { L1: 'L', L2: 'L', L3: 'M', L4: 'H', L5: 'M' },
@@ -144,19 +144,19 @@ export const LOVE_PERSONALITY_TYPES: LovePersonalityType[] = [
     profile: { L1: 'L', L2: 'L', L3: 'M', L4: 'H', L5: 'L' },
   },
   {
-    slug: 'balance', code: 'BALANCE', name: '恋爱特种兵', tagline: '工作恋爱两手抓，一个都不能少。',
+    slug: 'balance', code: 'BALANCE', name: '双开战神', tagline: '工作恋爱，我都不想掉线。',
     color: '#f97316', emoji: '⚖️',
     description: '你是所有人格里最"正常"的那个——但"正常"不代表"无趣"。你很懂得平衡恋爱和生活的关系，不会因为恋爱耽误工作，也不会因为工作冷落对象。你的时间管理能力在恋爱里也适用：工作日好好努力，周末给对象安排惊喜。你谈恋爱像经营一个项目——有计划、有执行、有复盘。虽然不够浪漫，但你的对象会觉得很安心。',
     profile: { L1: 'M', L2: 'M', L3: 'M', L4: 'H', L5: 'M' },
   },
   {
-    slug: 'buddy', code: 'BUDDY', name: '哥们儿式恋人', tagline: '我们谈的是恋爱还是兄弟情？',
+    slug: 'buddy', code: 'BUDDY', name: '搭子对象', tagline: '亲是亲了，画风还是兄弟。',
     color: '#06b6d4', emoji: '🤜',
     description: '你谈恋爱的方式跟交朋友差不多——不会太黏、不会太甜、不会太作，一起打游戏、互怼、偶尔正经一下。你觉得最好的感情就是"舒服"，不需要仪式感也不需要甜言蜜语。你跟对象相处就像好哥们儿加个亲嘴功能。你的对象有时候会抱怨：你能不能浪漫一点？但你觉得：不做作的感情才走得远啊。',
     profile: { L1: 'L', L2: 'M', L3: 'L', L4: 'H', L5: 'M' },
   },
   {
-    slug: 'sleepy', code: 'SLEEPY', name: '梦游型恋人', tagline: '等一下，我们什么时候在一起的？',
+    slug: 'sleepy', code: 'SLEEPY', name: '开窍延迟', tagline: '爱意发货了，我这边还没签收。',
     color: '#6366f1', emoji: '😴',
     description: '你在恋爱里的存在感比透明还透明。你不是不爱，你只是反应太慢了。对方给你暗示你看不懂，对方生气你不知道为什么，对方说"你猜"你就真的开始猜。你的情感迟钝不是冷漠，是真的对感情这件事不太敏感。你可能在一段关系里待了三个月才突然反应过来"哦我好像在谈恋爱"。你需要的不是教你如何恋爱，而是找一个足够耐心等你开窍的人。',
     profile: { L1: 'L', L2: 'L', L3: 'L', L4: 'M', L5: 'L' },

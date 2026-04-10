@@ -4,7 +4,7 @@ import { GUIDE_ARTICLES } from '@/lib/guides';
 
 export const metadata: Metadata = {
   title: 'SBTI 测试说明与结果解读',
-  description: '查看 SBTI 测试说明、结果怎么看、SBTI 和 MBTI 的区别，以及 27 种人格类型的阅读入口。',
+  description: '查看 SBTI 测试说明、结果怎么看、SBTI 和 MBTI 的区别，以及 27 张抽象人设卡的阅读入口。',
   alternates: { canonical: '/guide/' },
 };
 
@@ -37,7 +37,7 @@ export default function GuidePage() {
         <h2 className="text-xl font-medium text-text-primary mb-4">从哪里开始最合适？</h2>
         <div className="space-y-4 text-text-secondary leading-8 text-sm sm:text-base">
           <p>
-            如果你还没做过测试，建议先看《SBTI 是什么》再去答题；如果你已经拿到结果，建议先读《SBTI 结果怎么看》，再回头对照人格图鉴和相近人格。至于 “SBTI 和 MBTI 的区别”，更适合在你已经对结果有初步理解之后再看。
+            如果你还没做过测试，建议先看《SBTI 是什么》再去答题；如果你已经拿到结果，建议先读《SBTI 结果怎么看》，再回头对照人设图鉴和相近人格。至于 “SBTI 和 MBTI 的区别”，更适合在你已经对结果有初步理解之后再看。
           </p>
           <p>
             这套结构的目标，是让站内既有工具页，也有解释页。这样不管你是通过搜索进来，还是通过朋友分享进来，都能在站内找到下一步要读的内容，而不是停留在一个孤立页面上。

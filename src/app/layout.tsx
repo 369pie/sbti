@@ -97,7 +97,7 @@ export default function RootLayout({
                   name: 'SBTI 人格测试',
                   url: getSiteUrl('/'),
                   logo: getSiteUrl('/favicon.ico'),
-                  description: '一个轻松向的人格测试站点，提供 SBTI、打工人格和今日状态等测试内容。',
+                  description: '一个轻松向的人格测试站点，提供 SBTI、打工人设和今日模式等测试内容。',
                 },
               ],
             }),
@@ -134,7 +134,7 @@ export default function RootLayout({
             <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
               <Link href="/guide" className="hover:text-text-primary transition-colors">测试说明</Link>
               <Link href="/about" className="hover:text-text-primary transition-colors">关于测试</Link>
-              <Link href="/types" className="hover:text-text-primary transition-colors">人格图鉴</Link>
+              <Link href="/types" className="hover:text-text-primary transition-colors">人设图鉴</Link>
               <Link href="/contact" className="hover:text-text-primary transition-colors">联系与社群</Link>
               <Link href="/privacy" className="hover:text-text-primary transition-colors">隐私说明</Link>
               <Link href="/terms" className="hover:text-text-primary transition-colors">使用条款</Link>

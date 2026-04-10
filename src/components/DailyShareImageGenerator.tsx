@@ -70,29 +70,6 @@ function strokeRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, 
   ctx.stroke();
 }
 
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number) {
-  const lines: string[] = [];
-  let idx = 0;
-  while (idx < text.length && lines.length < maxLines) {
-    let line = '';
-    while (idx < text.length) {
-      const char = text[idx];
-      if (char === '\n') { idx++; break; }
-      const candidate = line + char;
-      if (line && ctx.measureText(candidate).width > maxWidth) break;
-      line = candidate;
-      idx++;
-    }
-    lines.push(line.trimStart());
-  }
-  if (idx < text.length && lines.length > 0) {
-    let last = lines[lines.length - 1];
-    while (last && ctx.measureText(`${last}…`).width > maxWidth) last = last.slice(0, -1);
-    lines[lines.length - 1] = `${last}…`;
-  }
-  return lines;
-}
-
 async function loadImage(src: string): Promise<HTMLImageElement> {
   const img = new window.Image();
   img.crossOrigin = 'anonymous';
@@ -168,7 +145,7 @@ async function renderDailyShareImage(status: DailyStatusType, dimensionScores: D
   const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
   ctx.fillStyle = status.color;
   ctx.font = `600 12px ${FONT_MONO}`;
-  ctx.fillText(`今日状态鉴定 · ${dateStr}`, CARD_WIDTH / 2, 48);
+  ctx.fillText(`今日模式鉴定 · ${dateStr}`, CARD_WIDTH / 2, 48);
 
   // ========== Character image ==========
   const imgX = 100;
@@ -255,7 +232,7 @@ async function renderDailyShareImage(status: DailyStatusType, dimensionScores: D
   const ftY = footerDivY + 18;
   ctx.fillStyle = DARK;
   ctx.font = `600 14px ${FONT_SANS}`;
-  ctx.fillText('测测你今天是什么状态？', 48, ftY);
+  ctx.fillText('测测你今天开了什么模式？', 48, ftY);
 
   ctx.fillStyle = status.color;
   ctx.font = `11px ${FONT_MONO}`;
@@ -331,7 +308,7 @@ export const DailyShareImageGenerator = forwardRef<DailyShareImageGeneratorHandl
       try {
         const file = await createPreviewFile();
         if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `我的今日状态：${status.name}` });
+          await navigator.share({ files: [file], title: `我的今日模式：${status.name}` });
         } else {
           await handleDownload();
         }
@@ -370,9 +347,19 @@ export const DailyShareImageGenerator = forwardRef<DailyShareImageGeneratorHandl
             onClick={() => setPreviewUrl(null)}
           >
             <div
-              className="w-full max-w-sm animate-in fade-in zoom-in-95 duration-200"
+              className="relative w-full max-w-sm animate-in fade-in zoom-in-95 duration-200"
               onClick={e => e.stopPropagation()}
             >
+              <button
+                onClick={() => setPreviewUrl(null)}
+                className="absolute -top-11 -right-1 p-2 text-white/50 hover:text-white transition-colors z-10"
+                aria-label="关闭"
+              >
+                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
               <div className="rounded-2xl overflow-hidden shadow-2xl mb-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={previewUrl} alt="分享图片" className="w-full" />

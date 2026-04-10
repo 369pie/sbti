@@ -1,66 +1,111 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getDailyQuestions, calculateDailyResult } from '@/lib/daily/scoring';
 import type { Answer } from '@/lib/daily/scoring';
 import type { DailyAnswerOption } from '@/lib/daily/questions';
 import { DAILY_QUESTIONS } from '@/lib/daily/questions';
 import { DAILY_MODEL_NAMES, DAILY_MODEL_COLORS } from '@/lib/daily/dimensions';
-import type { DailyModelType } from '@/lib/daily/dimensions';
 import { basePath } from '@/lib/site';
 
-export function DailyQuiz() {
-  const [mounted, setMounted] = useState(false);
-  const [questions] = useState(() => getDailyQuestions());
+const emptySubscribe = () => () => {};
 
-  useEffect(() => { setMounted(true); }, []);
+export function DailyQuiz() {
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const [questions] = useState(() => getDailyQuestions());
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Map<number, Answer>>(new Map());
   const [direction, setDirection] = useState(1);
   const [isFinishing, setIsFinishing] = useState(false);
   const answerLockRef = useRef<number | null>(null);
+  const activeQuestionIdRef = useRef<number | null>(null);
+  const isFinishingRef = useRef(false);
+  const finishTimeoutRef = useRef<number | null>(null);
 
   const currentQ = questions[currentIndex];
+  const currentQuestionId = currentQ?.id ?? null;
   const total = questions.length;
   const progress = ((currentIndex) / total) * 100;
-  const isAnswerLocked = currentQ ? answerLockRef.current === currentQ.id : false;
 
   const modelColor = currentQ ? DAILY_MODEL_COLORS[currentQ.model] : DAILY_MODEL_COLORS.energy;
 
-  useEffect(() => {
-    if (currentQ) {
+  useLayoutEffect(() => {
+    activeQuestionIdRef.current = currentQuestionId;
+
+    if (currentQuestionId !== null) {
       answerLockRef.current = null;
     }
-  }, [currentQ?.id]);
+  }, [currentQuestionId]);
 
-  const handleAnswer = useCallback((value: Answer) => {
-    if (!currentQ || isFinishing || answerLockRef.current === currentQ.id) return;
-    answerLockRef.current = currentQ.id;
+  useEffect(() => {
+    isFinishingRef.current = isFinishing;
+  }, [isFinishing]);
+
+  useEffect(() => {
+    return () => {
+      if (finishTimeoutRef.current !== null) {
+        window.clearTimeout(finishTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const finishTest = useCallback((finalAnswers: Map<number, Answer>) => {
+    if (isFinishingRef.current) return;
+
+    isFinishingRef.current = true;
+    setIsFinishing(true);
+
+    const result = calculateDailyResult(finalAnswers, DAILY_QUESTIONS);
+
+    if (finishTimeoutRef.current !== null) {
+      window.clearTimeout(finishTimeoutRef.current);
+    }
+
+    finishTimeoutRef.current = window.setTimeout(() => {
+      window.location.href = `${basePath}/daily/result/${encodeURIComponent(result.status.slug)}/`;
+    }, 800);
+  }, []);
+
+  const handleAnswer = useCallback((questionId: number, value: Answer) => {
+    if (!currentQ) return;
+    if (isFinishingRef.current || questionId !== activeQuestionIdRef.current || answerLockRef.current === questionId) return;
+
+    answerLockRef.current = questionId;
 
     const newAnswers = new Map(answers);
-    newAnswers.set(currentQ.id, value);
+    newAnswers.set(questionId, value);
     setAnswers(newAnswers);
     setDirection(1);
 
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(i => i + 1);
     } else {
-      setIsFinishing(true);
-      const result = calculateDailyResult(newAnswers, DAILY_QUESTIONS);
-      setTimeout(() => {
-        window.location.href = `${basePath}/daily/result/${encodeURIComponent(result.status.slug)}/`;
-      }, 800);
+      finishTest(newAnswers);
     }
-  }, [currentQ, answers, currentIndex, questions, isFinishing]);
+  }, [answers, currentIndex, currentQ, finishTest, questions.length]);
 
   const handleBack = useCallback(() => {
+    if (isFinishingRef.current || answerLockRef.current === currentQuestionId) return;
+
     if (currentIndex > 0) {
       setDirection(-1);
       setCurrentIndex(i => i - 1);
     }
-  }, [currentIndex]);
+  }, [currentIndex, currentQuestionId]);
+
+  useEffect(() => {
+    if (!mounted || currentQ || isFinishingRef.current || answers.size === 0 || currentIndex < questions.length) return;
+
+    const timeoutId = window.setTimeout(() => {
+      finishTest(new Map(answers));
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [answers, currentIndex, currentQ, finishTest, mounted, questions.length]);
 
   if (!mounted || !currentQ) {
     return (
@@ -132,8 +177,8 @@ export function DailyQuiz() {
                 return (
                   <motion.button
                     key={opt.key}
-                    onClick={() => handleAnswer(opt.value as Answer)}
-                    disabled={isAnswerLocked || isFinishing}
+                    onClick={() => handleAnswer(currentQ.id, opt.value as Answer)}
+                    disabled={isFinishing}
                     whileTap={{ scale: 0.98 }}
                     className={`group relative w-full py-4 px-6 rounded-2xl text-left transition-all duration-200 cursor-pointer ${
                       selected

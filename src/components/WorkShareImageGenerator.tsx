@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
+import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import QRCode from 'qrcode';
 import { getWorkTypeImage, getWorkRarity } from '@/lib/work/personalities';
 import type { WorkPersonalityType } from '@/lib/work/personalities';
@@ -177,11 +177,11 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   // Header
   ctx.fillStyle = personality.color;
   ctx.font = `600 12px ${FONT_MONO}`;
-  ctx.fillText('WPTI 打工人格报告', CARD_WIDTH / 2, 46);
+  ctx.fillText('WPTI 打工人设报告', CARD_WIDTH / 2, 46);
 
   ctx.fillStyle = MED;
   ctx.font = `13px ${FONT_SANS}`;
-  ctx.fillText('在打工人格测试中，我被鉴定为', CARD_WIDTH / 2, 68);
+  ctx.fillText('在打工人设测试里，我是这一挂', CARD_WIDTH / 2, 68);
 
   // ============ HERO CHARACTER IMAGE ============
   const avatarX = 100;
@@ -286,7 +286,7 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   // CTA
   ctx.fillStyle = DARK;
   ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText('测测你是哪种打工人？', 36, footerY + 20);
+  ctx.fillText('测测你是哪张打工人设？', 36, footerY + 20);
 
   ctx.fillStyle = personality.color;
   ctx.font = `12px ${FONT_MONO}`;
@@ -360,7 +360,7 @@ export const WorkShareImageGenerator = forwardRef<WorkShareImageGeneratorHandle,
       try {
         const file = await createPreviewFile();
         if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `我的打工人格：${personality.name}` });
+          await navigator.share({ files: [file], title: `我的打工人设：${personality.name}` });
         } else {
           await handleDownload();
         }
@@ -399,9 +399,19 @@ export const WorkShareImageGenerator = forwardRef<WorkShareImageGeneratorHandle,
             onClick={() => setPreviewUrl(null)}
           >
             <div
-              className="w-full max-w-sm animate-in fade-in zoom-in-95 duration-200"
+              className="relative w-full max-w-sm animate-in fade-in zoom-in-95 duration-200"
               onClick={e => e.stopPropagation()}
             >
+              <button
+                onClick={() => setPreviewUrl(null)}
+                className="absolute -top-11 -right-1 p-2 text-white/50 hover:text-white transition-colors z-10"
+                aria-label="关闭"
+              >
+                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
               <div className="rounded-2xl overflow-hidden shadow-2xl mb-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={previewUrl} alt="分享图片" className="w-full" />

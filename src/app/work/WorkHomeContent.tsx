@@ -34,13 +34,13 @@ export default function WorkHomeContent() {
             </span>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
-              你是哪种
+              你上班时
               <br />
-              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">打工人</span>
+              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">是哪张打工人设</span>
             </h1>
 
             <p className="text-text-secondary text-lg sm:text-xl leading-relaxed max-w-xl mx-auto mb-10">
-              5 个职场维度 · 15 道灵魂拷问 · 16 种打工人格
+              5 个职场维度 · 15 道灵魂拷问 · 16 张打工人设卡
               <br />
               三分钟测出你的职场真面目。
             </p>
@@ -73,7 +73,7 @@ export default function WorkHomeContent() {
           >
             {[
               { value: '5 维', label: '职场维度' },
-              { value: '16 种', label: '打工人格' },
+              { value: '16 张', label: '打工人设' },
               { value: '15 题', label: '约3分钟' },
             ].map(stat => (
               <div key={stat.label} className="bg-bg-secondary/60 px-4 py-6 text-center">
@@ -139,7 +139,7 @@ export default function WorkHomeContent() {
             className="mb-12"
           >
             <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Types</span>
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">16 种打工人格</h2>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">16 张打工人设卡</h2>
           </motion.div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {FEATURED.map((p, i) => (
@@ -183,7 +183,7 @@ export default function WorkHomeContent() {
             href="/work/test"
             className="inline-flex items-center gap-2 px-10 py-4 rounded-xl bg-indigo-500 text-white font-medium text-lg hover:brightness-110 transition-all duration-200 shadow-[0_0_40px_rgba(99,102,241,0.2)]"
           >
-            开始打工人格测试
+            开始测打工人设
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>

@@ -22,13 +22,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: `${p.tagline} — LPTI 恋爱人格测试结果：${p.name}，五维度恋爱画像。`,
     alternates: { canonical: `/love/result/${type}/` },
     openGraph: {
-      title: `我的恋爱人格是 ${p.code}（${p.name}）`,
+      title: `我的恋爱人设是 ${p.code}（${p.name}）`,
       description: p.tagline,
       images: [{ url: getLoveTypeImage(p.slug), width: 256, height: 256, alt: p.name }],
     },
     twitter: {
       card: 'summary',
-      title: `我的恋爱人格是 ${p.code}（${p.name}）`,
+      title: `我的恋爱人设是 ${p.code}（${p.name}）`,
       description: p.tagline,
     },
   };

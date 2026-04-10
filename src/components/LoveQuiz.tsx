@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { LOVE_QUESTIONS, LOVE_DEFAULT_OPTIONS, shuffleLoveQuestions } from '@/lib/love/questions';
@@ -8,68 +8,105 @@ import type { LoveAnswerOption } from '@/lib/love/questions';
 import { calculateLoveResult } from '@/lib/love/scoring';
 import type { Answer } from '@/lib/love/scoring';
 import { LOVE_MODEL_NAMES, LOVE_MODEL_COLORS } from '@/lib/love/dimensions';
-import type { LoveModelType } from '@/lib/love/dimensions';
 import { basePath } from '@/lib/site';
 
-const MODEL_CLASS: Record<LoveModelType, string> = {
-  depend: 'love-model-depend',
-  jealous: 'love-model-jealous',
-  brain: 'love-model-brain',
-  secure: 'love-model-secure',
-  drama: 'love-model-drama',
-};
+const emptySubscribe = () => () => {};
 
 export function LoveQuiz() {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [questions] = useState(() => shuffleLoveQuestions(LOVE_QUESTIONS));
-
-  useEffect(() => { setMounted(true); }, []);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Map<number, Answer>>(new Map());
   const [direction, setDirection] = useState(1);
   const [isFinishing, setIsFinishing] = useState(false);
   const answerLockRef = useRef<number | null>(null);
+  const activeQuestionIdRef = useRef<number | null>(null);
+  const isFinishingRef = useRef(false);
+  const finishTimeoutRef = useRef<number | null>(null);
 
   const currentQ = questions[currentIndex];
+  const currentQuestionId = currentQ?.id ?? null;
   const total = questions.length;
   const progress = ((currentIndex) / total) * 100;
-  const isAnswerLocked = currentQ ? answerLockRef.current === currentQ.id : false;
 
   const modelColor = currentQ ? LOVE_MODEL_COLORS[currentQ.model] : LOVE_MODEL_COLORS.depend;
 
-  useEffect(() => {
-    if (currentQ) {
+  useLayoutEffect(() => {
+    activeQuestionIdRef.current = currentQuestionId;
+
+    if (currentQuestionId !== null) {
       answerLockRef.current = null;
     }
-  }, [currentQ?.id]);
+  }, [currentQuestionId]);
 
-  const handleAnswer = useCallback((value: Answer) => {
-    if (!currentQ || isFinishing || answerLockRef.current === currentQ.id) return;
-    answerLockRef.current = currentQ.id;
+  useEffect(() => {
+    isFinishingRef.current = isFinishing;
+  }, [isFinishing]);
+
+  useEffect(() => {
+    return () => {
+      if (finishTimeoutRef.current !== null) {
+        window.clearTimeout(finishTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const finishTest = useCallback((finalAnswers: Map<number, Answer>) => {
+    if (isFinishingRef.current) return;
+
+    isFinishingRef.current = true;
+    setIsFinishing(true);
+
+    const result = calculateLoveResult(finalAnswers, LOVE_QUESTIONS);
+
+    if (finishTimeoutRef.current !== null) {
+      window.clearTimeout(finishTimeoutRef.current);
+    }
+
+    finishTimeoutRef.current = window.setTimeout(() => {
+      window.location.href = `${basePath}/love/result/${encodeURIComponent(result.personality.slug)}/`;
+    }, 800);
+  }, []);
+
+  const handleAnswer = useCallback((questionId: number, value: Answer) => {
+    if (!currentQ) return;
+    if (isFinishingRef.current || questionId !== activeQuestionIdRef.current || answerLockRef.current === questionId) return;
+
+    answerLockRef.current = questionId;
 
     const newAnswers = new Map(answers);
-    newAnswers.set(currentQ.id, value);
+    newAnswers.set(questionId, value);
     setAnswers(newAnswers);
     setDirection(1);
 
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(i => i + 1);
     } else {
-      setIsFinishing(true);
-      const result = calculateLoveResult(newAnswers, LOVE_QUESTIONS);
-      setTimeout(() => {
-        window.location.href = `${basePath}/love/result/${encodeURIComponent(result.personality.slug)}/`;
-      }, 800);
+      finishTest(newAnswers);
     }
-  }, [currentQ, answers, currentIndex, questions, isFinishing]);
+  }, [answers, currentIndex, currentQ, finishTest, questions.length]);
 
   const handleBack = useCallback(() => {
+    if (isFinishingRef.current || answerLockRef.current === currentQuestionId) return;
+
     if (currentIndex > 0) {
       setDirection(-1);
       setCurrentIndex(i => i - 1);
     }
-  }, [currentIndex]);
+  }, [currentIndex, currentQuestionId]);
+
+  useEffect(() => {
+    if (!mounted || currentQ || isFinishingRef.current || answers.size === 0 || currentIndex < questions.length) return;
+
+    const timeoutId = window.setTimeout(() => {
+      finishTest(new Map(answers));
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [answers, currentIndex, currentQ, finishTest, mounted, questions.length]);
 
   if (!mounted || !currentQ) {
     return (
@@ -141,8 +178,8 @@ export function LoveQuiz() {
                 return (
                   <motion.button
                     key={opt.key}
-                    onClick={() => handleAnswer(opt.value as Answer)}
-                    disabled={isAnswerLocked || isFinishing}
+                    onClick={() => handleAnswer(currentQ.id, opt.value as Answer)}
+                    disabled={isFinishing}
                     whileTap={{ scale: 0.98 }}
                     className={`group relative w-full py-4 px-6 rounded-xl text-left transition-all duration-200 cursor-pointer ${
                       selected
@@ -209,7 +246,7 @@ export function LoveQuiz() {
               className="text-center"
             >
               <div className="text-4xl mb-4">💕</div>
-              <p className="text-text-secondary text-lg">正在分析你的恋爱人格…</p>
+              <p className="text-text-secondary text-lg">正在给你对号入座恋爱人设…</p>
             </motion.div>
           </motion.div>
         )}

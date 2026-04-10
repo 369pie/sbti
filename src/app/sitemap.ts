@@ -23,6 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: getSiteUrl('/work/'), lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: getSiteUrl('/love/'), lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: getSiteUrl('/daily/'), lastModified: now, changeFrequency: 'daily', priority: 0.7 },
+    { url: getSiteUrl('/combo/'), lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
   ];
 
   const guidePages: MetadataRoute.Sitemap = GUIDE_ARTICLES.map((article) => ({

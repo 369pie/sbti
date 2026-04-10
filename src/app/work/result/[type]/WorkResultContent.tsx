@@ -33,7 +33,7 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `我的打工人格是 ${personality.code}（${personality.name}）`,
+          title: `我的打工人设是 ${personality.code}（${personality.name}）`,
           text: personality.tagline,
           url: shareUrl,
         });
@@ -76,7 +76,7 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
           >
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border-subtle bg-bg-secondary/60 text-xs text-text-muted mb-6">
-              打工人格测试结果
+              打工人设鉴定结果
             </div>
 
             <WorkPersonalityAvatar
@@ -255,7 +255,7 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
       {/* Other types */}
       <section className="max-w-3xl mx-auto px-6 pb-24">
         <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
-          还可以看看其他打工人格
+          还可以看看其他打工人设
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {others.map(p => (

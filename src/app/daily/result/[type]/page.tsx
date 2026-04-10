@@ -18,17 +18,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const s = getDailyStatusBySlug(type);
   if (!s) return {};
   return {
-    title: `${s.code}（${s.name}）— 今日状态`,
-    description: `${s.tagline} — SBTI 今日状态测试结果：${s.name}。`,
+    title: `${s.code}（${s.name}）— 今日模式`,
+    description: `${s.tagline} — SBTI 今日模式测试结果：${s.name}。`,
     alternates: { canonical: `/daily/result/${type}/` },
     openGraph: {
-      title: `我今天的状态是 ${s.code}（${s.name}）`,
+      title: `我今天开的模式是 ${s.code}（${s.name}）`,
       description: s.tagline,
       images: [{ url: getDailyTypeImage(s.slug), width: 256, height: 256, alt: s.name }],
     },
     twitter: {
       card: 'summary',
-      title: `我今天的状态是 ${s.code}（${s.name}）`,
+      title: `我今天开的模式是 ${s.code}（${s.name}）`,
       description: s.tagline,
     },
   };
