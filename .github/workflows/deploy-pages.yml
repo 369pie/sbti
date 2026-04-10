@@ -41,6 +41,7 @@ jobs:
 
       - name: Build static site
         env:
+          NEXT_PUBLIC_BASE_PATH: /sbti
           NEXT_PUBLIC_SITE_ORIGIN: https://www.sbtinb.com
         run: pnpm build
 
