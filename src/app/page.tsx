@@ -231,13 +231,16 @@ export default function HomePage() {
                 <span className="font-medium text-text-primary">微信群</span>
               </div>
               <div className="rounded-xl overflow-hidden bg-white p-2 inline-block">
-                <NextImage
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={withBasePath('/images/qr-wechat.png')}
                   alt="SBTI 微信交流群二维码"
                   width={200}
                   height={200}
-                  className="w-48 h-48 object-contain"
-                  unoptimized
+                  loading="eager"
+                  decoding="sync"
+                  fetchPriority="high"
+                  className="block w-48 h-48 object-contain"
                 />
               </div>
               <p className="text-xs text-text-muted mt-4">SBTI交流玩耍群</p>
@@ -258,13 +261,16 @@ export default function HomePage() {
                 <span className="font-medium text-text-primary">QQ 群</span>
               </div>
               <div className="rounded-xl overflow-hidden bg-[#2b2b2b] p-2 inline-block">
-                <NextImage
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={withBasePath('/images/qr-qq.png')}
                   alt="SBTI QQ群二维码"
                   width={200}
                   height={200}
-                  className="w-48 h-48 object-contain"
-                  unoptimized
+                  loading="eager"
+                  decoding="sync"
+                  fetchPriority="high"
+                  className="block w-48 h-48 object-contain"
                 />
               </div>
               <p className="text-xs text-text-muted mt-4">SBTI交友玩耍群 · 群号 962576932</p>
