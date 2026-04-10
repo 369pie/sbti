@@ -5,11 +5,12 @@ import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import { DimensionRadar, DimensionBars } from '@/components/DimensionChart';
 import { ShareImageGenerator } from '@/components/ShareImageGenerator';
+import type { ShareImageGeneratorHandle } from '@/components/ShareImageGenerator';
 import { PERSONALITY_TYPES, getTypeImage } from '@/lib/personalities';
 import { DIMENSIONS, MODEL_NAMES, MODEL_COLORS } from '@/lib/dimensions';
 import type { PersonalityType } from '@/lib/personalities';
 import type { DimensionScore } from '@/lib/scoring';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 interface Props {
   personality: PersonalityType;
@@ -18,6 +19,7 @@ interface Props {
 
 export function ResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
+  const shareRef = useRef<ShareImageGeneratorHandle>(null);
 
   const copyLink = useCallback(() => {
     navigator.clipboard.writeText(window.location.href);
@@ -39,6 +41,17 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         />
 
         <div className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center relative">
+          {/* Top-right share button */}
+          <button
+            onClick={() => shareRef.current?.generate()}
+            className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-accent transition-all cursor-pointer"
+            title="生成分享图片"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+          </button>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -143,7 +156,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           </h2>
 
           <div className="space-y-3">
-            <ShareImageGenerator personality={personality} dimensionScores={dimensionScores} />
+            <ShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
 
             <div className="flex gap-3">
               <button

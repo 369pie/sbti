@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { toPng } from 'html-to-image';
 import QRCode from 'qrcode';
 import type { PersonalityType } from '@/lib/personalities';
@@ -10,16 +10,41 @@ import { SHARE_SITE_URL } from '@/lib/site';
 
 import type { DimensionScore } from '@/lib/scoring';
 
+export interface ShareImageGeneratorHandle {
+  generate: () => void;
+}
+
 interface Props {
   personality: PersonalityType;
   dimensionScores: DimensionScore[];
 }
 
-export function ShareImageGenerator({ personality, dimensionScores }: Props) {
+async function imageToDataUrl(src: string): Promise<string> {
+  const img = new window.Image();
+  img.crossOrigin = 'anonymous';
+  img.src = src;
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error('Image load failed'));
+  });
+  const canvas = document.createElement('canvas');
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  canvas.getContext('2d')!.drawImage(img, 0, 0);
+  return canvas.toDataURL('image/png');
+}
+
+function isMobile() {
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
+
+export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
+  function ShareImageGenerator({ personality, dimensionScores }, ref) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [generating, setGenerating] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [typeImageDataUrl, setTypeImageDataUrl] = useState<string | null>(null);
   const siteLabel = SHARE_SITE_URL;
 
   const generateQR = useCallback(async () => {
@@ -37,12 +62,16 @@ export function ShareImageGenerator({ personality, dimensionScores }: Props) {
     setGenerating(true);
 
     try {
-      // Generate QR first so it can render
-      const qr = await generateQR();
+      // Pre-load personality image as data URL (fixes html-to-image cross-origin issue)
+      const [qr, imgData] = await Promise.all([
+        generateQR(),
+        imageToDataUrl(getTypeImage(personality.slug)),
+      ]);
       setQrDataUrl(qr);
+      setTypeImageDataUrl(imgData);
 
-      // Wait for QR to render in DOM
-      await new Promise(r => setTimeout(r, 150));
+      // Wait for data URLs to render in DOM
+      await new Promise(r => setTimeout(r, 200));
 
       const dataUrl = await toPng(cardRef.current, {
         pixelRatio: 3,
@@ -55,14 +84,23 @@ export function ShareImageGenerator({ personality, dimensionScores }: Props) {
     } finally {
       setGenerating(false);
     }
-  }, [generating, generateQR]);
+  }, [generating, generateQR, personality.slug]);
 
   const handleDownload = useCallback(() => {
     if (!previewUrl) return;
-    const link = document.createElement('a');
-    link.download = `SBTI-${personality.code}.png`;
-    link.href = previewUrl;
-    link.click();
+    if (isMobile()) {
+      // On mobile, <a download> often doesn't work — open in new tab so user can long-press save
+      const w = window.open('', '_blank');
+      if (w) {
+        w.document.write(`<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>SBTI-${personality.code}</title><style>*{margin:0;padding:0}body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}img{max-width:100%;height:auto}</style></head><body><img src="${previewUrl}" alt="SBTI-${personality.code}"></body></html>`);
+        w.document.close();
+      }
+    } else {
+      const link = document.createElement('a');
+      link.download = `SBTI-${personality.code}.png`;
+      link.href = previewUrl;
+      link.click();
+    }
   }, [previewUrl, personality.code]);
 
   const handleShare = useCallback(async () => {
@@ -79,6 +117,11 @@ export function ShareImageGenerator({ personality, dimensionScores }: Props) {
       handleDownload();
     }
   }, [previewUrl, personality.code, personality.name, handleDownload]);
+
+  // Expose generate method for external triggers (e.g. top-right share button)
+  useImperativeHandle(ref, () => ({
+    generate: () => { handleGenerate(); },
+  }), [handleGenerate]);
 
   return (
     <div>
@@ -184,7 +227,7 @@ export function ShareImageGenerator({ personality, dimensionScores }: Props) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={getTypeImage(personality.slug)}
+                src={typeImageDataUrl || getTypeImage(personality.slug)}
                 alt={personality.name}
                 width={220} height={220}
                 style={{ objectFit: 'contain', filter: 'drop-shadow(0 12px 24px rgba(0,0,0,0.4))' }}
@@ -288,6 +331,11 @@ export function ShareImageGenerator({ personality, dimensionScores }: Props) {
               <img src={previewUrl} alt="分享图片" className="w-full" />
             </div>
 
+            {/* Mobile hint */}
+            <p className="text-center text-xs text-text-muted mb-3 sm:hidden">
+              💡 长按上方图片可直接保存到相册
+            </p>
+
             {/* Actions */}
             <div className="flex gap-3">
               <button
@@ -319,4 +367,4 @@ export function ShareImageGenerator({ personality, dimensionScores }: Props) {
       )}
     </div>
   );
-}
+});
