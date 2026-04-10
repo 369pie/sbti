@@ -5,6 +5,7 @@ import type { DimensionLevel } from '@/lib/dimensions';
 import { ResultContent } from './ResultContent';
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
+import { buildPersonalityGuide } from '@/lib/result-guide';
 
 type PageProps = {
   params: Promise<{ type: string }>;
@@ -21,6 +22,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${p.code}（${p.name}）— SBTI 人格测试结果`,
     description: `${p.tagline} — SBTI 人格测试结果：${p.name}，了解你的 15 维度人格画像。`,
+    keywords: [`${p.name}`, `${p.code}`, `SBTI ${p.name}`, 'SBTI 人格测试结果', '人格类型解释'],
     alternates: { canonical: `/result/${type}/` },
     openGraph: {
       title: `我的 SBTI 人格是 ${p.code}（${p.name}）`,
@@ -40,6 +42,7 @@ export default async function ResultPage({ params }: PageProps) {
   const { type } = await params;
   const personality = getPersonalityBySlug(type);
   if (!personality) notFound();
+  const guide = buildPersonalityGuide(personality);
 
   // Build dimension scores from the personality profile for display
   const dimensionScores = DIMENSIONS.map(dim => {
@@ -48,5 +51,5 @@ export default async function ResultPage({ params }: PageProps) {
     return { id: dim.id, score, level };
   });
 
-  return <ResultContent personality={personality} dimensionScores={dimensionScores} />;
+  return <ResultContent personality={personality} dimensionScores={dimensionScores} guide={guide} />;
 }

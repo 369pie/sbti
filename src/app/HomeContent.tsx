@@ -30,9 +30,9 @@ const LEARN_MORE_LINKS = [
     description: '先看全部人格类型和结果标签，再决定要不要开始测试。',
   },
   {
-    href: '/about',
-    title: '了解测试说明',
-    description: '查看 SBTI 的五组切面、十五维结构和结果解释方式。',
+    href: '/guide',
+    title: '查看测试说明',
+    description: '集中查看 SBTI 的测试说明、结果解读和 SBTI / MBTI 对比。',
   },
 ];
 

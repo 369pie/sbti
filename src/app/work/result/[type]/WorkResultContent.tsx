@@ -6,7 +6,7 @@ import { WorkPersonalityAvatar } from '@/components/WorkPersonalityAvatar';
 import { WorkShareImageGenerator } from '@/components/WorkShareImageGenerator';
 import type { WorkShareImageGeneratorHandle } from '@/components/WorkShareImageGenerator';
 import { WORK_DIMENSIONS, WORK_MODEL_NAMES, WORK_MODEL_COLORS } from '@/lib/work/dimensions';
-import { WORK_PERSONALITY_TYPES } from '@/lib/work/personalities';
+import { WORK_PERSONALITY_TYPES, getWorkRarity } from '@/lib/work/personalities';
 import type { WorkPersonalityType } from '@/lib/work/personalities';
 import type { WorkDimensionScore } from '@/lib/work/scoring';
 import { useCallback, useRef, useState } from 'react';
@@ -21,13 +21,30 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const shareRef = useRef<WorkShareImageGeneratorHandle>(null);
 
+  const shareUrl = getSiteUrl(`/work/result/${personality.slug}/`);
+
   const copyLink = useCallback(() => {
-    navigator.clipboard.writeText(getSiteUrl(`/work/result/${personality.slug}/`));
+    navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [personality.slug]);
+  }, [shareUrl]);
+
+  const quickShare = useCallback(async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `我的打工人格是 ${personality.code}（${personality.name}）`,
+          text: personality.tagline,
+          url: shareUrl,
+        });
+        return;
+      } catch { /* user cancelled or not supported */ }
+    }
+    copyLink();
+  }, [copyLink, personality.code, personality.name, personality.tagline, shareUrl]);
 
   const others = WORK_PERSONALITY_TYPES.filter(p => p.slug !== personality.slug).slice(0, 3);
+  const rarity = getWorkRarity(personality.slug);
 
   return (
     <div className="min-h-screen">
@@ -66,11 +83,11 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
               personality={personality}
               alt={`${personality.name}形象`}
               priority
-              sizes="112px"
-              className="relative w-28 h-28 mx-auto mb-4 rounded-2xl overflow-hidden"
+              sizes="192px"
+              className="relative w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-6 rounded-2xl overflow-hidden"
               style={{ background: `${personality.color}15` }}
               imageClassName="object-contain p-2"
-              fallbackClassName="w-full h-full flex items-center justify-center text-6xl"
+              fallbackClassName="w-full h-full flex items-center justify-center text-7xl"
             />
 
             {/* Code */}
@@ -85,6 +102,21 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
             <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mb-4">
               {personality.name}
             </h1>
+
+            {/* Rarity + population badge */}
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <span
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border"
+                style={{ color: rarity.color, background: rarity.bgColor, borderColor: `${rarity.color}30` }}
+              >
+                {rarity.tier === 'legendary' && '✦ '}
+                {rarity.tier === 'epic' && '◆ '}
+                {rarity.label}
+              </span>
+              <span className="text-xs text-text-muted">
+                仅 {rarity.populationPct}% 的测试者是此人格
+              </span>
+            </div>
 
             {/* Tagline */}
             <p className="text-xl text-text-secondary max-w-md mx-auto">
@@ -199,6 +231,15 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
                 className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all cursor-pointer"
               >
                 {copied ? '已复制 ✓' : '复制链接'}
+              </button>
+              <button
+                onClick={quickShare}
+                className="flex-1 py-3 rounded-xl border border-indigo-500/30 text-sm text-indigo-400 hover:bg-indigo-500/10 transition-all cursor-pointer flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                快速分享
               </button>
               <Link
                 href="/work/test"

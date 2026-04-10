@@ -1,6 +1,54 @@
 import type { DimensionLevel } from './dimensions';
 import { withBasePath } from '../site';
 
+export type WorkRarityTier = 'legendary' | 'epic' | 'rare' | 'uncommon' | 'common';
+
+export interface WorkRarityInfo {
+  tier: WorkRarityTier;
+  label: string;
+  color: string;
+  bgColor: string;
+  populationPct: number;
+}
+
+const WORK_RARITY_CONFIG: Record<WorkRarityTier, Omit<WorkRarityInfo, 'tier' | 'populationPct'>> = {
+  legendary: { label: '传说级', color: '#fbbf24', bgColor: 'rgba(251,191,36,0.12)' },
+  epic:      { label: '超稀有', color: '#a78bfa', bgColor: 'rgba(167,139,250,0.12)' },
+  rare:      { label: '稀有',   color: '#60a5fa', bgColor: 'rgba(96,165,250,0.12)' },
+  uncommon:  { label: '较少见', color: '#34d399', bgColor: 'rgba(52,211,153,0.12)' },
+  common:    { label: '常见',   color: '#a8a29e', bgColor: 'rgba(168,162,158,0.12)' },
+};
+
+const WORK_SLUG_RARITY: Record<string, { tier: WorkRarityTier; pct: number }> = {
+  // legendary — unique archetype
+  ceo:    { tier: 'legendary', pct: 1.5 },
+  // epic — very distinct profiles
+  tool:   { tier: 'epic', pct: 2.2 },
+  climb:  { tier: 'epic', pct: 2.8 },
+  ghost:  { tier: 'epic', pct: 3.0 },
+  // rare — strong polarity
+  juan:   { tier: 'rare', pct: 3.5 },
+  '996':  { tier: 'rare', pct: 3.8 },
+  quit:   { tier: 'rare', pct: 4.0 },
+  tea:    { tier: 'rare', pct: 3.6 },
+  // uncommon — moderate polarity
+  fish:   { tier: 'uncommon', pct: 5.0 },
+  ddl:    { tier: 'uncommon', pct: 5.5 },
+  drama:  { tier: 'uncommon', pct: 5.2 },
+  run:    { tier: 'uncommon', pct: 4.8 },
+  // common — balanced profiles
+  ppt:    { tier: 'common', pct: 7.0 },
+  meet:   { tier: 'common', pct: 8.0 },
+  zen:    { tier: 'common', pct: 7.5 },
+  snack:  { tier: 'common', pct: 6.5 },
+};
+
+export function getWorkRarity(slug: string): WorkRarityInfo {
+  const entry = WORK_SLUG_RARITY[slug] ?? { tier: 'common' as WorkRarityTier, pct: 5.0 };
+  const config = WORK_RARITY_CONFIG[entry.tier];
+  return { tier: entry.tier, populationPct: entry.pct, ...config };
+}
+
 export interface WorkPersonalityType {
   slug: string;
   code: string;

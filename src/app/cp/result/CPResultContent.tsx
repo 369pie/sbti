@@ -372,7 +372,7 @@ export function CPResultContent() {
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer"
               style={{
                 background: cpLinkCopied ? '#22c55e' : tierColor,
-                color: '#0c0a09',
+                color: '#110f1c',
               }}
             >
               {cpLinkCopied ? '链接已复制 ✓' : '复制 CP 结果链接'}

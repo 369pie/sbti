@@ -34,7 +34,7 @@ export function createSocialImageResponse() {
             width: '380px',
             height: '380px',
             borderRadius: '999px',
-            background: 'rgba(249, 115, 22, 0.18)',
+            background: 'rgba(232, 114, 156, 0.18)',
           }}
         />
         <div
@@ -114,11 +114,11 @@ export function createSocialImageResponse() {
                   display: 'flex',
                   alignItems: 'center',
                   borderRadius: '999px',
-                  background: 'rgba(249, 115, 22, 0.14)',
-                  border: '1px solid rgba(249, 115, 22, 0.45)',
+                  background: 'rgba(232, 114, 156, 0.14)',
+                  border: '1px solid rgba(232, 114, 156, 0.45)',
                   padding: '10px 16px',
                   fontSize: '22px',
-                  color: '#fdba74',
+                  color: '#f09abc',
                 }}
               >
                 27 results

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getWorkPersonalityBySlug, getAllWorkSlugs } from '@/lib/work/personalities';
+import { getWorkPersonalityBySlug, getAllWorkSlugs, getWorkTypeImage } from '@/lib/work/personalities';
 import { WORK_DIMENSIONS } from '@/lib/work/dimensions';
 import type { DimensionLevel } from '@/lib/work/dimensions';
 import { WorkResultContent } from './WorkResultContent';
@@ -24,6 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `我的打工人格是 ${p.code}（${p.name}）`,
       description: p.tagline,
+      images: [{ url: getWorkTypeImage(p.slug), width: 256, height: 256, alt: p.name }],
     },
     twitter: {
       card: 'summary',

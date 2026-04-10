@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   },
   description: "SBTI (Silly Behavioral Type Indicator) 是一个轻松向的人格测试。5 组切面、15 个维度、27 种人格，找到最像你的那一个。",
   keywords: ["SBTI", "SBTI 人格测试", "SBTI 在线测试", "SBTI 人格测试在线测试", "人格测试", "性格测试", "抽象人格", "MBTI", "打工人格", "CP配对", "心理测试"],
+  verification: {
+    google: 'BzRtTDBXJV_X_JIZsMs0jPNwGrHIj7flfmUMjuJ1IwY',
+  },
   robots: isLegacyPagesBuild
     ? {
         index: false,
@@ -109,15 +112,15 @@ export default function RootLayout({
             <div
               style={{
                 padding: '12px 16px',
-                background: '#f59e0b',
-                color: '#0c0a09',
+                background: '#e8729c',
+                color: '#110f1c',
                 textAlign: 'center',
                 fontSize: '14px',
                 lineHeight: '1.6',
               }}
             >
               旧地址已迁移，请访问{' '}
-              <a href={getSiteUrl('/')} style={{ color: '#0c0a09', fontWeight: 700, textDecoration: 'underline' }}>
+              <a href={getSiteUrl('/')} style={{ color: '#110f1c', fontWeight: 700, textDecoration: 'underline' }}>
                 {getSiteLabel()}
               </a>{' '}
               查看最新内容。
@@ -129,6 +132,7 @@ export default function RootLayout({
         <footer className="border-t border-border-subtle py-8 px-6 text-center text-text-muted text-sm">
           <div className="max-w-5xl mx-auto">
             <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
+              <Link href="/guide" className="hover:text-text-primary transition-colors">测试说明</Link>
               <Link href="/about" className="hover:text-text-primary transition-colors">关于测试</Link>
               <Link href="/types" className="hover:text-text-primary transition-colors">人格图鉴</Link>
               <Link href="/contact" className="hover:text-text-primary transition-colors">联系与社群</Link>

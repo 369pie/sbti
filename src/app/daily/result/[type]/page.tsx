@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getDailyStatusBySlug, getAllDailySlugs } from '@/lib/daily/statuses';
+import { getDailyStatusBySlug, getAllDailySlugs, getDailyTypeImage } from '@/lib/daily/statuses';
 import { DAILY_DIMENSIONS } from '@/lib/daily/dimensions';
 import type { DimensionLevel } from '@/lib/daily/dimensions';
 import { DailyResultContent } from './DailyResultContent';
@@ -24,6 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `我今天的状态是 ${s.code}（${s.name}）`,
       description: s.tagline,
+      images: [{ url: getDailyTypeImage(s.slug), width: 256, height: 256, alt: s.name }],
     },
     twitter: {
       card: 'summary',

@@ -118,13 +118,19 @@ function getCachedImage(src: string) {
 async function createQrImage() {
   const qrDataUrl = await QRCode.toDataURL(SHARE_SITE_URL, {
     width: 200, margin: 1,
-    color: { dark: '#000000', light: '#ffffffff' },
+    color: { dark: '#2d2236', light: '#FFF9F2' },
     errorCorrectionLevel: 'M',
   });
   return getCachedImage(qrDataUrl);
 }
 
 async function renderCPShareImage(result: CPResult) {
+  const BG = '#FFF9F2';
+  const DARK = '#2d2236';
+  const MED = '#6b6380';
+  const LIGHT = '#a099b4';
+  const DIV = '#e8e0d6';
+
   const { typeA, typeB, overall, tier, modelScores, summary } = result;
   const tierColor = getTierColor(tier);
   const tierEmoji = getTierEmoji(tier);
@@ -144,122 +150,114 @@ async function renderCPShareImage(result: CPResult) {
   ctx.scale(CARD_SCALE, CARD_SCALE);
   ctx.textBaseline = 'top';
 
-  // Background
-  ctx.fillStyle = '#0c0a09';
+  // ========== Cream background ==========
+  ctx.fillStyle = BG;
   ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-  // Grid
-  ctx.strokeStyle = hexToRgba('#292524', 0.38);
-  ctx.lineWidth = 1;
-  for (let p = 0; p <= CARD_WIDTH; p += 30) { ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, CARD_HEIGHT); ctx.stroke(); }
-  for (let p = 0; p <= CARD_HEIGHT; p += 30) { ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(CARD_WIDTH, p); ctx.stroke(); }
+  // Dual color washes
+  const washA = ctx.createRadialGradient(160, 180, 0, 160, 180, 200);
+  washA.addColorStop(0, hexToRgba(typeA.color, 0.08));
+  washA.addColorStop(1, hexToRgba(typeA.color, 0));
+  ctx.fillStyle = washA;
+  ctx.fillRect(0, 0, CARD_WIDTH / 2, 360);
 
-  // Dual glow
-  const glowA = ctx.createRadialGradient(160, 200, 0, 160, 200, 250);
-  glowA.addColorStop(0, hexToRgba(typeA.color, 0.16));
-  glowA.addColorStop(1, 'rgba(12,10,9,0)');
-  ctx.fillStyle = glowA;
-  ctx.fillRect(0, 0, CARD_WIDTH, 400);
+  const washB = ctx.createRadialGradient(380, 180, 0, 380, 180, 200);
+  washB.addColorStop(0, hexToRgba(typeB.color, 0.08));
+  washB.addColorStop(1, hexToRgba(typeB.color, 0));
+  ctx.fillStyle = washB;
+  ctx.fillRect(CARD_WIDTH / 2, 0, CARD_WIDTH / 2, 360);
 
-  const glowB = ctx.createRadialGradient(380, 200, 0, 380, 200, 250);
-  glowB.addColorStop(0, hexToRgba(typeB.color, 0.16));
-  glowB.addColorStop(1, 'rgba(12,10,9,0)');
-  ctx.fillStyle = glowB;
-  ctx.fillRect(0, 0, CARD_WIDTH, 400);
+  // Card border
+  strokeRoundedRect(ctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 24, hexToRgba(tierColor, 0.35), 2.5);
+  strokeRoundedRect(ctx, 22, 22, CARD_WIDTH - 44, CARD_HEIGHT - 44, 18, hexToRgba(tierColor, 0.1), 1);
 
-  // Header
-  ctx.fillStyle = '#78716c';
-  ctx.font = `13px ${FONT_MONO}`;
-  ctx.fillText('SBTI CP 配对报告 //', 36, 32);
-  ctx.textAlign = 'right';
-  ctx.fillStyle = '#a8a29e';
-  ctx.font = `11px ${FONT_MONO}`;
-  ctx.fillText(SHARE_SITE_URL, CARD_WIDTH - 36, 32);
-  ctx.textAlign = 'left';
+  // Corner ornaments
+  ctx.fillStyle = hexToRgba(tierColor, 0.4);
+  ctx.font = `14px ${FONT_SANS}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('✦', 36, 28);
+  ctx.fillText('✦', CARD_WIDTH - 36, 28);
+  ctx.fillText('✦', 36, CARD_HEIGHT - 44);
+  ctx.fillText('✦', CARD_WIDTH - 36, CARD_HEIGHT - 44);
 
-  // Title
-  ctx.fillStyle = '#a8a29e';
-  ctx.font = `15px ${FONT_SANS}`;
-  ctx.fillText('我们的 CP 配对结果', 36, 70);
+  // ========== Header ==========
+  ctx.fillStyle = tierColor;
+  ctx.font = `600 12px ${FONT_MONO}`;
+  ctx.fillText('SBTI CP 配对鉴定', CARD_WIDTH / 2, 46);
 
-  // Two personality avatars side by side
-  const avatarY = 100;
-  const avatarSize = 160;
+  ctx.fillStyle = MED;
+  ctx.font = `13px ${FONT_SANS}`;
+  ctx.fillText('我们的 CP 配对结果', CARD_WIDTH / 2, 68);
+
+  // ========== Two character avatars ==========
+  const avatarY = 96;
+  const avatarSize = 150;
   const gap = 40;
   const leftX = CARD_WIDTH / 2 - avatarSize - gap / 2;
   const rightX = CARD_WIDTH / 2 + gap / 2;
 
   // Type A avatar
-  fillRoundedRect(ctx, leftX, avatarY, avatarSize, avatarSize, 20, hexToRgba(typeA.color, 0.15));
-  strokeRoundedRect(ctx, leftX, avatarY, avatarSize, avatarSize, 20, hexToRgba(typeA.color, 0.3));
+  fillRoundedRect(ctx, leftX, avatarY, avatarSize, avatarSize, 18, '#ffffff');
+  strokeRoundedRect(ctx, leftX, avatarY, avatarSize, avatarSize, 18, hexToRgba(typeA.color, 0.25));
   if (imgA) {
     ctx.save();
-    roundRectPath(ctx, leftX + 4, avatarY + 4, avatarSize - 8, avatarSize - 8, 16);
+    roundRectPath(ctx, leftX + 4, avatarY + 4, avatarSize - 8, avatarSize - 8, 14);
     ctx.clip();
     drawImageContain(ctx, imgA, leftX + 4, avatarY + 4, avatarSize - 8, avatarSize - 8);
     ctx.restore();
   } else {
-    ctx.fillStyle = '#fafaf9';
+    ctx.fillStyle = DARK;
     ctx.font = `48px ${FONT_SANS}`;
-    ctx.textAlign = 'center';
-    ctx.fillText(typeA.emoji, leftX + avatarSize / 2, avatarY + 18);
-    ctx.textAlign = 'left';
+    ctx.fillText(typeA.emoji, leftX + avatarSize / 2, avatarY + 20);
   }
 
   // Type B avatar
-  fillRoundedRect(ctx, rightX, avatarY, avatarSize, avatarSize, 20, hexToRgba(typeB.color, 0.15));
-  strokeRoundedRect(ctx, rightX, avatarY, avatarSize, avatarSize, 20, hexToRgba(typeB.color, 0.3));
+  fillRoundedRect(ctx, rightX, avatarY, avatarSize, avatarSize, 18, '#ffffff');
+  strokeRoundedRect(ctx, rightX, avatarY, avatarSize, avatarSize, 18, hexToRgba(typeB.color, 0.25));
   if (imgB) {
     ctx.save();
-    roundRectPath(ctx, rightX + 4, avatarY + 4, avatarSize - 8, avatarSize - 8, 16);
+    roundRectPath(ctx, rightX + 4, avatarY + 4, avatarSize - 8, avatarSize - 8, 14);
     ctx.clip();
     drawImageContain(ctx, imgB, rightX + 4, avatarY + 4, avatarSize - 8, avatarSize - 8);
     ctx.restore();
   } else {
-    ctx.fillStyle = '#fafaf9';
+    ctx.fillStyle = DARK;
     ctx.font = `48px ${FONT_SANS}`;
-    ctx.textAlign = 'center';
-    ctx.fillText(typeB.emoji, rightX + avatarSize / 2, avatarY + 18);
-    ctx.textAlign = 'left';
+    ctx.fillText(typeB.emoji, rightX + avatarSize / 2, avatarY + 20);
   }
 
-  // Heart/VS between avatars
+  // Heart between avatars
   ctx.fillStyle = tierColor;
-  ctx.font = `28px ${FONT_SANS}`;
-  ctx.textAlign = 'center';
-  ctx.fillText('💕', CARD_WIDTH / 2, avatarY + 62);
-  ctx.textAlign = 'left';
+  ctx.font = `26px ${FONT_SANS}`;
+  ctx.fillText('💕', CARD_WIDTH / 2, avatarY + 58);
 
   // Labels under avatars
-  const labelY = avatarY + avatarSize + 10;
-  ctx.textAlign = 'center';
+  const labelY = avatarY + avatarSize + 8;
   ctx.fillStyle = typeA.color;
-  ctx.font = `600 15px ${FONT_MONO}`;
+  ctx.font = `600 13px ${FONT_MONO}`;
   ctx.fillText(typeA.code, leftX + avatarSize / 2, labelY);
-  ctx.fillStyle = '#fafaf9';
-  ctx.font = `600 18px ${FONT_SANS}`;
-  ctx.fillText(typeA.name, leftX + avatarSize / 2, labelY + 22);
+  ctx.fillStyle = DARK;
+  ctx.font = `600 16px ${FONT_SANS}`;
+  ctx.fillText(typeA.name, leftX + avatarSize / 2, labelY + 20);
 
   ctx.fillStyle = typeB.color;
-  ctx.font = `600 15px ${FONT_MONO}`;
+  ctx.font = `600 13px ${FONT_MONO}`;
   ctx.fillText(typeB.code, rightX + avatarSize / 2, labelY);
-  ctx.fillStyle = '#fafaf9';
-  ctx.font = `600 18px ${FONT_SANS}`;
-  ctx.fillText(typeB.name, rightX + avatarSize / 2, labelY + 22);
-  ctx.textAlign = 'left';
+  ctx.fillStyle = DARK;
+  ctx.font = `600 16px ${FONT_SANS}`;
+  ctx.fillText(typeB.name, rightX + avatarSize / 2, labelY + 20);
 
-  // Big score circle
-  const scoreY = 360;
+  // ========== Score circle ==========
+  const scoreY = 340;
   const scoreCenterX = CARD_WIDTH / 2;
-  const scoreRadius = 52;
+  const scoreRadius = 48;
 
-  // Background circle
   ctx.beginPath();
   ctx.arc(scoreCenterX, scoreY + scoreRadius, scoreRadius, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255,255,255,0.03)';
+  ctx.fillStyle = hexToRgba(tierColor, 0.06);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-  ctx.lineWidth = 3;
+  ctx.strokeStyle = DIV;
+  ctx.lineWidth = 2;
   ctx.stroke();
 
   // Progress arc
@@ -274,32 +272,30 @@ async function renderCPShareImage(result: CPResult) {
   ctx.lineCap = 'butt';
 
   // Score text
-  ctx.textAlign = 'center';
   ctx.fillStyle = tierColor;
-  ctx.font = `700 36px ${FONT_MONO}`;
-  ctx.fillText(`${overall}%`, scoreCenterX, scoreY + scoreRadius - 20);
-  ctx.font = `600 14px ${FONT_SANS}`;
-  ctx.fillText(`${tierEmoji} ${tier}`, scoreCenterX, scoreY + scoreRadius + 22);
+  ctx.font = `700 32px ${FONT_MONO}`;
+  ctx.fillText(`${overall}%`, scoreCenterX, scoreY + scoreRadius - 18);
+  ctx.font = `600 13px ${FONT_SANS}`;
+  ctx.fillText(`${tierEmoji} ${tier}`, scoreCenterX, scoreY + scoreRadius + 20);
+
+  // ========== Summary box ==========
+  const summaryY = 460;
+  const summaryWidth = CARD_WIDTH - 80;
+  fillRoundedRect(ctx, 40, summaryY, summaryWidth, 110, 16, hexToRgba(tierColor, 0.04));
+  strokeRoundedRect(ctx, 40, summaryY, summaryWidth, 110, 16, hexToRgba(tierColor, 0.12));
+
   ctx.textAlign = 'left';
-
-  // Summary text box
-  const summaryY = 490;
-  const summaryWidth = CARD_WIDTH - 72;
-  fillRoundedRect(ctx, 36, summaryY, summaryWidth, 120, 16, 'rgba(255,255,255,0.04)');
-  strokeRoundedRect(ctx, 36, summaryY, summaryWidth, 120, 16, 'rgba(255,255,255,0.07)');
-
-  ctx.fillStyle = '#78716c';
+  ctx.fillStyle = MED;
   ctx.font = `11px ${FONT_MONO}`;
-  ctx.fillText('配对速写', 56, summaryY + 16);
+  ctx.fillText('配对速写', 60, summaryY + 16);
 
-  ctx.fillStyle = '#d6d3d1';
+  ctx.fillStyle = DARK;
   ctx.font = `13px ${FONT_SANS}`;
-  // Simple text wrap for summary
   const maxWidth = summaryWidth - 40;
-  const lines: string[] = [];
+  const sLines: string[] = [];
   let remaining = summary;
   let safety = 0;
-  while (remaining.length > 0 && lines.length < 4 && safety < 100) {
+  while (remaining.length > 0 && sLines.length < 4 && safety < 100) {
     safety++;
     let line = '';
     let i = 0;
@@ -309,111 +305,113 @@ async function renderCPShareImage(result: CPResult) {
       line = candidate;
       i++;
     }
-    if (i < remaining.length && lines.length === 3) {
+    if (i < remaining.length && sLines.length === 3) {
       while (line && ctx.measureText(line + '…').width > maxWidth) line = line.slice(0, -1);
       line += '…';
     }
-    lines.push(line);
+    sLines.push(line);
     remaining = remaining.slice(i);
   }
-  lines.forEach((line, idx) => {
-    ctx.fillText(line, 56, summaryY + 40 + idx * 20);
+  sLines.forEach((line, idx) => {
+    ctx.fillText(line, 60, summaryY + 38 + idx * 18);
   });
 
-  // Model compatibility bars
-  const barStartY = 630;
-  ctx.fillStyle = '#78716c';
-  ctx.font = `12px ${FONT_SANS}`;
-  ctx.fillText('五大模型契合度', 36, barStartY);
+  // ========== Model compatibility bars ==========
+  const barStartY = 588;
+  ctx.fillStyle = MED;
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.fillText('五大模型契合度', 44, barStartY);
 
   modelScores.forEach((ms, index) => {
     const colors = MODEL_COLORS[ms.model];
-    const rowY = barStartY + 30 + index * 34;
+    const rowY = barStartY + 24 + index * 30;
     const barX = 130;
-    const barWidth = 326;
+    const barWidth = 320;
     const progressWidth = Math.max(20, (ms.score / 100) * barWidth);
 
-    ctx.fillStyle = '#a8a29e';
+    ctx.fillStyle = DARK;
     ctx.font = `13px ${FONT_SANS}`;
-    ctx.fillText(ms.name, 36, rowY);
+    ctx.fillText(ms.name, 44, rowY);
 
-    fillRoundedRect(ctx, barX, rowY + 7, barWidth, 8, 999, 'rgba(255,255,255,0.08)');
-    fillRoundedRect(ctx, barX, rowY + 7, progressWidth, 8, 999, colors.base);
+    fillRoundedRect(ctx, barX, rowY + 7, barWidth, 7, 999, DIV);
+    fillRoundedRect(ctx, barX, rowY + 7, progressWidth, 7, 999, colors.base);
 
     ctx.fillStyle = colors.base;
-    ctx.font = `600 14px ${FONT_MONO}`;
+    ctx.font = `600 12px ${FONT_MONO}`;
     ctx.textAlign = 'right';
-    ctx.fillText(`${ms.score}`, 492, rowY - 1);
+    ctx.fillText(`${ms.score}`, 488, rowY);
     ctx.textAlign = 'left';
   });
 
-  // Dimension highlights
-  const highlightY = 818;
+  // ========== Dimension highlights ==========
+  const highlightY = barStartY + 24 + modelScores.length * 30 + 12;
   const best = result.comparisons.filter(c => c.compatibility === 100).slice(0, 3);
   const worst = result.comparisons.filter(c => c.compatibility <= 30).slice(0, 3);
 
-  ctx.fillStyle = '#78716c';
+  ctx.fillStyle = MED;
   ctx.font = `12px ${FONT_SANS}`;
-  ctx.fillText('高度契合', 36, highlightY);
+  ctx.fillText('高度契合', 44, highlightY);
 
   if (best.length > 0) {
     ctx.fillStyle = '#22c55e';
     ctx.font = `13px ${FONT_SANS}`;
-    ctx.fillText(best.map(c => c.dimensionName).join('  ·  '), 110, highlightY);
+    ctx.fillText(best.map(c => c.dimensionName).join('  ·  '), 120, highlightY);
   } else {
-    ctx.fillStyle = '#a8a29e';
+    ctx.fillStyle = LIGHT;
     ctx.font = `13px ${FONT_SANS}`;
-    ctx.fillText('—', 110, highlightY);
+    ctx.fillText('—', 120, highlightY);
   }
 
-  ctx.fillStyle = '#78716c';
+  ctx.fillStyle = MED;
   ctx.font = `12px ${FONT_SANS}`;
-  ctx.fillText('差异地带', 36, highlightY + 26);
+  ctx.fillText('差异地带', 44, highlightY + 24);
 
   if (worst.length > 0) {
     ctx.fillStyle = '#ef4444';
     ctx.font = `13px ${FONT_SANS}`;
-    ctx.fillText(worst.map(c => c.dimensionName).join('  ·  '), 110, highlightY + 26);
+    ctx.fillText(worst.map(c => c.dimensionName).join('  ·  '), 120, highlightY + 24);
   } else {
-    ctx.fillStyle = '#a8a29e';
+    ctx.fillStyle = LIGHT;
     ctx.font = `13px ${FONT_SANS}`;
-    ctx.fillText('—', 110, highlightY + 26);
+    ctx.fillText('—', 120, highlightY + 24);
   }
 
-  // Divider
-  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  // ========== Divider ==========
+  const divFooterY = highlightY + 60;
+  ctx.strokeStyle = DIV;
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(36, 890);
-  ctx.lineTo(CARD_WIDTH - 36, 890);
+  ctx.moveTo(60, divFooterY);
+  ctx.lineTo(CARD_WIDTH - 60, divFooterY);
   ctx.stroke();
 
-  // Footer
-  const footerY = 910;
+  // ========== Footer ==========
+  const ftY = divFooterY + 16;
 
-  ctx.fillStyle = '#fafaf9';
-  ctx.font = `600 18px ${FONT_SANS}`;
-  ctx.fillText(`${typeA.code} × ${typeB.code}`, 36, footerY);
+  ctx.fillStyle = DARK;
+  ctx.font = `600 16px ${FONT_SANS}`;
+  ctx.fillText(`${typeA.code} × ${typeB.code}`, 48, ftY);
 
   ctx.fillStyle = tierColor;
-  ctx.font = `600 14px ${FONT_SANS}`;
-  ctx.fillText(`契合度 ${overall}%`, 36, footerY + 28);
+  ctx.font = `600 13px ${FONT_SANS}`;
+  ctx.fillText(`契合度 ${overall}%`, 48, ftY + 24);
 
-  ctx.fillStyle = '#78716c';
-  ctx.font = `13px ${FONT_SANS}`;
-  ctx.fillText('来测测你和好友的 CP 值', 36, footerY + 56);
+  ctx.fillStyle = MED;
+  ctx.font = `12px ${FONT_SANS}`;
+  ctx.fillText('来测测你和好友的 CP 值', 48, ftY + 48);
 
-  ctx.fillStyle = '#f59e0b';
-  ctx.font = `12px ${FONT_MONO}`;
-  ctx.fillText(SHARE_SITE_URL, 36, footerY + 82);
+  ctx.fillStyle = tierColor;
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.fillText(SHARE_SITE_URL, 48, ftY + 68);
 
   // QR
-  const qrSize = 80;
-  const qrX = CARD_WIDTH - 36 - qrSize;
-  const qrY = footerY + 10;
-  fillRoundedRect(ctx, qrX, qrY, qrSize, qrSize, 12, '#ffffff');
+  const qrSize = 68;
+  const qrX = CARD_WIDTH - 48 - qrSize;
+  const qrY = ftY + 4;
+  fillRoundedRect(ctx, qrX - 3, qrY - 3, qrSize + 6, qrSize + 6, 10, '#ffffff');
+  strokeRoundedRect(ctx, qrX - 3, qrY - 3, qrSize + 6, qrSize + 6, 10, DIV);
   if (qrImage) {
-    drawImageContain(ctx, qrImage, qrX + 4, qrY + 4, qrSize - 8, qrSize - 8);
+    drawImageContain(ctx, qrImage, qrX, qrY, qrSize, qrSize);
   }
 
   return canvas.toDataURL('image/png');

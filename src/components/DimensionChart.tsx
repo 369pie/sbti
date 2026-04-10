@@ -77,20 +77,20 @@ export function DimensionRadar({ dimensions, size = 360 }: Props) {
           <Radar
             name="你的维度"
             dataKey="value"
-            stroke="#f97316"
+            stroke="#e8729c"
             strokeWidth={2}
             fill="url(#radarGradient)"
             fillOpacity={0.3}
             dot={{
               r: 3,
-              fill: '#f97316',
-              stroke: '#0c0a09',
+              fill: '#e8729c',
+              stroke: '#110f1c',
               strokeWidth: 1.5,
             }}
           />
           <defs>
             <radialGradient id="radarGradient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#f97316" stopOpacity={0.4} />
+              <stop offset="0%" stopColor="#e8729c" stopOpacity={0.4} />
               <stop offset="100%" stopColor="#f43f5e" stopOpacity={0.1} />
             </radialGradient>
           </defs>

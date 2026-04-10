@@ -12,22 +12,40 @@ import type { PersonalityType } from '@/lib/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
+import type { PersonalityGuide } from '@/lib/result-guide';
 
 interface Props {
   personality: PersonalityType;
   dimensionScores: DimensionScore[];
+  guide: PersonalityGuide;
 }
 
-export function ResultContent({ personality, dimensionScores }: Props) {
+export function ResultContent({ personality, dimensionScores, guide }: Props) {
   const [copied, setCopied] = useState(false);
   const [cpCopied, setCpCopied] = useState(false);
   const shareRef = useRef<ShareImageGeneratorHandle>(null);
 
+  const shareUrl = getSiteUrl(`/result/${personality.slug}/`);
+
   const copyLink = useCallback(() => {
-    navigator.clipboard.writeText(getSiteUrl(`/result/${personality.slug}/`));
+    navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [personality.slug]);
+  }, [shareUrl]);
+
+  const quickShare = useCallback(async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `我的 SBTI 人格是 ${personality.code}（${personality.name}）`,
+          text: personality.tagline,
+          url: shareUrl,
+        });
+        return;
+      } catch { /* user cancelled or not supported */ }
+    }
+    copyLink();
+  }, [copyLink, personality.code, personality.name, personality.tagline, shareUrl]);
 
   const copyCPLink = useCallback(() => {
     const url = getSiteUrl(`/cp/${personality.slug}/`);
@@ -36,7 +54,8 @@ export function ResultContent({ personality, dimensionScores }: Props) {
     setTimeout(() => setCpCopied(false), 2000);
   }, [personality.slug]);
 
-  const others = PERSONALITY_TYPES.filter(p => p.slug !== personality.slug).slice(0, 3);
+  const similarSlugs = new Set(guide.similarTypes.map((item) => item.personality.slug));
+  const others = PERSONALITY_TYPES.filter(p => p.slug !== personality.slug && !similarSlugs.has(p.slug)).slice(0, 3);
   const rarity = getRarity(personality.slug);
 
   return (
@@ -137,6 +156,145 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         </motion.div>
       </section>
 
+      <section className="max-w-3xl mx-auto px-6 pb-16">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.24, duration: 0.5 }}
+        >
+          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
+            人格类型解释
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {guide.explanation.map((item) => (
+              <article
+                key={item.title}
+                className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-5"
+              >
+                <h3 className="text-base font-medium text-text-primary mb-3">{item.title}</h3>
+                <p className="text-sm text-text-secondary leading-7">{item.body}</p>
+              </article>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
+      <section className="max-w-3xl mx-auto px-6 pb-16">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.28, duration: 0.5 }}
+          className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 sm:p-8"
+        >
+          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-5">
+            适合人群
+          </h2>
+          <ul className="space-y-3 text-text-secondary text-sm sm:text-base leading-7">
+            {guide.suitableFor.map((item) => (
+              <li key={item} className="flex gap-3">
+                <span className="mt-1 h-2 w-2 rounded-full flex-shrink-0" style={{ background: personality.color }} />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+      </section>
+
+      <section className="max-w-3xl mx-auto px-6 pb-16">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.32, duration: 0.5 }}
+        >
+          <div className="flex items-end justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-2">
+                相近人格对比
+              </h2>
+              <p className="text-sm text-text-secondary leading-6">
+                如果你觉得这个结果和别的人格只差一点点，先看这两个最接近的类型。
+              </p>
+            </div>
+            <Link href="/guide/how-to-read-sbti-results" className="text-sm text-text-muted hover:text-accent transition-colors">
+              看结果说明 →
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {guide.similarTypes.map((item) => (
+              <Link
+                key={item.personality.slug}
+                href={`/result/${item.personality.slug}`}
+                className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-5 hover:bg-bg-secondary/60 hover:border-border transition-all"
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-14 h-14 rounded-xl overflow-hidden" style={{ background: `${item.personality.color}15` }}>
+                    <NextImage
+                      src={getTypeImage(item.personality.slug)}
+                      alt={item.personality.name}
+                      width={56}
+                      height={56}
+                      className="w-full h-full object-contain p-1"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-xs font-mono tracking-wider block mb-1" style={{ color: item.personality.color }}>
+                      {item.personality.code}
+                    </span>
+                    <h3 className="text-base font-medium text-text-primary">{item.personality.name}</h3>
+                    <p className="text-xs text-text-muted mt-1">{item.personality.tagline}</p>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <p className="text-xs font-mono tracking-wider text-text-muted uppercase mb-2">相似点</p>
+                  <div className="flex flex-wrap gap-2">
+                    {item.sharedTraits.map((trait) => (
+                      <span key={trait} className="text-xs px-2.5 py-1 rounded-full bg-bg-tertiary text-text-secondary">
+                        {trait}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs font-mono tracking-wider text-text-muted uppercase mb-2">关键差异</p>
+                  <ul className="space-y-2 text-sm text-text-secondary leading-6">
+                    {item.differenceSummary.map((summary) => (
+                      <li key={summary} className="flex gap-2">
+                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-text-muted flex-shrink-0" />
+                        <span>{summary}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
+      <section className="max-w-2xl mx-auto px-6 pb-16">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.36, duration: 0.5 }}
+        >
+          <div className="rounded-2xl border border-accent/20 bg-accent/5 p-6 sm:p-8 text-center">
+            <div className="text-3xl mb-3">📚</div>
+            <h2 className="text-lg font-semibold mb-2">继续看测试说明与结果解读</h2>
+            <p className="text-sm text-text-secondary max-w-md mx-auto mb-5 leading-7">
+              如果你已经拿到了结果，但还想看懂十五维、稀有度、相近人格和 SBTI / MBTI 的差别，可以继续读说明栏目。
+            </p>
+            <Link
+              href="/guide"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:brightness-110 transition-all"
+            >
+              进入说明栏目
+            </Link>
+          </div>
+        </motion.div>
+      </section>
+
       {/* Radar Chart */}
       <section className="max-w-3xl mx-auto px-6 pb-16">
         <motion.div
@@ -190,7 +348,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer"
               style={{
                 background: cpCopied ? '#22c55e' : personality.color,
-                color: '#0c0a09',
+                color: '#110f1c',
               }}
             >
               {cpCopied ? '链接已复制 ✓' : '复制 CP 邀请链接'}
@@ -224,6 +382,15 @@ export function ResultContent({ personality, dimensionScores }: Props) {
                 className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all cursor-pointer"
               >
                 {copied ? '已复制 ✓' : '复制链接'}
+              </button>
+              <button
+                onClick={quickShare}
+                className="flex-1 py-3 rounded-xl border border-accent/30 text-sm text-accent hover:bg-accent/10 transition-all cursor-pointer flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                快速分享
               </button>
               <Link
                 href="/test"

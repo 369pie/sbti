@@ -60,6 +60,12 @@ export default function AboutPage() {
         >
           查看 27 种人格
         </Link>
+        <Link
+          href="/guide"
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all"
+        >
+          进入说明栏目
+        </Link>
       </div>
     </div>
   );

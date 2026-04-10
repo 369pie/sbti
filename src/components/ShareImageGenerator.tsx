@@ -19,7 +19,7 @@ interface Props {
 }
 
 const CARD_WIDTH = 540;
-const CARD_HEIGHT = 1060;
+const CARD_HEIGHT = 960;
 const CARD_SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
@@ -200,7 +200,7 @@ async function createQrImage() {
   const qrDataUrl = await QRCode.toDataURL(SHARE_SITE_URL, {
     width: 200,
     margin: 1,
-    color: { dark: '#000000', light: '#ffffffff' },
+    color: { dark: '#2d2236', light: '#FFF9F2' },
     errorCorrectionLevel: 'M',
   });
 
@@ -227,6 +227,12 @@ function drawImageContain(
 }
 
 async function renderShareImage(personality: PersonalityType, dimensionScores: DimensionScore[]) {
+  const BG = '#FFF9F2';
+  const DARK = '#2d2236';
+  const MED = '#6b6380';
+  const LIGHT = '#a099b4';
+  const DIV = '#e8e0d6';
+
   const [typeImage, qrImage] = await Promise.all([
     getCachedImage(getTypeImage(personality.slug)).catch(() => null),
     createQrImage().catch(() => null),
@@ -235,193 +241,163 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   const canvas = document.createElement('canvas');
   canvas.width = CARD_WIDTH * CARD_SCALE;
   canvas.height = CARD_HEIGHT * CARD_SCALE;
-
   const ctx = canvas.getContext('2d');
-  if (!ctx) {
-    throw new Error('Canvas context unavailable');
-  }
+  if (!ctx) throw new Error('Canvas context unavailable');
 
   ctx.scale(CARD_SCALE, CARD_SCALE);
   ctx.textBaseline = 'top';
-  ctx.fillStyle = '#0c0a09';
+
+  // ========== Cream background ==========
+  ctx.fillStyle = BG;
   ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-  ctx.strokeStyle = hexToRgba('#292524', 0.38);
-  ctx.lineWidth = 1;
-  for (let position = 0; position <= CARD_WIDTH; position += 30) {
-    ctx.beginPath();
-    ctx.moveTo(position, 0);
-    ctx.lineTo(position, CARD_HEIGHT);
-    ctx.stroke();
-  }
-  for (let position = 0; position <= CARD_HEIGHT; position += 30) {
-    ctx.beginPath();
-    ctx.moveTo(0, position);
-    ctx.lineTo(CARD_WIDTH, position);
-    ctx.stroke();
-  }
+  // Soft color wash
+  const wash = ctx.createRadialGradient(CARD_WIDTH / 2, 240, 0, CARD_WIDTH / 2, 240, 320);
+  wash.addColorStop(0, hexToRgba(personality.color, 0.09));
+  wash.addColorStop(1, hexToRgba(personality.color, 0));
+  ctx.fillStyle = wash;
+  ctx.fillRect(0, 0, CARD_WIDTH, 500);
 
-  const glow = ctx.createRadialGradient(270, 300, 0, 270, 300, 340);
-  glow.addColorStop(0, hexToRgba(personality.color, 0.28));
-  glow.addColorStop(1, 'rgba(12, 10, 9, 0)');
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, CARD_WIDTH, 560);
+  // Card border
+  strokeRoundedRect(ctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 24, hexToRgba(personality.color, 0.4), 2.5);
+  // Inner decorative rule
+  strokeRoundedRect(ctx, 22, 22, CARD_WIDTH - 44, CARD_HEIGHT - 44, 18, hexToRgba(personality.color, 0.1), 1);
 
-  ctx.fillStyle = '#78716c';
-  ctx.font = `13px ${FONT_MONO}`;
-  ctx.fillText('SBTI 人格报告 //', 36, 32);
-
-  ctx.textAlign = 'right';
-  ctx.fillStyle = '#a8a29e';
-  ctx.font = `11px ${FONT_MONO}`;
-  ctx.fillText(SHARE_SITE_URL, CARD_WIDTH - 36, 32);
-  ctx.textAlign = 'left';
-
-  ctx.fillStyle = '#a8a29e';
-  ctx.font = `16px ${FONT_SANS}`;
+  // Corner ornaments
+  ctx.fillStyle = hexToRgba(personality.color, 0.45);
+  ctx.font = `14px ${FONT_SANS}`;
   ctx.textAlign = 'center';
-  ctx.fillText('在SBTI商业性格测定中，我被鉴定为', CARD_WIDTH / 2, 70);
+  ctx.fillText('✦', 36, 28);
+  ctx.fillText('✦', CARD_WIDTH - 36, 28);
+  ctx.fillText('✦', 36, CARD_HEIGHT - 44);
+  ctx.fillText('✦', CARD_WIDTH - 36, CARD_HEIGHT - 44);
 
-  // ============ HERO CHARACTER IMAGE (dominant visual) ============
-  const imageCardX = 90;
-  const imageCardY = 100;
-  const imageCardWidth = CARD_WIDTH - 180;
-  const imageCardHeight = 380;
-  const imageGradient = ctx.createLinearGradient(imageCardX, imageCardY, imageCardX + imageCardWidth, imageCardY + imageCardHeight);
-  imageGradient.addColorStop(0, hexToRgba(personality.color, 0.14));
-  imageGradient.addColorStop(1, hexToRgba(personality.color, 0.04));
-  fillRoundedRect(ctx, imageCardX, imageCardY, imageCardWidth, imageCardHeight, 24, imageGradient);
-  strokeRoundedRect(ctx, imageCardX, imageCardY, imageCardWidth, imageCardHeight, 24, hexToRgba(personality.color, 0.28));
+  // ========== Header ==========
+  ctx.fillStyle = personality.color;
+  ctx.font = `600 12px ${FONT_MONO}`;
+  ctx.fillText('SBTI 人格鉴定', CARD_WIDTH / 2, 48);
+
+  // ========== Character image ==========
+  const imgX = 90;
+  const imgY = 78;
+  const imgW = CARD_WIDTH - 180;
+  const imgH = 340;
+
+  fillRoundedRect(ctx, imgX, imgY, imgW, imgH, 20, '#ffffff');
+  strokeRoundedRect(ctx, imgX, imgY, imgW, imgH, 20, hexToRgba(personality.color, 0.18));
 
   if (typeImage) {
     ctx.save();
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.36)';
-    ctx.shadowBlur = 24;
-    drawImageContain(ctx, typeImage, imageCardX + 20, imageCardY + 20, imageCardWidth - 40, imageCardHeight - 40);
+    roundRectPath(ctx, imgX + 4, imgY + 4, imgW - 8, imgH - 8, 16);
+    ctx.clip();
+    drawImageContain(ctx, typeImage, imgX + 12, imgY + 12, imgW - 24, imgH - 24);
     ctx.restore();
   } else {
-    ctx.fillStyle = '#fafaf9';
-    ctx.font = `700 120px ${FONT_SANS}`;
-    ctx.fillText(personality.emoji, imageCardX + imageCardWidth / 2, imageCardY + 120);
+    ctx.fillStyle = DARK;
+    ctx.font = `120px ${FONT_SANS}`;
+    ctx.fillText(personality.emoji, CARD_WIDTH / 2, imgY + 90);
   }
 
-  const badgeText = `#${personality.isSpecial ? '特殊人格' : '标准人格'}`;
-  ctx.font = `12px ${FONT_MONO}`;
+  // Type badge on image
+  const typeBadge = personality.isSpecial ? '✦ 特殊人格' : '标准人格';
+  ctx.font = `11px ${FONT_MONO}`;
   ctx.textAlign = 'left';
-  const badgeWidth = ctx.measureText(badgeText).width + 24;
-  const badgeX = imageCardX + imageCardWidth - badgeWidth - 16;
-  const badgeY = imageCardY + imageCardHeight - 40;
-  fillRoundedRect(ctx, badgeX, badgeY, badgeWidth, 28, 14, 'rgba(0, 0, 0, 0.5)');
-  ctx.fillStyle = personality.color;
-  ctx.fillText(badgeText, badgeX + 12, badgeY + 7);
+  const tbW = ctx.measureText(typeBadge).width + 20;
+  const tbX = imgX + imgW - tbW - 10;
+  const tbY = imgY + imgH - 32;
+  fillRoundedRect(ctx, tbX, tbY, tbW, 24, 12, hexToRgba(personality.color, 0.88));
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(typeBadge, tbX + 10, tbY + 6);
 
-  // Name + Code centered
-  const nameY = imageCardY + imageCardHeight + 24;
-  ctx.fillStyle = '#fafaf9';
-  ctx.font = `700 48px ${FONT_SANS}`;
+  // ========== Name + Code ==========
+  const nameY = imgY + imgH + 22;
+  ctx.fillStyle = DARK;
+  ctx.font = `700 40px ${FONT_SANS}`;
   ctx.textAlign = 'center';
   ctx.fillText(personality.name, CARD_WIDTH / 2, nameY);
 
   ctx.fillStyle = personality.color;
-  ctx.font = `600 18px ${FONT_MONO}`;
-  ctx.fillText(personality.code, CARD_WIDTH / 2, nameY + 60);
+  ctx.font = `600 16px ${FONT_MONO}`;
+  ctx.fillText(personality.code, CARD_WIDTH / 2, nameY + 50);
 
-  // Rarity badge + population %
+  // ========== Rarity stars ==========
   const rarity = getRarity(personality.slug);
-  const rarityY = nameY + 90;
-  const rarityText = rarity.label;
-  ctx.font = `600 13px ${FONT_SANS}`;
-  const rarityW = ctx.measureText(rarityText).width + 28;
-  const pctText = `仅 ${rarity.populationPct}% 的测试者`;
-  ctx.font = `12px ${FONT_SANS}`;
-  const pctW = ctx.measureText(pctText).width;
-  const totalBadgeW = rarityW + 8 + pctW;
-  const badgeStartX = (CARD_WIDTH - totalBadgeW) / 2;
-  // rarity pill
-  fillRoundedRect(ctx, badgeStartX, rarityY, rarityW, 24, 12, rarity.bgColor);
+  const rarityY = nameY + 78;
+  const starMap: Record<string, number> = { legendary: 5, epic: 4, rare: 3, uncommon: 2, common: 1 };
+  const starCount = starMap[rarity.tier] || 1;
+  const stars = '★'.repeat(starCount) + '☆'.repeat(5 - starCount);
   ctx.fillStyle = rarity.color;
-  ctx.font = `600 13px ${FONT_SANS}`;
-  ctx.fillText(rarityText, badgeStartX + rarityW / 2, rarityY + 5);
-  // population text
-  ctx.fillStyle = '#a8a29e';
-  ctx.font = `12px ${FONT_SANS}`;
-  ctx.fillText(pctText, badgeStartX + rarityW + 8 + pctW / 2, rarityY + 6);
-  ctx.textAlign = 'left';
+  ctx.font = `13px ${FONT_SANS}`;
+  ctx.fillText(`${stars}  ${rarity.label}  ·  ${rarity.populationPct}% 的人`, CARD_WIDTH / 2, rarityY);
 
-  // Tagline + description card
-  const descX = 36;
-  const descY = nameY + 130;
-  const descWidth = CARD_WIDTH - 72;
-  const descHeight = 120;
-  fillRoundedRect(ctx, descX, descY, descWidth, descHeight, 16, 'rgba(255, 255, 255, 0.04)');
-  strokeRoundedRect(ctx, descX, descY, descWidth, descHeight, 16, 'rgba(255, 255, 255, 0.07)');
-
+  // ========== Tagline ==========
+  const tagY = rarityY + 32;
   ctx.fillStyle = personality.color;
-  ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText(`"${personality.tagline}"`, descX + 24, descY + 20);
+  ctx.font = `600 15px ${FONT_SANS}`;
+  ctx.fillText(`「${personality.tagline}」`, CARD_WIDTH / 2, tagY);
 
-  ctx.fillStyle = '#d6d3d1';
-  ctx.font = `14px ${FONT_SANS}`;
-  drawWrappedText(ctx, personality.description, descX + 24, descY + 54, descWidth - 48, 24, 3);
-
-  const topDimensionScores = dimensionScores.slice(0, 3);
-  const barSectionY = descY + descHeight + 20;
-  const barRowSpacing = 30;
-  ctx.fillStyle = '#78716c';
-  ctx.font = `12px ${FONT_SANS}`;
-  ctx.fillText('核心特质 TOP 3', 36, barSectionY);
-
-  topDimensionScores.forEach((score, index) => {
-    const dim = DIMENSIONS.find(item => item.id === score.id);
-    if (!dim) return;
-
-    const color = MODEL_COLORS[dim.model].base;
-    const rowY = barSectionY + 38 + index * barRowSpacing;
-    const barX = 130;
-    const barWidth = 326;
-    const progressWidth = Math.max(36, (score.score / 15) * barWidth);
-
-    ctx.fillStyle = '#a8a29e';
-    ctx.font = `13px ${FONT_SANS}`;
-    ctx.fillText(dim.name, 36, rowY);
-
-    fillRoundedRect(ctx, barX, rowY + 7, barWidth, 8, 999, 'rgba(255, 255, 255, 0.08)');
-    fillRoundedRect(ctx, barX, rowY + 7, progressWidth, 8, 999, color);
-
-    ctx.fillStyle = color;
-    ctx.font = `600 14px ${FONT_MONO}`;
-    ctx.textAlign = 'right';
-    ctx.fillText(String(score.score), 492, rowY - 1);
-    ctx.textAlign = 'left';
+  // ========== Description ==========
+  const descY = tagY + 32;
+  ctx.fillStyle = MED;
+  ctx.font = `13px ${FONT_SANS}`;
+  const descLines = wrapText(ctx, personality.description, CARD_WIDTH - 100, 3);
+  descLines.forEach((line, i) => {
+    ctx.fillText(line, CARD_WIDTH / 2, descY + i * 22);
   });
 
-  const lastBarBottom = topDimensionScores.length > 0
-    ? barSectionY + 38 + (topDimensionScores.length - 1) * barRowSpacing + 15
-    : barSectionY + 24;
-  const footerDividerY = lastBarBottom + 12;
-  const footerTitleY = footerDividerY + 20;
-  const footerUrlY = footerDividerY + 50;
-  const qrCardY = footerDividerY - 4;
+  // ========== TOP 3 dimension pills ==========
+  const topScores = dimensionScores.slice(0, 3);
+  const pillY = descY + descLines.length * 22 + 20;
+  ctx.font = `600 11px ${FONT_SANS}`;
+  const pills = topScores.map(s => {
+    const dim = DIMENSIONS.find(d => d.id === s.id);
+    return {
+      label: dim ? `${dim.name} ${s.score}` : `${s.id} ${s.score}`,
+      color: dim ? MODEL_COLORS[dim.model].base : '#999',
+      w: 0,
+    };
+  });
+  pills.forEach(p => { p.w = ctx.measureText(p.label).width + 24; });
+  const totalPW = pills.reduce((s, p) => s + p.w, 0) + 10 * (pills.length - 1);
+  let px = (CARD_WIDTH - totalPW) / 2;
+  pills.forEach(p => {
+    fillRoundedRect(ctx, px, pillY, p.w, 26, 13, hexToRgba(p.color, 0.1));
+    strokeRoundedRect(ctx, px, pillY, p.w, 26, 13, hexToRgba(p.color, 0.25));
+    ctx.fillStyle = p.color;
+    ctx.font = `600 11px ${FONT_SANS}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(p.label, px + p.w / 2, pillY + 7);
+    px += p.w + 10;
+  });
 
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  // ========== Divider ==========
+  const divY = pillY + 46;
+  ctx.strokeStyle = DIV;
+  ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(36, footerDividerY);
-  ctx.lineTo(CARD_WIDTH - 36, footerDividerY);
+  ctx.moveTo(60, divY);
+  ctx.lineTo(CARD_WIDTH - 60, divY);
   ctx.stroke();
 
-  ctx.fillStyle = '#fafaf9';
-  ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText('测测你的隐藏人格', 36, footerTitleY);
+  // ========== Footer ==========
+  const ftY = divY + 18;
+  ctx.textAlign = 'left';
+  ctx.fillStyle = DARK;
+  ctx.font = `600 14px ${FONT_SANS}`;
+  ctx.fillText('测测你的隐藏人格', 48, ftY);
 
-  ctx.fillStyle = '#f59e0b';
-  ctx.font = `12px ${FONT_MONO}`;
-  ctx.fillText(SHARE_SITE_URL, 36, footerUrlY);
+  ctx.fillStyle = personality.color;
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.fillText(SHARE_SITE_URL, 48, ftY + 24);
 
-  fillRoundedRect(ctx, 424, qrCardY, 80, 80, 12, '#ffffff');
+  // QR code
+  const qrS = 60;
+  const qrX = CARD_WIDTH - 48 - qrS;
+  const qrY = ftY - 4;
+  fillRoundedRect(ctx, qrX - 3, qrY - 3, qrS + 6, qrS + 6, 10, '#ffffff');
+  strokeRoundedRect(ctx, qrX - 3, qrY - 3, qrS + 6, qrS + 6, 10, DIV);
   if (qrImage) {
-    drawImageContain(ctx, qrImage, 428, qrCardY + 4, 72, 72);
-  } else {
-    fillRoundedRect(ctx, 432, qrCardY + 8, 64, 64, 8, '#292524');
+    drawImageContain(ctx, qrImage, qrX, qrY, qrS, qrS);
   }
 
   return canvas.toDataURL('image/png');

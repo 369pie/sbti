@@ -213,7 +213,7 @@ export function Quiz() {
                         className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-mono transition-colors"
                         style={
                           selected
-                            ? { background: modelColor.base, color: '#0c0a09' }
+                            ? { background: modelColor.base, color: '#110f1c' }
                             : { background: 'rgba(68,64,60,0.5)', color: '#a8a29e' }
                         }
                       >

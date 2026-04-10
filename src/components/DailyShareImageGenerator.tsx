@@ -119,9 +119,14 @@ function drawImageContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
 }
 
 async function renderDailyShareImage(status: DailyStatusType, dimensionScores: DailyDimensionScore[]) {
+  const BG = '#FFF9F2';
+  const DARK = '#2d2236';
+  const MED = '#6b6380';
+  const DIV = '#e8e0d6';
+
   const [qrImage, charImage] = await Promise.all([
     QRCode.toDataURL(DAILY_SHARE_URL, {
-      width: 200, margin: 1, color: { dark: '#000000', light: '#ffffffff' }, errorCorrectionLevel: 'M',
+      width: 200, margin: 1, color: { dark: DARK, light: BG + 'ff' }, errorCorrectionLevel: 'M',
     }).then(url => loadImage(url)).catch(() => null),
     loadImage(getDailyTypeImage(status.slug)).catch(() => null),
   ]);
@@ -135,138 +140,135 @@ async function renderDailyShareImage(status: DailyStatusType, dimensionScores: D
   ctx.scale(CARD_SCALE, CARD_SCALE);
   ctx.textBaseline = 'top';
 
-  // Background
-  ctx.fillStyle = '#0c0a09';
+  // ========== Cream background ==========
+  ctx.fillStyle = BG;
   ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-  // Grid
-  ctx.strokeStyle = hexToRgba('#292524', 0.38);
-  ctx.lineWidth = 1;
-  for (let p = 0; p <= CARD_WIDTH; p += 30) { ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, CARD_HEIGHT); ctx.stroke(); }
-  for (let p = 0; p <= CARD_HEIGHT; p += 30) { ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(CARD_WIDTH, p); ctx.stroke(); }
+  const wash = ctx.createRadialGradient(CARD_WIDTH / 2, 220, 0, CARD_WIDTH / 2, 220, 300);
+  wash.addColorStop(0, hexToRgba(status.color, 0.09));
+  wash.addColorStop(1, hexToRgba(status.color, 0));
+  ctx.fillStyle = wash;
+  ctx.fillRect(0, 0, CARD_WIDTH, 460);
 
-  // Glow — larger, centered on character
-  const glow = ctx.createRadialGradient(270, 280, 0, 270, 280, 300);
-  glow.addColorStop(0, hexToRgba(status.color, 0.25));
-  glow.addColorStop(1, 'rgba(12, 10, 9, 0)');
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, CARD_WIDTH, 560);
+  // Card border
+  strokeRoundedRect(ctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 24, hexToRgba(status.color, 0.4), 2.5);
+  strokeRoundedRect(ctx, 22, 22, CARD_WIDTH - 44, CARD_HEIGHT - 44, 18, hexToRgba(status.color, 0.1), 1);
 
-  // Date header
+  // Corner ornaments
+  ctx.fillStyle = hexToRgba(status.color, 0.45);
+  ctx.font = `14px ${FONT_SANS}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('✦', 36, 28);
+  ctx.fillText('✦', CARD_WIDTH - 36, 28);
+  ctx.fillText('✦', 36, CARD_HEIGHT - 44);
+  ctx.fillText('✦', CARD_WIDTH - 36, CARD_HEIGHT - 44);
+
+  // ========== Header ==========
   const today = new Date();
   const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+  ctx.fillStyle = status.color;
+  ctx.font = `600 12px ${FONT_MONO}`;
+  ctx.fillText(`今日状态鉴定 · ${dateStr}`, CARD_WIDTH / 2, 48);
 
-  ctx.fillStyle = '#78716c';
-  ctx.font = `13px ${FONT_MONO}`;
-  ctx.fillText(`今日状态报告 // ${dateStr}`, 36, 32);
+  // ========== Character image ==========
+  const imgX = 100;
+  const imgY = 78;
+  const imgW = CARD_WIDTH - 200;
+  const imgH = 300;
 
-  ctx.textAlign = 'right';
-  ctx.fillStyle = '#a8a29e';
-  ctx.font = `11px ${FONT_MONO}`;
-  ctx.fillText(DAILY_SHARE_URL, CARD_WIDTH - 36, 32);
-  ctx.textAlign = 'left';
-
-  // Subtitle
-  ctx.fillStyle = '#a8a29e';
-  ctx.font = `16px ${FONT_SANS}`;
-  ctx.textAlign = 'center';
-  ctx.fillText('今天的我被鉴定为', CARD_WIDTH / 2, 70);
-
-  // ============ HERO CHARACTER IMAGE (dominant visual) ============
-  const charAreaY = 100;
-  const charAreaH = 320;
-  // Colored card behind character
-  const cardX = 100;
-  const cardW = CARD_WIDTH - 200;
-  fillRoundedRect(ctx, cardX, charAreaY, cardW, charAreaH, 28, hexToRgba(status.color, 0.08));
-  strokeRoundedRect(ctx, cardX, charAreaY, cardW, charAreaH, 28, hexToRgba(status.color, 0.18));
+  fillRoundedRect(ctx, imgX, imgY, imgW, imgH, 20, '#ffffff');
+  strokeRoundedRect(ctx, imgX, imgY, imgW, imgH, 20, hexToRgba(status.color, 0.18));
 
   if (charImage) {
     ctx.save();
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-    ctx.shadowBlur = 20;
-    drawImageContain(ctx, charImage, cardX + 20, charAreaY + 15, cardW - 40, charAreaH - 30);
+    roundRectPath(ctx, imgX + 4, imgY + 4, imgW - 8, imgH - 8, 16);
+    ctx.clip();
+    drawImageContain(ctx, charImage, imgX + 12, imgY + 12, imgW - 24, imgH - 24);
     ctx.restore();
   } else {
-    ctx.font = `160px ${FONT_SANS}`;
-    ctx.fillText(status.emoji, CARD_WIDTH / 2, charAreaY + 60);
+    ctx.font = `120px ${FONT_SANS}`;
+    ctx.fillText(status.emoji, CARD_WIDTH / 2, imgY + 70);
   }
 
-  // Name — large
-  const nameY = charAreaY + charAreaH + 24;
-  ctx.fillStyle = '#fafaf9';
-  ctx.font = `700 48px ${FONT_SANS}`;
+  // ========== Name + Code ==========
+  const nameY = imgY + imgH + 20;
+  ctx.fillStyle = DARK;
+  ctx.font = `700 40px ${FONT_SANS}`;
   ctx.fillText(status.name, CARD_WIDTH / 2, nameY);
 
-  // Code
   ctx.fillStyle = status.color;
-  ctx.font = `600 18px ${FONT_MONO}`;
-  ctx.fillText(status.code, CARD_WIDTH / 2, nameY + 60);
+  ctx.font = `600 16px ${FONT_MONO}`;
+  ctx.fillText(status.code, CARD_WIDTH / 2, nameY + 50);
   ctx.textAlign = 'left';
 
-  // Tagline card
-  const tagY = nameY + 100;
-  const tagW = CARD_WIDTH - 72;
-  fillRoundedRect(ctx, 36, tagY, tagW, 50, 16, 'rgba(255,255,255,0.04)');
-  strokeRoundedRect(ctx, 36, tagY, tagW, 50, 16, 'rgba(255,255,255,0.07)');
+  // ========== Tagline ==========
+  const tagY = nameY + 82;
+  const tagW = CARD_WIDTH - 80;
+  fillRoundedRect(ctx, 40, tagY, tagW, 44, 14, hexToRgba(status.color, 0.06));
+  strokeRoundedRect(ctx, 40, tagY, tagW, 44, 14, hexToRgba(status.color, 0.15));
   ctx.fillStyle = status.color;
-  ctx.font = `600 15px ${FONT_SANS}`;
+  ctx.font = `600 14px ${FONT_SANS}`;
   ctx.textAlign = 'center';
-  ctx.fillText(`"${status.tagline}"`, CARD_WIDTH / 2, tagY + 16);
+  ctx.fillText(`「${status.tagline}」`, CARD_WIDTH / 2, tagY + 14);
   ctx.textAlign = 'left';
 
-  // Dimension bars (compact)
-  const barY = tagY + 72;
-  ctx.fillStyle = '#78716c';
-  ctx.font = `12px ${FONT_SANS}`;
-  ctx.fillText('五维数据', 36, barY);
+  // ========== Dimension bars ==========
+  const barY = tagY + 60;
+  ctx.fillStyle = MED;
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.fillText('五维数据', 44, barY);
 
   dimensionScores.forEach((score, i) => {
     const dim = DAILY_DIMENSIONS.find(d => d.id === score.id);
     if (!dim) return;
     const color = DAILY_MODEL_COLORS[dim.model].base;
-    const rowY = barY + 30 + i * 32;
+    const rowY = barY + 24 + i * 28;
     const barX = 120;
-    const barW = 336;
+    const barW = 330;
     const pct = ((score.score - 1) / 2);
     const pw = Math.max(36, pct * barW);
 
-    ctx.fillStyle = '#a8a29e';
+    ctx.fillStyle = DARK;
     ctx.font = `13px ${FONT_SANS}`;
-    ctx.fillText(dim.name, 36, rowY);
+    ctx.fillText(dim.name, 44, rowY);
 
-    fillRoundedRect(ctx, barX, rowY + 6, barW, 8, 999, 'rgba(255,255,255,0.08)');
-    fillRoundedRect(ctx, barX, rowY + 6, pw, 8, 999, color);
+    fillRoundedRect(ctx, barX, rowY + 6, barW, 7, 999, DIV);
+    fillRoundedRect(ctx, barX, rowY + 6, pw, 7, 999, color);
 
     ctx.fillStyle = color;
-    ctx.font = `600 13px ${FONT_MONO}`;
+    ctx.font = `600 12px ${FONT_MONO}`;
     ctx.textAlign = 'right';
-    ctx.fillText(score.level, 492, rowY);
+    ctx.fillText(score.level, 488, rowY);
     ctx.textAlign = 'left';
   });
 
-  // Divider
-  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  // ========== Divider ==========
+  const footerDivY = barY + 24 + dimensionScores.length * 28 + 18;
+  ctx.strokeStyle = DIV;
+  ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(36, 850);
-  ctx.lineTo(CARD_WIDTH - 36, 850);
+  ctx.moveTo(60, footerDivY);
+  ctx.lineTo(CARD_WIDTH - 60, footerDivY);
   ctx.stroke();
 
-  // CTA
-  ctx.fillStyle = '#fafaf9';
-  ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText('测测你今天是什么状态？', 36, 870);
+  // ========== Footer ==========
+  const ftY = footerDivY + 18;
+  ctx.fillStyle = DARK;
+  ctx.font = `600 14px ${FONT_SANS}`;
+  ctx.fillText('测测你今天是什么状态？', 48, ftY);
 
-  ctx.fillStyle = '#14b8a6';
-  ctx.font = `12px ${FONT_MONO}`;
-  ctx.fillText(DAILY_SHARE_URL, 36, 900);
+  ctx.fillStyle = status.color;
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.fillText(DAILY_SHARE_URL, 48, ftY + 24);
 
   // QR
-  fillRoundedRect(ctx, 424, 848, 80, 80, 12, '#ffffff');
+  const qrS = 60;
+  const qrX = CARD_WIDTH - 48 - qrS;
+  const qrY = ftY - 4;
+  fillRoundedRect(ctx, qrX - 3, qrY - 3, qrS + 6, qrS + 6, 10, '#ffffff');
+  strokeRoundedRect(ctx, qrX - 3, qrY - 3, qrS + 6, qrS + 6, 10, DIV);
   if (qrImage) {
-    drawImageContain(ctx, qrImage, 428, 852, 72, 72);
-  } else {
-    fillRoundedRect(ctx, 432, 856, 64, 64, 8, '#292524');
+    drawImageContain(ctx, qrImage, qrX, qrY, qrS, qrS);
   }
 
   return canvas.toDataURL('image/png');
