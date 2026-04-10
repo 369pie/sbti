@@ -167,6 +167,12 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   ctx.font = `13px ${FONT_MONO}`;
   ctx.fillText('WPTI 打工人格报告 //', 36, 32);
 
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#a8a29e';
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.fillText(WORK_SHARE_URL, CARD_WIDTH - 36, 32);
+  ctx.textAlign = 'left';
+
   // Subtitle
   ctx.fillStyle = '#a8a29e';
   ctx.font = `16px ${FONT_SANS}`;

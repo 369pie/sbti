@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { WORK_QUESTIONS, WORK_DEFAULT_OPTIONS, shuffleWorkQuestions } from '@/lib/work/questions';
@@ -29,15 +29,25 @@ export function WorkQuiz() {
   const [answers, setAnswers] = useState<Map<number, Answer>>(new Map());
   const [direction, setDirection] = useState(1);
   const [isFinishing, setIsFinishing] = useState(false);
+  const answerLockRef = useRef<number | null>(null);
 
   const currentQ = questions[currentIndex];
   const total = questions.length;
   const progress = ((currentIndex) / total) * 100;
+  const isAnswerLocked = currentQ ? answerLockRef.current === currentQ.id : false;
 
   const modelColor = currentQ ? WORK_MODEL_COLORS[currentQ.model] : WORK_MODEL_COLORS.drive;
 
+  useEffect(() => {
+    if (currentQ) {
+      answerLockRef.current = null;
+    }
+  }, [currentQ?.id]);
+
   const handleAnswer = useCallback((value: Answer) => {
-    if (!currentQ || isFinishing) return;
+    if (!currentQ || isFinishing || answerLockRef.current === currentQ.id) return;
+    answerLockRef.current = currentQ.id;
+
     const newAnswers = new Map(answers);
     newAnswers.set(currentQ.id, value);
     setAnswers(newAnswers);
@@ -133,12 +143,13 @@ export function WorkQuiz() {
                   <motion.button
                     key={opt.key}
                     onClick={() => handleAnswer(opt.value as Answer)}
+                    disabled={isAnswerLocked || isFinishing}
                     whileTap={{ scale: 0.98 }}
                     className={`group relative w-full py-4 px-6 rounded-xl text-left transition-all duration-200 cursor-pointer ${
                       selected
                         ? 'bg-bg-tertiary border-2'
                         : 'bg-bg-secondary/60 border border-border-subtle hover:border-border hover:bg-bg-tertiary/50'
-                    }`}
+                    } disabled:cursor-not-allowed disabled:opacity-80`}
                     style={selected ? { borderColor: modelColor.base } : undefined}
                   >
                     <div className="flex items-center gap-4">

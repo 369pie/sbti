@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QUESTIONS, DEFAULT_OPTIONS, shuffleQuestions } from '@/lib/questions';
@@ -37,6 +37,7 @@ export function Quiz() {
   const [drinkBranchIndex, setDrinkBranchIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isFinishing, setIsFinishing] = useState(false);
+  const answerLockRef = useRef<number | null>(null);
 
   const allQuestions = useMemo(() => {
     if (showDrinkBranch) return drinkBranch;
@@ -47,11 +48,20 @@ export function Quiz() {
   const currentQ = allQuestions[idx];
   const totalMain = questions.length;
   const progress = ((currentIndex + (showDrinkBranch ? drinkBranchIndex : 0)) / (totalMain + (showDrinkBranch ? drinkBranch.length : 0))) * 100;
+  const isAnswerLocked = currentQ ? answerLockRef.current === currentQ.id : false;
 
   const modelColor = currentQ ? MODEL_COLORS[currentQ.model] : MODEL_COLORS.self;
 
+  useEffect(() => {
+    if (currentQ) {
+      answerLockRef.current = null;
+    }
+  }, [currentQ?.id]);
+
   const handleAnswer = useCallback((value: Answer) => {
-    if (!currentQ || isFinishing) return;
+    if (!currentQ || isFinishing || answerLockRef.current === currentQ.id) return;
+    answerLockRef.current = currentQ.id;
+
     const newAnswers = new Map(answers);
     newAnswers.set(currentQ.id, value);
     setAnswers(newAnswers);
@@ -189,12 +199,13 @@ export function Quiz() {
                   <motion.button
                     key={opt.key}
                     onClick={() => handleAnswer(opt.value as Answer)}
+                    disabled={isAnswerLocked || isFinishing}
                     whileTap={{ scale: 0.98 }}
                     className={`group relative w-full py-4 px-6 rounded-xl text-left transition-all duration-200 cursor-pointer ${
                       selected
                         ? 'bg-bg-tertiary border-2'
                         : 'bg-bg-secondary/60 border border-border-subtle hover:border-border hover:bg-bg-tertiary/50'
-                    }`}
+                    } disabled:cursor-not-allowed disabled:opacity-80`}
                     style={selected ? { borderColor: modelColor.base } : undefined}
                   >
                     <div className="flex items-center gap-4">
