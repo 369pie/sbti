@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QUESTIONS, DEFAULT_OPTIONS, shuffleQuestions } from '@/lib/questions';
 import type { AnswerOption } from '@/lib/questions';
@@ -9,6 +9,7 @@ import { calculateResult } from '@/lib/scoring';
 import type { Answer } from '@/lib/scoring';
 import { MODEL_NAMES, MODEL_COLORS } from '@/lib/dimensions';
 import type { ModelType } from '@/lib/dimensions';
+import { basePath } from '@/lib/site';
 
 const MODEL_CLASS: Record<ModelType, string> = {
   self: 'model-self',
@@ -19,7 +20,6 @@ const MODEL_CLASS: Record<ModelType, string> = {
 };
 
 export function Quiz() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const cpPartner = searchParams.get('cp');
   const [mounted, setMounted] = useState(false);
@@ -104,12 +104,12 @@ export function Quiz() {
   const finishTest = (finalAnswers: Map<number, Answer>) => {
     setIsFinishing(true);
     const result = calculateResult(finalAnswers, QUESTIONS);
-    // Brief delay for animation
+    // Brief delay for animation, then use hard navigation to avoid RSC fetch failures
     setTimeout(() => {
       if (cpPartner) {
-        router.push(`/cp/result?a=${cpPartner}&b=${result.personality.slug}`);
+        window.location.href = `${basePath}/cp/result?a=${encodeURIComponent(cpPartner)}&b=${encodeURIComponent(result.personality.slug)}`;
       } else {
-        router.push(`/result/${result.personality.slug}`);
+        window.location.href = `${basePath}/result/${encodeURIComponent(result.personality.slug)}/`;
       }
     }, 800);
   };

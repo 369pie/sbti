@@ -19,7 +19,7 @@ interface Props {
 }
 
 const CARD_WIDTH = 540;
-const CARD_HEIGHT = 960;
+const CARD_HEIGHT = 1060;
 const CARD_SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
@@ -291,9 +291,9 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   ctx.fillText(personality.code, 36 + nameWidth + 18, 176);
 
   const imageCardX = 36;
-  const imageCardY = 246;
+  const imageCardY = 230;
   const imageCardWidth = CARD_WIDTH - 72;
-  const imageCardHeight = 280;
+  const imageCardHeight = 380;
   const imageGradient = ctx.createLinearGradient(imageCardX, imageCardY, imageCardX + imageCardWidth, imageCardY + imageCardHeight);
   imageGradient.addColorStop(0, hexToRgba(personality.color, 0.14));
   imageGradient.addColorStop(1, hexToRgba(personality.color, 0.04));
@@ -304,14 +304,14 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
     ctx.save();
     ctx.shadowColor = 'rgba(0, 0, 0, 0.36)';
     ctx.shadowBlur = 24;
-    drawImageContain(ctx, typeImage, imageCardX + 124, imageCardY + 26, 220, 220);
+    drawImageContain(ctx, typeImage, imageCardX + 84, imageCardY + 40, 300, 300);
     ctx.restore();
   } else {
-    fillRoundedRect(ctx, imageCardX + 160, imageCardY + 58, 148, 148, 30, hexToRgba(personality.color, 0.12));
+    fillRoundedRect(ctx, imageCardX + 160, imageCardY + 108, 148, 148, 30, hexToRgba(personality.color, 0.12));
     ctx.fillStyle = '#fafaf9';
     ctx.font = `700 82px ${FONT_SANS}`;
     ctx.textAlign = 'center';
-    ctx.fillText(personality.emoji, imageCardX + imageCardWidth / 2, imageCardY + 84);
+    ctx.fillText(personality.emoji, imageCardX + imageCardWidth / 2, imageCardY + 134);
     ctx.textAlign = 'left';
   }
 
@@ -325,7 +325,7 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   ctx.fillText(badgeText, badgeX + 12, badgeY + 7);
 
   const descX = 36;
-  const descY = 566;
+  const descY = 650;
   const descWidth = CARD_WIDTH - 72;
   const descHeight = 146;
   fillRoundedRect(ctx, descX, descY, descWidth, descHeight, 16, 'rgba(255, 255, 255, 0.04)');
@@ -340,7 +340,7 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   drawWrappedText(ctx, personality.description, descX + 24, descY + 60, descWidth - 48, 24, 4);
 
   const topDimensionScores = dimensionScores.slice(0, 3);
-  const barSectionY = 744;
+  const barSectionY = 830;
   const barRowSpacing = 30;
   ctx.fillStyle = '#78716c';
   ctx.font = `12px ${FONT_SANS}`;

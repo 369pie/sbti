@@ -18,7 +18,7 @@ interface Props {
 }
 
 const CARD_WIDTH = 540;
-const CARD_HEIGHT = 880;
+const CARD_HEIGHT = 1000;
 const CARD_SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
@@ -173,10 +173,10 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   ctx.fillText('在打工人格测试中，我被鉴定为', 36, 100);
 
   // Character image
-  const avatarX = 190;
+  const avatarX = 130;
   const avatarY = 136;
-  const avatarW = 160;
-  const avatarH = 120;
+  const avatarW = 280;
+  const avatarH = 220;
   fillRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 20, 'rgba(255,255,255,0.05)');
   strokeRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 20, 'rgba(255,255,255,0.08)');
   if (personalityImage) {
@@ -192,16 +192,16 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   ctx.fillStyle = '#fafaf9';
   ctx.font = `700 48px ${FONT_SANS}`;
   ctx.textAlign = 'center';
-  ctx.fillText(personality.name, CARD_WIDTH / 2, 272);
+  ctx.fillText(personality.name, CARD_WIDTH / 2, 372);
 
   // Code
   ctx.fillStyle = personality.color;
   ctx.font = `600 18px ${FONT_MONO}`;
-  ctx.fillText(personality.code, CARD_WIDTH / 2, 332);
+  ctx.fillText(personality.code, CARD_WIDTH / 2, 432);
   ctx.textAlign = 'left';
 
   // Tagline card
-  const tagY = 366;
+  const tagY = 468;
   const tagW = CARD_WIDTH - 72;
   fillRoundedRect(ctx, 36, tagY, tagW, 56, 16, 'rgba(255,255,255,0.04)');
   strokeRoundedRect(ctx, 36, tagY, tagW, 56, 16, 'rgba(255,255,255,0.07)');
@@ -212,14 +212,14 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   ctx.textAlign = 'left';
 
   // Description
-  const descY = 446;
+  const descY = 548;
   ctx.fillStyle = '#d6d3d1';
   ctx.font = `14px ${FONT_SANS}`;
   const lines = wrapText(ctx, personality.description, CARD_WIDTH - 72, 4);
   lines.forEach((line, i) => ctx.fillText(line, 36, descY + i * 24));
 
   // Dimension bars
-  const barY = 558;
+  const barY = 660;
   ctx.fillStyle = '#78716c';
   ctx.font = `12px ${FONT_SANS}`;
   ctx.fillText('五维画像', 36, barY);
@@ -251,25 +251,25 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   // Divider
   ctx.strokeStyle = 'rgba(255,255,255,0.08)';
   ctx.beginPath();
-  ctx.moveTo(36, 768);
-  ctx.lineTo(CARD_WIDTH - 36, 768);
+  ctx.moveTo(36, 878);
+  ctx.lineTo(CARD_WIDTH - 36, 878);
   ctx.stroke();
 
   // CTA
   ctx.fillStyle = '#fafaf9';
   ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText('测测你是哪种打工人？', 36, 790);
+  ctx.fillText('测测你是哪种打工人？', 36, 898);
 
   ctx.fillStyle = '#6366f1';
   ctx.font = `12px ${FONT_MONO}`;
-  ctx.fillText(WORK_SHARE_URL, 36, 820);
+  ctx.fillText(WORK_SHARE_URL, 36, 928);
 
   // QR
-  fillRoundedRect(ctx, 424, 780, 80, 80, 12, '#ffffff');
+  fillRoundedRect(ctx, 424, 888, 80, 80, 12, '#ffffff');
   if (qrImage) {
-    drawImageContain(ctx, qrImage, 428, 784, 72, 72);
+    drawImageContain(ctx, qrImage, 428, 892, 72, 72);
   } else {
-    fillRoundedRect(ctx, 432, 788, 64, 64, 8, '#292524');
+    fillRoundedRect(ctx, 432, 896, 64, 64, 8, '#292524');
   }
 
   return canvas.toDataURL('image/png');

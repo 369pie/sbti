@@ -17,7 +17,7 @@ interface Props {
 }
 
 const CARD_WIDTH = 540;
-const CARD_HEIGHT = 960;
+const CARD_HEIGHT = 1020;
 const CARD_SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
@@ -183,9 +183,9 @@ async function renderCPShareImage(result: CPResult) {
   ctx.fillText('我们的 CP 配对结果', 36, 70);
 
   // Two personality avatars side by side
-  const avatarY = 104;
-  const avatarSize = 90;
-  const gap = 56;
+  const avatarY = 100;
+  const avatarSize = 160;
+  const gap = 40;
   const leftX = CARD_WIDTH / 2 - avatarSize - gap / 2;
   const rightX = CARD_WIDTH / 2 + gap / 2;
 
@@ -225,31 +225,31 @@ async function renderCPShareImage(result: CPResult) {
 
   // Heart/VS between avatars
   ctx.fillStyle = tierColor;
-  ctx.font = `24px ${FONT_SANS}`;
+  ctx.font = `28px ${FONT_SANS}`;
   ctx.textAlign = 'center';
-  ctx.fillText('💕', CARD_WIDTH / 2, avatarY + 30);
+  ctx.fillText('💕', CARD_WIDTH / 2, avatarY + 62);
   ctx.textAlign = 'left';
 
   // Labels under avatars
   const labelY = avatarY + avatarSize + 10;
   ctx.textAlign = 'center';
   ctx.fillStyle = typeA.color;
-  ctx.font = `600 14px ${FONT_MONO}`;
+  ctx.font = `600 15px ${FONT_MONO}`;
   ctx.fillText(typeA.code, leftX + avatarSize / 2, labelY);
   ctx.fillStyle = '#fafaf9';
-  ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText(typeA.name, leftX + avatarSize / 2, labelY + 20);
+  ctx.font = `600 18px ${FONT_SANS}`;
+  ctx.fillText(typeA.name, leftX + avatarSize / 2, labelY + 22);
 
   ctx.fillStyle = typeB.color;
-  ctx.font = `600 14px ${FONT_MONO}`;
+  ctx.font = `600 15px ${FONT_MONO}`;
   ctx.fillText(typeB.code, rightX + avatarSize / 2, labelY);
   ctx.fillStyle = '#fafaf9';
-  ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText(typeB.name, rightX + avatarSize / 2, labelY + 20);
+  ctx.font = `600 18px ${FONT_SANS}`;
+  ctx.fillText(typeB.name, rightX + avatarSize / 2, labelY + 22);
   ctx.textAlign = 'left';
 
   // Big score circle
-  const scoreY = 270;
+  const scoreY = 360;
   const scoreCenterX = CARD_WIDTH / 2;
   const scoreRadius = 52;
 
@@ -283,7 +283,7 @@ async function renderCPShareImage(result: CPResult) {
   ctx.textAlign = 'left';
 
   // Summary text box
-  const summaryY = 400;
+  const summaryY = 490;
   const summaryWidth = CARD_WIDTH - 72;
   fillRoundedRect(ctx, 36, summaryY, summaryWidth, 120, 16, 'rgba(255,255,255,0.04)');
   strokeRoundedRect(ctx, 36, summaryY, summaryWidth, 120, 16, 'rgba(255,255,255,0.07)');
@@ -321,7 +321,7 @@ async function renderCPShareImage(result: CPResult) {
   });
 
   // Model compatibility bars
-  const barStartY = 540;
+  const barStartY = 630;
   ctx.fillStyle = '#78716c';
   ctx.font = `12px ${FONT_SANS}`;
   ctx.fillText('五大模型契合度', 36, barStartY);
@@ -348,7 +348,7 @@ async function renderCPShareImage(result: CPResult) {
   });
 
   // Dimension highlights
-  const highlightY = 728;
+  const highlightY = 818;
   const best = result.comparisons.filter(c => c.compatibility === 100).slice(0, 3);
   const worst = result.comparisons.filter(c => c.compatibility <= 30).slice(0, 3);
 
@@ -384,12 +384,12 @@ async function renderCPShareImage(result: CPResult) {
   ctx.strokeStyle = 'rgba(255,255,255,0.08)';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(36, 800);
-  ctx.lineTo(CARD_WIDTH - 36, 800);
+  ctx.moveTo(36, 890);
+  ctx.lineTo(CARD_WIDTH - 36, 890);
   ctx.stroke();
 
   // Footer
-  const footerY = 820;
+  const footerY = 910;
 
   ctx.fillStyle = '#fafaf9';
   ctx.font = `600 18px ${FONT_SANS}`;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { WORK_QUESTIONS, WORK_DEFAULT_OPTIONS, shuffleWorkQuestions } from '@/lib/work/questions';
 import type { WorkAnswerOption } from '@/lib/work/questions';
@@ -9,6 +9,7 @@ import { calculateWorkResult } from '@/lib/work/scoring';
 import type { Answer } from '@/lib/work/scoring';
 import { WORK_MODEL_NAMES, WORK_MODEL_COLORS } from '@/lib/work/dimensions';
 import type { WorkModelType } from '@/lib/work/dimensions';
+import { basePath } from '@/lib/site';
 
 const MODEL_CLASS: Record<WorkModelType, string> = {
   drive: 'work-model-drive',
@@ -19,7 +20,6 @@ const MODEL_CLASS: Record<WorkModelType, string> = {
 };
 
 export function WorkQuiz() {
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [questions] = useState(() => shuffleWorkQuestions(WORK_QUESTIONS));
 
@@ -48,11 +48,12 @@ export function WorkQuiz() {
     } else {
       setIsFinishing(true);
       const result = calculateWorkResult(newAnswers, WORK_QUESTIONS);
+      // Use hard navigation to avoid RSC fetch failures on mobile
       setTimeout(() => {
-        router.push(`/work/result/${result.personality.slug}`);
+        window.location.href = `${basePath}/work/result/${encodeURIComponent(result.personality.slug)}/`;
       }, 800);
     }
-  }, [currentQ, answers, currentIndex, questions, isFinishing, router]);
+  }, [currentQ, answers, currentIndex, questions, isFinishing]);
 
   const handleBack = useCallback(() => {
     if (currentIndex > 0) {
