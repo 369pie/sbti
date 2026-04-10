@@ -1,54 +1,40 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { QUESTIONS, DEFAULT_OPTIONS, shuffleQuestions } from '@/lib/questions';
-import type { AnswerOption } from '@/lib/questions';
-import { calculateResult } from '@/lib/scoring';
-import type { Answer } from '@/lib/scoring';
-import { MODEL_NAMES, MODEL_COLORS } from '@/lib/dimensions';
-import type { ModelType } from '@/lib/dimensions';
+import { WORK_QUESTIONS, WORK_DEFAULT_OPTIONS, shuffleWorkQuestions } from '@/lib/work/questions';
+import type { WorkAnswerOption } from '@/lib/work/questions';
+import { calculateWorkResult } from '@/lib/work/scoring';
+import type { Answer } from '@/lib/work/scoring';
+import { WORK_MODEL_NAMES, WORK_MODEL_COLORS } from '@/lib/work/dimensions';
+import type { WorkModelType } from '@/lib/work/dimensions';
 
-const MODEL_CLASS: Record<ModelType, string> = {
-  self: 'model-self',
-  emotion: 'model-emotion',
-  attitude: 'model-attitude',
-  action: 'model-action',
-  social: 'model-social',
+const MODEL_CLASS: Record<WorkModelType, string> = {
+  drive: 'work-model-drive',
+  social: 'work-model-social',
+  stress: 'work-model-stress',
+  slack: 'work-model-slack',
+  ambition: 'work-model-ambition',
 };
 
-export function Quiz() {
+export function WorkQuiz() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const cpPartner = searchParams.get('cp');
   const [mounted, setMounted] = useState(false);
-  const [questions] = useState(() => {
-    const main = shuffleQuestions(QUESTIONS.filter(q => !q.isDrinkBranch));
-    return main;
-  });
+  const [questions] = useState(() => shuffleWorkQuestions(WORK_QUESTIONS));
 
   useEffect(() => { setMounted(true); }, []);
-  const drinkBranch = useMemo(() => QUESTIONS.filter(q => q.isDrinkBranch), []);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Map<number, Answer>>(new Map());
-  const [showDrinkBranch, setShowDrinkBranch] = useState(false);
-  const [drinkBranchIndex, setDrinkBranchIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isFinishing, setIsFinishing] = useState(false);
 
-  const allQuestions = useMemo(() => {
-    if (showDrinkBranch) return drinkBranch;
-    return questions;
-  }, [showDrinkBranch, questions, drinkBranch]);
+  const currentQ = questions[currentIndex];
+  const total = questions.length;
+  const progress = ((currentIndex) / total) * 100;
 
-  const idx = showDrinkBranch ? drinkBranchIndex : currentIndex;
-  const currentQ = allQuestions[idx];
-  const totalMain = questions.length;
-  const progress = ((currentIndex + (showDrinkBranch ? drinkBranchIndex : 0)) / (totalMain + (showDrinkBranch ? drinkBranch.length : 0))) * 100;
-
-  const modelColor = currentQ ? MODEL_COLORS[currentQ.model] : MODEL_COLORS.self;
+  const modelColor = currentQ ? WORK_MODEL_COLORS[currentQ.model] : WORK_MODEL_COLORS.drive;
 
   const handleAnswer = useCallback((value: Answer) => {
     if (!currentQ || isFinishing) return;
@@ -57,64 +43,23 @@ export function Quiz() {
     setAnswers(newAnswers);
     setDirection(1);
 
-    if (showDrinkBranch) {
-      if (drinkBranchIndex < drinkBranch.length - 1) {
-        setDrinkBranchIndex(i => i + 1);
-      } else {
-        finishTest(newAnswers);
-      }
-      return;
-    }
-
-    // Check if drink trigger
-    if (currentQ.isDrinkTrigger && value === 3) {
-      if (currentIndex < questions.length - 1) {
-        setCurrentIndex(i => i + 1);
-      } else {
-        setShowDrinkBranch(true);
-        setDrinkBranchIndex(0);
-      }
-      return;
-    }
-
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(i => i + 1);
     } else {
-      if (currentQ.isDrinkTrigger && value === 3) {
-        setShowDrinkBranch(true);
-      } else {
-        finishTest(newAnswers);
-      }
+      setIsFinishing(true);
+      const result = calculateWorkResult(newAnswers, WORK_QUESTIONS);
+      setTimeout(() => {
+        router.push(`/work/result/${result.personality.slug}`);
+      }, 800);
     }
-  }, [currentQ, answers, currentIndex, questions, showDrinkBranch, drinkBranchIndex, drinkBranch, isFinishing]);
+  }, [currentQ, answers, currentIndex, questions, isFinishing, router]);
 
   const handleBack = useCallback(() => {
-    if (showDrinkBranch && drinkBranchIndex > 0) {
-      setDirection(-1);
-      setDrinkBranchIndex(i => i - 1);
-    } else if (showDrinkBranch && drinkBranchIndex === 0) {
-      setShowDrinkBranch(false);
-      setDirection(-1);
-    } else if (currentIndex > 0) {
+    if (currentIndex > 0) {
       setDirection(-1);
       setCurrentIndex(i => i - 1);
     }
-  }, [currentIndex, showDrinkBranch, drinkBranchIndex]);
-
-  const finishTest = (finalAnswers: Map<number, Answer>) => {
-    setIsFinishing(true);
-    const result = calculateResult(finalAnswers, QUESTIONS);
-    // Brief delay for animation
-    setTimeout(() => {
-      if (cpPartner) {
-        router.push(`/cp/result?a=${cpPartner}&b=${result.personality.slug}`);
-      } else {
-        router.push(`/result/${result.personality.slug}`);
-      }
-    }, 800);
-  };
-
-  const canGoBack = currentIndex > 0 || (showDrinkBranch && drinkBranchIndex >= 0);
+  }, [currentIndex]);
 
   if (!mounted || !currentQ) {
     return (
@@ -125,20 +70,18 @@ export function Quiz() {
   }
 
   return (
-    <div className={`min-h-[calc(100vh-3.5rem)] flex flex-col ${MODEL_CLASS[currentQ.model]} model-glow`}>
+    <div className="min-h-[calc(100vh-3.5rem)] flex flex-col">
       {/* Progress */}
       <div className="px-6 pt-6 pb-2 max-w-2xl mx-auto w-full">
         <div className="flex items-center justify-between text-xs text-text-muted mb-3">
           <span className="font-mono tracking-wider">
-            {currentIndex + 1} / {totalMain}
-            {showDrinkBranch && <span className="text-accent ml-1">+{drinkBranchIndex + 1}</span>}
+            {currentIndex + 1} / {total}
           </span>
           <span style={{ color: modelColor.base }}>
-            {MODEL_NAMES[currentQ.model]}
+            {WORK_MODEL_NAMES[currentQ.model]}
           </span>
         </div>
 
-        {/* Progress bar */}
         <div className="h-[3px] bg-bg-tertiary rounded-full overflow-hidden">
           <motion.div
             className="h-full rounded-full"
@@ -183,7 +126,7 @@ export function Quiz() {
 
             {/* Answer buttons */}
             <div className="flex flex-col gap-3 max-w-md mx-auto">
-              {(currentQ.options ?? DEFAULT_OPTIONS).map((opt: AnswerOption) => {
+              {(currentQ.options ?? WORK_DEFAULT_OPTIONS).map((opt: WorkAnswerOption) => {
                 const selected = answers.get(currentQ.id) === opt.value;
                 return (
                   <motion.button
@@ -214,7 +157,7 @@ export function Quiz() {
                     </div>
                     {selected && (
                       <motion.div
-                        layoutId="selected-ring"
+                        layoutId="work-selected-ring"
                         className="absolute inset-0 rounded-xl"
                         style={{ boxShadow: `0 0 20px ${modelColor.bg}` }}
                         transition={{ duration: 0.2 }}
@@ -224,19 +167,12 @@ export function Quiz() {
                 );
               })}
             </div>
-
-            {/* Drink trigger hint */}
-            {currentQ.isDrinkTrigger && (
-              <p className="text-center text-text-muted text-xs mt-6 opacity-60">
-                这道题可能会触发隐藏分支 🍺
-              </p>
-            )}
           </motion.div>
         </AnimatePresence>
 
         {/* Navigation */}
         <div className="mt-8 flex items-center gap-4">
-          {canGoBack && (
+          {currentIndex > 0 && (
             <button
               onClick={handleBack}
               className="text-sm text-text-muted hover:text-text-secondary transition-colors px-4 py-2 cursor-pointer"
@@ -261,8 +197,8 @@ export function Quiz() {
               transition={{ delay: 0.1, duration: 0.4 }}
               className="text-center"
             >
-              <div className="text-4xl mb-4">🎯</div>
-              <p className="text-text-secondary text-lg">正在分析你的人格…</p>
+              <div className="text-4xl mb-4">💼</div>
+              <p className="text-text-secondary text-lg">正在分析你的打工人格…</p>
             </motion.div>
           </motion.div>
         )}

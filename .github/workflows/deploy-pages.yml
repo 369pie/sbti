@@ -41,7 +41,7 @@ jobs:
 
       - name: Build static site
         env:
-          NEXT_PUBLIC_SITE_ORIGIN: https://369pie.github.io
+          NEXT_PUBLIC_SITE_ORIGIN: https://www.sbtinb.com
         run: pnpm build
 
       - name: Upload artifact

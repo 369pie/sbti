@@ -339,17 +339,19 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   ctx.font = `14px ${FONT_SANS}`;
   drawWrappedText(ctx, personality.description, descX + 24, descY + 60, descWidth - 48, 24, 4);
 
-  const barSectionY = 760;
+  const topDimensionScores = dimensionScores.slice(0, 3);
+  const barSectionY = 744;
+  const barRowSpacing = 30;
   ctx.fillStyle = '#78716c';
   ctx.font = `12px ${FONT_SANS}`;
   ctx.fillText('核心特质 TOP 3', 36, barSectionY);
 
-  dimensionScores.slice(0, 3).forEach((score, index) => {
+  topDimensionScores.forEach((score, index) => {
     const dim = DIMENSIONS.find(item => item.id === score.id);
     if (!dim) return;
 
     const color = MODEL_COLORS[dim.model].base;
-    const rowY = barSectionY + 38 + index * 34;
+    const rowY = barSectionY + 38 + index * barRowSpacing;
     const barX = 130;
     const barWidth = 326;
     const progressWidth = Math.max(36, (score.score / 15) * barWidth);
@@ -368,25 +370,33 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
     ctx.textAlign = 'left';
   });
 
+  const lastBarBottom = topDimensionScores.length > 0
+    ? barSectionY + 38 + (topDimensionScores.length - 1) * barRowSpacing + 15
+    : barSectionY + 24;
+  const footerDividerY = lastBarBottom + 12;
+  const footerTitleY = footerDividerY + 20;
+  const footerUrlY = footerDividerY + 50;
+  const qrCardY = footerDividerY - 4;
+
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
   ctx.beginPath();
-  ctx.moveTo(36, 848);
-  ctx.lineTo(CARD_WIDTH - 36, 848);
+  ctx.moveTo(36, footerDividerY);
+  ctx.lineTo(CARD_WIDTH - 36, footerDividerY);
   ctx.stroke();
 
   ctx.fillStyle = '#fafaf9';
   ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText('测测你的隐藏人格？', 36, 872);
+  ctx.fillText('测测你的隐藏人格', 36, footerTitleY);
 
   ctx.fillStyle = '#f59e0b';
   ctx.font = `12px ${FONT_MONO}`;
-  ctx.fillText(SHARE_SITE_URL, 36, 902);
+  ctx.fillText(SHARE_SITE_URL, 36, footerUrlY);
 
-  fillRoundedRect(ctx, 424, 862, 80, 80, 12, '#ffffff');
+  fillRoundedRect(ctx, 424, qrCardY, 80, 80, 12, '#ffffff');
   if (qrImage) {
-    drawImageContain(ctx, qrImage, 428, 866, 72, 72);
+    drawImageContain(ctx, qrImage, 428, qrCardY + 4, 72, 72);
   } else {
-    fillRoundedRect(ctx, 432, 870, 64, 64, 8, '#292524');
+    fillRoundedRect(ctx, 432, qrCardY + 8, 64, 64, 8, '#292524');
   }
 
   return canvas.toDataURL('image/png');

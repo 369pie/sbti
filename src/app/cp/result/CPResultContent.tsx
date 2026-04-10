@@ -11,7 +11,7 @@ import type { CPResult, DimensionComparison } from '@/lib/cp-matching';
 import { useRef, useState, useCallback } from 'react';
 import { CPShareImageGenerator } from '@/components/CPShareImageGenerator';
 import type { CPShareImageGeneratorHandle } from '@/components/CPShareImageGenerator';
-import { SHARE_SITE_URL } from '@/lib/site';
+import { getSiteUrl } from '@/lib/site';
 
 function CompatibilityRing({ value, size = 160, color }: { value: number; size?: number; color: string }) {
   const r = (size - 16) / 2;
@@ -121,6 +121,15 @@ export function CPResultContent() {
   const slugA = searchParams.get('a');
   const slugB = searchParams.get('b');
   const shareRef = useRef<CPShareImageGeneratorHandle>(null);
+  const [cpLinkCopied, setCpLinkCopied] = useState(false);
+
+  const copyCPResultLink = useCallback(() => {
+    if (!slugA || !slugB) return;
+    const url = getSiteUrl(`/cp/result/?a=${slugA}&b=${slugB}`);
+    navigator.clipboard.writeText(url);
+    setCpLinkCopied(true);
+    setTimeout(() => setCpLinkCopied(false), 2000);
+  }, [slugA, slugB]);
 
   if (!slugA || !slugB) {
     return (
@@ -146,15 +155,6 @@ export function CPResultContent() {
       </div>
     );
   }
-
-  const [cpLinkCopied, setCpLinkCopied] = useState(false);
-
-  const copyCPResultLink = useCallback(() => {
-    const url = `${SHARE_SITE_URL}cp/result/?a=${slugA}&b=${slugB}`;
-    navigator.clipboard.writeText(url);
-    setCpLinkCopied(true);
-    setTimeout(() => setCpLinkCopied(false), 2000);
-  }, [slugA, slugB]);
 
   const result = calculateCP(typeA, typeB);
   const tierColor = getTierColor(result.tier);

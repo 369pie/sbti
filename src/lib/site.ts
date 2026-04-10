@@ -1,7 +1,8 @@
+const DEFAULT_SHARE_SITE_ORIGIN = 'https://www.sbtinb.com';
+const LEGACY_SITE_HOSTS = ['369pie.github.io'];
 const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
-const configuredSiteOrigin = process.env.NEXT_PUBLIC_SITE_ORIGIN ?? '';
-
-export const SHARE_SITE_URL = 'https://369pie.github.io/sbti/';
+const rawSiteBasePath = process.env.NEXT_PUBLIC_SITE_BASE_PATH ?? '';
+const configuredSiteOrigin = process.env.NEXT_PUBLIC_SITE_ORIGIN?.trim() ?? '';
 
 function normalizeBasePath(value: string): string {
   if (!value || value === '/') return '';
@@ -10,26 +11,32 @@ function normalizeBasePath(value: string): string {
 }
 
 export const basePath = normalizeBasePath(rawBasePath);
+export const siteBasePath = normalizeBasePath(rawSiteBasePath);
+export const isLegacyPagesBuild = basePath.length > 0;
+
+const normalizedShareSiteOrigin = (configuredSiteOrigin || DEFAULT_SHARE_SITE_ORIGIN).replace(/\/$/, '');
+
+function withNormalizedBasePath(path: string, normalizedBasePath: string): string {
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return normalizedBasePath ? `${normalizedBasePath}${normalizedPath}` : normalizedPath;
+}
+
+export const SHARE_SITE_URL = `${normalizedShareSiteOrigin}${siteBasePath ? `${siteBasePath}/` : '/'}`;
 
 export function withBasePath(path: string): string {
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  return `${basePath}${normalizedPath}` || '/';
+  return withNormalizedBasePath(path, basePath) || '/';
+}
+
+export function withSiteBasePath(path: string): string {
+  return withNormalizedBasePath(path, siteBasePath) || '/';
 }
 
 export function getSiteOrigin(): string {
-  if (configuredSiteOrigin) {
-    return configuredSiteOrigin.replace(/\/$/, '');
-  }
-
-  if (typeof window !== 'undefined') {
-    return window.location.origin;
-  }
-
-  return '';
+  return normalizedShareSiteOrigin;
 }
 
 export function getSiteUrl(path = '/'): string {
-  const pathname = withBasePath(path);
+  const pathname = withSiteBasePath(path);
   const origin = getSiteOrigin();
   return origin ? `${origin}${pathname}` : pathname;
 }
@@ -38,9 +45,45 @@ export function getSiteLabel(): string {
   const origin = getSiteOrigin();
 
   if (!origin) {
-    return basePath ? basePath.slice(1) : 'sbti';
+    return siteBasePath ? siteBasePath.slice(1) : 'sbti';
   }
 
   const host = origin.replace(/^https?:\/\//, '');
-  return `${host}${basePath}`;
+  return `${host}${siteBasePath}`;
+}
+
+export function getLegacyRedirectScript(): string {
+  return `(() => {
+    try {
+      const legacyHosts = ${JSON.stringify(LEGACY_SITE_HOSTS)};
+      const currentHost = window.location.hostname;
+      if (!legacyHosts.includes(currentHost)) {
+        return;
+      }
+
+      const targetOrigin = ${JSON.stringify(normalizedShareSiteOrigin)};
+      const assetBasePath = ${JSON.stringify(basePath)};
+      const publicBasePath = ${JSON.stringify(siteBasePath)};
+      let pathname = window.location.pathname || '/';
+
+      if (assetBasePath && (pathname === assetBasePath || pathname.startsWith(assetBasePath + '/'))) {
+        pathname = pathname.slice(assetBasePath.length) || '/';
+      }
+
+      if (!pathname.startsWith('/')) {
+        pathname = '/' + pathname;
+      }
+
+      if (publicBasePath) {
+        pathname = pathname === '/' ? publicBasePath + '/' : publicBasePath + pathname;
+      }
+
+      const targetUrl = targetOrigin + pathname + window.location.search + window.location.hash;
+      if (targetUrl !== window.location.href) {
+        window.location.replace(targetUrl);
+      }
+    } catch (error) {
+      console.error('Legacy site redirect failed', error);
+    }
+  })();`;
 }

@@ -165,21 +165,21 @@ export default function HomePage() {
               >
                 <Link
                   href={`/result/${p.slug}`}
-                  className="group block rounded-xl border border-border-subtle hover:border-border bg-bg-secondary/30 hover:bg-bg-secondary/60 transition-all p-4"
+                  className="group block rounded-xl border border-border-subtle hover:border-border bg-bg-secondary/30 hover:bg-bg-secondary/60 transition-all p-4 sm:p-5"
                 >
-                  <div className="w-12 h-12 rounded-lg overflow-hidden mb-2" style={{ background: `${p.color}15` }}>
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden mb-3" style={{ background: `${p.color}15` }}>
                     <NextImage
                       src={getTypeImage(p.slug)}
                       alt={p.name}
-                      width={48}
-                      height={48}
+                      width={96}
+                      height={96}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <span className="text-xs font-mono tracking-wider block mb-1" style={{ color: p.color }}>
                     {p.code}
                   </span>
-                  <span className="text-sm font-medium text-text-primary">{p.name}</span>
+                  <span className="text-base font-medium text-text-primary">{p.name}</span>
                   <p className="text-xs text-text-muted mt-1 line-clamp-1">{p.tagline}</p>
                 </Link>
               </motion.div>
@@ -194,6 +194,40 @@ export default function HomePage() {
               查看全部 27 种 →
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Work Personality Test promo */}
+      <section className="py-20 px-6 border-t border-border-subtle">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-8 sm:p-10 text-center"
+          >
+            <div className="text-4xl mb-4">💼</div>
+            <span className="inline-block text-xs font-mono tracking-[0.2em] text-indigo-400 uppercase mb-3">
+              WPTI · New
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">
+              打工人格测试
+            </h2>
+            <p className="text-text-secondary leading-relaxed max-w-md mx-auto mb-6">
+              5 个职场维度 · 15 道灵魂拷问 · 16 种打工人格
+              <br />
+              三分钟测出你的职场真面目。
+            </p>
+            <Link
+              href="/work"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-indigo-500 text-white font-medium text-base hover:brightness-110 transition-all duration-200 shadow-[0_0_30px_rgba(99,102,241,0.2)]"
+            >
+              去测打工人格
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </motion.div>
         </div>
       </section>
 

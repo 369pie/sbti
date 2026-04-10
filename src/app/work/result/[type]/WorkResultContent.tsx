@@ -1,42 +1,33 @@
 'use client';
 
 import Link from 'next/link';
-import NextImage from 'next/image';
 import { motion } from 'framer-motion';
-import { DimensionRadar, DimensionBars } from '@/components/DimensionChart';
-import { ShareImageGenerator } from '@/components/ShareImageGenerator';
-import type { ShareImageGeneratorHandle } from '@/components/ShareImageGenerator';
-import { PERSONALITY_TYPES, getTypeImage } from '@/lib/personalities';
-import { DIMENSIONS, MODEL_NAMES, MODEL_COLORS } from '@/lib/dimensions';
-import type { PersonalityType } from '@/lib/personalities';
-import type { DimensionScore } from '@/lib/scoring';
+import { WorkPersonalityAvatar } from '@/components/WorkPersonalityAvatar';
+import { WorkShareImageGenerator } from '@/components/WorkShareImageGenerator';
+import type { WorkShareImageGeneratorHandle } from '@/components/WorkShareImageGenerator';
+import { WORK_DIMENSIONS, WORK_MODEL_NAMES, WORK_MODEL_COLORS } from '@/lib/work/dimensions';
+import { WORK_PERSONALITY_TYPES } from '@/lib/work/personalities';
+import type { WorkPersonalityType } from '@/lib/work/personalities';
+import type { WorkDimensionScore } from '@/lib/work/scoring';
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 
 interface Props {
-  personality: PersonalityType;
-  dimensionScores: DimensionScore[];
+  personality: WorkPersonalityType;
+  dimensionScores: WorkDimensionScore[];
 }
 
-export function ResultContent({ personality, dimensionScores }: Props) {
+export function WorkResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
-  const [cpCopied, setCpCopied] = useState(false);
-  const shareRef = useRef<ShareImageGeneratorHandle>(null);
+  const shareRef = useRef<WorkShareImageGeneratorHandle>(null);
 
   const copyLink = useCallback(() => {
-    navigator.clipboard.writeText(getSiteUrl(`/result/${personality.slug}/`));
+    navigator.clipboard.writeText(getSiteUrl(`/work/result/${personality.slug}/`));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }, [personality.slug]);
 
-  const copyCPLink = useCallback(() => {
-    const url = getSiteUrl(`/cp/${personality.slug}/`);
-    navigator.clipboard.writeText(url);
-    setCpCopied(true);
-    setTimeout(() => setCpCopied(false), 2000);
-  }, [personality.slug]);
-
-  const others = PERSONALITY_TYPES.filter(p => p.slug !== personality.slug).slice(0, 3);
+  const others = WORK_PERSONALITY_TYPES.filter(p => p.slug !== personality.slug).slice(0, 3);
 
   return (
     <div className="min-h-screen">
@@ -53,7 +44,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           {/* Top-right share button */}
           <button
             onClick={() => shareRef.current?.generate()}
-            className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-accent transition-all cursor-pointer"
+            className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-indigo-400 transition-all cursor-pointer"
             title="生成分享图片"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -68,20 +59,19 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           >
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border-subtle bg-bg-secondary/60 text-xs text-text-muted mb-6">
-              {personality.isSpecial ? '特殊人格结果' : '标准人格结果'}
+              打工人格测试结果
             </div>
 
-            {/* Type image */}
-            <div className="w-28 h-28 mx-auto mb-4 rounded-2xl overflow-hidden" style={{ background: `${personality.color}15` }}>
-              <NextImage
-                src={getTypeImage(personality.slug)}
-                alt={personality.name}
-                width={112}
-                height={112}
-                className="w-full h-full object-cover"
-                priority
-              />
-            </div>
+            <WorkPersonalityAvatar
+              personality={personality}
+              alt={`${personality.name}形象`}
+              priority
+              sizes="112px"
+              className="relative w-28 h-28 mx-auto mb-4 rounded-2xl overflow-hidden"
+              style={{ background: `${personality.color}15` }}
+              imageClassName="object-contain p-2"
+              fallbackClassName="w-full h-full flex items-center justify-center text-6xl"
+            />
 
             {/* Code */}
             <div
@@ -113,27 +103,11 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 sm:p-8"
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
-            人格速写
+            打工速写
           </h2>
           <p className="text-text-secondary leading-[1.8] text-base">
             {personality.description}
           </p>
-        </motion.div>
-      </section>
-
-      {/* Radar Chart */}
-      <section className="max-w-3xl mx-auto px-6 pb-16">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-        >
-          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6 text-center">
-            十五维指纹
-          </h2>
-          <div className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 sm:p-8">
-            <DimensionRadar dimensions={dimensionScores} size={340} />
-          </div>
         </motion.div>
       </section>
 
@@ -142,48 +116,65 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
-            {personality.code} 的典型维度落点
+            {personality.code} 的五维画像
           </h2>
-          <div className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 sm:p-8">
-            <DimensionBars dimensionScores={dimensionScores} />
+          <div className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-6 sm:p-8 space-y-5">
+            {dimensionScores.map(ds => {
+              const dim = WORK_DIMENSIONS.find(d => d.id === ds.id);
+              if (!dim) return null;
+              const color = WORK_MODEL_COLORS[dim.model];
+              const pct = ((ds.score - 1) / 2) * 100;
+              return (
+                <div key={ds.id}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono" style={{ color: color.base }}>{ds.id}</span>
+                      <span className="text-sm text-text-primary">{WORK_MODEL_NAMES[dim.model]}</span>
+                    </div>
+                    <span className="text-xs font-mono text-text-muted">{ds.level}</span>
+                  </div>
+                  <div className="h-2 bg-bg-tertiary rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ background: `linear-gradient(90deg, ${color.base}, ${color.light})` }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ delay: 0.4, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+                    />
+                  </div>
+                  <p className="text-xs text-text-muted mt-1.5">{dim.levels[ds.level]}</p>
+                </div>
+              );
+            })}
           </div>
         </motion.div>
       </section>
 
-      {/* CP invite section */}
+      {/* Cross-promotion: try SBTI */}
       <section className="max-w-2xl mx-auto px-6 pb-10">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
         >
-          <div
-            className="rounded-2xl border p-6 sm:p-8 text-center"
-            style={{ borderColor: `${personality.color}30`, background: `${personality.color}08` }}
-          >
-            <div className="text-3xl mb-3">💕</div>
-            <h3 className="text-lg font-semibold mb-2">邀请好友测 CP</h3>
+          <div className="rounded-2xl border border-orange-500/20 bg-orange-500/5 p-6 sm:p-8 text-center">
+            <div className="text-3xl mb-3">🎯</div>
+            <h3 className="text-lg font-semibold mb-2">也来测测你的抽象人格</h3>
             <p className="text-sm text-text-secondary mb-5 max-w-sm mx-auto">
-              把链接发给朋友，TA 测完就能看到你们的配对结果！
+              SBTI 人格测试 — 5 组切面 · 15 个维度 · 27 种结果
             </p>
-            <button
-              onClick={copyCPLink}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer"
-              style={{
-                background: cpCopied ? '#22c55e' : personality.color,
-                color: '#0c0a09',
-              }}
+            <Link
+              href="/test"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary text-sm font-medium hover:brightness-110 transition-all"
             >
-              {cpCopied ? '链接已复制 ✓' : '复制 CP 邀请链接'}
-              {!cpCopied && (
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
-              )}
-            </button>
+              去测 SBTI
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
           </div>
         </motion.div>
       </section>
@@ -196,11 +187,11 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           transition={{ delay: 0.6, duration: 0.5 }}
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4 text-center">
-            分享给朋友
+            分享给同事
           </h2>
 
           <div className="space-y-3">
-            <ShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
+            <WorkShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
 
             <div className="flex gap-3">
               <button
@@ -210,7 +201,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
                 {copied ? '已复制 ✓' : '复制链接'}
               </button>
               <Link
-                href="/test"
+                href="/work/test"
                 className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all text-center"
               >
                 重新测试
@@ -223,35 +214,30 @@ export function ResultContent({ personality, dimensionScores }: Props) {
       {/* Other types */}
       <section className="max-w-3xl mx-auto px-6 pb-24">
         <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
-          还可以看看其他人格
+          还可以看看其他打工人格
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {others.map(p => (
             <Link
               key={p.slug}
-              href={`/result/${p.slug}`}
+              href={`/work/result/${p.slug}`}
               className="group rounded-xl border border-border-subtle hover:border-border bg-bg-secondary/30 hover:bg-bg-secondary/60 transition-all p-4"
             >
-              <div className="w-10 h-10 rounded-lg overflow-hidden mb-2" style={{ background: `${p.color}15` }}>
-                <NextImage
-                  src={getTypeImage(p.slug)}
-                  alt={p.name}
-                  width={40}
-                  height={40}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              <WorkPersonalityAvatar
+                personality={p}
+                alt=""
+                sizes="40px"
+                className="relative w-10 h-10 rounded-lg overflow-hidden mb-2"
+                style={{ background: `${p.color}15` }}
+                imageClassName="object-contain p-1"
+                fallbackClassName="w-full h-full flex items-center justify-center text-xl"
+              />
               <span className="text-xs font-mono tracking-wider block mb-1" style={{ color: p.color }}>
                 {p.code}
               </span>
               <span className="text-sm font-medium text-text-primary">{p.name}</span>
             </Link>
           ))}
-        </div>
-        <div className="mt-6 text-center">
-          <Link href="/types" className="text-sm text-text-muted hover:text-accent transition-colors">
-            查看全部 27 种 →
-          </Link>
         </div>
       </section>
     </div>

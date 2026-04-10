@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
-const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1] ?? 'sbti';
-const isGitHubPagesBuild = process.env.GITHUB_ACTIONS === 'true';
-const basePath = isGitHubPagesBuild ? `/${repoName}` : '';
+// Use NEXT_PUBLIC_BASE_PATH to set basePath explicitly.
+// With a custom domain (e.g. www.sbtinb.com), basePath should be empty.
+// Only set NEXT_PUBLIC_BASE_PATH=/sbti if deploying to user.github.io/sbti/ without custom domain.
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 const nextConfig: NextConfig = {
   output: 'export',
@@ -11,8 +12,10 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   basePath,
+  allowedDevOrigins: ['127.0.0.1'],
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
+    NEXT_PUBLIC_SITE_BASE_PATH: process.env.NEXT_PUBLIC_SITE_BASE_PATH ?? '',
     NEXT_PUBLIC_SITE_ORIGIN: process.env.NEXT_PUBLIC_SITE_ORIGIN ?? '',
   },
 };
