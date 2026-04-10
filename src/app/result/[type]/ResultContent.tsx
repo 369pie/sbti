@@ -11,6 +11,7 @@ import { DIMENSIONS, MODEL_NAMES, MODEL_COLORS } from '@/lib/dimensions';
 import type { PersonalityType } from '@/lib/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { useCallback, useRef, useState } from 'react';
+import { SHARE_SITE_URL } from '@/lib/site';
 
 interface Props {
   personality: PersonalityType;
@@ -19,6 +20,7 @@ interface Props {
 
 export function ResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
+  const [cpCopied, setCpCopied] = useState(false);
   const shareRef = useRef<ShareImageGeneratorHandle>(null);
 
   const copyLink = useCallback(() => {
@@ -26,6 +28,13 @@ export function ResultContent({ personality, dimensionScores }: Props) {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }, []);
+
+  const copyCPLink = useCallback(() => {
+    const url = `${SHARE_SITE_URL}cp/${personality.slug}/`;
+    navigator.clipboard.writeText(url);
+    setCpCopied(true);
+    setTimeout(() => setCpCopied(false), 2000);
+  }, [personality.slug]);
 
   const others = PERSONALITY_TYPES.filter(p => p.slug !== personality.slug).slice(0, 3);
 
@@ -144,12 +153,47 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         </motion.div>
       </section>
 
+      {/* CP invite section */}
+      <section className="max-w-2xl mx-auto px-6 pb-10">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+        >
+          <div
+            className="rounded-2xl border p-6 sm:p-8 text-center"
+            style={{ borderColor: `${personality.color}30`, background: `${personality.color}08` }}
+          >
+            <div className="text-3xl mb-3">💕</div>
+            <h3 className="text-lg font-semibold mb-2">邀请好友测 CP</h3>
+            <p className="text-sm text-text-secondary mb-5 max-w-sm mx-auto">
+              把链接发给朋友，TA 测完就能看到你们的配对结果！
+            </p>
+            <button
+              onClick={copyCPLink}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer"
+              style={{
+                background: cpCopied ? '#22c55e' : personality.color,
+                color: '#0c0a09',
+              }}
+            >
+              {cpCopied ? '链接已复制 ✓' : '复制 CP 邀请链接'}
+              {!cpCopied && (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </motion.div>
+      </section>
+
       {/* Share section */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4 text-center">
             分享给朋友

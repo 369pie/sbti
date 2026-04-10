@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QUESTIONS, shuffleQuestions } from '@/lib/questions';
 import { calculateResult } from '@/lib/scoring';
@@ -25,6 +25,8 @@ const MODEL_CLASS: Record<ModelType, string> = {
 
 export function Quiz() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const cpPartner = searchParams.get('cp');
   const [mounted, setMounted] = useState(false);
   const [questions] = useState(() => {
     const main = shuffleQuestions(QUESTIONS.filter(q => !q.isDrinkBranch));
@@ -109,7 +111,11 @@ export function Quiz() {
     const result = calculateResult(finalAnswers, QUESTIONS);
     // Brief delay for animation
     setTimeout(() => {
-      router.push(`/result/${result.personality.slug}`);
+      if (cpPartner) {
+        router.push(`/cp/result?a=${cpPartner}&b=${result.personality.slug}`);
+      } else {
+        router.push(`/result/${result.personality.slug}`);
+      }
     }, 800);
   };
 

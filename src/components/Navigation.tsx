@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { href: '/', label: '首页' },
   { href: '/test', label: '开始测试' },
   { href: '/types', label: '人格图鉴' },
+  { href: '/cp', label: 'CP配对' },
 ];
 
 export function Navigation() {
@@ -31,7 +32,7 @@ export function Navigation() {
 
         <div className="flex items-center gap-1">
           {NAV_ITEMS.map(item => {
-            const isActive = pathname === item.href;
+            const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}
