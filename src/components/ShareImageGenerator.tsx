@@ -29,6 +29,10 @@ function isMobile() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 }
 
+function isWeChatBrowser() {
+  return /MicroMessenger/i.test(navigator.userAgent);
+}
+
 function hexToRgba(hex: string, alpha: number) {
   const normalized = hex.replace('#', '');
   const value = normalized.length === 3
@@ -392,6 +396,7 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
   function ShareImageGenerator({ personality, dimensionScores }, ref) {
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [saveHint, setSaveHint] = useState<string | null>(null);
 
     const prepareAssets = useCallback(async () => {
       await Promise.all([
@@ -407,6 +412,7 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
     const handleGenerate = useCallback(async () => {
       if (generating) return;
       setGenerating(true);
+      setSaveHint(null);
 
       try {
         const dataUrl = await renderShareImage(personality, dimensionScores);
@@ -418,15 +424,37 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
       }
     }, [dimensionScores, generating, personality]);
 
-    const handleDownload = useCallback(() => {
+    const createPreviewFile = useCallback(async () => {
+      if (!previewUrl) return null;
+      const blob = await (await fetch(previewUrl)).blob();
+      return new File([blob], `SBTI-${personality.code}.png`, { type: 'image/png' });
+    }, [personality.code, previewUrl]);
+
+    const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
 
       if (isMobile()) {
-        const w = window.open('', '_blank');
-        if (w) {
-          w.document.write(`<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>SBTI-${personality.code}</title><style>*{margin:0;padding:0}body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}img{max-width:100%;height:auto}</style></head><body><img src="${previewUrl}" alt="SBTI-${personality.code}"></body></html>`);
-          w.document.close();
+        try {
+          const file = await createPreviewFile();
+          if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
+            setSaveHint('请在系统菜单里选择“保存到照片”或“存储到文件”。');
+            await navigator.share({
+              files: [file],
+              title: `SBTI-${personality.code}.png`,
+            });
+            return;
+          }
+        } catch (error) {
+          if (error instanceof DOMException && error.name === 'AbortError') {
+            return;
+          }
         }
+
+        setSaveHint(
+          isWeChatBrowser()
+            ? '微信内置浏览器不支持直接弹出保存面板，请长按上方图片保存，或右上角用系统浏览器打开后再保存。'
+            : '当前浏览器不能直接弹出保存面板，请长按上方图片保存到相册。',
+        );
         return;
       }
 
@@ -434,23 +462,22 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
       link.download = `SBTI-${personality.code}.png`;
       link.href = previewUrl;
       link.click();
-    }, [personality.code, previewUrl]);
+    }, [createPreviewFile, personality.code, previewUrl]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
 
       try {
-        const blob = await (await fetch(previewUrl)).blob();
-        const file = new File([blob], `SBTI-${personality.code}.png`, { type: 'image/png' });
-        if (navigator.share) {
+        const file = await createPreviewFile();
+        if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
           await navigator.share({ files: [file], title: `我的 SBTI 人格：${personality.name}` });
         } else {
-          handleDownload();
+          await handleDownload();
         }
       } catch {
-        handleDownload();
+        await handleDownload();
       }
-    }, [handleDownload, personality.code, personality.name, previewUrl]);
+    }, [createPreviewFile, handleDownload, personality.name, previewUrl]);
 
     useImperativeHandle(ref, () => ({
       generate: handleGenerate,
@@ -495,6 +522,12 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
               <p className="text-center text-xs text-text-muted mb-3 sm:hidden">
                 💡 长按上方图片可直接保存到相册
               </p>
+
+              {saveHint && (
+                <p className="text-center text-xs text-accent mb-3 px-4 leading-5">
+                  {saveHint}
+                </p>
+              )}
 
               <div className="flex gap-3">
                 <button
