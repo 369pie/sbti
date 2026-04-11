@@ -35,6 +35,18 @@ interface GalleryTab {
   items: GalleryItem[];
 }
 
+const GALLERY_THUMBNAIL_EXTENSION = /\.(png|jpe?g)$/i;
+
+function getGalleryThumbnail(imagePath: string): string {
+  if (!imagePath.includes('/images/types/')) {
+    return imagePath;
+  }
+
+  return imagePath
+    .replace('/images/types/', '/images/types/thumbs/')
+    .replace(GALLERY_THUMBNAIL_EXTENSION, '.webp');
+}
+
 /* ── Build tabs from all modules ────────────────────────── */
 function buildTabs(): GalleryTab[] {
   const sbtiItems: GalleryItem[] = PERSONALITY_TYPES.map(p => {
@@ -115,6 +127,9 @@ function buildTabs(): GalleryTab[] {
 
 /* ── Gallery card ───────────────────────────────────────── */
 function GalleryCard({ item, index }: { item: GalleryItem; index: number }) {
+  const thumbnailImage = getGalleryThumbnail(item.image);
+  const shouldPrioritizeImage = index === 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -130,10 +145,12 @@ function GalleryCard({ item, index }: { item: GalleryItem; index: number }) {
           style={{ background: `linear-gradient(135deg, ${item.color}08, ${item.color}15)` }}
         >
           <NextImage
-            src={item.image}
+            src={thumbnailImage}
             alt={item.name}
-            width={280}
-            height={280}
+            width={384}
+            height={384}
+            loading={shouldPrioritizeImage ? 'eager' : 'lazy'}
+            fetchPriority={shouldPrioritizeImage ? 'high' : 'auto'}
             className="w-[75%] h-[75%] object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
           />
           {item.isSpecial && (

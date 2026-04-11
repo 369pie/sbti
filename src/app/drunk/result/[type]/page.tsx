@@ -4,7 +4,7 @@ import { DRUNK_DIMENSIONS } from '@/lib/drunk/dimensions';
 import type { DimensionLevel } from '@/lib/drunk/dimensions';
 import { DrunkResultContent } from './DrunkResultContent';
 import type { Metadata } from 'next';
-
+import { getSiteUrl } from '@/lib/site';
 type PageProps = {
   params: Promise<{ type: string }>;
 };
@@ -45,5 +45,35 @@ export default async function DrunkResultPage({ params }: PageProps) {
     return { id: dim.id, score, level };
   });
 
-  return <DrunkResultContent persona={persona} dimensionScores={dimensionScores} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'SBTI 人格测试', item: getSiteUrl('/') },
+                { '@type': 'ListItem', position: 2, name: '酒后人设', item: getSiteUrl('/drunk/') },
+                { '@type': 'ListItem', position: 3, name: persona.name, item: getSiteUrl(`/drunk/result/${persona.slug}/`) },
+              ],
+            },
+            {
+              '@type': 'FAQPage',
+              mainEntity: [
+                {
+                  '@type': 'Question',
+                  name: `酒后人设 ${persona.code}（${persona.name}）是什么？`,
+                  acceptedAnswer: { '@type': 'Answer', text: `${persona.name}是 SBTI 酒后人设测试的 12 种类型之一。${persona.tagline}` },
+                },
+              ],
+            },
+          ],
+        }) }}
+      />
+      <DrunkResultContent persona={persona} dimensionScores={dimensionScores} />
+    </>
+  );
 }

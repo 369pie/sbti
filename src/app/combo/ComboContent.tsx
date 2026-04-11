@@ -41,33 +41,42 @@ function SBTIPicker({
   onSelect: (slug: string) => void;
 }) {
   return (
-    <div>
+    <div className="max-w-5xl mx-auto">
       <h2 className="text-lg font-semibold mb-2 text-center">选择你的 SBTI 人格</h2>
       <p className="text-sm text-text-muted text-center mb-6">
         还没测过？<Link href="/test" className="text-accent hover:underline">先去测一下</Link>
       </p>
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-        {PERSONALITY_TYPES.filter(p => !p.isSpecial).map(p => (
+      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 lg:gap-4">
+        {PERSONALITY_TYPES.map(p => (
           <button
             key={p.slug}
             onClick={() => onSelect(p.slug)}
-            className={`group relative rounded-xl border p-2 text-center transition-all cursor-pointer ${
+            className={`group relative rounded-2xl border p-2.5 sm:p-3 lg:p-4 text-center transition-all cursor-pointer min-h-[7.5rem] lg:min-h-[11rem] ${
               selected === p.slug
                 ? 'border-accent bg-accent/10 ring-1 ring-accent/30'
                 : 'border-border-subtle hover:border-border hover:bg-bg-secondary/50'
             }`}
           >
-            <div className="w-10 h-10 mx-auto mb-1 rounded-lg overflow-hidden" style={{ background: `${p.color}15` }}>
+            {p.isSpecial && (
+              <span className="absolute top-2 right-2 rounded-full bg-accent/12 px-2 py-0.5 text-[10px] font-medium text-accent">
+                特殊
+              </span>
+            )}
+            <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-20 lg:h-20 mx-auto mb-1.5 lg:mb-3 rounded-xl lg:rounded-2xl overflow-hidden" style={{ background: `${p.color}15` }}>
               <NextImage
                 src={getTypeImage(p.slug)}
                 alt={p.name}
-                width={40}
-                height={40}
+                width={80}
+                height={80}
                 className="w-full h-full object-contain"
               />
             </div>
-            <div className="text-[10px] font-mono tracking-wider" style={{ color: p.color }}>{p.code}</div>
-            <div className="text-xs text-text-primary">{p.name}</div>
+            <div className="text-[10px] sm:text-[11px] lg:text-xs font-mono tracking-[0.16em]" style={{ color: p.color }}>
+              {p.code}
+            </div>
+            <div className="text-xs sm:text-sm lg:text-[15px] leading-tight text-text-primary mt-0.5 lg:mt-1">
+              {p.name}
+            </div>
           </button>
         ))}
       </div>
@@ -373,9 +382,11 @@ export function ComboContent() {
     setZodiacId(null);
   }, []);
 
+  const shellWidthClass = result ? 'max-w-2xl' : 'max-w-5xl';
+
   return (
     <div className="min-h-screen">
-      <div className="max-w-2xl mx-auto px-6 pt-12 pb-24">
+      <div className={`${shellWidthClass} mx-auto px-4 sm:px-6 pt-12 pb-24`}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -425,7 +436,7 @@ export function ComboContent() {
               {preselectedSBTI && sbtiSlug && (() => {
                 const p = PERSONALITY_TYPES.find(t => t.slug === sbtiSlug);
                 return p ? (
-                  <div className="flex items-center justify-center gap-2 mb-8 p-3 rounded-xl border border-border-subtle bg-bg-secondary/40">
+                  <div className="max-w-2xl mx-auto flex items-center justify-center gap-2 mb-8 p-3 rounded-xl border border-border-subtle bg-bg-secondary/40">
                     <div className="w-8 h-8 rounded-lg overflow-hidden" style={{ background: `${p.color}15` }}>
                       <NextImage src={getTypeImage(p.slug)} alt={p.name} width={32} height={32} className="w-full h-full object-contain" />
                     </div>
@@ -440,7 +451,7 @@ export function ComboContent() {
                 <motion.div
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mb-10"
+                  className="max-w-2xl mx-auto mb-10"
                 >
                   <MBTIPicker selected={mbtiCode} onSelect={handleMBTISelect} />
                 </motion.div>
@@ -451,7 +462,7 @@ export function ComboContent() {
                 <motion.div
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mb-10"
+                  className="max-w-2xl mx-auto mb-10"
                 >
                   <ZodiacPicker selected={zodiacId} onSelect={handleZodiacSelect} />
                 </motion.div>
@@ -462,7 +473,7 @@ export function ComboContent() {
                 <motion.div
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-8"
+                  className="max-w-2xl mx-auto mt-8"
                 >
                   <button
                     onClick={handleGenerate}

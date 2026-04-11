@@ -4,7 +4,7 @@ import { LOVE_DIMENSIONS } from '@/lib/love/dimensions';
 import type { DimensionLevel } from '@/lib/love/dimensions';
 import { LoveResultContent } from './LoveResultContent';
 import type { Metadata } from 'next';
-
+import { getSiteUrl } from '@/lib/site';
 type PageProps = {
   params: Promise<{ type: string }>;
 };
@@ -45,5 +45,35 @@ export default async function LoveResultPage({ params }: PageProps) {
     return { id: dim.id, score, level };
   });
 
-  return <LoveResultContent personality={personality} dimensionScores={dimensionScores} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'SBTI 人格测试', item: getSiteUrl('/') },
+                { '@type': 'ListItem', position: 2, name: '恋爱人格', item: getSiteUrl('/love/') },
+                { '@type': 'ListItem', position: 3, name: personality.name, item: getSiteUrl(`/love/result/${personality.slug}/`) },
+              ],
+            },
+            {
+              '@type': 'FAQPage',
+              mainEntity: [
+                {
+                  '@type': 'Question',
+                  name: `恋爱人格 ${personality.code}（${personality.name}）是什么？`,
+                  acceptedAnswer: { '@type': 'Answer', text: `${personality.name}是 LPTI 恋爱人格测试的 16 种类型之一。${personality.tagline}` },
+                },
+              ],
+            },
+          ],
+        }) }}
+      />
+      <LoveResultContent personality={personality} dimensionScores={dimensionScores} />
+    </>
+  );
 }

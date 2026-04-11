@@ -11,6 +11,7 @@ import type { LovePersonalityType } from '@/lib/love/personalities';
 import type { LoveDimensionScore } from '@/lib/love/scoring';
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
+import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 
 interface Props {
   personality: LovePersonalityType;
@@ -19,9 +20,17 @@ interface Props {
 
 export function LoveResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
+  const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<LoveShareImageGeneratorHandle>(null);
 
   const shareUrl = getSiteUrl(`/love/result/${personality.slug}/`);
+
+  const copyShareText = useCallback(() => {
+    const text = `我的恋爱人设是 ${personality.code}（${personality.name}）\n${personality.tagline}\n来测测你的 → ${shareUrl}`;
+    navigator.clipboard.writeText(text);
+    setTextCopied(true);
+    setTimeout(() => setTextCopied(false), 2000);
+  }, [personality.code, personality.name, personality.tagline, shareUrl]);
 
   const copyLink = useCallback(() => {
     navigator.clipboard.writeText(shareUrl);
@@ -185,31 +194,7 @@ export function LoveResultContent({ personality, dimensionScores }: Props) {
         </motion.div>
       </section>
 
-      {/* Cross-promotion: try SBTI */}
-      <section className="max-w-2xl mx-auto px-6 pb-10">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-        >
-          <div className="rounded-2xl border border-orange-500/20 bg-orange-500/5 p-6 sm:p-8 text-center">
-            <div className="text-3xl mb-3">🎯</div>
-            <h3 className="text-lg font-semibold mb-2">也来测测你的抽象人格</h3>
-            <p className="text-sm text-text-secondary mb-5 max-w-sm mx-auto">
-              SBTI 人格测试 — 5 组切面 · 15 个维度 · 27 种结果
-            </p>
-            <Link
-              href="/test"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary text-sm font-medium hover:brightness-110 transition-all"
-            >
-              去测 SBTI
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
-          </div>
-        </motion.div>
-      </section>
+      <CrossTestRecommendations currentTest="love" personalityName={personality.name} />
 
       {/* Share section */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
@@ -224,6 +209,13 @@ export function LoveResultContent({ personality, dimensionScores }: Props) {
 
           <div className="space-y-3">
             <LoveShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
+
+            <button
+              onClick={copyShareText}
+              className="w-full py-3 rounded-xl border border-pink-500/20 bg-pink-500/5 text-sm text-pink-400 hover:bg-pink-500/10 transition-all cursor-pointer"
+            >
+              {textCopied ? '已复制分享文案 ✓' : '📋 复制分享文案'}
+            </button>
 
             <div className="flex gap-3">
               <button

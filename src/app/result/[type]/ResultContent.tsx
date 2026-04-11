@@ -12,6 +12,7 @@ import type { PersonalityType } from '@/lib/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
+import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 
 interface Props {
   personality: PersonalityType;
@@ -21,9 +22,17 @@ interface Props {
 export function ResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [cpCopied, setCpCopied] = useState(false);
+  const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<ShareImageGeneratorHandle>(null);
 
   const shareUrl = getSiteUrl(`/result/${personality.slug}/`);
+
+  const copyShareText = useCallback(() => {
+    const text = `我的 SBTI 人格是 ${personality.code}（${personality.name}）\n${personality.tagline}\n来测测你的 → ${shareUrl}`;
+    navigator.clipboard.writeText(text);
+    setTextCopied(true);
+    setTimeout(() => setTextCopied(false), 2000);
+  }, [personality.code, personality.name, personality.tagline, shareUrl]);
 
   const copyLink = useCallback(() => {
     navigator.clipboard.writeText(shareUrl);
@@ -247,6 +256,8 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         </motion.div>
       </section>
 
+      <CrossTestRecommendations currentTest="sbti" personalityName={personality.name} />
+
       {/* Share section */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
         <motion.div
@@ -260,6 +271,13 @@ export function ResultContent({ personality, dimensionScores }: Props) {
 
           <div className="space-y-3">
             <ShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
+
+            <button
+              onClick={copyShareText}
+              className="w-full py-3 rounded-xl border border-accent/20 bg-accent/5 text-sm text-accent hover:bg-accent/10 transition-all cursor-pointer"
+            >
+              {textCopied ? '已复制分享文案 ✓' : '📋 复制分享文案'}
+            </button>
 
             <div className="flex gap-3">
               <button

@@ -11,6 +11,7 @@ import type { DrunkShareImageGeneratorHandle } from '@/components/DrunkShareImag
 import { DrunkPersonaAvatar } from '@/components/DrunkPersonaAvatar';
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
+import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 
 interface Props {
   persona: DrunkPersonaType;
@@ -19,13 +20,23 @@ interface Props {
 
 export function DrunkResultContent({ persona, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
+  const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<DrunkShareImageGeneratorHandle>(null);
 
+  const shareUrl = getSiteUrl(`/drunk/result/${persona.slug}/`);
+
   const copyLink = useCallback(() => {
-    navigator.clipboard.writeText(getSiteUrl(`/drunk/result/${persona.slug}/`));
+    navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [persona.slug]);
+  }, [shareUrl]);
+
+  const copyShareText = useCallback(() => {
+    const text = `我的酒后人设是 ${persona.code}（${persona.name}）\n${persona.tagline}\n来测测你的 → ${shareUrl}`;
+    navigator.clipboard.writeText(text);
+    setTextCopied(true);
+    setTimeout(() => setTextCopied(false), 2000);
+  }, [persona.code, persona.name, persona.tagline, shareUrl]);
 
   const others = DRUNK_PERSONA_TYPES.filter(p => p.slug !== persona.slug).slice(0, 3);
 
@@ -107,22 +118,7 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
         </motion.div>
       </section>
 
-      {/* Cross-promotion */}
-      <section className="max-w-2xl mx-auto px-6 pb-10">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5, duration: 0.5 }}>
-          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 sm:p-8 text-center">
-            <div className="text-3xl mb-3">🎯</div>
-            <h3 className="text-lg font-semibold mb-2">也来测测你的抽象人格</h3>
-            <p className="text-sm text-text-secondary mb-5 max-w-sm mx-auto">SBTI 人格测试 — 5 组切面 · 15 个维度 · 27 种结果</p>
-            <Link href="/test" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary text-sm font-medium hover:brightness-110 transition-all">
-              去测 SBTI
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
-          </div>
-        </motion.div>
-      </section>
+      <CrossTestRecommendations currentTest="drunk" personalityName={persona.name} />
 
       {/* Share section */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
@@ -130,6 +126,10 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4 text-center">分享你的酒后人设</h2>
           <div className="space-y-3">
             <DrunkShareImageGenerator ref={shareRef} persona={persona} dimensionScores={dimensionScores} />
+            <button onClick={copyShareText}
+              className="w-full py-3 rounded-xl border border-amber-500/20 bg-amber-500/5 text-sm text-amber-400 hover:bg-amber-500/10 transition-all cursor-pointer">
+              {textCopied ? '已复制分享文案 ✓' : '📋 复制分享文案'}
+            </button>
             <div className="flex gap-3">
               <button onClick={copyLink}
                 className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all cursor-pointer">

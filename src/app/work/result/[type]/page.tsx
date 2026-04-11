@@ -4,7 +4,7 @@ import { WORK_DIMENSIONS } from '@/lib/work/dimensions';
 import type { DimensionLevel } from '@/lib/work/dimensions';
 import { WorkResultContent } from './WorkResultContent';
 import type { Metadata } from 'next';
-
+import { getSiteUrl } from '@/lib/site';
 type PageProps = {
   params: Promise<{ type: string }>;
 };
@@ -45,5 +45,35 @@ export default async function WorkResultPage({ params }: PageProps) {
     return { id: dim.id, score, level };
   });
 
-  return <WorkResultContent personality={personality} dimensionScores={dimensionScores} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'SBTI 人格测试', item: getSiteUrl('/') },
+                { '@type': 'ListItem', position: 2, name: '打工人格', item: getSiteUrl('/work/') },
+                { '@type': 'ListItem', position: 3, name: personality.name, item: getSiteUrl(`/work/result/${personality.slug}/`) },
+              ],
+            },
+            {
+              '@type': 'FAQPage',
+              mainEntity: [
+                {
+                  '@type': 'Question',
+                  name: `打工人格 ${personality.code}（${personality.name}）是什么？`,
+                  acceptedAnswer: { '@type': 'Answer', text: `${personality.name}是 WPTI 打工人格测试的 16 种类型之一。${personality.tagline}` },
+                },
+              ],
+            },
+          ],
+        }) }}
+      />
+      <WorkResultContent personality={personality} dimensionScores={dimensionScores} />
+    </>
+  );
 }

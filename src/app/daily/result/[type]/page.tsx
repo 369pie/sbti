@@ -4,7 +4,7 @@ import { DAILY_DIMENSIONS } from '@/lib/daily/dimensions';
 import type { DimensionLevel } from '@/lib/daily/dimensions';
 import { DailyResultContent } from './DailyResultContent';
 import type { Metadata } from 'next';
-
+import { getSiteUrl } from '@/lib/site';
 type PageProps = {
   params: Promise<{ type: string }>;
 };
@@ -45,5 +45,35 @@ export default async function DailyResultPage({ params }: PageProps) {
     return { id: dim.id, score, level };
   });
 
-  return <DailyResultContent status={status} dimensionScores={dimensionScores} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'SBTI 人格测试', item: getSiteUrl('/') },
+                { '@type': 'ListItem', position: 2, name: '今日模式', item: getSiteUrl('/daily/') },
+                { '@type': 'ListItem', position: 3, name: status.name, item: getSiteUrl(`/daily/result/${status.slug}/`) },
+              ],
+            },
+            {
+              '@type': 'FAQPage',
+              mainEntity: [
+                {
+                  '@type': 'Question',
+                  name: `今日模式 ${status.code}（${status.name}）是什么？`,
+                  acceptedAnswer: { '@type': 'Answer', text: `${status.name}是 SBTI 今日模式测试的 12 种状态之一。${status.tagline}` },
+                },
+              ],
+            },
+          ],
+        }) }}
+      />
+      <DailyResultContent status={status} dimensionScores={dimensionScores} />
+    </>
+  );
 }

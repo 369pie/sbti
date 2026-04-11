@@ -5,7 +5,6 @@ import type { DimensionLevel } from '@/lib/dimensions';
 import { ResultContent } from './ResultContent';
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
-
 type PageProps = {
   params: Promise<{ type: string }>;
 };
@@ -49,5 +48,39 @@ export default async function ResultPage({ params }: PageProps) {
     return { id: dim.id, score, level };
   });
 
-  return <ResultContent personality={personality} dimensionScores={dimensionScores} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'SBTI 人格测试', item: getSiteUrl('/') },
+                { '@type': 'ListItem', position: 2, name: '测试结果', item: getSiteUrl(`/result/${personality.slug}/`) },
+              ],
+            },
+            {
+              '@type': 'FAQPage',
+              mainEntity: [
+                {
+                  '@type': 'Question',
+                  name: `SBTI 人格类型 ${personality.code}（${personality.name}）是什么？`,
+                  acceptedAnswer: { '@type': 'Answer', text: `${personality.name}是 SBTI 人格测试的 27 种类型之一。${personality.tagline}` },
+                },
+                {
+                  '@type': 'Question',
+                  name: `如何获得 ${personality.code} 结果？`,
+                  acceptedAnswer: { '@type': 'Answer', text: `通过 SBTI 人格测试的 5 组切面、15 个维度的问题，系统会综合算出你的人格类型。${personality.code} 是其中一种结果。` },
+                },
+              ],
+            },
+          ],
+        }) }}
+      />
+      <ResultContent personality={personality} dimensionScores={dimensionScores} />
+    </>
+  );
 }
