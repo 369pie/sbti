@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -143,6 +144,7 @@ export default function RootLayout({
             <p className="mt-2 opacity-60">Silly Behavioral Type Indicator</p>
           </div>
         </footer>
+        <Analytics />
       </body>
     </html>
   );

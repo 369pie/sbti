@@ -1,6 +1,7 @@
 import type { PersonalityType } from './personalities';
 import { PERSONALITY_TYPES } from './personalities';
 import type { DimensionLevel } from './dimensions';
+import { withBasePath } from './site';
 
 // ─── MBTI ────────────────────────────────────────────────
 
@@ -466,12 +467,110 @@ const EASTER_EGGS: EasterEgg[] = [
   },
 ];
 
+// ─── Combo Personality (Fusion Type) ─────────────────────
+
+export interface ComboPersonality {
+  code: string;
+  name: string;
+  tagline: string;
+  emoji: string;
+  color: string;
+}
+
+const COMBO_PERSONALITIES: ComboPersonality[] = [
+  { code: 'INFERNO', name: '爆燃体', tagline: '一点就着，烧完整条街', emoji: '🔥', color: '#ef4444' },
+  { code: 'ABYSS',   name: '深渊体', tagline: '外表平静，内心是马里亚纳海沟', emoji: '🌊', color: '#3b82f6' },
+  { code: 'GLITCH',  name: '故障体', tagline: '逻辑自洽但人类不理解', emoji: '⚡', color: '#8b5cf6' },
+  { code: 'FROST',   name: '冰封体', tagline: '冷到结霜但里面是岩浆', emoji: '❄️', color: '#06b6d4' },
+  { code: 'BLOOM',   name: '绽放体', tagline: '走到哪里哪里就是花田', emoji: '🌸', color: '#ec4899' },
+  { code: 'VOID',    name: '虚空体', tagline: '存在感为零但能量无限', emoji: '🕳️', color: '#6366f1' },
+  { code: 'STORM',   name: '风暴体', tagline: '安静十分钟已是极限', emoji: '🌪️', color: '#f59e0b' },
+  { code: 'MIRROR',  name: '镜像体', tagline: '你看到的永远不是真实的我', emoji: '🪞', color: '#a78bfa' },
+  { code: 'ANCHOR',  name: '锚定体', tagline: '全世界在动只有我不动', emoji: '⚓', color: '#059669' },
+  { code: 'SPARK',   name: '火花体', tagline: '灵光一闪然后就忘了', emoji: '✨', color: '#f97316' },
+  { code: 'PHANTOM', name: '幻影体', tagline: '在场但已经精神离席', emoji: '👻', color: '#94a3b8' },
+  { code: 'NOVA',    name: '超新星', tagline: '能量爆发后归于沉寂', emoji: '💫', color: '#eab308' },
+];
+
+function classifyComboPersonality(
+  traits: SBTITraits,
+  mbti: MBTIType,
+  zodiac: ZodiacSign,
+  seed: number,
+): ComboPersonality {
+  const dims = mbti.dims;
+  const el = zodiac.element;
+
+  // Fire + high emotion + E → INFERNO
+  if (el === 'fire' && traits.emotion === 'high' && dims.ei === 'E') {
+    return COMBO_PERSONALITIES.find(p => p.code === 'INFERNO')!;
+  }
+  // Water + high emotion + I → ABYSS
+  if (el === 'water' && traits.emotion !== 'low' && dims.ei === 'I') {
+    return COMBO_PERSONALITIES.find(p => p.code === 'ABYSS')!;
+  }
+  // High self + I + N → GLITCH (confident introvert dreamer)
+  if (traits.self === 'high' && dims.ei === 'I' && dims.sn === 'N') {
+    return COMBO_PERSONALITIES.find(p => p.code === 'GLITCH')!;
+  }
+  // Low emotion + T + earth → FROST
+  if (traits.emotion === 'low' && dims.tf === 'T' && el === 'earth') {
+    return COMBO_PERSONALITIES.find(p => p.code === 'FROST')!;
+  }
+  // High social + E + F → BLOOM
+  if (traits.social === 'high' && dims.ei === 'E' && dims.tf === 'F') {
+    return COMBO_PERSONALITIES.find(p => p.code === 'BLOOM')!;
+  }
+  // Low social + I + low self → VOID
+  if (traits.social === 'low' && dims.ei === 'I' && traits.self === 'low') {
+    return COMBO_PERSONALITIES.find(p => p.code === 'VOID')!;
+  }
+  // High action + E + fire → STORM
+  if (traits.action === 'high' && dims.ei === 'E' && el === 'fire') {
+    return COMBO_PERSONALITIES.find(p => p.code === 'STORM')!;
+  }
+  // High attitude + N + water → MIRROR
+  if (traits.attitude === 'high' && dims.sn === 'N' && el === 'water') {
+    return COMBO_PERSONALITIES.find(p => p.code === 'MIRROR')!;
+  }
+  // Low action + J + earth → ANCHOR
+  if (traits.action !== 'high' && dims.jp === 'J' && el === 'earth') {
+    return COMBO_PERSONALITIES.find(p => p.code === 'ANCHOR')!;
+  }
+  // Air + N + P → SPARK
+  if (el === 'air' && dims.sn === 'N' && dims.jp === 'P') {
+    return COMBO_PERSONALITIES.find(p => p.code === 'SPARK')!;
+  }
+  // Low action + P + low social → PHANTOM
+  if (traits.action === 'low' && dims.jp === 'P' && traits.social === 'low') {
+    return COMBO_PERSONALITIES.find(p => p.code === 'PHANTOM')!;
+  }
+  // High action + high emotion → NOVA
+  if (traits.action === 'high' && traits.emotion === 'high') {
+    return COMBO_PERSONALITIES.find(p => p.code === 'NOVA')!;
+  }
+
+  // Fallback: pick by seed
+  const fallbacks = [
+    COMBO_PERSONALITIES.find(p => p.code === 'GLITCH')!,
+    COMBO_PERSONALITIES.find(p => p.code === 'SPARK')!,
+    COMBO_PERSONALITIES.find(p => p.code === 'MIRROR')!,
+    COMBO_PERSONALITIES.find(p => p.code === 'NOVA')!,
+  ];
+  return fallbacks[seed % fallbacks.length];
+}
+
+export function getComboPersonalityImage(code: string): string {
+  return withBasePath(`/images/types/combo-${code.toLowerCase()}.png`);
+}
+
 // ─── Main combo result ───────────────────────────────────
 
 export interface ComboResult {
   personality: PersonalityType;
   mbti: MBTIType;
   zodiac: ZodiacSign;
+  comboPersonality: ComboPersonality;
   title: string;
   roasts: string[];
   isEasterEgg: boolean;
@@ -492,20 +591,24 @@ export function generateCombo(
   const egg = EASTER_EGGS.find(
     e => e.sbtiSlug === sbtiSlug && e.mbtiCode === mbtiCode && e.zodiacId === zodiacId,
   );
+
+  const traits = analyzeProfile(personality.profile);
+  const seed = hashSeed(sbtiSlug, mbtiCode, zodiacId);
+  const comboPersonality = classifyComboPersonality(traits, mbti, zodiac, seed);
+
   if (egg) {
     return {
       personality, mbti, zodiac,
+      comboPersonality,
       title: egg.title,
       roasts: egg.roasts,
       isEasterEgg: true,
     };
   }
 
-  const traits = analyzeProfile(personality.profile);
-  const seed = hashSeed(sbtiSlug, mbtiCode, zodiacId);
-
   return {
     personality, mbti, zodiac,
+    comboPersonality,
     title: generateTitle(traits, mbti, zodiac, seed),
     roasts: generateRoasts(traits, mbti, zodiac, seed),
     isEasterEgg: false,

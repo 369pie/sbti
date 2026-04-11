@@ -11,6 +11,8 @@ const NAV_ITEMS = [
   { href: '/work', label: '打工人设' },
   { href: '/love', label: '恋爱人设' },
   { href: '/daily', label: '今日模式' },
+  { href: '/drunk', label: '酒后人设' },
+  { href: '/squad', label: '组局测试' },
   { href: '/combo', label: '人格拼盘' },
 ];
 

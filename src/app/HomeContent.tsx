@@ -378,6 +378,74 @@ export default function HomeContent() {
         </div>
       </section>
 
+      {/* Squad Test promo */}
+      <section className="py-20 px-6 border-t border-border-subtle">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8 sm:p-10 text-center"
+          >
+            <div className="text-4xl mb-4">👥</div>
+            <span className="inline-block text-xs font-mono tracking-[0.2em] text-amber-400 uppercase mb-3">
+              Squad · New
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">
+              组局测试
+            </h2>
+            <p className="text-text-secondary leading-relaxed max-w-md mx-auto mb-6">
+              拉上你的宿舍 / 闺蜜 / 同事一起测
+              <br />
+              生成群体抽象全家福，看看你们有多离谱。
+            </p>
+            <Link
+              href="/squad"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-amber-500 text-white font-medium text-base hover:bg-amber-600 transition-all duration-200"
+            >
+              去组局
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Drunk Persona promo */}
+      <section className="py-20 px-6 border-t border-border-subtle">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-orange-500/20 bg-orange-500/5 p-8 sm:p-10 text-center"
+          >
+            <div className="text-4xl mb-4">🍻</div>
+            <span className="inline-block text-xs font-mono tracking-[0.2em] text-orange-400 uppercase mb-3">
+              Drunk Persona · New
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">
+              酒后人设鉴定
+            </h2>
+            <p className="text-text-secondary leading-relaxed max-w-md mx-auto mb-6">
+              6 道灵魂拷问，一分钟测出你喝醉后会变成什么样的人
+              <br />
+              12 种酒后人设，有人断片有人社死有人原地去世。
+            </p>
+            <Link
+              href="/drunk"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-orange-500 text-white font-medium text-base hover:bg-orange-600 transition-all duration-200"
+            >
+              去测酒后人设
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
       <section className="py-20 px-6 border-t border-border-subtle">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">

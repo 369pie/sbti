@@ -8,7 +8,7 @@ import { useState, useCallback, useRef } from 'react';
 import { PERSONALITY_TYPES, getTypeImage } from '@/lib/personalities';
 import {
   MBTI_TYPES, ZODIAC_SIGNS, ELEMENT_LABELS,
-  generateCombo,
+  generateCombo, getComboPersonalityImage,
 } from '@/lib/combo';
 import type { ComboResult } from '@/lib/combo';
 import { ComboShareImageGenerator } from '@/components/ComboShareImageGenerator';
@@ -150,13 +150,35 @@ function ZodiacPicker({
 
 function ComboResultDisplay({ result }: { result: ComboResult }) {
   const shareRef = useRef<ComboShareImageGeneratorHandle>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = async () => {
+    try {
+      const url = window.location.href;
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* ignore */ }
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
+      className="relative"
     >
+      {/* Top-right share button */}
+      <button
+        onClick={() => shareRef.current?.generate()}
+        className="absolute -top-2 right-0 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-purple-400 transition-all cursor-pointer z-10"
+        title="生成分享图片"
+      >
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+        </svg>
+      </button>
+
       {/* Easter egg badge */}
       {result.isEasterEgg && (
         <motion.div
@@ -172,7 +194,7 @@ function ComboResultDisplay({ result }: { result: ComboResult }) {
       )}
 
       {/* Three badges row */}
-      <div className="flex items-center justify-center gap-2 flex-wrap mb-8">
+      <div className="flex items-center justify-center gap-2 flex-wrap mb-6">
         <span
           className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border"
           style={{ color: result.personality.color, background: `${result.personality.color}12`, borderColor: `${result.personality.color}30` }}
@@ -189,16 +211,59 @@ function ComboResultDisplay({ result }: { result: ComboResult }) {
         </span>
       </div>
 
-      {/* Character image */}
-      <div className="w-32 h-32 mx-auto mb-6 rounded-2xl overflow-hidden" style={{ background: `${result.personality.color}15` }}>
-        <NextImage
-          src={getTypeImage(result.personality.slug)}
-          alt={result.personality.name}
-          width={128}
-          height={128}
-          className="w-full h-full object-contain p-1"
-        />
-      </div>
+      {/* Combo Personality Hero Card */}
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+        className="rounded-2xl border-2 p-6 sm:p-8 text-center mb-6"
+        style={{ borderColor: result.comboPersonality.color, background: `${result.comboPersonality.color}08` }}
+      >
+        <div className="flex items-center justify-center gap-4 sm:gap-6 mb-4">
+          {/* Combo personality image */}
+          <div
+            className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 shrink-0"
+            style={{ borderColor: `${result.comboPersonality.color}40`, background: `${result.comboPersonality.color}12` }}
+          >
+            <NextImage
+              src={getComboPersonalityImage(result.comboPersonality.code)}
+              alt={result.comboPersonality.name}
+              width={96}
+              height={96}
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                const target = e.currentTarget;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  parent.innerHTML = `<span style="font-size:2.5rem;line-height:1;display:flex;align-items:center;justify-content:center;height:100%">${result.comboPersonality.emoji}</span>`;
+                }
+              }}
+            />
+          </div>
+          {/* SBTI character image */}
+          <div
+            className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 shrink-0"
+            style={{ borderColor: `${result.personality.color}40`, background: `${result.personality.color}12` }}
+          >
+            <NextImage
+              src={getTypeImage(result.personality.slug)}
+              alt={result.personality.name}
+              width={96}
+              height={96}
+              className="w-full h-full object-contain p-1"
+            />
+          </div>
+        </div>
+        <div
+          className="text-lg sm:text-xl font-mono font-extrabold tracking-wider mb-1"
+          style={{ color: result.comboPersonality.color }}
+        >
+          {result.comboPersonality.code}
+        </div>
+        <h3 className="text-xl sm:text-2xl font-bold text-text-primary mb-1">{result.comboPersonality.name}</h3>
+        <p className="text-sm text-text-secondary">「{result.comboPersonality.tagline}」</p>
+      </motion.div>
 
       {/* Combo title */}
       <motion.h1
@@ -248,6 +313,12 @@ function ComboResultDisplay({ result }: { result: ComboResult }) {
 
       {/* Actions */}
       <div className="flex gap-3">
+        <button
+          onClick={handleCopyLink}
+          className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all cursor-pointer"
+        >
+          {copied ? '已复制 ✓' : '复制链接'}
+        </button>
         <Link
           href={`/result/${result.personality.slug}/`}
           className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all text-center"

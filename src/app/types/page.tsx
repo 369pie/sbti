@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import TypesContent from './TypesContent';
 
 export const metadata: Metadata = {
-  title: 'SBTI 27 种人格图鉴 — 27 张抽象人设卡',
+  title: 'SBTI 全人格图鉴馆 — 83 张抽象人设卡',
   description:
-    '浏览 SBTI 全部 27 张抽象人设卡：五大模型、十五个维度、二十七种结果，对照查看每张卡的核心画像与差异。',
+    '浏览 SBTI 全部 83 张抽象人设卡：人格图鉴、恋爱人格、职场人格、今日状态、酒后人设，五大系列一次刷完。',
   alternates: { canonical: '/types/' },
 };
 

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } fro
 import QRCode from 'qrcode';
 import { getTypeImage } from '@/lib/personalities';
 import type { ComboResult } from '@/lib/combo';
+import { getComboPersonalityImage } from '@/lib/combo';
 import { SHARE_SITE_URL } from '@/lib/site';
 
 export interface ComboShareImageGeneratorHandle {
@@ -15,7 +16,6 @@ interface Props {
 }
 
 const CARD_WIDTH = 540;
-const CARD_HEIGHT = 920;
 const CARD_SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
@@ -145,11 +145,44 @@ function drawImageContain(
 }
 
 async function renderComboShareImage(result: ComboResult) {
-  const [typeImage, qrImage] = await Promise.all([
+  const [typeImage, qrImage, comboImage] = await Promise.all([
     getCachedImage(getTypeImage(result.personality.slug)).catch(() => null),
     createQrImage().catch(() => null),
+    getCachedImage(getComboPersonalityImage(result.comboPersonality.code)).catch(() => null),
   ]);
 
+  // ── Pre-compute layout positions for dynamic height ──
+  const measureCanvas = document.createElement('canvas');
+  const measureCtx = measureCanvas.getContext('2d')!;
+
+  const imgY = 108;
+  const imgSize = 200;
+  const cpInfoY = imgY + imgSize + 12;
+  const easterEggOffset = result.isEasterEgg ? 92 : 66;
+  const titleY = cpInfoY + easterEggOffset;
+
+  measureCtx.font = `700 30px ${FONT_SANS}`;
+  const titleLines = wrapText(measureCtx, result.title, CARD_WIDTH - 80, 2);
+  const subY = titleY + titleLines.length * 40 + 8;
+  const roastY = subY + 36;
+  const roastW = CARD_WIDTH - 72;
+  const lineHeight = 28;
+  const roastPaddingY = 20;
+
+  measureCtx.font = `14px ${FONT_SANS}`;
+  let totalRoastLines = 0;
+  const wrappedRoasts: string[][] = [];
+  for (const line of result.roasts) {
+    const wrapped = wrapText(measureCtx, `▸ ${line}`, roastW - 48, 3);
+    wrappedRoasts.push(wrapped);
+    totalRoastLines += wrapped.length;
+  }
+  const roastH = roastPaddingY * 2 + totalRoastLines * lineHeight + (result.roasts.length - 1) * 8;
+  const footerY = roastY + roastH + 16;
+  const FOOTER_BOTTOM = 98; // QR(80) + top-gap(4) + bottom padding(14)
+  const CARD_HEIGHT = footerY + FOOTER_BOTTOM;
+
+  // ── Create canvas at computed height ──
   const canvas = document.createElement('canvas');
   canvas.width = CARD_WIDTH * CARD_SCALE;
   canvas.height = CARD_HEIGHT * CARD_SCALE;
@@ -231,48 +264,78 @@ async function renderComboShareImage(result: ComboResult) {
   ctx.fillStyle = '#06b6d4';
   ctx.fillText(zodiacTag, bx + zodiacW / 2, badgeY + 5);
 
-  // Character image
-  const imgX = 160;
-  const imgY = 108;
-  const imgW = CARD_WIDTH - 320;
-  const imgH = 260;
-  fillRoundedRect(ctx, imgX, imgY, imgW, imgH, 20, '#ffffff');
-  strokeRoundedRect(ctx, imgX, imgY, imgW, imgH, 20, hexToRgba(color, 0.2));
+  // Character images — combo personality + SBTI type side by side
+  const imgGap = 20;
+  const totalImgW = imgSize * 2 + imgGap;
+  const imgStartX = (CARD_WIDTH - totalImgW) / 2;
+  const cpColor = result.comboPersonality.color;
+
+  // Combo personality image (left)
+  fillRoundedRect(ctx, imgStartX, imgY, imgSize, imgSize, 20, hexToRgba(cpColor, 0.08));
+  strokeRoundedRect(ctx, imgStartX, imgY, imgSize, imgSize, 20, hexToRgba(cpColor, 0.3), 2);
+  if (comboImage) {
+    ctx.save();
+    roundRectPath(ctx, imgStartX + 4, imgY + 4, imgSize - 8, imgSize - 8, 16);
+    ctx.clip();
+    drawImageContain(ctx, comboImage, imgStartX + 8, imgY + 8, imgSize - 16, imgSize - 16);
+    ctx.restore();
+  } else {
+    // Emoji fallback
+    ctx.fillStyle = cpColor;
+    ctx.font = `64px ${FONT_SANS}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(result.comboPersonality.emoji, imgStartX + imgSize / 2, imgY + 32);
+  }
+
+  // SBTI type image (right)
+  const img2X = imgStartX + imgSize + imgGap;
+  fillRoundedRect(ctx, img2X, imgY, imgSize, imgSize, 20, hexToRgba(color, 0.08));
+  strokeRoundedRect(ctx, img2X, imgY, imgSize, imgSize, 20, hexToRgba(color, 0.3), 2);
   if (typeImage) {
     ctx.save();
-    roundRectPath(ctx, imgX + 4, imgY + 4, imgW - 8, imgH - 8, 16);
+    roundRectPath(ctx, img2X + 4, imgY + 4, imgSize - 8, imgSize - 8, 16);
     ctx.clip();
-    drawImageContain(ctx, typeImage, imgX + 16, imgY + 16, imgW - 32, imgH - 32);
+    drawImageContain(ctx, typeImage, img2X + 8, imgY + 8, imgSize - 16, imgSize - 16);
     ctx.restore();
   }
+
+  // Combo personality code + name below images
+  ctx.textAlign = 'center';
+  ctx.fillStyle = cpColor;
+  ctx.font = `800 16px ${FONT_MONO}`;
+  ctx.fillText(result.comboPersonality.code, CARD_WIDTH / 2, cpInfoY);
+
+  ctx.fillStyle = DARK;
+  ctx.font = `700 15px ${FONT_SANS}`;
+  ctx.fillText(result.comboPersonality.name, CARD_WIDTH / 2, cpInfoY + 22);
+
+  ctx.fillStyle = MED;
+  ctx.font = `12px ${FONT_SANS}`;
+  ctx.fillText(`「${result.comboPersonality.tagline}」`, CARD_WIDTH / 2, cpInfoY + 44);
 
   // Easter egg badge
   if (result.isEasterEgg) {
     ctx.font = `10px ${FONT_MONO}`;
     const eggText = '🥚 隐藏彩蛋';
     const eggW = ctx.measureText(eggText).width + 16;
-    fillRoundedRect(ctx, imgX + imgW - eggW - 8, imgY + imgH - 28, eggW, 20, 10, 'rgba(251,191,36,0.15)');
+    fillRoundedRect(ctx, (CARD_WIDTH - eggW) / 2, cpInfoY + 62, eggW, 20, 10, 'rgba(251,191,36,0.15)');
     ctx.fillStyle = '#fbbf24';
-    ctx.textAlign = 'left';
-    ctx.fillText(eggText, imgX + imgW - eggW, imgY + imgH - 23);
     ctx.textAlign = 'center';
+    ctx.fillText(eggText, CARD_WIDTH / 2, cpInfoY + 67);
   }
 
   // Combo title
-  const titleY = imgY + imgH + 20;
   ctx.textAlign = 'center';
 
   // Gradient-ish title (draw twice for pseudo-gradient)
   ctx.fillStyle = color;
   ctx.font = `700 30px ${FONT_SANS}`;
-  // Wrap title if too long
-  const titleLines = wrapText(ctx, result.title, CARD_WIDTH - 80, 2);
+  // Wrap title if too long — reuse pre-computed titleLines
   titleLines.forEach((line, i) => {
     ctx.fillText(line, CARD_WIDTH / 2, titleY + i * 40);
   });
 
   // Sub line
-  const subY = titleY + titleLines.length * 40 + 8;
   ctx.fillStyle = MED;
   ctx.font = `13px ${FONT_SANS}`;
   ctx.fillText(
@@ -282,23 +345,9 @@ async function renderComboShareImage(result: ComboResult) {
   );
 
   // Roast card
-  const roastY = subY + 36;
   const roastX = 36;
-  const roastW = CARD_WIDTH - 72;
-  const lineHeight = 28;
-  const roastPaddingY = 20;
 
-  // Calculate roast card height based on wrapped text
-  ctx.font = `14px ${FONT_SANS}`;
-  let totalRoastLines = 0;
-  const wrappedRoasts: string[][] = [];
-  for (const line of result.roasts) {
-    const wrapped = wrapText(ctx, `▸ ${line}`, roastW - 48, 3);
-    wrappedRoasts.push(wrapped);
-    totalRoastLines += wrapped.length;
-  }
-  const roastH = roastPaddingY * 2 + totalRoastLines * lineHeight + (result.roasts.length - 1) * 8;
-
+  // Roast card — use pre-computed dimensions
   fillRoundedRect(ctx, roastX, roastY, roastW, roastH, 16, hexToRgba(color, 0.04));
   strokeRoundedRect(ctx, roastX, roastY, roastW, roastH, 16, hexToRgba(color, 0.10));
 
@@ -315,7 +364,6 @@ async function renderComboShareImage(result: ComboResult) {
   }
 
   // Footer
-  const footerY = roastY + roastH + 16;
   ctx.textAlign = 'left';
   ctx.strokeStyle = DIV;
   ctx.beginPath();
@@ -332,11 +380,12 @@ async function renderComboShareImage(result: ComboResult) {
   ctx.fillText(SHARE_SITE_URL, 36, footerY + 44);
 
   // QR
-  fillRoundedRect(ctx, 424, footerY + 4, 80, 80, 12, '#ffffff');
+  const qrX = CARD_WIDTH - 120;
+  fillRoundedRect(ctx, qrX, footerY + 4, 80, 80, 12, '#ffffff');
   if (qrImage) {
-    drawImageContain(ctx, qrImage, 428, footerY + 8, 72, 72);
+    drawImageContain(ctx, qrImage, qrX + 4, footerY + 8, 72, 72);
   } else {
-    fillRoundedRect(ctx, 432, footerY + 12, 64, 64, 8, DIV);
+    fillRoundedRect(ctx, qrX + 8, footerY + 12, 64, 64, 8, DIV);
   }
 
   return canvas.toDataURL('image/png');
@@ -351,9 +400,10 @@ export const ComboShareImageGenerator = forwardRef<ComboShareImageGeneratorHandl
     const prepareAssets = useCallback(async () => {
       await Promise.all([
         getCachedImage(getTypeImage(result.personality.slug)).catch(() => null),
+        getCachedImage(getComboPersonalityImage(result.comboPersonality.code)).catch(() => null),
         createQrImage().catch(() => null),
       ]);
-    }, [result.personality.slug]);
+    }, [result.personality.slug, result.comboPersonality.code]);
 
     useEffect(() => {
       void prepareAssets();
