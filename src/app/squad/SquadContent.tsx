@@ -111,7 +111,7 @@ function AddMembersStep({
       <p className="text-sm text-text-muted text-center mb-6">
         每人填昵称 + 选人格类型，至少 2 人
         <br />
-        <Link href="/test" className="text-accent hover:underline">还没测？先去测一下</Link>
+        <Link href="/test/" className="text-accent hover:underline">还没测？先去测一下</Link>
       </p>
 
       {/* Current members */}

@@ -1,15 +1,18 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PERSONALITY_TYPES, getTypeImage, getRarity } from '@/lib/personalities';
+import { PERSONALITY_TYPES, getTypeImage, getXiuxianTypeImage, getRarity } from '@/lib/personalities';
 import { LOVE_PERSONALITY_TYPES, getLoveTypeImage, getLoveRarity } from '@/lib/love/personalities';
 import { WORK_PERSONALITY_TYPES, getWorkTypeImage, getWorkRarity } from '@/lib/work/personalities';
 import { DAILY_STATUS_TYPES, getDailyTypeImage } from '@/lib/daily/statuses';
 import { DRUNK_PERSONA_TYPES, getDrunkTypeImage } from '@/lib/drunk/personas';
 import { GUIDE_ARTICLES } from '@/lib/guides';
+import { WTFTI_PERSONALITIES, getWtftiTypeImage, getWtftiTypeThumbnailImage } from '@/lib/wtfti-personalities';
+import { getXiuxianSkin } from '@/lib/xiuxian';
+import { getXiuxianLaunchOnlyTypes } from '@/lib/xiuxian-v2';
 
 /* ── Normalized gallery item ────────────────────────────── */
 interface GalleryItem {
@@ -20,6 +23,7 @@ interface GalleryItem {
   color: string;
   emoji?: string;
   image: string;
+  thumbnailImage?: string;
   href: string;
   rarity?: { label: string; color: string; bgColor: string };
   isSpecial?: boolean;
@@ -48,13 +52,24 @@ function getGalleryThumbnail(imagePath: string): string {
 }
 
 /* ── Build tabs from all modules ────────────────────────── */
-function buildTabs(): GalleryTab[] {
-  const sbtiItems: GalleryItem[] = PERSONALITY_TYPES.map(p => {
+function buildTabs(isXiuxian: boolean): GalleryTab[] {
+  const sbtiSourceTypes = isXiuxian
+    ? [...PERSONALITY_TYPES, ...getXiuxianLaunchOnlyTypes()]
+    : PERSONALITY_TYPES;
+
+  const sbtiItems: GalleryItem[] = sbtiSourceTypes.map(p => {
     const r = getRarity(p.slug);
+    const xiuxianSkin = isXiuxian ? getXiuxianSkin(p.slug) : undefined;
     return {
-      slug: p.slug, code: p.code, name: p.name, tagline: p.tagline,
-      color: p.color, emoji: p.emoji, image: getTypeImage(p.slug),
-      href: `/result/${p.slug}`, isSpecial: p.isSpecial,
+      slug: p.slug,
+      code: p.code,
+      name: xiuxianSkin?.displayName ?? p.name,
+      tagline: xiuxianSkin?.tagline ?? p.tagline,
+      color: xiuxianSkin?.color ?? p.color,
+      emoji: xiuxianSkin?.emoji ?? p.emoji,
+      image: isXiuxian ? getXiuxianTypeImage(p.slug) : getTypeImage(p.slug),
+      href: isXiuxian ? `/result/${p.slug}?skin=xiuxian` : `/result/${p.slug}`,
+      isSpecial: p.isSpecial,
       rarity: { label: r.label, color: r.color, bgColor: r.bgColor },
     };
   });
@@ -91,12 +106,32 @@ function buildTabs(): GalleryTab[] {
     href: `/drunk/result/${p.slug}`,
   }));
 
+  const wtftiItems: GalleryItem[] = WTFTI_PERSONALITIES.map(p => ({
+    slug: p.slug,
+    code: p.number,
+    name: p.wtftiName,
+    tagline: p.tagline,
+    color: p.color,
+    emoji: p.emoji,
+    image: getWtftiTypeImage(p.slug),
+    thumbnailImage: getWtftiTypeThumbnailImage(p.slug),
+    href: `/wtfti/result/${p.slug}/`,
+  }));
+
   return [
     {
       id: 'sbti', label: '人格图鉴', emoji: '🧬', accent: '#e8729c',
-      testHref: '/test',
-      description: '五大模型十五维度交叉分析，27 张人设卡各有各的离谱逻辑。',
+      testHref: isXiuxian ? '/test?skin=xiuxian' : '/test',
+      description: isXiuxian
+        ? `同一套核心模型，切成修仙世界观：${sbtiItems.length} 张修仙结果卡，含首发隐藏卡。`
+        : `五大模型十五维度交叉分析，${sbtiItems.length} 张人设卡各有各的离谱逻辑。`,
       items: sbtiItems,
+    },
+    {
+      id: 'wtfti', label: 'WTFTI', emoji: '🤯', accent: '#ef4444',
+      testHref: '/wtfti/test/',
+      description: `同一套 15 维度模型，切进另一个命名宇宙：${wtftiItems.length} 张 WTF 人格图鉴，张张都像在当面拆你。`,
+      items: wtftiItems,
     },
     {
       id: 'love', label: '恋爱人格', emoji: '💕', accent: '#f472b6',
@@ -127,7 +162,7 @@ function buildTabs(): GalleryTab[] {
 
 /* ── Gallery card ───────────────────────────────────────── */
 function GalleryCard({ item, index }: { item: GalleryItem; index: number }) {
-  const thumbnailImage = getGalleryThumbnail(item.image);
+  const thumbnailImage = item.thumbnailImage ?? getGalleryThumbnail(item.image);
   const shouldPrioritizeImage = index === 0;
 
   return (
@@ -201,10 +236,23 @@ function GalleryCard({ item, index }: { item: GalleryItem; index: number }) {
 
 /* ── Main component ─────────────────────────────────────── */
 export default function TypesContent() {
-  const tabs = useMemo(() => buildTabs(), []);
+  const [isXiuxian, setIsXiuxian] = useState(() =>
+    (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('skin') : null) === 'xiuxian'
+  );
+  const tabs = useMemo(() => buildTabs(isXiuxian), [isXiuxian]);
   const [activeId, setActiveId] = useState('sbti');
   const activeTab = tabs.find(t => t.id === activeId)!;
   const totalCount = tabs.reduce((s, t) => s + t.items.length, 0);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (isXiuxian) {
+      url.searchParams.set('skin', 'xiuxian');
+    } else {
+      url.searchParams.delete('skin');
+    }
+    window.history.replaceState({}, '', url.toString());
+  }, [isXiuxian]);
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
@@ -222,8 +270,30 @@ export default function TypesContent() {
           全人格图鉴馆
         </h1>
         <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
-          从基础人格到恋爱、职场、每日状态、酒后人设——{totalCount} 张抽象人设卡，五大系列一次刷完。
+          从基础人格、WTFTI 到恋爱、职场、每日状态、酒后人设——{totalCount} 张抽象人设卡，{tabs.length} 个系列一次刷完。
         </p>
+        <div className="mt-4 inline-flex items-center rounded-full bg-bg-secondary/80 border border-border-subtle p-0.5 text-xs">
+          <button
+            onClick={() => setIsXiuxian(false)}
+            className={`px-4 py-1.5 rounded-full transition-all duration-200 cursor-pointer ${
+              !isXiuxian
+                ? 'bg-bg-elevated text-text-primary shadow-sm font-medium'
+                : 'text-text-muted hover:text-text-secondary'
+            }`}
+          >
+            标准版
+          </button>
+          <button
+            onClick={() => setIsXiuxian(true)}
+            className={`px-4 py-1.5 rounded-full transition-all duration-200 cursor-pointer ${
+              isXiuxian
+                ? 'bg-bg-elevated text-text-primary shadow-sm font-medium'
+                : 'text-text-muted hover:text-text-secondary'
+            }`}
+          >
+            修仙版
+          </button>
+        </div>
       </motion.div>
 
       {/* Tab bar */}
@@ -314,7 +384,7 @@ export default function TypesContent() {
           </h2>
           <div className="space-y-4 text-text-secondary leading-8 text-sm sm:text-base">
             <p>
-              SBTI 的人设卡不是随便起梗的标签列表——基础人格是五组切面、十五个维度的交叉组合；恋爱、职场、酒后人设各有独立维度模型。两个人看起来相似，最后也可能落到完全不同的卡上。
+              SBTI 的人设卡不是随便起梗的标签列表——基础人格是五组切面、十五个维度的交叉组合；WTFTI 用同一套核心维度切进另一套更毒舌的命名宇宙；恋爱、职场、今日状态、酒后人设各有独立维度模型。两个人看起来相似，最后也可能落到完全不同的卡上。
             </p>
             <p>
               最顺手的打开方式：先刷一遍感兴趣的系列图鉴，再去做对应测试，然后回到结果页对照详细解读。比只看一个结果名更容易理解自己为什么会落到那个类型。

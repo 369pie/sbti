@@ -136,7 +136,7 @@ export function CPResultContent() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-text-muted mb-4">缺少配对参数</p>
-          <Link href="/test" className="text-accent hover:underline">去测试 →</Link>
+          <Link href="/test/" className="text-accent hover:underline">去测试 →</Link>
         </div>
       </div>
     );
@@ -150,7 +150,7 @@ export function CPResultContent() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-text-muted mb-4">未找到对应人格类型</p>
-          <Link href="/test" className="text-accent hover:underline">去测试 →</Link>
+          <Link href="/test/" className="text-accent hover:underline">去测试 →</Link>
         </div>
       </div>
     );
@@ -418,7 +418,7 @@ export function CPResultContent() {
             查看 {typeB.code} 详情
           </Link>
           <Link
-            href="/test"
+            href="/test/"
             className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all text-center"
           >
             重新测试

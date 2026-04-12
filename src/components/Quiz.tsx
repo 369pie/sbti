@@ -10,6 +10,8 @@ import type { Answer } from '@/lib/scoring';
 import { MODEL_NAMES, MODEL_COLORS } from '@/lib/dimensions';
 import type { ModelType } from '@/lib/dimensions';
 import { basePath } from '@/lib/site';
+import { XIUXIAN_V2_QUESTION_SKINS, XIUXIAN_V2_DEFAULT_OPTIONS } from '@/lib/xiuxian-questions-v2';
+import { XIUXIAN_MODEL_NAMES, XIUXIAN_MODEL_COLORS } from '@/lib/xiuxian';
 
 const MODEL_CLASS: Record<ModelType, string> = {
   self: 'model-self',
@@ -21,9 +23,26 @@ const MODEL_CLASS: Record<ModelType, string> = {
 
 const emptySubscribe = () => () => {};
 
-export function Quiz() {
+interface QuizProps {
+  /** Path prefix before /result/, e.g. '/wtfti' for /wtfti/result/[slug] */
+  resultPrefix?: string;
+  /** Whether to show the xiuxian/standard skin toggle (default: true) */
+  showSkinToggle?: boolean;
+  /** Which variant is active: 'standard' or 'wtfti' */
+  variant?: 'standard' | 'wtfti';
+  /** Custom finishing overlay emoji + text */
+  finishingOverlay?: { emoji: string; text: string };
+}
+
+export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'standard', finishingOverlay }: QuizProps = {}) {
   const searchParams = useSearchParams();
   const cpPartner = searchParams.get('cp');
+  const [skinMode, setSkinMode] = useState<'standard' | 'xiuxian'>(() =>
+    (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('skin') : null) === 'xiuxian' ? 'xiuxian' : 'standard'
+  );
+  const isXiuxian = skinMode === 'xiuxian';
+  const modelNames = isXiuxian ? XIUXIAN_MODEL_NAMES : MODEL_NAMES;
+  const modelColors = isXiuxian ? XIUXIAN_MODEL_COLORS : MODEL_COLORS;
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [questions] = useState(() => {
     const main = shuffleQuestions(QUESTIONS.filter(q => !q.isDrinkBranch));
@@ -53,7 +72,7 @@ export function Quiz() {
   const totalMain = questions.length;
   const progress = ((currentIndex + (showDrinkBranch ? drinkBranchIndex : 0)) / (totalMain + (showDrinkBranch ? drinkBranch.length : 0))) * 100;
 
-  const modelColor = currentQ ? MODEL_COLORS[currentQ.model] : MODEL_COLORS.self;
+  const modelColor = currentQ ? modelColors[currentQ.model] : modelColors.self;
 
   useLayoutEffect(() => {
     activeQuestionIdRef.current = currentQuestionId;
@@ -88,13 +107,15 @@ export function Quiz() {
     }
 
     finishTimeoutRef.current = window.setTimeout(() => {
+      const skinParam = isXiuxian ? '?skin=xiuxian' : '';
       if (cpPartner) {
-        window.location.href = `${basePath}/cp/result?a=${encodeURIComponent(cpPartner)}&b=${encodeURIComponent(result.personality.slug)}`;
+        const sep = skinParam ? '&skin=xiuxian' : '';
+        window.location.href = `${basePath}/cp/result?a=${encodeURIComponent(cpPartner)}&b=${encodeURIComponent(result.personality.slug)}${sep}`;
       } else {
-        window.location.href = `${basePath}/result/${encodeURIComponent(result.personality.slug)}/`;
+        window.location.href = `${basePath}${resultPrefix}/result/${encodeURIComponent(result.personality.slug)}${skinParam}`;
       }
     }, 800);
-  }, [cpPartner]);
+  }, [cpPartner, isXiuxian, resultPrefix]);
 
   const handleAnswer = useCallback((questionId: number, value: Answer) => {
     if (!currentQ) return;
@@ -176,8 +197,74 @@ export function Quiz() {
     );
   }
 
+  // Xiuxian 2.0 question overlay
+  const xiuxianSkin = isXiuxian ? XIUXIAN_V2_QUESTION_SKINS[currentQ.id] : undefined;
+  const qText = xiuxianSkin?.text ?? currentQ.text;
+  const defaultOpts = isXiuxian ? XIUXIAN_V2_DEFAULT_OPTIONS : DEFAULT_OPTIONS;
+  const qOptions = xiuxianSkin?.options ?? currentQ.options ?? defaultOpts;
+
   return (
     <div className={`min-h-[calc(100vh-3.5rem)] flex flex-col ${MODEL_CLASS[currentQ.model]} model-glow`}>
+      {/* Skin toggle */}
+      {showSkinToggle && (
+      <div className="px-6 pt-4 max-w-2xl mx-auto w-full flex justify-center">
+        <div className="inline-flex items-center rounded-full bg-bg-secondary/80 border border-border-subtle p-0.5 text-xs">
+          <button
+            onClick={() => {
+              if (variant === 'wtfti') {
+                window.location.href = `${basePath}/test`;
+                return;
+              }
+              setSkinMode('standard');
+              const url = new URL(window.location.href);
+              url.searchParams.delete('skin');
+              window.history.replaceState({}, '', url.toString());
+            }}
+            className={`px-4 py-1.5 rounded-full transition-all duration-200 cursor-pointer ${
+              variant === 'standard' && !isXiuxian
+                ? 'bg-bg-elevated text-text-primary shadow-sm font-medium'
+                : 'text-text-muted hover:text-text-secondary'
+            }`}
+          >
+            标准版
+          </button>
+          <button
+            onClick={() => {
+              if (variant === 'wtfti') {
+                window.location.href = `${basePath}/test?skin=xiuxian`;
+                return;
+              }
+              setSkinMode('xiuxian');
+              const url = new URL(window.location.href);
+              url.searchParams.set('skin', 'xiuxian');
+              window.history.replaceState({}, '', url.toString());
+            }}
+            className={`px-4 py-1.5 rounded-full transition-all duration-200 cursor-pointer ${
+              variant === 'standard' && isXiuxian
+                ? 'bg-purple-100 text-purple-700 shadow-sm font-medium'
+                : 'text-text-muted hover:text-text-secondary'
+            }`}
+          >
+            🔮 修仙 2.0
+          </button>
+          <button
+            onClick={() => {
+              if (variant !== 'wtfti') {
+                window.location.href = `${basePath}/wtfti/test`;
+              }
+            }}
+            className={`px-4 py-1.5 rounded-full transition-all duration-200 cursor-pointer ${
+              variant === 'wtfti'
+                ? 'bg-rose-100 text-rose-700 shadow-sm font-medium'
+                : 'text-text-muted hover:text-text-secondary'
+            }`}
+          >
+            🤯 WTF 毒舌版
+          </button>
+        </div>
+      </div>
+      )}
+
       {/* Progress */}
       <div className="px-6 pt-6 pb-2 max-w-2xl mx-auto w-full">
         <div className="flex items-center justify-between text-xs text-text-muted mb-3">
@@ -186,7 +273,7 @@ export function Quiz() {
             {showDrinkBranch && <span className="text-accent ml-1">+{drinkBranchIndex + 1}</span>}
           </span>
           <span style={{ color: modelColor.base }}>
-            {MODEL_NAMES[currentQ.model]}
+            {modelNames[currentQ.model]}
           </span>
         </div>
 
@@ -200,10 +287,7 @@ export function Quiz() {
             transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
           />
         </div>
-      </div>
-
       {/* Question area */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-12">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={currentQ.id}
@@ -230,12 +314,12 @@ export function Quiz() {
 
             {/* Question text */}
             <h2 className="text-2xl sm:text-3xl font-medium text-center leading-relaxed tracking-tight mb-12">
-              {currentQ.text}
+              {qText}
             </h2>
 
             {/* Answer buttons */}
             <div className="flex flex-col gap-3 max-w-md mx-auto">
-              {(currentQ.options ?? DEFAULT_OPTIONS).map((opt: AnswerOption) => {
+              {qOptions.map((opt: AnswerOption) => {
                 const selected = answers.get(currentQ.id) === opt.value;
                 return (
                   <motion.button
@@ -281,7 +365,7 @@ export function Quiz() {
             {/* Drink trigger hint */}
             {currentQ.isDrinkTrigger && (
               <p className="text-center text-text-muted text-xs mt-6 opacity-60">
-                这道题可能会触发隐藏分支 🍺
+                {isXiuxian ? '此题可能触发隐藏灵酒支线 🍺' : '这道题可能会触发隐藏分支 🍺'}
               </p>
             )}
           </motion.div>
@@ -314,8 +398,10 @@ export function Quiz() {
               transition={{ delay: 0.1, duration: 0.4 }}
               className="text-center"
             >
-              <div className="text-4xl mb-4">🎯</div>
-              <p className="text-text-secondary text-lg">正在分析你的人格…</p>
+              <div className="text-4xl mb-4">{finishingOverlay?.emoji ?? (isXiuxian ? '🔮' : '🎯')}</div>
+              <p className="text-text-secondary text-lg">
+                {finishingOverlay?.text ?? (isXiuxian ? '灵镜推演中，请稳住道心…' : '正在分析你的人格…')}
+              </p>
             </motion.div>
           </motion.div>
         )}

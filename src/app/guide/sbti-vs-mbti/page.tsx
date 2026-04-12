@@ -40,10 +40,10 @@ export default function SbtiVsMbtiGuidePage() {
       </div>
 
       <div className="mt-12 flex flex-wrap gap-3">
-        <Link href="/guide/what-is-sbti" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:brightness-110 transition-all">
+        <Link href="/guide/what-is-sbti/" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:brightness-110 transition-all">
           回到 SBTI 说明
         </Link>
-        <Link href="/test" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all">
+        <Link href="/test/" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all">
           直接开始测试
         </Link>
       </div>

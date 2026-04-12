@@ -3,11 +3,12 @@
 import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
 import QRCode from 'qrcode';
 import type { PersonalityType } from '@/lib/personalities';
-import { getTypeImage, getRarity } from '@/lib/personalities';
+import { getTypeImage, getXiuxianTypeImage, getRarity } from '@/lib/personalities';
 import { DIMENSIONS, MODEL_COLORS } from '@/lib/dimensions';
 import { SHARE_SITE_URL } from '@/lib/site';
 
 import type { DimensionScore } from '@/lib/scoring';
+import { getXiuxianSkin } from '@/lib/xiuxian';
 
 export interface ShareImageGeneratorHandle {
   generate: () => void;
@@ -16,6 +17,7 @@ export interface ShareImageGeneratorHandle {
 interface Props {
   personality: PersonalityType;
   dimensionScores: DimensionScore[];
+  isXiuxian?: boolean;
 }
 
 const CARD_WIDTH = 540;
@@ -226,9 +228,16 @@ function drawImageContain(
   ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
 }
 
-async function renderShareImage(personality: PersonalityType, dimensionScores: DimensionScore[]) {
+async function renderShareImage(personality: PersonalityType, dimensionScores: DimensionScore[], isXiuxian?: boolean) {
+  const xiuxianSkin = isXiuxian ? getXiuxianSkin(personality.slug) : undefined;
+  const accentColor = xiuxianSkin?.color ?? personality.color;
+  const displayName = xiuxianSkin ? `${xiuxianSkin.name} · ${xiuxianSkin.dao}` : personality.name;
+  const displayTagline = xiuxianSkin ? xiuxianSkin.tagline : personality.tagline;
+  const displayDesc = xiuxianSkin ? xiuxianSkin.description : personality.description;
+
+  const imageSrc = isXiuxian ? getXiuxianTypeImage(personality.slug) : getTypeImage(personality.slug);
   const [typeImage, qrImage] = await Promise.all([
-    getCachedImage(getTypeImage(personality.slug)).catch(() => null),
+    getCachedImage(imageSrc).catch(() => null),
     createQrImage().catch(() => null),
   ]);
 
@@ -255,17 +264,17 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
 
   // Subtle color wash
   const wash = ctx.createRadialGradient(270, 280, 0, 270, 280, 300);
-  wash.addColorStop(0, hexToRgba(personality.color, 0.08));
-  wash.addColorStop(1, hexToRgba(personality.color, 0));
+  wash.addColorStop(0, hexToRgba(accentColor, 0.08));
+  wash.addColorStop(1, hexToRgba(accentColor, 0));
   ctx.fillStyle = wash;
   ctx.fillRect(0, 0, CARD_WIDTH, 560);
 
   // Card border
-  strokeRoundedRect(ctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 24, hexToRgba(personality.color, 0.25), 2.5);
-  strokeRoundedRect(ctx, 22, 22, CARD_WIDTH - 44, CARD_HEIGHT - 44, 18, hexToRgba(personality.color, 0.08), 1);
+  strokeRoundedRect(ctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 24, hexToRgba(accentColor, 0.25), 2.5);
+  strokeRoundedRect(ctx, 22, 22, CARD_WIDTH - 44, CARD_HEIGHT - 44, 18, hexToRgba(accentColor, 0.08), 1);
 
   // Corner ornaments
-  ctx.fillStyle = hexToRgba(personality.color, 0.35);
+  ctx.fillStyle = hexToRgba(accentColor, 0.35);
   ctx.font = `14px ${FONT_SANS}`;
   ctx.textAlign = 'center';
   ctx.fillText('✦', 36, 28);
@@ -274,13 +283,13 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   ctx.fillText('✦', CARD_WIDTH - 36, CARD_HEIGHT - 44);
 
   // Header
-  ctx.fillStyle = personality.color;
+  ctx.fillStyle = accentColor;
   ctx.font = `600 12px ${FONT_MONO}`;
-  ctx.fillText('SBTI 人格报告', CARD_WIDTH / 2, 46);
+  ctx.fillText(isXiuxian ? 'SBTI 修仙灵境' : 'SBTI 人格报告', CARD_WIDTH / 2, 46);
 
   ctx.fillStyle = MED;
   ctx.font = `13px ${FONT_SANS}`;
-  ctx.fillText('在SBTI商业性格测定中，我被鉴定为', CARD_WIDTH / 2, 68);
+  ctx.fillText(isXiuxian ? '在SBTI测定中，我的本命灵兽被鉴定为' : '在SBTI商业性格测定中，我被鉴定为', CARD_WIDTH / 2, 68);
 
   // ============ HERO CHARACTER IMAGE ============
   const imageCardX = 90;
@@ -288,7 +297,7 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   const imageCardWidth = CARD_WIDTH - 180;
   const imageCardHeight = 380;
   fillRoundedRect(ctx, imageCardX, imageCardY, imageCardWidth, imageCardHeight, 24, '#ffffff');
-  strokeRoundedRect(ctx, imageCardX, imageCardY, imageCardWidth, imageCardHeight, 24, hexToRgba(personality.color, 0.25));
+  strokeRoundedRect(ctx, imageCardX, imageCardY, imageCardWidth, imageCardHeight, 24, hexToRgba(accentColor, 0.25));
 
   if (typeImage) {
     ctx.save();
@@ -302,34 +311,59 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
     ctx.fillText(personality.emoji, imageCardX + imageCardWidth / 2, imageCardY + 120);
   }
 
-  const badgeText = `#${personality.isSpecial ? '特殊人格' : '标准人格'}`;
+  const badgeText = isXiuxian
+    ? `#${personality.isSpecial ? '特殊灵宠' : '标准修仙结果'}`
+    : `#${personality.isSpecial ? '特殊人格' : '标准人格'}`;
   ctx.font = `12px ${FONT_MONO}`;
   ctx.textAlign = 'left';
   const badgeWidth = ctx.measureText(badgeText).width + 24;
   const badgeX = imageCardX + imageCardWidth - badgeWidth - 16;
   const badgeY = imageCardY + imageCardHeight - 40;
-  fillRoundedRect(ctx, badgeX, badgeY, badgeWidth, 28, 14, hexToRgba(personality.color, 0.12));
-  ctx.fillStyle = personality.color;
+  fillRoundedRect(ctx, badgeX, badgeY, badgeWidth, 28, 14, hexToRgba(accentColor, 0.12));
+  ctx.fillStyle = accentColor;
   ctx.fillText(badgeText, badgeX + 12, badgeY + 7);
 
-  // Name + Code centered
+  // Name + Code centered (adaptive for long xiuxian titles)
   const nameY = imageCardY + imageCardHeight + 24;
-  ctx.fillStyle = DARK;
-  ctx.font = `700 48px ${FONT_SANS}`;
-  ctx.textAlign = 'center';
-  ctx.fillText(personality.name, CARD_WIDTH / 2, nameY);
+  const titleMaxWidth = CARD_WIDTH - 72;
+  let titleFontSize = isXiuxian ? 52 : 48;
+  let titleLines: string[] = [];
 
-  ctx.fillStyle = personality.color;
+  while (titleFontSize >= 36) {
+    ctx.font = `700 ${titleFontSize}px ${FONT_SANS}`;
+    titleLines = wrapText(ctx, displayName, titleMaxWidth, 2);
+    if (titleLines.length <= 2) {
+      break;
+    }
+    titleFontSize -= 2;
+  }
+
+  if (titleLines.length === 0) {
+    ctx.font = `700 ${titleFontSize}px ${FONT_SANS}`;
+    titleLines = wrapText(ctx, displayName, titleMaxWidth, 2);
+  }
+
+  const titleLineHeight = Math.round(titleFontSize * 1.08);
+  ctx.fillStyle = DARK;
+  ctx.textAlign = 'center';
+  titleLines.forEach((line, index) => {
+    ctx.fillText(line, CARD_WIDTH / 2, nameY + index * titleLineHeight);
+  });
+
+  const codeY = nameY + titleLines.length * titleLineHeight + 8;
+  ctx.fillStyle = accentColor;
   ctx.font = `600 18px ${FONT_MONO}`;
-  ctx.fillText(personality.code, CARD_WIDTH / 2, nameY + 60);
+  ctx.fillText(personality.code, CARD_WIDTH / 2, codeY);
 
   // Rarity badge + population %
   const rarity = getRarity(personality.slug);
-  const rarityY = nameY + 90;
-  const rarityText = rarity.label;
+  const rarityY = codeY + 38;
+  const rarityText = isXiuxian && xiuxianSkin ? xiuxianSkin.realm : rarity.label;
   ctx.font = `600 13px ${FONT_SANS}`;
   const rarityW = ctx.measureText(rarityText).width + 28;
-  const pctText = `仅 ${rarity.populationPct}% 的测试者`;
+  const pctText = isXiuxian
+    ? `仅 ${rarity.populationPct}% 的修士结成了此等灵体`
+    : `仅 ${rarity.populationPct}% 的测试者是此人格`;
   ctx.font = `12px ${FONT_SANS}`;
   const pctW = ctx.measureText(pctText).width;
   const totalBadgeW = rarityW + 8 + pctW;
@@ -345,25 +379,68 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   ctx.fillText(pctText, badgeStartX + rarityW + 8 + pctW / 2, rarityY + 6);
   ctx.textAlign = 'left';
 
-  // Tagline + description card
+  const topDimensionScores = dimensionScores.slice(0, 3);
+  const bottomLimit = CARD_HEIGHT - 28;
   const descX = 36;
-  const descY = nameY + 130;
   const descWidth = CARD_WIDTH - 72;
-  const descHeight = 120;
-  fillRoundedRect(ctx, descX, descY, descWidth, descHeight, 16, hexToRgba(personality.color, 0.04));
-  strokeRoundedRect(ctx, descX, descY, descWidth, descHeight, 16, hexToRgba(personality.color, 0.10));
+  let descTopOffset = 42;
+  let descHeight = 120;
+  let descBodyLineHeight = 24;
+  let descBodyMaxLines = 3;
+  let descToBarsGap = 20;
+  let barRowSpacing = 30;
+  let footerGap = 12;
+  let taglineLineHeight = 22;
+  let taglineMaxLines = 2;
 
-  ctx.fillStyle = personality.color;
+  const getFooterBottom = () => {
+    const descYLocal = rarityY + descTopOffset;
+    const barSectionYLocal = descYLocal + descHeight + descToBarsGap;
+    const lastBarBottomLocal = topDimensionScores.length > 0
+      ? barSectionYLocal + 38 + (topDimensionScores.length - 1) * barRowSpacing + 15
+      : barSectionYLocal + 24;
+    const footerDividerYLocal = lastBarBottomLocal + footerGap;
+    const qrCardYLocal = footerDividerYLocal - 4;
+    return qrCardYLocal + 80;
+  };
+
+  let compactPass = 0;
+  while (getFooterBottom() > bottomLimit && compactPass < 12) {
+    descTopOffset = Math.max(28, descTopOffset - 2);
+    descHeight = Math.max(92, descHeight - 8);
+    descBodyLineHeight = Math.max(20, descBodyLineHeight - 1);
+    descBodyMaxLines = Math.max(2, descBodyMaxLines - 1);
+    descToBarsGap = Math.max(12, descToBarsGap - 2);
+    barRowSpacing = Math.max(24, barRowSpacing - 1);
+    footerGap = Math.max(8, footerGap - 1);
+    if (compactPass >= 6) {
+      taglineLineHeight = Math.max(20, taglineLineHeight - 1);
+      taglineMaxLines = 1;
+    }
+    compactPass += 1;
+  }
+
+  const descY = rarityY + descTopOffset;
+  fillRoundedRect(ctx, descX, descY, descWidth, descHeight, 16, hexToRgba(accentColor, 0.04));
+  strokeRoundedRect(ctx, descX, descY, descWidth, descHeight, 16, hexToRgba(accentColor, 0.10));
+
+  ctx.fillStyle = accentColor;
   ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText(`"${personality.tagline}"`, descX + 24, descY + 20);
+  const taglineLines = wrapText(ctx, `"${displayTagline}"`, descWidth - 48, taglineMaxLines);
+  taglineLines.forEach((line, index) => {
+    ctx.fillText(line, descX + 24, descY + 16 + index * taglineLineHeight);
+  });
+
+  const descBodyStartY = descY + 16 + taglineLines.length * taglineLineHeight + 10;
+  const descBodyAvailableHeight = Math.max(24, descHeight - (descBodyStartY - descY) - 12);
+  const descBodyLinesByHeight = Math.max(1, Math.floor(descBodyAvailableHeight / descBodyLineHeight));
+  const descBodyLines = Math.min(descBodyMaxLines, descBodyLinesByHeight);
 
   ctx.fillStyle = DARK;
   ctx.font = `14px ${FONT_SANS}`;
-  drawWrappedText(ctx, personality.description, descX + 24, descY + 54, descWidth - 48, 24, 3);
+  drawWrappedText(ctx, displayDesc, descX + 24, descBodyStartY, descWidth - 48, descBodyLineHeight, descBodyLines);
 
-  const topDimensionScores = dimensionScores.slice(0, 3);
-  const barSectionY = descY + descHeight + 20;
-  const barRowSpacing = 30;
+  const barSectionY = descY + descHeight + descToBarsGap;
   ctx.fillStyle = MED;
   ctx.font = `12px ${FONT_SANS}`;
   ctx.fillText('核心特质 TOP 3', 36, barSectionY);
@@ -395,7 +472,7 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   const lastBarBottom = topDimensionScores.length > 0
     ? barSectionY + 38 + (topDimensionScores.length - 1) * barRowSpacing + 15
     : barSectionY + 24;
-  const footerDividerY = lastBarBottom + 12;
+  const footerDividerY = lastBarBottom + footerGap;
   const footerTitleY = footerDividerY + 20;
   const footerUrlY = footerDividerY + 50;
   const qrCardY = footerDividerY - 4;
@@ -410,7 +487,7 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   ctx.font = `600 16px ${FONT_SANS}`;
   ctx.fillText('测测你的隐藏人格', 36, footerTitleY);
 
-  ctx.fillStyle = personality.color;
+  ctx.fillStyle = accentColor;
   ctx.font = `12px ${FONT_MONO}`;
   ctx.fillText(SHARE_SITE_URL, 36, footerUrlY);
 
@@ -425,17 +502,21 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
 }
 
 export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
-  function ShareImageGenerator({ personality, dimensionScores }, ref) {
+  function ShareImageGenerator({ personality, dimensionScores, isXiuxian }, ref) {
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const shareDisplayName = isXiuxian
+      ? (getXiuxianSkin(personality.slug)?.displayName ?? personality.name)
+      : personality.name;
 
     const prepareAssets = useCallback(async () => {
+      const imageSrc = isXiuxian ? getXiuxianTypeImage(personality.slug) : getTypeImage(personality.slug);
       await Promise.all([
-        getCachedImage(getTypeImage(personality.slug)).catch(() => null),
+        getCachedImage(imageSrc).catch(() => null),
         createQrImage().catch(() => null),
       ]);
-    }, [personality.slug]);
+    }, [personality.slug, isXiuxian]);
 
     useEffect(() => {
       void prepareAssets();
@@ -447,14 +528,14 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
       setSaveHint(null);
 
       try {
-        const dataUrl = await renderShareImage(personality, dimensionScores);
+        const dataUrl = await renderShareImage(personality, dimensionScores, isXiuxian);
         setPreviewUrl(dataUrl);
       } catch (err) {
         console.error('Failed to generate share image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [dimensionScores, generating, personality]);
+    }, [dimensionScores, generating, isXiuxian, personality]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
@@ -502,14 +583,14 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
       try {
         const file = await createPreviewFile();
         if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `我的 SBTI 人格：${personality.name}` });
+          await navigator.share({ files: [file], title: `我的 SBTI 人格：${shareDisplayName}` });
         } else {
           await handleDownload();
         }
       } catch {
         await handleDownload();
       }
-    }, [createPreviewFile, handleDownload, personality.name, previewUrl]);
+    }, [createPreviewFile, handleDownload, previewUrl, shareDisplayName]);
 
     useImperativeHandle(ref, () => ({
       generate: handleGenerate,

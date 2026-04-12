@@ -564,6 +564,10 @@ export function getComboPersonalityImage(code: string): string {
   return withBasePath(`/images/types/combo-${code.toLowerCase()}.png`);
 }
 
+export function getComboPersonalityThumbnailImage(code: string): string {
+  return withBasePath(`/images/types/thumbs/combo-${code.toLowerCase()}.webp`);
+}
+
 // ─── Main combo result ───────────────────────────────────
 
 export interface ComboResult {

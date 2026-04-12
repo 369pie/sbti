@@ -133,12 +133,12 @@ export default function RootLayout({
         <footer className="border-t border-border-subtle py-8 px-6 text-center text-text-muted text-sm">
           <div className="max-w-5xl mx-auto">
             <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
-              <Link href="/guide" className="hover:text-text-primary transition-colors">测试说明</Link>
-              <Link href="/about" className="hover:text-text-primary transition-colors">关于测试</Link>
-              <Link href="/types" className="hover:text-text-primary transition-colors">人设图鉴</Link>
-              <Link href="/contact" className="hover:text-text-primary transition-colors">联系与社群</Link>
-              <Link href="/privacy" className="hover:text-text-primary transition-colors">隐私说明</Link>
-              <Link href="/terms" className="hover:text-text-primary transition-colors">使用条款</Link>
+              <Link href="/guide/" className="hover:text-text-primary transition-colors">测试说明</Link>
+              <Link href="/about/" className="hover:text-text-primary transition-colors">关于测试</Link>
+              <Link href="/types/" className="hover:text-text-primary transition-colors">人设图鉴</Link>
+              <Link href="/contact/" className="hover:text-text-primary transition-colors">联系与社群</Link>
+              <Link href="/privacy/" className="hover:text-text-primary transition-colors">隐私说明</Link>
+              <Link href="/terms/" className="hover:text-text-primary transition-colors">使用条款</Link>
             </div>
             <p>SBTI 更适合拿来娱乐和自我观察，不适合作为严肃的心理诊断结果。</p>
             <p className="mt-2 opacity-60">Silly Behavioral Type Indicator</p>

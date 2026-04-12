@@ -5,10 +5,10 @@ import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useCallback, useRef } from 'react';
-import { PERSONALITY_TYPES, getTypeImage } from '@/lib/personalities';
+import { PERSONALITY_TYPES, getTypeImage, getTypeThumbnailImage } from '@/lib/personalities';
 import {
   MBTI_TYPES, ZODIAC_SIGNS, ELEMENT_LABELS,
-  generateCombo, getComboPersonalityImage,
+  generateCombo, getComboPersonalityImage, getComboPersonalityThumbnailImage,
 } from '@/lib/combo';
 import type { ComboResult } from '@/lib/combo';
 import { ComboShareImageGenerator } from '@/components/ComboShareImageGenerator';
@@ -44,7 +44,7 @@ function SBTIPicker({
     <div className="max-w-5xl mx-auto">
       <h2 className="text-lg font-semibold mb-2 text-center">选择你的 SBTI 人格</h2>
       <p className="text-sm text-text-muted text-center mb-6">
-        还没测过？<Link href="/test" className="text-accent hover:underline">先去测一下</Link>
+        还没测过？<Link href="/test/" className="text-accent hover:underline">先去测一下</Link>
       </p>
       <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 lg:gap-4">
         {PERSONALITY_TYPES.map(p => (
@@ -160,6 +160,20 @@ function ZodiacPicker({
 function ComboResultDisplay({ result }: { result: ComboResult }) {
   const shareRef = useRef<ComboShareImageGeneratorHandle>(null);
   const [copied, setCopied] = useState(false);
+  const comboImageSrc = getComboPersonalityThumbnailImage(result.comboPersonality.code);
+  const comboImageFallbackSrc = getComboPersonalityImage(result.comboPersonality.code);
+  const personalityImageSrc = getTypeThumbnailImage(result.personality.slug);
+  const personalityImageFallbackSrc = getTypeImage(result.personality.slug);
+
+  const applyImageFallback = (target: HTMLImageElement, fallbackSrc: string) => {
+    if (target.dataset.fallbackApplied === 'true') {
+      return true;
+    }
+
+    target.dataset.fallbackApplied = 'true';
+    target.src = fallbackSrc;
+    return false;
+  };
 
   const handleCopyLink = async () => {
     try {
@@ -235,13 +249,19 @@ function ComboResultDisplay({ result }: { result: ComboResult }) {
             style={{ borderColor: `${result.comboPersonality.color}40`, background: `${result.comboPersonality.color}12` }}
           >
             <NextImage
-              src={getComboPersonalityImage(result.comboPersonality.code)}
+              src={comboImageSrc}
               alt={result.comboPersonality.name}
               width={96}
               height={96}
+              loading="eager"
+              fetchPriority="high"
               className="w-full h-full object-contain"
               onError={(e) => {
                 const target = e.currentTarget;
+                if (!applyImageFallback(target, comboImageFallbackSrc)) {
+                  return;
+                }
+
                 target.style.display = 'none';
                 const parent = target.parentElement;
                 if (parent) {
@@ -256,11 +276,16 @@ function ComboResultDisplay({ result }: { result: ComboResult }) {
             style={{ borderColor: `${result.personality.color}40`, background: `${result.personality.color}12` }}
           >
             <NextImage
-              src={getTypeImage(result.personality.slug)}
+              src={personalityImageSrc}
               alt={result.personality.name}
               width={96}
               height={96}
+              loading="eager"
+              fetchPriority="high"
               className="w-full h-full object-contain p-1"
+              onError={(e) => {
+                applyImageFallback(e.currentTarget, personalityImageFallbackSrc);
+              }}
             />
           </div>
         </div>
@@ -335,7 +360,7 @@ function ComboResultDisplay({ result }: { result: ComboResult }) {
           查看 SBTI 详情
         </Link>
         <Link
-          href="/test"
+          href="/test/"
           className="flex-1 py-3 rounded-xl border border-accent/30 text-sm text-accent hover:bg-accent/10 transition-all text-center"
         >
           重新测试

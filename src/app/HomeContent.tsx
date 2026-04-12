@@ -88,7 +88,7 @@ export default function HomeContent() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
-                href="/test"
+                href="/test/"
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-white font-medium text-base hover:bg-accent/90 transition-all duration-200"
               >
                 开始测试
@@ -97,12 +97,26 @@ export default function HomeContent() {
                 </svg>
               </Link>
               <Link
-                href="/types"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:border-border hover:bg-bg-secondary/50 transition-all duration-200 text-base"
+                href="/wtfti/test"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full border-2 border-rose-300/60 text-rose-600 hover:bg-rose-50/50 hover:border-rose-400/80 transition-all duration-200 text-base font-medium"
               >
-                先刷 27 张人设卡
+                <span className="text-lg leading-none">🤯</span>
+                WTF 毒舌版
+              </Link>
+              <Link
+                href="/test?skin=xiuxian"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full border-2 border-purple-300/60 text-purple-600 hover:bg-purple-50/50 hover:border-purple-400/80 transition-all duration-200 text-base font-medium"
+              >
+                <span className="text-lg leading-none">🔮</span>
+                修仙 2.0
               </Link>
             </div>
+            <Link
+              href="/types/"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-text-muted hover:text-text-secondary transition-all duration-200 text-sm mt-2"
+            >
+              先刷 27 张人设卡 →
+            </Link>
           </motion.div>
 
           {/* Stats */}
@@ -232,7 +246,7 @@ export default function HomeContent() {
 
           <div className="mt-8 text-center">
             <Link
-              href="/types"
+              href="/types/"
               className="text-sm text-text-muted hover:text-accent transition-colors"
             >
               查看全部 27 种 →
@@ -298,7 +312,7 @@ export default function HomeContent() {
               三分钟测出你的职场真面目。
             </p>
             <Link
-              href="/work"
+              href="/work/"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-indigo-500 text-white font-medium text-base hover:bg-indigo-600 transition-all duration-200"
             >
               去测打工人设
@@ -332,7 +346,7 @@ export default function HomeContent() {
               三分钟测出你在感情里的真面目。
             </p>
             <Link
-              href="/love"
+              href="/love/"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-pink-500 text-white font-medium text-base hover:bg-pink-600 transition-all duration-200"
             >
               去测恋爱人设
@@ -366,7 +380,7 @@ export default function HomeContent() {
               一分钟测出你今天开了什么模式。每天题目不一样。
             </p>
             <Link
-              href="/daily"
+              href="/daily/"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-teal-500 text-white font-medium text-base hover:bg-teal-600 transition-all duration-200"
             >
               测一测今天开了什么模式
@@ -400,7 +414,7 @@ export default function HomeContent() {
               生成群体抽象全家福，看看你们有多离谱。
             </p>
             <Link
-              href="/squad"
+              href="/squad/"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-amber-500 text-white font-medium text-base hover:bg-amber-600 transition-all duration-200"
             >
               去组局
@@ -434,7 +448,7 @@ export default function HomeContent() {
               12 种酒后人设，有人断片有人社死有人原地去世。
             </p>
             <Link
-              href="/drunk"
+              href="/drunk/"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-orange-500 text-white font-medium text-base hover:bg-orange-600 transition-all duration-200"
             >
               去测酒后人设
@@ -564,7 +578,7 @@ export default function HomeContent() {
             纯前端计算，不上传任何数据。测完直接看结果。
           </p>
           <Link
-            href="/test"
+            href="/test/"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-white font-medium hover:bg-accent/90 transition-all"
           >
             开始测试 →

@@ -42,7 +42,7 @@ export default function CPLandingContent() {
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              href="/test"
+              href="/test/"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-accent text-bg-primary font-medium text-base hover:bg-accent-light transition-all"
             >
               先去测试

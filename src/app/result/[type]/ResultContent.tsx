@@ -6,13 +6,14 @@ import { motion } from 'framer-motion';
 import { DimensionRadar, DimensionBars } from '@/components/DimensionChart';
 import { ShareImageGenerator } from '@/components/ShareImageGenerator';
 import type { ShareImageGeneratorHandle } from '@/components/ShareImageGenerator';
-import { PERSONALITY_TYPES, getTypeImage, getRarity } from '@/lib/personalities';
-import { DIMENSIONS, MODEL_NAMES, MODEL_COLORS } from '@/lib/dimensions';
+import { PERSONALITY_TYPES, getTypeImage, getXiuxianTypeImage, getRarity } from '@/lib/personalities';
 import type { PersonalityType } from '@/lib/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { getXiuxianSkin } from '@/lib/xiuxian';
+import { getXiuxianLaunchOnlyTypes } from '@/lib/xiuxian-v2';
 
 interface Props {
   personality: PersonalityType;
@@ -20,19 +21,53 @@ interface Props {
 }
 
 export function ResultContent({ personality, dimensionScores }: Props) {
+  const isLaunchOnly = Boolean(personality.isLaunchOnly);
   const [copied, setCopied] = useState(false);
   const [cpCopied, setCpCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
+  const [isXiuxian, setIsXiuxian] = useState(() => {
+    if (typeof window === 'undefined') {
+      return isLaunchOnly;
+    }
+    const querySkin = new URLSearchParams(window.location.search).get('skin') === 'xiuxian';
+    return querySkin || isLaunchOnly;
+  });
   const shareRef = useRef<ShareImageGeneratorHandle>(null);
 
-  const shareUrl = getSiteUrl(`/result/${personality.slug}/`);
+  const toggleSkin = useCallback(() => {
+    if (isLaunchOnly) {
+      return;
+    }
+
+    const next = !isXiuxian;
+    setIsXiuxian(next);
+    const url = new URL(window.location.href);
+    if (next) {
+      url.searchParams.set('skin', 'xiuxian');
+    } else {
+      url.searchParams.delete('skin');
+    }
+    window.history.replaceState({}, '', url.toString());
+  }, [isLaunchOnly, isXiuxian]);
+
+  const showXiuxian = isXiuxian || isLaunchOnly;
+  const xiuxianSkin = showXiuxian ? getXiuxianSkin(personality.slug) : undefined;
+  const displayColor = xiuxianSkin?.color ?? personality.color;
+  const displayName = xiuxianSkin?.displayName ?? personality.name;
+  const displayTagline = xiuxianSkin?.tagline ?? personality.tagline;
+  const displayDesc = xiuxianSkin?.description ?? personality.description;
+  const skinQuery = showXiuxian ? '?skin=xiuxian' : '';
+  const shareUrl = getSiteUrl(`/result/${personality.slug}${skinQuery}`);
+  const xiuxianGalleryCount = PERSONALITY_TYPES.length + getXiuxianLaunchOnlyTypes().length;
 
   const copyShareText = useCallback(() => {
-    const text = `我的 SBTI 人格是 ${personality.code}（${personality.name}）\n${personality.tagline}\n来测测你的 → ${shareUrl}`;
+    const text = showXiuxian
+      ? `我的 SBTI 本命灵兽是 ${personality.code}（${displayName}）\n${displayTagline}\n来照照修仙灵镜 → ${shareUrl}`
+      : `我的 SBTI 人格是 ${personality.code}（${personality.name}）\n${personality.tagline}\n来测测你的 → ${shareUrl}`;
     navigator.clipboard.writeText(text);
     setTextCopied(true);
     setTimeout(() => setTextCopied(false), 2000);
-  }, [personality.code, personality.name, personality.tagline, shareUrl]);
+  }, [personality.code, personality.name, personality.tagline, displayName, displayTagline, shareUrl, showXiuxian]);
 
   const copyLink = useCallback(() => {
     navigator.clipboard.writeText(shareUrl);
@@ -44,22 +79,24 @@ export function ResultContent({ personality, dimensionScores }: Props) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `我的 SBTI 人格是 ${personality.code}（${personality.name}）`,
-          text: personality.tagline,
+          title: showXiuxian 
+            ? `我的 SBTI 本命灵兽是 ${personality.code}（${displayName}）`
+            : `我的 SBTI 人格是 ${personality.code}（${displayName}）`,
+          text: displayTagline,
           url: shareUrl,
         });
         return;
       } catch { /* user cancelled or not supported */ }
     }
     copyLink();
-  }, [copyLink, personality.code, personality.name, personality.tagline, shareUrl]);
+  }, [copyLink, personality.code, displayName, displayTagline, shareUrl, showXiuxian]);
 
   const copyCPLink = useCallback(() => {
-    const url = getSiteUrl(`/cp/${personality.slug}/`);
+    const url = getSiteUrl(`/cp/${personality.slug}${skinQuery}`);
     navigator.clipboard.writeText(url);
     setCpCopied(true);
     setTimeout(() => setCpCopied(false), 2000);
-  }, [personality.slug]);
+  }, [personality.slug, skinQuery]);
 
   const others = PERSONALITY_TYPES.filter(p => p.slug !== personality.slug).slice(0, 3);
   const rarity = getRarity(personality.slug);
@@ -71,21 +108,35 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[500px] pointer-events-none"
           style={{
-            background: `radial-gradient(ellipse, ${personality.color}12, transparent 70%)`,
+            background: `radial-gradient(ellipse, ${displayColor}12, transparent 70%)`,
           }}
         />
 
         <div className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center relative">
-          {/* Top-right share button */}
-          <button
-            onClick={() => shareRef.current?.generate()}
-            className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-accent transition-all cursor-pointer"
-            title="生成分享图片"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-            </svg>
-          </button>
+          {/* Top-right buttons */}
+          <div className="absolute top-16 right-6 flex items-center gap-2">
+            <button
+              onClick={toggleSkin}
+              className={`px-3 py-2 rounded-xl border text-xs font-medium transition-all cursor-pointer ${
+                showXiuxian
+                  ? 'border-purple-300/60 bg-purple-50/80 text-purple-600 hover:bg-purple-100/80'
+                  : 'border-border-subtle bg-bg-secondary/60 text-text-muted hover:bg-bg-secondary hover:text-text-secondary'
+              }`}
+              title={showXiuxian ? '切换为标准版' : '切换为修仙版'}
+              disabled={isLaunchOnly}
+            >
+              {showXiuxian ? '📋 标准版' : '🔮 修仙版'}
+            </button>
+            <button
+              onClick={() => shareRef.current?.generate()}
+              className="p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-accent transition-all cursor-pointer"
+              title="生成分享图片"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+            </button>
+          </div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -94,14 +145,16 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           >
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border-subtle bg-bg-secondary/60 text-xs text-text-muted mb-6">
-              {personality.isSpecial ? '特殊人格结果' : '标准人格结果'}
+              {showXiuxian 
+                ? (personality.isSpecial ? '特殊灵宠' : '标准修仙结果')
+                : (personality.isSpecial ? '特殊人格结果' : '标准人格结果')}
             </div>
 
             {/* Type image */}
-            <div className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-6 rounded-2xl overflow-hidden" style={{ background: `${personality.color}15` }}>
+            <div className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-6 rounded-2xl overflow-hidden" style={{ background: `${displayColor}15` }}>
               <NextImage
-                src={getTypeImage(personality.slug)}
-                alt={personality.name}
+                src={showXiuxian ? getXiuxianTypeImage(personality.slug) : getTypeImage(personality.slug)}
+                alt={displayName}
                 width={192}
                 height={192}
                 className="w-full h-full object-contain p-2"
@@ -112,15 +165,26 @@ export function ResultContent({ personality, dimensionScores }: Props) {
             {/* Code */}
             <div
               className="text-sm font-mono tracking-[0.3em] uppercase mb-2"
-              style={{ color: personality.color }}
+              style={{ color: displayColor }}
             >
               {personality.code}
             </div>
 
             {/* Name */}
-            <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mb-4">
-              {personality.name}
-            </h1>
+            {xiuxianSkin ? (
+              <div className="mb-4">
+                <p className="text-[clamp(2rem,5vw,2.5rem)] font-semibold tracking-tight leading-tight text-text-primary/85">
+                  {xiuxianSkin.name}
+                </p>
+                <h1 className="mx-auto mt-2 max-w-[14ch] text-[clamp(2.2rem,7vw,4rem)] font-semibold tracking-tight leading-[1.06] text-balance">
+                  {xiuxianSkin.dao}
+                </h1>
+              </div>
+            ) : (
+              <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mb-4">
+                {personality.name}
+              </h1>
+            )}
 
             {/* Rarity + population badge */}
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -130,16 +194,18 @@ export function ResultContent({ personality, dimensionScores }: Props) {
               >
                 {rarity.tier === 'legendary' && '✦ '}
                 {rarity.tier === 'epic' && '◆ '}
-                {rarity.label}
+                {showXiuxian && xiuxianSkin ? xiuxianSkin.realm : rarity.label}
               </span>
               <span className="text-xs text-text-muted">
-                仅 {rarity.populationPct}% 的测试者是此人格
+                {showXiuxian
+                  ? `仅 ${rarity.populationPct}% 的修士结成了此等灵体`
+                  : `仅 ${rarity.populationPct}% 的测试者是此人格`}
               </span>
             </div>
 
             {/* Tagline */}
             <p className="text-xl text-text-secondary max-w-md mx-auto">
-              {personality.tagline}
+              {displayTagline}
             </p>
           </motion.div>
         </div>
@@ -154,10 +220,19 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           className="rounded-2xl border border-border-subtle bg-bg-elevated p-6 sm:p-8 shadow-sm"
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
-            人格速写
+            {showXiuxian ? '灵物图鉴册' : '人格速写'}
           </h2>
-          <p className="text-text-secondary leading-[1.8] text-base">
-            {personality.description}
+
+          {showXiuxian && xiuxianSkin && (
+            <div className="mb-6 pb-6 border-b border-border-subtle space-y-3">
+              <div className="flex text-sm"><span className="w-20 text-text-muted">本体形态：</span><span className="flex-1 text-text-secondary">{xiuxianSkin.creature}</span></div>
+              <div className="flex text-sm"><span className="w-20 text-text-muted">看家法术：</span><span className="flex-1 text-text-secondary">{xiuxianSkin.spell}</span></div>
+              <div className="flex text-sm"><span className="w-20 text-text-muted">专属法宝：</span><span className="flex-1 text-text-secondary">{xiuxianSkin.artifact}</span></div>
+            </div>
+          )}
+
+          <p className="text-text-secondary leading-[1.8] text-base whitespace-pre-wrap">
+            {displayDesc}
           </p>
         </motion.div>
       </section>
@@ -194,67 +269,68 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         </motion.div>
       </section>
 
-      {/* CP invite section */}
-      <section className="max-w-2xl mx-auto px-6 pb-10">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-        >
-          <div
-            className="rounded-2xl border p-6 sm:p-8 text-center"
-            style={{ borderColor: `${personality.color}30`, background: `${personality.color}08` }}
-          >
-            <div className="text-3xl mb-3">💕</div>
-            <h3 className="text-lg font-semibold mb-2">邀请好友测 CP</h3>
-            <p className="text-sm text-text-secondary mb-5 max-w-sm mx-auto">
-              把链接发给朋友，TA 测完就能看到你们的配对结果！
-            </p>
-            <button
-              onClick={copyCPLink}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer"
-              style={{
-                background: cpCopied ? '#22c55e' : personality.color,
-                color: '#FFFFFF',
-              }}
+      {!isLaunchOnly && (
+        <>
+          {/* CP invite section */}
+          <section className="max-w-2xl mx-auto px-6 pb-10">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
             >
-              {cpCopied ? '链接已复制 ✓' : '复制 CP 邀请链接'}
-              {!cpCopied && (
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
-              )}
-            </button>
-          </div>
-        </motion.div>
-      </section>
+              <div
+                className="rounded-2xl border p-6 sm:p-8 text-center"
+                style={{ borderColor: `${displayColor}30`, background: `${displayColor}08` }}
+              >
+                <div className="text-3xl mb-3">💕</div>
+                <h3 className="text-lg font-semibold mb-2">邀请好友测 CP</h3>
+                <p className="text-sm text-text-secondary mb-5 max-w-sm mx-auto">
+                  把链接发给朋友，TA 测完就能看到你们的配对结果！
+                </p>
+                <button
+                  onClick={copyCPLink}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer"
+                  style={{ background: cpCopied ? '#22c55e' : displayColor, color: '#FFFFFF' }}
+                >
+                  {cpCopied ? '链接已复制 ✓' : '复制 CP 邀请链接'}
+                  {!cpCopied && (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </section>
 
-      {/* Combo entry */}
-      <section className="max-w-2xl mx-auto px-6 pb-10">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.55, duration: 0.5 }}
-        >
-          <Link
-            href={`/combo?sbti=${personality.slug}`}
-            className="block rounded-2xl border p-6 sm:p-8 text-center transition-all hover:shadow-md"
-            style={{ borderColor: '#a78bfa30', background: 'rgba(167,139,250,0.06)' }}
-          >
-            <div className="text-3xl mb-3">🧩</div>
-            <h3 className="text-lg font-semibold mb-2">解锁你的人格拼盘</h3>
-            <p className="text-sm text-text-secondary mb-4 max-w-sm mx-auto">
-              SBTI × MBTI × 星座，三合一拼出你的专属称号和毒舌分析
-            </p>
-            <span
-              className="inline-flex items-center gap-1 px-5 py-2.5 rounded-xl text-sm font-medium text-white"
-              style={{ background: '#a78bfa' }}
+          {/* Combo entry */}
+          <section className="max-w-2xl mx-auto px-6 pb-10">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.55, duration: 0.5 }}
             >
-              去拼盘 →
-            </span>
-          </Link>
-        </motion.div>
-      </section>
+              <Link
+                href={`/combo?sbti=${personality.slug}`}
+                className="block rounded-2xl border p-6 sm:p-8 text-center transition-all hover:shadow-md"
+                style={{ borderColor: '#a78bfa30', background: 'rgba(167,139,250,0.06)' }}
+              >
+                <div className="text-3xl mb-3">🧩</div>
+                <h3 className="text-lg font-semibold mb-2">解锁你的人格拼盘</h3>
+                <p className="text-sm text-text-secondary mb-4 max-w-sm mx-auto">
+                  SBTI × MBTI × 星座，三合一拼出你的专属称号和毒舌分析
+                </p>
+                <span
+                  className="inline-flex items-center gap-1 px-5 py-2.5 rounded-xl text-sm font-medium text-white"
+                  style={{ background: '#a78bfa' }}
+                >
+                  去拼盘 →
+                </span>
+              </Link>
+            </motion.div>
+          </section>
+        </>
+      )}
 
       <CrossTestRecommendations currentTest="sbti" personalityName={personality.name} />
 
@@ -270,7 +346,12 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           </h2>
 
           <div className="space-y-3">
-            <ShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
+            <ShareImageGenerator 
+              ref={shareRef} 
+              personality={personality} 
+              dimensionScores={dimensionScores} 
+              isXiuxian={isXiuxian} 
+            />
 
             <button
               onClick={copyShareText}
@@ -296,7 +377,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
                 快速分享
               </button>
               <Link
-                href="/test"
+                href={isXiuxian ? '/test?skin=xiuxian' : '/test'}
                 className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all text-center"
               >
                 重新测试
@@ -317,7 +398,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
             return (
             <Link
               key={p.slug}
-              href={`/result/${p.slug}`}
+              href={`/result/${p.slug}${skinQuery}`}
               className="group rounded-2xl border border-border-subtle hover:border-border bg-bg-elevated hover:shadow-md transition-all p-4"
             >
               <div className="w-16 h-16 rounded-lg overflow-hidden mb-2" style={{ background: `${p.color}15` }}>
@@ -344,8 +425,8 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           })}
         </div>
         <div className="mt-6 text-center">
-          <Link href="/types" className="text-sm text-text-muted hover:text-accent transition-colors">
-            查看全部 27 种 →
+          <Link href={`/types${skinQuery}`} className="text-sm text-text-muted hover:text-accent transition-colors">
+            查看全部 {isXiuxian ? xiuxianGalleryCount : PERSONALITY_TYPES.length} 种 →
           </Link>
         </div>
       </section>

@@ -2,8 +2,10 @@
   "name": "sbti",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.15.1",
   "scripts": {
-    "dev": "node scripts/generate-gallery-thumbnails.mjs && next dev",
+    "dev": "node scripts/generate-gallery-thumbnails.mjs && next dev --webpack",
+    "dev:turbo": "node scripts/generate-gallery-thumbnails.mjs && next dev",
     "build": "node scripts/generate-gallery-thumbnails.mjs && next build",
     "images:thumbs": "node scripts/generate-gallery-thumbnails.mjs",
     "start": "next start",

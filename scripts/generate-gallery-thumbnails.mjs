@@ -8,14 +8,28 @@ const SUPPORTED_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg']);
 const THUMBNAIL_SIZE = 384;
 const THUMBNAIL_QUALITY = 80;
 
-async function listSourceImages() {
-  const entries = await fs.readdir(SOURCE_DIR, { withFileTypes: true });
+async function listSourceImages(directory = SOURCE_DIR) {
+  const entries = await fs.readdir(directory, { withFileTypes: true });
+  const sourceImages = [];
 
-  return entries
-    .filter((entry) => entry.isFile())
-    .map((entry) => entry.name)
-    .filter((name) => SUPPORTED_EXTENSIONS.has(path.extname(name).toLowerCase()))
-    .map((name) => path.join(SOURCE_DIR, name));
+  for (const entry of entries) {
+    if (entry.name === 'thumbs') {
+      continue;
+    }
+
+    const fullPath = path.join(directory, entry.name);
+
+    if (entry.isDirectory()) {
+      sourceImages.push(...await listSourceImages(fullPath));
+      continue;
+    }
+
+    if (entry.isFile() && SUPPORTED_EXTENSIONS.has(path.extname(entry.name).toLowerCase())) {
+      sourceImages.push(fullPath);
+    }
+  }
+
+  return sourceImages;
 }
 
 async function shouldRegenerate(sourcePath, outputPath) {
@@ -33,11 +47,15 @@ async function shouldRegenerate(sourcePath, outputPath) {
 
 async function generateThumbnail(sourcePath) {
   const outputName = `${path.parse(sourcePath).name}.webp`;
-  const outputPath = path.join(OUTPUT_DIR, outputName);
+  const relativeDir = path.relative(SOURCE_DIR, path.dirname(sourcePath));
+  const outputDir = relativeDir ? path.join(SOURCE_DIR, relativeDir, 'thumbs') : OUTPUT_DIR;
+  const outputPath = path.join(outputDir, outputName);
 
   if (!(await shouldRegenerate(sourcePath, outputPath))) {
     return false;
   }
+
+  await fs.mkdir(outputDir, { recursive: true });
 
   await sharp(sourcePath)
     .resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, {

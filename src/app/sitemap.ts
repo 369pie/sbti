@@ -6,6 +6,8 @@ import { LOVE_PERSONALITY_TYPES } from '@/lib/love/personalities';
 import { DAILY_STATUS_TYPES } from '@/lib/daily/statuses';
 import { DRUNK_PERSONA_TYPES } from '@/lib/drunk/personas';
 import { GUIDE_ARTICLES } from '@/lib/guides';
+import { getXiuxianLaunchOnlySlugs } from '@/lib/xiuxian-v2';
+import { getWtftiSlugs } from '@/lib/wtfti-personalities';
 
 export const dynamic = 'force-static';
 
@@ -27,6 +29,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: getSiteUrl('/combo/'), lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: getSiteUrl('/squad/'), lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: getSiteUrl('/drunk/'), lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: getSiteUrl('/wtfti/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
   ];
 
   const guidePages: MetadataRoute.Sitemap = GUIDE_ARTICLES.map((article) => ({
@@ -36,7 +39,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  const resultPages: MetadataRoute.Sitemap = getAllSlugs().map((slug) => ({
+  const resultPages: MetadataRoute.Sitemap = [...getAllSlugs(), ...getXiuxianLaunchOnlySlugs()].map((slug) => ({
     url: getSiteUrl(`/result/${slug}/`),
     lastModified: now,
     changeFrequency: 'monthly' as const,
@@ -71,5 +74,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }));
 
-  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...dailyResultPages, ...drunkResultPages];
+  const wtftiResultPages: MetadataRoute.Sitemap = getWtftiSlugs().map((slug) => ({
+    url: getSiteUrl(`/wtfti/result/${slug}/`),
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages];
 }

@@ -49,19 +49,19 @@ export default function AboutPage() {
 
       <div className="mt-12 flex flex-wrap gap-3">
         <Link
-          href="/test"
+          href="/test/"
           className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:brightness-110 transition-all"
         >
           开始测试
         </Link>
         <Link
-          href="/types"
+          href="/types/"
           className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all"
         >
           查看 27 种人格
         </Link>
         <Link
-          href="/guide"
+          href="/guide/"
           className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all"
         >
           进入说明栏目

@@ -1,4 +1,5 @@
 import type { DimensionLevel } from './dimensions';
+import { getXiuxianV2ImagePath, hasXiuxianV2Image } from './xiuxian-v2';
 import { withBasePath } from './site';
 
 export type RarityTier = 'legendary' | 'epic' | 'rare' | 'uncommon' | 'common';
@@ -43,8 +44,10 @@ const SLUG_RARITY: Record<string, { tier: RarityTier; pct: number }> = {
   'atm-er':{ tier: 'uncommon', pct: 4.5 },
   'dior-s':{ tier: 'uncommon', pct: 5.2 },
   sexy:    { tier: 'uncommon', pct: 4.8 },
+  fake:    { tier: 'uncommon', pct: 4.9 },
   malo:    { tier: 'uncommon', pct: 5.5 },
   'luck-y':{ tier: 'uncommon', pct: 4.2 },
+  joker:   { tier: 'uncommon', pct: 5.1 },
   shy:     { tier: 'uncommon', pct: 5.0 },
   rebel:   { tier: 'uncommon', pct: 4.6 },
   // 6-7 extreme dims — common (~5-8%)
@@ -72,13 +75,26 @@ export interface PersonalityType {
   color: string;
   emoji: string;
   isSpecial?: boolean;
+  isLaunchOnly?: boolean;
 }
 
-const JPG_SLUGS = new Set(['dior-s', 'drama']);
+const JPG_SLUGS = new Set(['dior-s', 'drama', 'joker']);
 
 export function getTypeImage(slug: string): string {
   const ext = JPG_SLUGS.has(slug) ? 'jpg' : 'png';
   return withBasePath(`/images/types/${slug}.${ext}`);
+}
+
+export function getTypeThumbnailImage(slug: string): string {
+  return withBasePath(`/images/types/thumbs/${slug}.webp`);
+}
+
+export function getXiuxianTypeImage(slug: string): string {
+  const imagePath = hasXiuxianV2Image(slug)
+    ? getXiuxianV2ImagePath(slug)
+    : `/images/types/xiuxian-${slug}.png`;
+
+  return withBasePath(imagePath);
 }
 
 export const PERSONALITY_TYPES: PersonalityType[] = [

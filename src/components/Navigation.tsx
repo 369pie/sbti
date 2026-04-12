@@ -5,15 +5,16 @@ import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
   { href: '/', label: '首页' },
-  { href: '/test', label: '开始测试' },
-  { href: '/types', label: '人设图鉴' },
-  { href: '/cp', label: 'CP配对' },
-  { href: '/work', label: '打工人设' },
-  { href: '/love', label: '恋爱人设' },
-  { href: '/daily', label: '今日模式' },
-  { href: '/drunk', label: '酒后人设' },
-  { href: '/squad', label: '组局测试' },
-  { href: '/combo', label: '人格拼盘' },
+  { href: '/test/', label: '开始测试' },
+  { href: '/wtfti/', label: '🤯 WTFTI' },
+  { href: '/types/', label: '人设图鉴' },
+  { href: '/cp/', label: 'CP配对' },
+  { href: '/work/', label: '打工人设' },
+  { href: '/love/', label: '恋爱人设' },
+  { href: '/daily/', label: '今日模式' },
+  { href: '/drunk/', label: '酒后人设' },
+  { href: '/squad/', label: '组局测试' },
+  { href: '/combo/', label: '人格拼盘' },
 ];
 
 export function Navigation() {
