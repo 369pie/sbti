@@ -8,6 +8,7 @@
     "dev:turbo": "node scripts/generate-gallery-thumbnails.mjs && next dev",
     "build": "node scripts/generate-gallery-thumbnails.mjs && next build",
     "images:thumbs": "node scripts/generate-gallery-thumbnails.mjs",
+    "images:banti-launch": "node scripts/generate-banti-launch.mjs",
     "start": "next start",
     "lint": "eslint"
   },

@@ -16,6 +16,10 @@ export function getDailyTypeImage(slug: string): string {
   return withBasePath(`/images/types/daily-${slug}.png`);
 }
 
+export function getDailyTypeThumbnailImage(slug: string): string {
+  return withBasePath(`/images/types/thumbs/daily-${slug}.webp`);
+}
+
 export const DAILY_STATUS_TYPES: DailyStatusType[] = [
   {
     slug: 'supercharged', code: 'MAX', name: '电量暴走', tagline: '今天谁都别拦我。',

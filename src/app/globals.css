@@ -62,6 +62,44 @@ html {
   background-clip: text;
 }
 
+@keyframes fade-up-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-fade-up,
+.animate-fade-up-delay-1,
+.animate-fade-up-delay-2 {
+  opacity: 0;
+  animation-name: fade-up-in;
+  animation-duration: 560ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: forwards;
+}
+
+.animate-fade-up-delay-1 {
+  animation-delay: 120ms;
+}
+
+.animate-fade-up-delay-2 {
+  animation-delay: 240ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-up-delay-1,
+  .animate-fade-up-delay-2 {
+    opacity: 1;
+    animation: none;
+  }
+}
+
 /* Model subtle tints */
 .model-self { --model-color: #e5940a; }
 .model-emotion { --model-color: #e03a55; }

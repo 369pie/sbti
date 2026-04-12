@@ -1,11 +1,8 @@
-'use client';
-
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import NextImage from 'next/image';
 import { DRUNK_MODEL_NAMES, DRUNK_MODEL_COLORS } from '@/lib/drunk/dimensions';
 import type { DrunkModelType } from '@/lib/drunk/dimensions';
-import { DRUNK_PERSONA_TYPES } from '@/lib/drunk/personas';
-import { DrunkPersonaAvatar } from '@/components/DrunkPersonaAvatar';
+import { DRUNK_PERSONA_TYPES, getDrunkTypeThumbnailImage } from '@/lib/drunk/personas';
 
 const MODELS: { key: DrunkModelType; label: string }[] = [
   { key: 'talk', label: '喝完酒你的嘴巴有多停不下来' },
@@ -21,11 +18,7 @@ export default function DrunkHomeContent() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          >
+          <div className="animate-fade-up">
             <span className="inline-block text-xs font-mono tracking-[0.25em] text-text-muted mb-6 uppercase">
               Drunk Persona · 酒后人设鉴定
             </span>
@@ -54,20 +47,16 @@ export default function DrunkHomeContent() {
               </Link>
               <Link
                 href="/"
+                prefetch={false}
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:border-border hover:bg-bg-secondary/50 transition-all duration-200 text-base"
               >
                 ← 返回首页
               </Link>
             </div>
-          </motion.div>
+          </div>
 
           {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="mt-16 grid grid-cols-3 gap-px bg-border-subtle rounded-2xl overflow-hidden"
-          >
+          <div className="mt-16 grid grid-cols-3 gap-px bg-border-subtle rounded-2xl overflow-hidden animate-fade-up-delay-1">
             {[
               { value: '5 维', label: '醉态维度' },
               { value: '12 张', label: '酒后人设卡' },
@@ -78,17 +67,13 @@ export default function DrunkHomeContent() {
                 <div className="text-xs text-text-muted">{stat.label}</div>
               </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* 5 Dimensions */}
       <section className="max-w-3xl mx-auto px-6 pb-20">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-        >
+        <div className="animate-fade-up">
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-8">
             五大醉态维度
           </h2>
@@ -115,16 +100,12 @@ export default function DrunkHomeContent() {
               );
             })}
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* 12 Personas Preview */}
       <section className="max-w-3xl mx-auto px-6 pb-24">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-        >
+        <div className="animate-fade-up-delay-1">
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-8">
             12 种酒后人设
           </h2>
@@ -134,17 +115,21 @@ export default function DrunkHomeContent() {
               <Link
                 key={p.slug}
                 href={`/drunk/result/${p.slug}`}
+                prefetch={false}
                 className="group rounded-xl border border-border-subtle hover:border-border bg-bg-secondary/30 hover:bg-bg-secondary/60 transition-all p-4 text-center"
               >
-                <DrunkPersonaAvatar
-                  persona={p}
-                  alt=""
-                  sizes="64px"
+                <div
                   className="relative w-16 h-16 rounded-lg overflow-hidden mx-auto mb-2"
                   style={{ background: `${p.color}15` }}
-                  imageClassName="object-contain p-1"
-                  fallbackClassName="w-full h-full flex items-center justify-center text-2xl"
-                />
+                >
+                  <NextImage
+                    src={getDrunkTypeThumbnailImage(p.slug)}
+                    alt={p.name}
+                    fill
+                    sizes="64px"
+                    className="object-contain p-1"
+                  />
+                </div>
                 <span className="text-xs font-mono tracking-wider block mb-1" style={{ color: p.color }}>
                   {p.code}
                 </span>
@@ -154,7 +139,7 @@ export default function DrunkHomeContent() {
               </Link>
             ))}
           </div>
-        </motion.div>
+        </div>
       </section>
     </div>
   );

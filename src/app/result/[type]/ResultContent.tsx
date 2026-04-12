@@ -14,6 +14,7 @@ import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { getXiuxianSkin } from '@/lib/xiuxian';
 import { getXiuxianLaunchOnlyTypes } from '@/lib/xiuxian-v2';
+import { UniverseResultBar } from '@/components/UniverseResultBar';
 
 interface Props {
   personality: PersonalityType;
@@ -385,6 +386,11 @@ export function ResultContent({ personality, dimensionScores }: Props) {
             </div>
           </div>
         </motion.div>
+      </section>
+
+      {/* Cross-universe exploration */}
+      <section className="max-w-3xl mx-auto px-6 pb-8">
+        <UniverseResultBar slug={personality.slug} current={isXiuxian ? 'xiuxian' : 'standard'} />
       </section>
 
       {/* Other types */}

@@ -1,9 +1,7 @@
-'use client';
-
 import Link from 'next/link';
 import NextImage from 'next/image';
-import { motion } from 'framer-motion';
-import { PERSONALITY_TYPES, getTypeImage } from '@/lib/personalities';
+import { PERSONALITY_TYPES, getTypeThumbnailImage } from '@/lib/personalities';
+import { getLiveUniverses } from '@/lib/universes';
 import { MODEL_NAMES, MODEL_COLORS } from '@/lib/dimensions';
 import { withBasePath } from '@/lib/site';
 import type { ModelType } from '@/lib/dimensions';
@@ -66,11 +64,7 @@ export default function HomeContent() {
       <section className="relative overflow-hidden">
 
         <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          >
+          <div className="animate-fade-up">
             <span className="inline-block text-xs font-mono tracking-[0.25em] text-text-muted mb-6 uppercase">
               Silly Behavioral Type Indicator
             </span>
@@ -96,36 +90,35 @@ export default function HomeContent() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </Link>
-              <Link
-                href="/wtfti/test"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full border-2 border-rose-300/60 text-rose-600 hover:bg-rose-50/50 hover:border-rose-400/80 transition-all duration-200 text-base font-medium"
-              >
-                <span className="text-lg leading-none">🤯</span>
-                WTF 毒舌版
-              </Link>
-              <Link
-                href="/test?skin=xiuxian"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full border-2 border-purple-300/60 text-purple-600 hover:bg-purple-50/50 hover:border-purple-400/80 transition-all duration-200 text-base font-medium"
-              >
-                <span className="text-lg leading-none">🔮</span>
-                修仙 2.0
-              </Link>
+              {getLiveUniverses()
+                .filter(u => u.id !== 'standard')
+                .map(u => (
+                  <Link
+                    key={u.id}
+                    href={u.testPath}
+                    prefetch={false}
+                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full border-2 transition-all duration-200 text-base font-medium"
+                    style={{
+                      borderColor: `${u.accent}60`,
+                      color: u.accent,
+                    }}
+                  >
+                    {u.emoji && <span className="text-lg leading-none">{u.emoji}</span>}
+                    {u.name}
+                  </Link>
+                ))}
             </div>
             <Link
               href="/types/"
+              prefetch={false}
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-text-muted hover:text-text-secondary transition-all duration-200 text-sm mt-2"
             >
               先刷 27 张人设卡 →
             </Link>
-          </motion.div>
+          </div>
 
           {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="mt-16 grid grid-cols-3 gap-3"
-          >
+          <div className="mt-16 grid grid-cols-3 gap-3 animate-fade-up-delay-1">
             {[
               { value: '15 维', label: '人格维度' },
               { value: '27 种', label: '结果类型' },
@@ -136,19 +129,14 @@ export default function HomeContent() {
                 <div className="text-xs text-text-muted mt-1">{stat.label}</div>
               </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* 5 Models */}
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="mb-12"
-          >
+          <div className="mb-12 animate-fade-up">
             <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Models</span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
               5 组切面看人格状态
@@ -156,19 +144,16 @@ export default function HomeContent() {
             <p className="text-text-secondary mt-3 leading-relaxed">
               不只给一个名字，还会把你的状态落到十五个维度上。
             </p>
-          </motion.div>
+          </div>
 
           <div className="space-y-4">
             {MODELS.map((m, i) => {
               const c = MODEL_COLORS[m.key];
               return (
-                <motion.div
+                <div
                   key={m.key}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
-                  className="rounded-xl border border-border-subtle bg-bg-elevated shadow-sm p-5 hover:shadow-md transition-shadow"
+                  className="animate-fade-up rounded-xl border border-border-subtle bg-bg-elevated shadow-sm p-5 hover:shadow-md transition-shadow"
+                  style={{ animationDelay: `${i * 80}ms` }}
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <div
@@ -190,7 +175,7 @@ export default function HomeContent() {
                       </span>
                     ))}
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -209,15 +194,14 @@ export default function HomeContent() {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {FEATURED.map((p, i) => (
-              <motion.div
+              <div
                 key={p.slug}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.06 }}
+                className="animate-fade-up"
+                style={{ animationDelay: `${i * 60}ms` }}
               >
                 <Link
                   href={`/result/${p.slug}`}
+                  prefetch={false}
                   className="group block rounded-2xl border border-border-subtle hover:border-border bg-bg-elevated hover:shadow-md transition-all overflow-hidden"
                 >
                   <div
@@ -225,10 +209,11 @@ export default function HomeContent() {
                     style={{ background: `linear-gradient(135deg, ${p.color}08, ${p.color}15)` }}
                   >
                     <NextImage
-                      src={getTypeImage(p.slug)}
+                      src={getTypeThumbnailImage(p.slug)}
                       alt={p.name}
                       width={200}
                       height={200}
+                      sizes="(max-width: 640px) 44vw, (max-width: 1024px) 28vw, 220px"
                       className="w-[70%] h-[70%] object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
                     />
                   </div>
@@ -240,7 +225,7 @@ export default function HomeContent() {
                     <p className="text-xs text-text-muted mt-0.5 line-clamp-1">{p.tagline}</p>
                   </div>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
 
@@ -290,26 +275,58 @@ export default function HomeContent() {
         </div>
       </section>
 
+      {/* BanTI promo */}
+      <section className="py-20 px-6 border-t border-border-subtle">
+        <div className="max-w-3xl mx-auto">
+          <div className="rounded-2xl border border-sky-500/20 bg-sky-500/5 p-8 sm:p-10 text-center animate-fade-up">
+            <div className="text-4xl mb-4">💼</div>
+            <span className="inline-block text-xs font-mono tracking-[0.2em] text-sky-400 uppercase mb-3">
+              WTFTI · New Universe
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">
+              班TI 社畜宇宙
+            </h2>
+            <p className="text-text-secondary leading-relaxed max-w-md mx-auto mb-6">
+              同一套 15 维人格内核，全新的办公室题包。
+              <br />
+              29 张社畜图鉴卡，专门翻译你在工位上的样子。
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                href="/wtfti/work/"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-sky-500 text-white font-medium text-base hover:bg-sky-600 transition-all duration-200"
+              >
+                进入班TI
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+              <Link
+                href="/wtfti/work/test/"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-sky-300/40 text-sky-200 text-sm hover:border-sky-300/70 hover:text-sky-100 transition-all"
+              >
+                直接开始测试
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Work Personality Test promo */}
       <section className="py-20 px-6 border-t border-border-subtle">
         <div className="max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-8 sm:p-10 text-center"
-          >
+          <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-8 sm:p-10 text-center animate-fade-up">
             <div className="text-4xl mb-4">💼</div>
             <span className="inline-block text-xs font-mono tracking-[0.2em] text-indigo-400 uppercase mb-3">
-              WPTI · New
+              WPTI · 独立体系
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">
               打工人设测试
             </h2>
             <p className="text-text-secondary leading-relaxed max-w-md mx-auto mb-6">
-              5 个职场维度 · 15 道灵魂拷问 · 16 张打工人设卡
+              独立 5 维职场模型 · 15 道灵魂拷问 · 16 张打工人设卡
               <br />
-              三分钟测出你的职场真面目。
+              如果你想测一个纯职场专用体系，走这条线。
             </p>
             <Link
               href="/work/"
@@ -320,19 +337,14 @@ export default function HomeContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Love Personality Test promo */}
       <section className="py-20 px-6 border-t border-border-subtle">
         <div className="max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="rounded-2xl border border-pink-500/20 bg-pink-500/5 p-8 sm:p-10 text-center"
-          >
+          <div className="rounded-2xl border border-pink-500/20 bg-pink-500/5 p-8 sm:p-10 text-center animate-fade-up">
             <div className="text-4xl mb-4">💕</div>
             <span className="inline-block text-xs font-mono tracking-[0.2em] text-pink-400 uppercase mb-3">
               LPTI · New
@@ -354,19 +366,14 @@ export default function HomeContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Daily Status Test promo */}
       <section className="py-20 px-6 border-t border-border-subtle">
         <div className="max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="rounded-2xl border border-teal-500/20 bg-teal-500/5 p-8 sm:p-10 text-center"
-          >
+          <div className="rounded-2xl border border-teal-500/20 bg-teal-500/5 p-8 sm:p-10 text-center animate-fade-up">
             <div className="text-4xl mb-4">🔮</div>
             <span className="inline-block text-xs font-mono tracking-[0.2em] text-teal-400 uppercase mb-3">
               Daily Status · New
@@ -388,19 +395,14 @@ export default function HomeContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Squad Test promo */}
       <section className="py-20 px-6 border-t border-border-subtle">
         <div className="max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8 sm:p-10 text-center"
-          >
+          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8 sm:p-10 text-center animate-fade-up">
             <div className="text-4xl mb-4">👥</div>
             <span className="inline-block text-xs font-mono tracking-[0.2em] text-amber-400 uppercase mb-3">
               Squad · New
@@ -422,19 +424,14 @@ export default function HomeContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Drunk Persona promo */}
       <section className="py-20 px-6 border-t border-border-subtle">
         <div className="max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="rounded-2xl border border-orange-500/20 bg-orange-500/5 p-8 sm:p-10 text-center"
-          >
+          <div className="rounded-2xl border border-orange-500/20 bg-orange-500/5 p-8 sm:p-10 text-center animate-fade-up">
             <div className="text-4xl mb-4">🍻</div>
             <span className="inline-block text-xs font-mono tracking-[0.2em] text-orange-400 uppercase mb-3">
               Drunk Persona · New
@@ -456,7 +453,7 @@ export default function HomeContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -489,12 +486,7 @@ export default function HomeContent() {
       {/* Community */}
       <section className="py-20 px-6 border-t border-border-subtle">
         <div className="max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-10"
-          >
+          <div className="text-center mb-10 animate-fade-up">
             <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Community</span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
               加入 SBTI 社群
@@ -502,16 +494,13 @@ export default function HomeContent() {
             <p className="text-text-secondary mt-3 leading-relaxed">
               测完想找同类？来群里一起交流、玩耍、对线吧 🎉
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
             {/* WeChat */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 text-center hover:shadow-md transition-shadow"
+            <div
+              className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 text-center hover:shadow-md transition-shadow animate-fade-up"
+              style={{ animationDelay: '80ms' }}
             >
               <div className="inline-flex items-center gap-2 mb-4">
                 <svg className="w-5 h-5 text-[#07C160]" viewBox="0 0 24 24" fill="currentColor">
@@ -533,15 +522,12 @@ export default function HomeContent() {
                 />
               </div>
               <p className="text-xs text-text-muted mt-4">SBTI交流玩耍群</p>
-            </motion.div>
+            </div>
 
             {/* QQ */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 text-center hover:shadow-md transition-shadow"
+            <div
+              className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 text-center hover:shadow-md transition-shadow animate-fade-up"
+              style={{ animationDelay: '160ms' }}
             >
               <div className="inline-flex items-center gap-2 mb-4">
                 <svg className="w-5 h-5 text-[#12B7F5]" viewBox="0 0 24 24" fill="currentColor">
@@ -563,7 +549,7 @@ export default function HomeContent() {
                 />
               </div>
               <p className="text-xs text-text-muted mt-4">SBTI交友玩耍群 · 群号 962576932</p>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>

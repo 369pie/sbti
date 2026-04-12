@@ -12,6 +12,8 @@ import type { ModelType } from '@/lib/dimensions';
 import { basePath } from '@/lib/site';
 import { XIUXIAN_V2_QUESTION_SKINS, XIUXIAN_V2_DEFAULT_OPTIONS } from '@/lib/xiuxian-questions-v2';
 import { XIUXIAN_MODEL_NAMES, XIUXIAN_MODEL_COLORS } from '@/lib/xiuxian';
+import { UniversePicker } from '@/components/UniversePicker';
+import type { Universe } from '@/lib/universes';
 
 const MODEL_CLASS: Record<ModelType, string> = {
   self: 'model-self',
@@ -205,63 +207,25 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
 
   return (
     <div className={`min-h-[calc(100vh-3.5rem)] flex flex-col ${MODEL_CLASS[currentQ.model]} model-glow`}>
-      {/* Skin toggle */}
+      {/* Universe picker */}
       {showSkinToggle && (
       <div className="px-6 pt-4 max-w-2xl mx-auto w-full flex justify-center">
-        <div className="inline-flex items-center rounded-full bg-bg-secondary/80 border border-border-subtle p-0.5 text-xs">
-          <button
-            onClick={() => {
-              if (variant === 'wtfti') {
-                window.location.href = `${basePath}/test`;
-                return;
-              }
-              setSkinMode('standard');
+        <UniversePicker
+          current={variant === 'wtfti' ? 'wtfti' : isXiuxian ? 'xiuxian' : 'standard'}
+          onSelect={(u: Universe) => {
+            // standard ↔ xiuxian can switch in-page without navigation
+            if (variant === 'standard' && (u.id === 'standard' || u.id === 'xiuxian')) {
+              const next = u.id === 'xiuxian';
+              setSkinMode(next ? 'xiuxian' : 'standard');
               const url = new URL(window.location.href);
-              url.searchParams.delete('skin');
+              if (next) { url.searchParams.set('skin', 'xiuxian'); }
+              else { url.searchParams.delete('skin'); }
               window.history.replaceState({}, '', url.toString());
-            }}
-            className={`px-4 py-1.5 rounded-full transition-all duration-200 cursor-pointer ${
-              variant === 'standard' && !isXiuxian
-                ? 'bg-bg-elevated text-text-primary shadow-sm font-medium'
-                : 'text-text-muted hover:text-text-secondary'
-            }`}
-          >
-            标准版
-          </button>
-          <button
-            onClick={() => {
-              if (variant === 'wtfti') {
-                window.location.href = `${basePath}/test?skin=xiuxian`;
-                return;
-              }
-              setSkinMode('xiuxian');
-              const url = new URL(window.location.href);
-              url.searchParams.set('skin', 'xiuxian');
-              window.history.replaceState({}, '', url.toString());
-            }}
-            className={`px-4 py-1.5 rounded-full transition-all duration-200 cursor-pointer ${
-              variant === 'standard' && isXiuxian
-                ? 'bg-purple-100 text-purple-700 shadow-sm font-medium'
-                : 'text-text-muted hover:text-text-secondary'
-            }`}
-          >
-            🔮 修仙 2.0
-          </button>
-          <button
-            onClick={() => {
-              if (variant !== 'wtfti') {
-                window.location.href = `${basePath}/wtfti/test`;
-              }
-            }}
-            className={`px-4 py-1.5 rounded-full transition-all duration-200 cursor-pointer ${
-              variant === 'wtfti'
-                ? 'bg-rose-100 text-rose-700 shadow-sm font-medium'
-                : 'text-text-muted hover:text-text-secondary'
-            }`}
-          >
-            🤯 WTF 毒舌版
-          </button>
-        </div>
+              return true; // prevent Link navigation
+            }
+            return false; // allow Link navigation for other universes
+          }}
+        />
       </div>
       )}
 

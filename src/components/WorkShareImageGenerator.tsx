@@ -286,7 +286,7 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   // CTA
   ctx.fillStyle = DARK;
   ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText('测测你是哪张打工人设？', 36, footerY + 20);
+  ctx.fillText('测测你是哪种打工人设？', 36, footerY + 20);
 
   ctx.fillStyle = personality.color;
   ctx.font = `12px ${FONT_MONO}`;

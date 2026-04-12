@@ -1,11 +1,8 @@
-'use client';
-
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import NextImage from 'next/image';
 import { DAILY_MODEL_NAMES, DAILY_MODEL_COLORS } from '@/lib/daily/dimensions';
 import type { DailyModelType } from '@/lib/daily/dimensions';
-import { DAILY_STATUS_TYPES } from '@/lib/daily/statuses';
-import { DailyStatusAvatar } from '@/components/DailyStatusAvatar';
+import { DAILY_STATUS_TYPES, getDailyTypeThumbnailImage } from '@/lib/daily/statuses';
 
 const MODELS: { key: DailyModelType; label: string }[] = [
   { key: 'energy', label: '你今天有多少电' },
@@ -16,22 +13,15 @@ const MODELS: { key: DailyModelType; label: string }[] = [
 ];
 
 export default function DailyHomeContent() {
-  const today = new Date();
-  const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
-
   return (
     <div className="min-h-screen">
       {/* Hero */}
       <section className="relative overflow-hidden">
 
         <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          >
+          <div className="animate-fade-up">
             <span className="inline-block text-xs font-mono tracking-[0.25em] text-text-muted mb-6 uppercase">
-              Daily Status Check · {dateStr}
+              Daily Status Check · 每天题目不同
             </span>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
@@ -58,20 +48,16 @@ export default function DailyHomeContent() {
               </Link>
               <Link
                 href="/"
+                prefetch={false}
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:border-border hover:bg-bg-secondary/50 transition-all duration-200 text-base"
               >
                 ← 返回首页
               </Link>
             </div>
-          </motion.div>
+          </div>
 
           {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="mt-16 grid grid-cols-3 gap-px bg-border-subtle rounded-2xl overflow-hidden"
-          >
+          <div className="mt-16 grid grid-cols-3 gap-px bg-border-subtle rounded-2xl overflow-hidden animate-fade-up-delay-1">
             {[
               { value: '5 维', label: '状态维度' },
               { value: '12 张', label: '状态卡' },
@@ -82,17 +68,13 @@ export default function DailyHomeContent() {
                 <div className="text-xs text-text-muted">{stat.label}</div>
               </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* 5 Dimensions */}
       <section className="max-w-3xl mx-auto px-6 pb-20">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-        >
+        <div className="animate-fade-up">
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-8">
             五大状态维度
           </h2>
@@ -101,12 +83,10 @@ export default function DailyHomeContent() {
             {MODELS.map((m, i) => {
               const c = DAILY_MODEL_COLORS[m.key];
               return (
-                <motion.div
+                <div
                   key={m.key}
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + i * 0.08, duration: 0.4 }}
-                  className="flex items-center gap-4 px-5 py-4 rounded-xl border border-border-subtle bg-bg-elevated shadow-sm"
+                  className="animate-fade-up flex items-center gap-4 px-5 py-4 rounded-xl border border-border-subtle bg-bg-elevated shadow-sm"
+                  style={{ animationDelay: `${(i + 1) * 80}ms` }}
                 >
                   <span
                     className="w-2 h-2 rounded-full flex-shrink-0"
@@ -118,48 +98,45 @@ export default function DailyHomeContent() {
                     </span>
                     <span className="text-text-muted text-sm ml-2">{m.label}</span>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* Status types preview */}
       <section className="max-w-3xl mx-auto px-6 pb-24">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-        >
+        <div className="animate-fade-up-delay-1">
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-8">
             12 张今日模式卡
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {DAILY_STATUS_TYPES.map((s, i) => (
-              <motion.div
+              <div
                 key={s.slug}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 + i * 0.04, duration: 0.3 }}
-                className="flex flex-col items-center gap-3 p-5 rounded-xl border border-border-subtle bg-bg-secondary/30 hover:bg-bg-secondary/60 transition-colors"
+                className="animate-fade-up flex flex-col items-center gap-3 p-5 rounded-xl border border-border-subtle bg-bg-secondary/30 hover:bg-bg-secondary/60 transition-colors"
+                style={{ animationDelay: `${i * 40}ms` }}
               >
-                <DailyStatusAvatar
-                  status={s}
-                  alt=""
-                  sizes="(min-width: 768px) 96px, 80px"
+                <div
                   className="relative w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden"
                   style={{ background: `${s.color}15` }}
-                  imageClassName="object-contain p-1"
-                  fallbackClassName="w-full h-full flex items-center justify-center text-4xl"
-                />
+                >
+                  <NextImage
+                    src={getDailyTypeThumbnailImage(s.slug)}
+                    alt={s.name}
+                    fill
+                    sizes="(min-width: 768px) 96px, 80px"
+                    className="object-contain p-1"
+                  />
+                </div>
                 <span className="text-sm font-medium text-text-primary">{s.name}</span>
                 <span className="text-xs text-text-muted text-center leading-snug">{s.tagline}</span>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </section>
     </div>
   );

@@ -5,11 +5,12 @@ import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import { useCallback, useRef, useState } from 'react';
 import type { WtftiPersonality } from '@/lib/wtfti-personalities';
-import { WTFTI_PERSONALITIES, getWtftiTypeImage } from '@/lib/wtfti-personalities';
+import { WTFTI_PERSONALITIES, getWtftiTypeImage, getWtftiTypeThumbnailImage } from '@/lib/wtfti-personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
 import { WtftiShareImageGenerator } from '@/components/WtftiShareImageGenerator';
 import type { WtftiShareImageHandle } from '@/components/WtftiShareImageGenerator';
+import { UniverseResultBar } from '@/components/UniverseResultBar';
 
 interface Props {
   wtftiPersonality: WtftiPersonality;
@@ -242,6 +243,11 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
         </div>
       </section>
 
+      {/* Cross-universe exploration */}
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <UniverseResultBar slug={p.slug} current="wtfti" />
+      </section>
+
       {/* Other types */}
       <section className="max-w-2xl mx-auto px-6 pb-12">
         <h3 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
@@ -257,7 +263,7 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0" style={{ background: `${o.color}10` }}>
                   <NextImage
-                    src={getWtftiTypeImage(o.slug)}
+                    src={getWtftiTypeThumbnailImage(o.slug)}
                     alt={o.wtftiName}
                     width={80}
                     height={80}

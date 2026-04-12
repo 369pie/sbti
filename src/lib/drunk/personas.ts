@@ -16,6 +16,10 @@ export function getDrunkTypeImage(slug: string): string {
   return withBasePath(`/images/types/drunk-${slug}.png`);
 }
 
+export function getDrunkTypeThumbnailImage(slug: string): string {
+  return withBasePath(`/images/types/thumbs/drunk-${slug}.webp`);
+}
+
 export const DRUNK_PERSONA_TYPES: DrunkPersonaType[] = [
   {
     slug: 'blackout', code: '404', name: '断片艺术家', tagline: '我昨晚做了什么？',

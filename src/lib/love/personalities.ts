@@ -64,6 +64,10 @@ export function getLoveTypeImage(slug: string): string {
   return withBasePath(`/images/types/love-${slug}.png`);
 }
 
+export function getLoveTypeThumbnailImage(slug: string): string {
+  return withBasePath(`/images/types/thumbs/love-${slug}.webp`);
+}
+
 export const LOVE_PERSONALITY_TYPES: LovePersonalityType[] = [
   {
     slug: 'lick', code: 'LICK', name: '舔狗', tagline: '舔到最后一无所有。',

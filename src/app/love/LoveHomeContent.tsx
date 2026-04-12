@@ -1,11 +1,8 @@
-'use client';
-
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { LovePersonalityAvatar } from '@/components/LovePersonalityAvatar';
+import NextImage from 'next/image';
 import { LOVE_MODEL_NAMES, LOVE_MODEL_COLORS } from '@/lib/love/dimensions';
 import type { LoveModelType } from '@/lib/love/dimensions';
-import { LOVE_PERSONALITY_TYPES } from '@/lib/love/personalities';
+import { LOVE_PERSONALITY_TYPES, getLoveTypeThumbnailImage } from '@/lib/love/personalities';
 
 const MODELS: { key: LoveModelType; label: string }[] = [
   { key: 'depend', label: '你在恋爱里有多黏人' },
@@ -24,11 +21,7 @@ export default function LoveHomeContent() {
       <section className="relative overflow-hidden">
 
         <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          >
+          <div className="animate-fade-up">
             <span className="inline-block text-xs font-mono tracking-[0.25em] text-text-muted mb-6 uppercase">
               Love Personality Type Indicator
             </span>
@@ -57,20 +50,16 @@ export default function LoveHomeContent() {
               </Link>
               <Link
                 href="/"
+                prefetch={false}
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:border-border hover:bg-bg-secondary/50 transition-all duration-200 text-base"
               >
                 ← SBTI 抽象人格测试
               </Link>
             </div>
-          </motion.div>
+          </div>
 
           {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="mt-16 grid grid-cols-3 gap-px bg-border-subtle rounded-2xl overflow-hidden"
-          >
+          <div className="mt-16 grid grid-cols-3 gap-px bg-border-subtle rounded-2xl overflow-hidden animate-fade-up-delay-1">
             {[
               { value: '5 维', label: '恋爱维度' },
               { value: '16 张', label: '恋爱人设' },
@@ -81,34 +70,26 @@ export default function LoveHomeContent() {
                 <div className="text-xs text-text-muted mt-1">{stat.label}</div>
               </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* 5 Dimensions */}
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="mb-12"
-          >
+          <div className="mb-12 animate-fade-up">
             <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Dimensions</span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">五个恋爱切面</h2>
-          </motion.div>
+          </div>
 
           <div className="grid gap-3">
             {MODELS.map((m, i) => {
               const color = LOVE_MODEL_COLORS[m.key];
               return (
-                <motion.div
+                <div
                   key={m.key}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
-                  className="flex items-center gap-4 p-4 rounded-xl border border-border-subtle bg-bg-elevated shadow-sm hover:shadow-md transition-shadow"
+                  className="animate-fade-up flex items-center gap-4 p-4 rounded-xl border border-border-subtle bg-bg-elevated shadow-sm hover:shadow-md transition-shadow"
+                  style={{ animationDelay: `${i * 80}ms` }}
                 >
                   <div
                     className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-mono font-semibold flex-shrink-0"
@@ -122,7 +103,7 @@ export default function LoveHomeContent() {
                     </div>
                     <div className="text-xs text-text-muted mt-0.5">{m.label}</div>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -132,44 +113,41 @@ export default function LoveHomeContent() {
       {/* Featured types */}
       <section className="py-20 px-6 border-t border-border-subtle">
         <div className="max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="mb-12"
-          >
+          <div className="mb-12 animate-fade-up">
             <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Types</span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">16 张恋爱人设卡</h2>
-          </motion.div>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {FEATURED.map((p, i) => (
-              <motion.div
+              <div
                 key={p.slug}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.06 }}
+                className="animate-fade-up"
+                style={{ animationDelay: `${i * 60}ms` }}
               >
                 <Link
                   href={`/love/result/${p.slug}`}
+                  prefetch={false}
                   className="block p-4 sm:p-5 rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm text-center hover:shadow-md hover:border-border transition-all"
                 >
-                  <LovePersonalityAvatar
-                    personality={p}
-                    alt=""
-                    sizes="(max-width: 640px) 96px, 112px"
+                  <div
                     className="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-3 rounded-2xl overflow-hidden"
                     style={{ background: `${p.color}15` }}
-                    imageClassName="object-contain p-2"
-                    fallbackClassName="w-full h-full flex items-center justify-center text-5xl"
-                  />
+                  >
+                    <NextImage
+                      src={getLoveTypeThumbnailImage(p.slug)}
+                      alt={p.name}
+                      fill
+                      sizes="(max-width: 640px) 96px, 112px"
+                      className="object-contain p-2"
+                    />
+                  </div>
                   <div className="text-2xl font-mono tracking-[0.08em] leading-none mb-2" style={{ color: p.color }}>
                     {p.code}
                   </div>
                   <div className="text-base font-medium text-text-primary">{p.name}</div>
                   <p className="text-xs text-text-muted mt-1.5 line-clamp-1">{p.tagline}</p>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
