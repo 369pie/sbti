@@ -605,12 +605,56 @@ export const QUESTIONS: Question[] = [
   },
 ];
 
-export function shuffleQuestions(questions: Question[]): Question[] {
+/**
+ * Shuffle questions using Fisher-Yates.
+ * @param questions Source question array
+ * @param perDimension If set, randomly sample at most N questions per dimension
+ *   (drink-trigger questions are always kept). This lets us reduce a 62-question
+ *   bank to ~30 without losing dimension coverage.
+ */
+export function shuffleQuestions(
+  questions: Question[],
+  perDimension?: number,
+): Question[] {
   const main = questions.filter(q => !q.isDrinkBranch);
-  const shuffled = [...main];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+
+  let pool: Question[];
+
+  if (perDimension && perDimension > 0) {
+    // Group by dimension
+    const byDim = new Map<string, Question[]>();
+    const alwaysKeep: Question[] = []; // drink trigger must always be included
+
+    for (const q of main) {
+      if (q.isDrinkTrigger) {
+        alwaysKeep.push(q);
+        continue;
+      }
+      const arr = byDim.get(q.dimension) ?? [];
+      arr.push(q);
+      byDim.set(q.dimension, arr);
+    }
+
+    pool = [...alwaysKeep];
+
+    for (const [, dimQuestions] of byDim) {
+      // Shuffle within dimension first, then take N
+      const shuffled = [...dimQuestions];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      pool.push(...shuffled.slice(0, perDimension));
+    }
+  } else {
+    pool = [...main];
   }
-  return shuffled;
+
+  // Final shuffle
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+
+  return pool;
 }

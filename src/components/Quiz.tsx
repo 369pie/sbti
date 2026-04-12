@@ -46,10 +46,7 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
   const modelNames = isXiuxian ? XIUXIAN_MODEL_NAMES : MODEL_NAMES;
   const modelColors = isXiuxian ? XIUXIAN_MODEL_COLORS : MODEL_COLORS;
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
-  const [questions] = useState(() => {
-    const main = shuffleQuestions(QUESTIONS.filter(q => !q.isDrinkBranch));
-    return main;
-  });
+  const [questions] = useState(() => shuffleQuestions(QUESTIONS, 2));
   const drinkBranch = useMemo(() => QUESTIONS.filter(q => q.isDrinkBranch), []);
 
   const [currentIndex, setCurrentIndex] = useState(0);
