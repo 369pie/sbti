@@ -1,7 +1,8 @@
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { XPTI_MODEL_NAMES, XPTI_MODEL_COLORS } from '@/lib/xpti/dimensions';
 import type { XptiModelType } from '@/lib/xpti/dimensions';
-import { XPTI_PERSONALITY_TYPES } from '@/lib/xpti/personalities';
+import { XPTI_PERSONALITY_TYPES, getXptiTypeThumbnailImage } from '@/lib/xpti/personalities';
 
 const AXES: { key: XptiModelType; poleA: string; poleB: string; question: string }[] = [
   { key: 'power', poleA: '👑 女王体质', poleB: '🐑 配合体质', question: '你在关系里主导还是被安排' },
@@ -135,7 +136,18 @@ export default function XptiHomeContent() {
                   prefetch={false}
                   className="block p-4 rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm text-center hover:shadow-md hover:border-border transition-all"
                 >
-                  <div className="text-3xl mb-2">{p.emoji}</div>
+                  <div
+                    className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-2 rounded-2xl overflow-hidden"
+                    style={{ background: `${p.color}15` }}
+                  >
+                    <NextImage
+                      src={getXptiTypeThumbnailImage(p.slug)}
+                      alt={p.name}
+                      fill
+                      sizes="(max-width: 640px) 80px, 96px"
+                      className="object-contain p-1.5"
+                    />
+                  </div>
                   <div className="text-lg font-mono tracking-[0.06em] leading-none mb-1.5" style={{ color: p.color }}>
                     {p.code}
                   </div>

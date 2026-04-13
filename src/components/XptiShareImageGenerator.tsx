@@ -253,58 +253,157 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
     fillRoundedRect(ctx, 432, footerY + 16, 64, 64, 8, DIV);
   }
 
-  return canvas;
+  return canvas.toDataURL('image/png');
 }
 
 export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle, Props>(
   function XptiShareImageGenerator({ personality, dimensionScores }, ref) {
     const [generating, setGenerating] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [saveHint, setSaveHint] = useState<string | null>(null);
 
-    const generate = useCallback(async () => {
+    const handleGenerate = useCallback(async () => {
       if (generating) return;
       setGenerating(true);
+      setSaveHint(null);
       try {
-        const canvas = await renderXptiShareImage(personality, dimensionScores);
-        const blob = await new Promise<Blob | null>(resolve =>
-          canvas.toBlob(resolve, 'image/png')
-        );
-        if (!blob) throw new Error('Failed to create image');
-
-        // Try native share on mobile
-        if (isMobile() && navigator.share) {
-          try {
-            const file = new File([blob], `xpti-${personality.code}.png`, { type: 'image/png' });
-            await navigator.share({ files: [file] });
-            return;
-          } catch { /* fallback to download */ }
-        }
-
-        // Download fallback
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `xpti-${personality.code}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
+        const dataUrl = await renderXptiShareImage(personality, dimensionScores);
+        setPreviewUrl(dataUrl);
       } catch (e) {
         console.error('Share image generation failed:', e);
       } finally {
         setGenerating(false);
       }
-    }, [generating, personality, dimensionScores]);
+    }, [dimensionScores, generating, personality]);
 
-    useImperativeHandle(ref, () => ({ generate }), [generate]);
+    const createPreviewFile = useCallback(async () => {
+      if (!previewUrl) return null;
+      const blob = await (await fetch(previewUrl)).blob();
+      return new File([blob], `XPTI-${personality.code}.png`, { type: 'image/png' });
+    }, [personality.code, previewUrl]);
+
+    const handleDownload = useCallback(async () => {
+      if (!previewUrl) return;
+      if (isMobile()) {
+        try {
+          const file = await createPreviewFile();
+          if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
+            setSaveHint('请在系统菜单里选择"保存到照片"或"存储到文件"。');
+            await navigator.share({ files: [file], title: `XPTI-${personality.code}.png` });
+            return;
+          }
+        } catch (error) {
+          if (error instanceof DOMException && error.name === 'AbortError') return;
+        }
+        setSaveHint('请长按上方图片保存到相册。');
+        return;
+      }
+      const link = document.createElement('a');
+      link.download = `XPTI-${personality.code}.png`;
+      link.href = previewUrl;
+      link.click();
+    }, [createPreviewFile, personality.code, previewUrl]);
+
+    const handleShare = useCallback(async () => {
+      if (!previewUrl) return;
+      try {
+        const file = await createPreviewFile();
+        if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file], title: `我的恋爱XP体质：${personality.name}` });
+        } else {
+          await handleDownload();
+        }
+      } catch {
+        await handleDownload();
+      }
+    }, [createPreviewFile, handleDownload, personality.name, previewUrl]);
+
+    useImperativeHandle(ref, () => ({ generate: handleGenerate }), [handleGenerate]);
 
     return (
-      <button
-        onClick={generate}
-        disabled={generating}
-        className="w-full py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium hover:brightness-110 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {generating ? '生成中…' : '📸 生成分享卡片'}
-      </button>
+      <div>
+        <button
+          onClick={handleGenerate}
+          disabled={generating}
+          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {generating ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              生成中…
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              📸 生成分享卡片
+            </>
+          )}
+        </button>
+
+        {previewUrl && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            onClick={() => setPreviewUrl(null)}
+          >
+            <div
+              className="relative w-full max-w-sm animate-in fade-in zoom-in-95 duration-200"
+              onClick={e => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setPreviewUrl(null)}
+                className="absolute -top-11 -right-1 p-2 text-white/50 hover:text-white transition-colors z-10"
+                aria-label="关闭"
+              >
+                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              <div className="rounded-2xl overflow-hidden shadow-2xl mb-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={previewUrl} alt="分享图片" className="w-full" />
+              </div>
+
+              <p className="text-center text-xs text-white/60 mb-3 sm:hidden">
+                💡 长按上方图片可直接保存到相册
+              </p>
+
+              {saveHint && (
+                <p className="text-center text-xs text-pink-400 mb-3 px-4 leading-5">
+                  {saveHint}
+                </p>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleDownload}
+                  className="flex-1 py-3 rounded-xl border border-white/30 text-sm text-white hover:bg-white/10 transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  保存图片
+                </button>
+                <button
+                  onClick={handleShare}
+                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium hover:brightness-110 transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  分享
+                </button>
+              </div>
+
+              <p className="text-center text-xs text-white/60 mt-4">
+                点击空白处关闭
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     );
-  }
+  },
 );

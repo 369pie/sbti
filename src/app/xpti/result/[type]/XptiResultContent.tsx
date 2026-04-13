@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import { XPTI_DIMENSIONS, XPTI_MODEL_NAMES, XPTI_MODEL_COLORS } from '@/lib/xpti/dimensions';
-import { XPTI_PERSONALITY_TYPES, getXptiRarity } from '@/lib/xpti/personalities';
+import { XPTI_PERSONALITY_TYPES, getXptiRarity, getXptiTypeThumbnailImage } from '@/lib/xpti/personalities';
 import type { XptiPersonalityType } from '@/lib/xpti/personalities';
 import type { XptiDimensionScore } from '@/lib/xpti/scoring';
 import { XptiShareImageGenerator } from '@/components/XptiShareImageGenerator';
@@ -96,8 +97,20 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
               恋爱XP体质鉴定结果
             </div>
 
-            {/* Big emoji */}
-            <div className="text-7xl sm:text-8xl mb-6">{personality.emoji}</div>
+            {/* Hero character image */}
+            <div
+              className="relative w-36 h-36 sm:w-44 sm:h-44 mx-auto mb-6 rounded-3xl overflow-hidden"
+              style={{ background: `${personality.color}15` }}
+            >
+              <NextImage
+                src={getXptiTypeThumbnailImage(personality.slug)}
+                alt={personality.name}
+                fill
+                sizes="(max-width: 640px) 144px, 176px"
+                className="object-contain p-2"
+                priority
+              />
+            </div>
 
             {/* Number + Code */}
             <div className="flex items-center justify-center gap-3 mb-2">

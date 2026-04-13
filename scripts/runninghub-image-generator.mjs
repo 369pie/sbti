@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { getRunningHubConfig } from './runninghub-config.mjs';
-import { buildSbtiImagePrompt } from './runninghub-prompts.mjs';
+import { buildSbtiImagePrompt, buildUniverseCardPrompt } from './runninghub-prompts.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -87,16 +87,31 @@ function buildTypePrompt(config, type) {
     return type.prompt;
   }
 
+  // Card mode: 图鉴卡面模式 — bake text into image
+  if (config.cardMode && type.card) {
+    return buildUniverseCardPrompt({
+      seriesLabel: config.seriesLabel,
+      concept: type.concept,
+      card: type.card,
+      themeColor: config.themeColor,
+    });
+  }
+
   return buildSbtiImagePrompt({
     seriesLabel: config.seriesLabel,
     seriesTone: config.seriesTone,
     concept: type.concept,
     extraNotes: type.extraNotes,
+    artStyle: config.artStyle,
   });
 }
 
 function buildOutputPath(config, type) {
-  return path.join(getTypesDir(config), `${config.outputPrefix}-${type.slug}.png`);
+  if (config.outputSubdir) {
+    return path.join(getTypesDir(config), config.outputSubdir, `${type.slug}.png`);
+  }
+  const suffix = config.cardMode ? '-card' : '';
+  return path.join(getTypesDir(config), `${config.outputPrefix}${suffix}-${type.slug}.png`);
 }
 
 function buildReferencePath(config, type) {
@@ -120,6 +135,29 @@ async function submitTask(runtimeConfig, imageBase64DataUri, prompt) {
   if (!res.ok) {
     const txt = await res.text();
     throw new Error(`Submit HTTP ${res.status}: ${txt}`);
+  }
+
+  return res.json();
+}
+
+async function submitTextToImageTask(runtimeConfig, prompt, aspectRatio) {
+  const endpoint = runtimeConfig.text2imgEndpoint || '/rhart-image-n-g31-flash-official/text-to-image';
+  const res = await fetch(`${runtimeConfig.apiBase}${endpoint}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${runtimeConfig.apiKey}`,
+    },
+    body: JSON.stringify({
+      prompt,
+      aspectRatio: aspectRatio || runtimeConfig.aspectRatio,
+      resolution: runtimeConfig.text2imgResolution || '2k',
+    }),
+  });
+
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`Submit text2img HTTP ${res.status}: ${txt}`);
   }
 
   return res.json();
@@ -178,28 +216,37 @@ async function downloadImage(url, outputPath) {
 }
 
 async function generateOne(config, runtimeConfig, type, options) {
-  const refPath = buildReferencePath(config, type);
-  if (!fs.existsSync(refPath)) {
-    throw new Error(`Reference image not found: ${refPath}`);
-  }
-
   const outPath = buildOutputPath(config, type);
   if (fs.existsSync(outPath) && !options.force) {
     console.log(`\n⏭️  [${type.slug}] Skipped existing file: ${path.basename(outPath)}`);
     return outPath;
   }
 
-  const refBuf = fs.readFileSync(refPath);
-  const ext = path.extname(type.ref).slice(1).toLowerCase();
-  const mime = ext === 'jpg' ? 'image/jpeg' : `image/${ext}`;
-  const dataUri = `data:${mime};base64,${refBuf.toString('base64')}`;
   const prompt = buildTypePrompt(config, type);
+  const useText2Img = config.cardMode && type.card;
 
-  console.log(
-    `\n🎨 [${type.slug}] Submitting (ref: ${type.ref}, ${(refBuf.length / 1024).toFixed(0)}KB)...`,
-  );
+  let submit;
 
-  const submit = await submitTask(runtimeConfig, dataUri, prompt);
+  if (useText2Img) {
+    // Card mode: 文生图，不需要参考图
+    console.log(`\n🎨 [${type.slug}] Submitting text2img (card mode)...`);
+    submit = await submitTextToImageTask(runtimeConfig, prompt, runtimeConfig.aspectRatio);
+  } else {
+    // Normal mode: 图生图，需要参考图
+    const refPath = buildReferencePath(config, type);
+    if (!fs.existsSync(refPath)) {
+      throw new Error(`Reference image not found: ${refPath}`);
+    }
+    const refBuf = fs.readFileSync(refPath);
+    const ext = path.extname(type.ref).slice(1).toLowerCase();
+    const mime = ext === 'jpg' ? 'image/jpeg' : `image/${ext}`;
+    const dataUri = `data:${mime};base64,${refBuf.toString('base64')}`;
+
+    console.log(
+      `\n🎨 [${type.slug}] Submitting img2img (ref: ${type.ref}, ${(refBuf.length / 1024).toFixed(0)}KB)...`,
+    );
+    submit = await submitTask(runtimeConfig, dataUri, prompt);
+  }
 
   if (!submit.taskId) {
     throw new Error(`No taskId: ${JSON.stringify(submit)}`);
@@ -226,10 +273,14 @@ function printModuleHeader(config, runtimeConfig, selectedCount, options) {
   console.log('╔══════════════════════════════════════════════════╗');
   console.log(`║   ${config.displayName.padEnd(42, ' ')}║`);
   console.log('╚══════════════════════════════════════════════════╝');
-  console.log(`  Endpoint: ${runtimeConfig.editEndpoint}`);
+  if (config.cardMode) {
+    console.log(`  Endpoint: text2img (${runtimeConfig.text2imgEndpoint || '/rhart-image-n-g31-flash-official/text-to-image'})`);
+  } else {
+    console.log(`  Endpoint: img2img (${runtimeConfig.editEndpoint})`);
+  }
   console.log(`  Series: ${config.seriesLabel}`);
-  console.log(`  Types: ${selectedCount} | Aspect Ratio: ${runtimeConfig.aspectRatio}`);
-  console.log(`  Output: public/images/types/${config.outputPrefix}-{slug}.png`);
+  console.log(`  Types: ${selectedCount} | Aspect Ratio: ${runtimeConfig.aspectRatio}${config.cardMode ? ' | 📇 Card Mode' : ''}`);
+  console.log(`  Output: public/images/types/${config.outputSubdir ? config.outputSubdir + '/' : config.outputPrefix + (config.cardMode ? '-card' : '') + '-'}{slug}.png`);
   if (options.force) {
     console.log('  Mode: force overwrite existing files');
   }
@@ -244,6 +295,7 @@ export async function printModuleTypes(moduleKey) {
 export async function runImageGeneratorCli({ moduleKey, args = [] }) {
   const config = await loadModuleConfig(moduleKey);
   const runtimeConfig = getRunningHubConfig();
+  if (config.aspectRatio) runtimeConfig.aspectRatio = config.aspectRatio;
   const dryRun = args.includes('--dry-run');
   const force = args.includes('--force');
   const listTypes = args.includes('--list-types');

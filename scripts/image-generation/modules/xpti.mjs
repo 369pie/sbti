@@ -16,6 +16,7 @@ const xptiImageModule = {
   displayName: 'XPTI 恋爱XP体质 Card Generator',
   seriesLabel: 'XPTI 恋爱XP体质',
   outputPrefix: 'xpti',
+  outputSubdir: 'xpti',
   artStyle: 'inflatable-vinyl',
   cardMode: true,
   aspectRatio: '3:4',

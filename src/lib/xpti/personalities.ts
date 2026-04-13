@@ -62,7 +62,11 @@ export interface XptiPersonalityType {
 }
 
 export function getXptiTypeImage(slug: string): string {
-  return withBasePath(`/images/types/xpti-card-${slug}.png`);
+  return withBasePath(`/images/types/xpti/${slug}.png`);
+}
+
+export function getXptiTypeThumbnailImage(slug: string): string {
+  return withBasePath(`/images/types/xpti/thumbs/${slug}.webp`);
 }
 
 export const XPTI_PERSONALITY_TYPES: XptiPersonalityType[] = [
