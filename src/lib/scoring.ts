@@ -24,8 +24,8 @@ function getScore(answer: Answer, reversed: boolean): number {
 }
 
 function toLevel(score: number): DimensionLevel {
-  if (score >= 2.34) return 'H';
-  if (score >= 1.67) return 'M';
+  if (score >= 2.5) return 'H';
+  if (score >= 1.5) return 'M';
   return 'L';
 }
 

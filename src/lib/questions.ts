@@ -290,6 +290,11 @@ export const QUESTIONS: Question[] = [
   },
   {
     id: 28, text: '我渴望和我信任的人关系密切，熟得像失散多年的亲戚。', dimension: 'So2', model: 'social', reversed: true,
+    options: [
+      { value: 3, label: '是的，关系越近越好，最好天天腻在一起。', key: 'A' },
+      { value: 2, label: '看人吧，有几个特别的可以。', key: 'B' },
+      { value: 1, label: '不太渴望，我更喜欢保持距离。', key: 'C' },
+    ],
   },
 
   // So3 · 表达与真实度
@@ -568,19 +573,276 @@ export const QUESTIONS: Question[] = [
 
   // ── So3 · 表达与真实度 ──
   {
-    id: 61, text: '线上聊天的你和线下面对面的你，别人的评价是？', dimension: 'So3', model: 'social', reversed: true,
+    id: 61, text: '线上聊天的你和线下面对面的你，别人的评价是？', dimension: 'So3', model: 'social', reversed: false,
     options: [
-      { value: 3, label: '简直判若两人，像在cosplay对方。', key: 'A' },
+      { value: 1, label: '简直判若两人，像在cosplay对方。', key: 'A' },
       { value: 2, label: '差不多，只是线上更放得开。', key: 'B' },
-      { value: 1, label: '完全一样，我就是活在真实里的人。', key: 'C' },
+      { value: 3, label: '完全一样，我就是活在真实里的人。', key: 'C' },
     ],
   },
   {
-    id: 62, text: '你不喜欢一个人但对方对你很热情，你：', dimension: 'So3', model: 'social', reversed: true,
+    id: 62, text: '你不喜欢一个人但对方对你很热情，你：', dimension: 'So3', model: 'social', reversed: false,
     options: [
-      { value: 3, label: '先处着呗，面子功夫还是得做。', key: 'A' },
+      { value: 1, label: '先处着呗，面子功夫还是得做。', key: 'A' },
       { value: 2, label: '保持礼貌距离，不热也不冷。', key: 'B' },
-      { value: 1, label: '我态度上直接就表现出来了。', key: 'C' },
+      { value: 3, label: '我态度上直接就表现出来了。', key: 'C' },
+    ],
+  },
+
+  // ══════════════════════════════════════
+  //  新增题目 · 每维度 +2 → 达到 6 题/维度（id 63-90）
+  //  重点补充反向题（reversed: true）以平衡 acquiescence bias
+  // ══════════════════════════════════════
+
+  // ── S1 · 自尊自信 ── (现有: 4正向1反向 → 新增1反向1正向 → 最终4正向2反向)
+  {
+    id: 63, text: '看到别人的成就时，我经常觉得自己啥也不是。', dimension: 'S1', model: 'self', reversed: true,
+    options: [
+      { value: 3, label: '是的，经常被别人衬托得想消失。', key: 'A' },
+      { value: 2, label: '偶尔会这样，但不至于经常。', key: 'B' },
+      { value: 1, label: '不会啊，别人厉害是别人的事。', key: 'C' },
+    ],
+  },
+  {
+    id: 64, text: '如果让你上台即兴发言一分钟，你：', dimension: 'S1', model: 'self', reversed: false,
+    options: [
+      { value: 1, label: '光想就已经社死了。', key: 'A' },
+      { value: 2, label: '紧张但勉强能撑过去。', key: 'B' },
+      { value: 3, label: '没问题，给我个话筒就行。', key: 'C' },
+    ],
+  },
+
+  // ── S2 · 自我清晰度 ── (现有: 4正向0反向 → 新增2反向 → 最终4正向2反向)
+  {
+    id: 65, text: '我经常觉得自己的想法前后矛盾、不太一致。', dimension: 'S2', model: 'self', reversed: true,
+    options: [
+      { value: 3, label: '是的，经常自己跟自己打架。', key: 'A' },
+      { value: 2, label: '偶尔吧，不影响大局。', key: 'B' },
+      { value: 1, label: '不会，我很清楚自己的立场。', key: 'C' },
+    ],
+  },
+  {
+    id: 66, text: '问我"你到底想要什么"，我往往答不上来。', dimension: 'S2', model: 'self', reversed: true,
+    options: [
+      { value: 3, label: '是的，被问到会很慌。', key: 'A' },
+      { value: 2, label: '大方向知道，但细节模糊。', key: 'B' },
+      { value: 1, label: '我能说得很具体。', key: 'C' },
+    ],
+  },
+
+  // ── S3 · 核心价值 ── (现有: 4正向0反向 → 新增2反向 → 最终4正向2反向)
+  {
+    id: 67, text: '别人问我"你这辈子最想做什么"，我其实没有答案。', dimension: 'S3', model: 'self', reversed: true,
+    options: [
+      { value: 3, label: '是的，完全没想过这种问题。', key: 'A' },
+      { value: 2, label: '有模糊的方向但不确定。', key: 'B' },
+      { value: 1, label: '有明确的答案而且很坚定。', key: 'C' },
+    ],
+  },
+  {
+    id: 68, text: '我觉得什么事情都差不多，没什么值得特别认真对待的。', dimension: 'S3', model: 'self', reversed: true,
+    options: [
+      { value: 3, label: '确实，一切都无所谓。', key: 'A' },
+      { value: 2, label: '有些事还是值得上心的。', key: 'B' },
+      { value: 1, label: '不同意，我有非常在乎的东西。', key: 'C' },
+    ],
+  },
+
+  // ── E1 · 依恋安全感 ── (现有: 3正向1反向 → 新增1反向1正向 → 最终4正向2反向)
+  {
+    id: 69, text: '我总觉得自己不够好，配不上现在的关系。', dimension: 'E1', model: 'emotion', reversed: true,
+    options: [
+      { value: 3, label: '经常这么想，怕对方发现真正的我。', key: 'A' },
+      { value: 2, label: '偶尔会闪过这个念头。', key: 'B' },
+      { value: 1, label: '不会，我觉得我们很般配。', key: 'C' },
+    ],
+  },
+  {
+    id: 70, text: '即使吵了架，你依然相信这段关系不会因此结束。', dimension: 'E1', model: 'emotion', reversed: false,
+    options: [
+      { value: 1, label: '吵架后就开始怀疑一切。', key: 'A' },
+      { value: 2, label: '需要冷静一下才能确认。', key: 'B' },
+      { value: 3, label: '当然，吵架是吵架，关系是关系。', key: 'C' },
+    ],
+  },
+
+  // ── E2 · 情感投入度 ── (现有: 4正向0反向 → 新增2反向 → 最终4正向2反向)
+  {
+    id: 71, text: '在感情里我很难做到全身心投入，总会给自己留退路。', dimension: 'E2', model: 'emotion', reversed: true,
+    options: [
+      { value: 3, label: '是的，我必须留一条后路。', key: 'A' },
+      { value: 2, label: '看对方值不值得吧。', key: 'B' },
+      { value: 1, label: '不会，爱了就是 all in。', key: 'C' },
+    ],
+  },
+  {
+    id: 72, text: '朋友说"你对感情太冷淡了"，你觉得？', dimension: 'E2', model: 'emotion', reversed: true,
+    options: [
+      { value: 3, label: '确实，我就是比较淡漠。', key: 'A' },
+      { value: 2, label: '也许吧，但我内心还是有感觉的。', key: 'B' },
+      { value: 1, label: '???我明明很热烈好吗。', key: 'C' },
+    ],
+  },
+
+  // ── E3 · 边界与依赖 ── (现有: 4正向0反向 → 新增2反向 → 最终4正向2反向)
+  {
+    id: 73, text: '我离开一个人就会很焦虑，需要不断确认对方还在。', dimension: 'E3', model: 'emotion', reversed: true,
+    options: [
+      { value: 3, label: '是的，离开就不安。', key: 'A' },
+      { value: 2, label: '有时候会，看关系深浅。', key: 'B' },
+      { value: 1, label: '不会，各做各的挺好。', key: 'C' },
+    ],
+  },
+  {
+    id: 74, text: '和亲密的人一整天待在一起，到晚上你：', dimension: 'E3', model: 'emotion', reversed: true,
+    options: [
+      { value: 3, label: '还不够！我还想继续待一起。', key: 'A' },
+      { value: 2, label: '还行，但也有点想一个人待会儿。', key: 'B' },
+      { value: 1, label: '已经需要独处充电了。', key: 'C' },
+    ],
+  },
+
+  // ── A1 · 世界观倾向 ── (现有: 4正向0反向 → 新增2反向 → 最终4正向2反向)
+  {
+    id: 75, text: '做好事不留名？算了吧，这年头好人都没好报。', dimension: 'A1', model: 'attitude', reversed: true,
+    options: [
+      { value: 3, label: '没错，善良在这世上是种弱势。', key: 'A' },
+      { value: 2, label: '有一定道理但也不全是。', key: 'B' },
+      { value: 1, label: '不同意，好人终有好报。', key: 'C' },
+    ],
+  },
+  {
+    id: 76, text: '我觉得大部分人心里都在算计，真心话很少。', dimension: 'A1', model: 'attitude', reversed: true,
+    options: [
+      { value: 3, label: '人心隔肚皮，确实如此。', key: 'A' },
+      { value: 2, label: '有的人是，有的人不是。', key: 'B' },
+      { value: 1, label: '我遇到的好人挺多的。', key: 'C' },
+    ],
+  },
+
+  // ── A2 · 规则与灵活度 ── (现有: 3正向1反向 → 新增1反向1正向 → 最终4正向2反向)
+  {
+    id: 77, text: '规矩是死的人是活的，我觉得灵活变通比死守规则更重要。', dimension: 'A2', model: 'attitude', reversed: true,
+    options: [
+      { value: 3, label: '对，规矩就是用来打破的。', key: 'A' },
+      { value: 2, label: '看情况，有些规则还是该遵守的。', key: 'B' },
+      { value: 1, label: '不同意，规矩就是规矩。', key: 'C' },
+    ],
+  },
+  {
+    id: 78, text: '旅行时你更倾向于：', dimension: 'A2', model: 'attitude', reversed: false,
+    options: [
+      { value: 1, label: '走到哪算哪，随心所欲。', key: 'A' },
+      { value: 2, label: '大致有个方向就好。', key: 'B' },
+      { value: 3, label: '提前做好攻略，精确到每小时。', key: 'C' },
+    ],
+  },
+
+  // ── A3 · 人生意义感 ── (现有: 3正向1反向 → 新增1反向1正向 → 最终4正向2反向)
+  {
+    id: 79, text: '说实话我不太理解那些"为梦想拼命"的人，活着不累吗？', dimension: 'A3', model: 'attitude', reversed: true,
+    options: [
+      { value: 3, label: '是啊，开心就好何必那么拼。', key: 'A' },
+      { value: 2, label: '理解但自己不一定做得到。', key: 'B' },
+      { value: 1, label: '他们是对的，没有梦想跟咸鱼有什么区别。', key: 'C' },
+    ],
+  },
+  {
+    id: 80, text: '你觉得自己的存在对这个世界有什么特别的意义吗？', dimension: 'A3', model: 'attitude', reversed: false,
+    options: [
+      { value: 1, label: '没有，我就是宇宙中的一粒灰。', key: 'A' },
+      { value: 2, label: '也许有吧，但我说不清。', key: 'B' },
+      { value: 3, label: '有，我相信自己能留下些什么。', key: 'C' },
+    ],
+  },
+
+  // ── Ac1 · 动机导向 ── (现有: 4正向0反向 → 新增2反向 → 最终4正向2反向)
+  {
+    id: 81, text: '领导说"这个项目你来带"，你心里第一反应：', dimension: 'Ac1', model: 'action', reversed: true,
+    options: [
+      { value: 3, label: '完蛋，千万别出事就好。', key: 'A' },
+      { value: 2, label: '有点慌但也有点兴奋。', key: 'B' },
+      { value: 1, label: '太好了，又有机会证明自己。', key: 'C' },
+    ],
+  },
+  {
+    id: 82, text: '比起获得成功，我更怕的是犯错误和丢人。', dimension: 'Ac1', model: 'action', reversed: true,
+    options: [
+      { value: 3, label: '对，不出错就是最大的胜利。', key: 'A' },
+      { value: 2, label: '两者都在意吧。', key: 'B' },
+      { value: 1, label: '不怕犯错，我更想赢。', key: 'C' },
+    ],
+  },
+
+  // ── Ac2 · 决策风格 ── (现有: 4正向0反向 → 新增2反向 → 最终4正向2反向)
+  {
+    id: 83, text: '我经常在做完决定之后反复回想"要是当时选另一个就好了"。', dimension: 'Ac2', model: 'action', reversed: true,
+    options: [
+      { value: 3, label: '是的，后悔是我的日常。', key: 'A' },
+      { value: 2, label: '偶尔会，重大决定的时候。', key: 'B' },
+      { value: 1, label: '做了就做了，不回头。', key: 'C' },
+    ],
+  },
+  {
+    id: 84, text: '面对二选一的时候，我会纠结到失去两个选项。', dimension: 'Ac2', model: 'action', reversed: true,
+    options: [
+      { value: 3, label: '被说中了，选择恐惧症晚期。', key: 'A' },
+      { value: 2, label: '有时候纠结有时候不会。', key: 'B' },
+      { value: 1, label: '不会，直觉选一个就走。', key: 'C' },
+    ],
+  },
+
+  // ── Ac3 · 执行模式 ── (现有: 4正向0反向 → 新增2反向 → 最终4正向2反向)
+  {
+    id: 85, text: '我是那种"想法非常多但实际做出来的很少"的人。', dimension: 'Ac3', model: 'action', reversed: true,
+    options: [
+      { value: 3, label: '精准描述，脑子里有一百个项目全在规划阶段。', key: 'A' },
+      { value: 2, label: '有时候是，有时候能推自己一把。', key: 'B' },
+      { value: 1, label: '不是，我是想到就做的人。', key: 'C' },
+    ],
+  },
+  {
+    id: 86, text: 'DDL（deadline）是什么？是让你动起来的唯一力量。', dimension: 'Ac3', model: 'action', reversed: true,
+    options: [
+      { value: 3, label: '是的，没有DDL我永远不会开始。', key: 'A' },
+      { value: 2, label: '大部分时候是。', key: 'B' },
+      { value: 1, label: '不是，我通常提前就做完了。', key: 'C' },
+    ],
+  },
+
+  // ── So1 · 社交主动性 ── (现有: 4正向0反向 → 新增2反向 → 最终4正向2反向)
+  {
+    id: 87, text: '能不出门就不出门，能不社交就不社交。', dimension: 'So1', model: 'social', reversed: true,
+    options: [
+      { value: 3, label: '完美描述，我的终极生活理想。', key: 'A' },
+      { value: 2, label: '看心情吧，有时也想出去走走。', key: 'B' },
+      { value: 1, label: '不是，我不出去浪会难受。', key: 'C' },
+    ],
+  },
+  {
+    id: 88, text: '对我来说，独处比社交消耗更少的能量。', dimension: 'So1', model: 'social', reversed: true,
+    options: [
+      { value: 3, label: '必须的，社交是在燃烧生命。', key: 'A' },
+      { value: 2, label: '差不多吧，看什么类型的社交。', key: 'B' },
+      { value: 1, label: '不是，和人待在一起反而让我充电。', key: 'C' },
+    ],
+  },
+
+  // ── So2 · 人际边界感 ── (现有: 3正向1反向 → 新增1反向1正向 → 最终4正向2反向)
+  {
+    id: 89, text: '我很享受那种跟谁都"表面熟"但其实谁也进不来的状态。', dimension: 'So2', model: 'social', reversed: false,
+    options: [
+      { value: 1, label: '不想这样，我渴望亲密关系。', key: 'A' },
+      { value: 2, label: '有时候是这样但也想改变。', key: 'B' },
+      { value: 3, label: '是的，这样最舒服最安全。', key: 'C' },
+    ],
+  },
+  {
+    id: 90, text: '有人说你"冷漠"或"有距离感"，你觉得：', dimension: 'So2', model: 'social', reversed: false,
+    options: [
+      { value: 1, label: '冤枉，我其实很热情的。', key: 'A' },
+      { value: 2, label: '可能对不熟的人确实是这样。', key: 'B' },
+      { value: 3, label: '没说错，我就是这样的人。', key: 'C' },
     ],
   },
 

@@ -4,6 +4,8 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: 'Georgia', 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif;
+  --font-display: var(--font-display, 'Playfair Display'), 'Georgia', serif;
+  --font-heading: var(--font-heading, 'Space Grotesk'), var(--font-geist-sans), system-ui, sans-serif;
 
   /* Warm light palette — cream + warm neutrals */
   --color-bg-primary: #FAF8F5;
@@ -61,6 +63,62 @@ html {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.wtfti-gradient-text {
+  background: linear-gradient(135deg, #ff4d6d, #e06088, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Brand typography ── */
+
+/* Hero brand mark: "WTF" bold geometric + "TI" elegant serif */
+.brand-wtf {
+  font-family: var(--font-heading), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.brand-ti {
+  font-family: var(--font-display), 'Georgia', serif;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
+/* Section label — small monospace uppercase */
+.section-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Section headline — mix of heading font + tighter tracking */
+.section-headline {
+  font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Decorative quote / tagline — serif italic */
+.display-tagline {
+  font-family: var(--font-display), 'Georgia', serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* Stat number — mono, tabular */
+.stat-value {
+  font-family: var(--font-heading), var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.04em;
 }
 
 @keyframes fade-up-in {
@@ -123,4 +181,23 @@ html {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* ── Navigation dropdown & link styles ── */
+.nav-link {
+  @apply px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-all duration-200 shrink-0 text-text-muted hover:text-text-secondary hover:bg-bg-secondary cursor-pointer select-none;
+}
+
+.nav-dropdown {
+  @apply absolute top-full mt-2 py-2 rounded-xl border border-border-subtle bg-bg-elevated shadow-lg;
+  animation: nav-dropdown-in 150ms ease-out;
+}
+
+.nav-dropdown-item {
+  @apply flex items-start gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-bg-secondary;
+}
+
+@keyframes nav-dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

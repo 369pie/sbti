@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PERSONALITY_TYPES, getTypeImage } from '@/lib/personalities';
+import { PERSONALITY_TYPES, getTypeThumbnailImage } from '@/lib/personalities';
 import type { PersonalityType } from '@/lib/personalities';
 import { MODEL_COLORS, DIMENSIONS } from '@/lib/dimensions';
 import type { ModelType } from '@/lib/dimensions';
@@ -127,7 +127,7 @@ function AddMembersStep({
                 className="flex items-center gap-1.5 rounded-full border border-border-subtle bg-bg-secondary pl-1.5 pr-2 py-1"
               >
                 <div className="w-6 h-6 rounded-full overflow-hidden" style={{ background: `${p?.color}15` }}>
-                  <NextImage src={getTypeImage(m.slug)} alt="" width={24} height={24} className="w-full h-full object-contain" />
+                  <NextImage src={getTypeThumbnailImage(m.slug)} alt="" width={24} height={24} className="w-full h-full object-contain" />
                 </div>
                 <span className="text-xs text-text-primary">{m.name}</span>
                 <button
@@ -166,7 +166,7 @@ function AddMembersStep({
                 }`}
               >
                 <div className="w-14 h-14 mx-auto mb-1 rounded-lg overflow-hidden" style={{ background: `${p.color}15` }}>
-                  <NextImage src={getTypeImage(p.slug)} alt={p.name} width={56} height={56} className="w-full h-full object-contain" />
+                  <NextImage src={getTypeThumbnailImage(p.slug)} alt={p.name} width={56} height={56} className="w-full h-full object-contain" />
                 </div>
                 <div className="text-[10px] font-mono tracking-wider truncate" style={{ color: p.color }}>{p.code}</div>
                 <div className="text-xs text-text-primary truncate">{p.name}</div>
@@ -373,7 +373,7 @@ function SquadResultDisplay({
               style={{ borderColor: m.personality.color, background: `${m.personality.color}10` }}
             >
               <NextImage
-                src={getTypeImage(m.slug)}
+                src={getTypeThumbnailImage(m.slug)}
                 alt={m.personality.name}
                 width={80}
                 height={80}

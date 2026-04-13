@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import NextImage from 'next/image';
-import { getDrunkTypeImage } from '@/lib/drunk/personas';
+import { getDrunkTypeImage, getDrunkTypeThumbnailImage } from '@/lib/drunk/personas';
 import type { DrunkPersonaType } from '@/lib/drunk/personas';
 
 interface Props {
@@ -27,10 +27,16 @@ export function DrunkPersonaAvatar({
   fallbackClassName = 'w-full h-full flex items-center justify-center text-4xl',
 }: Props) {
   const [imageFailed, setImageFailed] = useState(false);
+  const [useOriginalImage, setUseOriginalImage] = useState(false);
 
   useEffect(() => {
     setImageFailed(false);
+    setUseOriginalImage(false);
   }, [persona.slug]);
+
+  const imageSrc = useOriginalImage
+    ? getDrunkTypeImage(persona.slug)
+    : getDrunkTypeThumbnailImage(persona.slug);
 
   return (
     <div className={className} style={style}>
@@ -38,14 +44,20 @@ export function DrunkPersonaAvatar({
         <div className={fallbackClassName}>{persona.emoji}</div>
       ) : (
         <NextImage
-          src={getDrunkTypeImage(persona.slug)}
+          src={imageSrc}
           alt={alt ?? `${persona.name}形象`}
           fill
           unoptimized
           priority={priority}
           sizes={sizes}
           className={imageClassName}
-          onError={() => setImageFailed(true)}
+          onError={() => {
+            if (!useOriginalImage) {
+              setUseOriginalImage(true);
+              return;
+            }
+            setImageFailed(true);
+          }}
         />
       )}
     </div>

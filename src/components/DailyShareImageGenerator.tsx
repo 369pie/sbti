@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
-import QRCode from 'qrcode';
+import { toQrDataUrl } from '@/lib/qr-code';
 import type { DailyStatusType } from '@/lib/daily/statuses';
 import { getDailyTypeImage } from '@/lib/daily/statuses';
 import { DAILY_DIMENSIONS, DAILY_MODEL_COLORS } from '@/lib/daily/dimensions';
@@ -102,7 +102,7 @@ async function renderDailyShareImage(status: DailyStatusType, dimensionScores: D
   const DIV = '#e8e0d6';
 
   const [qrImage, charImage] = await Promise.all([
-    QRCode.toDataURL(DAILY_SHARE_URL, {
+    toQrDataUrl(DAILY_SHARE_URL, {
       width: 200, margin: 1, color: { dark: DARK, light: BG + 'ff' }, errorCorrectionLevel: 'M',
     }).then(url => loadImage(url)).catch(() => null),
     loadImage(getDailyTypeImage(status.slug)).catch(() => null),

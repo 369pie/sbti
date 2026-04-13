@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
-import QRCode from 'qrcode';
+import { toQrDataUrl } from '@/lib/qr-code';
 import { getXptiRarity, getXptiTypeImage } from '@/lib/xpti/personalities';
 import type { XptiPersonalityType } from '@/lib/xpti/personalities';
 import { XPTI_DIMENSIONS, XPTI_MODEL_COLORS } from '@/lib/xpti/dimensions';
@@ -98,7 +98,7 @@ function drawImageContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
 async function renderXptiShareImage(personality: XptiPersonalityType, dimensionScores: XptiDimensionScore[]) {
   const [personalityImage, qrImage] = await Promise.all([
     getCachedImage(getXptiTypeImage(personality.slug)).catch(() => null),
-    QRCode.toDataURL(XPTI_SHARE_URL, {
+    toQrDataUrl(XPTI_SHARE_URL, {
       width: 200, margin: 1, color: { dark: '#000000', light: '#ffffffff' }, errorCorrectionLevel: 'M',
     }).then(url => getCachedImage(url)).catch(() => null),
   ]);

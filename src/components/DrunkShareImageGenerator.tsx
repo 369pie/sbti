@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
-import QRCode from 'qrcode';
+import { toQrDataUrl } from '@/lib/qr-code';
 import type { DrunkPersonaType } from '@/lib/drunk/personas';
 import { getDrunkTypeImage } from '@/lib/drunk/personas';
 import { DRUNK_DIMENSIONS, DRUNK_MODEL_COLORS } from '@/lib/drunk/dimensions';
@@ -102,7 +102,7 @@ async function renderDrunkShareImage(persona: DrunkPersonaType, dimensionScores:
   const DIV = '#e8e0d6';
 
   const [qrImage, charImage] = await Promise.all([
-    QRCode.toDataURL(DRUNK_SHARE_URL, {
+    toQrDataUrl(DRUNK_SHARE_URL, {
       width: 200, margin: 1, color: { dark: DARK, light: BG + 'ff' }, errorCorrectionLevel: 'M',
     }).then(url => loadImage(url)).catch(() => null),
     loadImage(getDrunkTypeImage(persona.slug)).catch(() => null),

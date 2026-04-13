@@ -23,6 +23,7 @@ const ALL_TESTS: TestRecommendation[] = [
   { id: 'combo', emoji: '🧩', title: '人格拼盘', hook: 'SBTI × MBTI × 星座三合一', href: '/combo', accent: '#a78bfa' },
   { id: 'xpti', emoji: '💜', title: 'XPTI 恋爱XP', hook: '你的恋爱DNA是什么体质？', href: '/xpti', accent: '#c084fc' },
   { id: 'jueti', emoji: '🌙', title: '觉TI 自然人格', hook: '向内看见你是哪种自然力', href: '/jueti', accent: '#8b7355' },
+  { id: 'flower', emoji: '🌸', title: '花TI 花格鉴定', hook: '测测你像自然界的哪朵花', href: '/flower', accent: '#e11d48' },
 ];
 
 interface Props {
@@ -52,6 +53,7 @@ export function CrossTestRecommendations({ currentTest, personalityName, max = 4
             <Link
               key={test.id}
               href={test.href}
+              prefetch={false}
               className="group rounded-2xl border border-border-subtle hover:border-border bg-bg-elevated hover:shadow-md transition-all p-4 sm:p-5"
             >
               <div className="text-2xl mb-2">{test.emoji}</div>

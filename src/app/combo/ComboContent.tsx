@@ -64,7 +64,7 @@ function SBTIPicker({
             )}
             <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-20 lg:h-20 mx-auto mb-1.5 lg:mb-3 rounded-xl lg:rounded-2xl overflow-hidden" style={{ background: `${p.color}15` }}>
               <NextImage
-                src={getTypeImage(p.slug)}
+                src={getTypeThumbnailImage(p.slug)}
                 alt={p.name}
                 width={80}
                 height={80}
@@ -463,7 +463,7 @@ export function ComboContent() {
                 return p ? (
                   <div className="max-w-2xl mx-auto flex items-center justify-center gap-2 mb-8 p-3 rounded-xl border border-border-subtle bg-bg-secondary/40">
                     <div className="w-8 h-8 rounded-lg overflow-hidden" style={{ background: `${p.color}15` }}>
-                      <NextImage src={getTypeImage(p.slug)} alt={p.name} width={32} height={32} className="w-full h-full object-contain" />
+                      <NextImage src={getTypeThumbnailImage(p.slug)} alt={p.name} width={32} height={32} className="w-full h-full object-contain" />
                     </div>
                     <span className="text-sm font-medium">{p.code}（{p.name}）</span>
                     <span className="text-xs text-text-muted">— 你的 SBTI 人格</span>

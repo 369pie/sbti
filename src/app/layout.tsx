@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import Link from "next/link";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
 import { getLegacyRedirectScript, getSiteLabel, getSiteOrigin, getSiteUrl, isLegacyPagesBuild } from "@/lib/site";
@@ -16,14 +16,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "900"],
+  style: ["normal", "italic"],
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-heading",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   metadataBase: getSiteOrigin() ? new URL(getSiteOrigin()) : undefined,
   title: {
-    default: "SBTI 人格测试 — 测测你是哪种抽象人格",
-    template: "%s | SBTI",
+    default: "WTFTI — 多宇宙人格测试平台",
+    template: "%s | WTFTI",
   },
-  description: "SBTI (Silly Behavioral Type Indicator) 是一个轻松向的人格测试。5 组切面、15 个维度、27 种人格，找到最像你的那一个。",
-  keywords: ["SBTI", "SBTI 人格测试", "SBTI 在线测试", "SBTI 人格测试在线测试", "人格测试", "性格测试", "抽象人格", "MBTI", "打工人格", "CP配对", "心理测试"],
+  description: "WTFTI (What's The F* Type Inside) 多宇宙人格测试平台。同一个你，在不同主题宇宙里有完全不同的人格翻译。经典版、修仙版、毒舌版、社畜版、鸟类版……来测测你到底是哪种人。",
+  keywords: ["WTFTI", "WTFTI 人格测试", "多宇宙人格测试", "人格测试", "性格测试", "MBTI", "人格类型", "CP配对", "打工人格", "心理测试", "修仙人格", "鸟类人格"],
   verification: {
     google: 'BzRtTDBXJV_X_JIZsMs0jPNwGrHIj7flfmUMjuJ1IwY',
   },
@@ -51,17 +64,17 @@ export const metadata: Metadata = {
         },
       },
   openGraph: {
-    title: "SBTI 人格测试 — 测测你是哪种抽象人格",
-    description: "5 组切面 · 15 个维度 · 27 种人格，不套术语，只看你平时怎么想、怎么爱、怎么活。",
+    title: "WTFTI — 多宇宙人格测试平台",
+    description: "同一个你，在不同主题宇宙里有完全不同的人格翻译。经典、修仙、毒舌、社畜、鸟类……来测测你到底是哪种人。",
     type: "website",
-    siteName: "SBTI 人格测试",
+    siteName: "WTFTI",
     locale: "zh_CN",
     url: getSiteUrl('/'),
   },
   twitter: {
     card: "summary_large_image",
-    title: "SBTI 人格测试 — 测测你是哪种抽象人格",
-    description: "5 组切面 · 15 个维度 · 27 种人格，不套术语，只看你平时怎么想、怎么爱、怎么活。",
+    title: "WTFTI — 多宇宙人格测试平台",
+    description: "同一个你，在不同主题宇宙里有完全不同的人格翻译。经典、修仙、毒舌、社畜、鸟类……来测测你到底是哪种人。",
   },
   alternates: {
     canonical: '/',
@@ -77,7 +90,7 @@ export default function RootLayout({
     <html
       lang="zh-CN"
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <script
@@ -88,17 +101,17 @@ export default function RootLayout({
               '@graph': [
                 {
                   '@type': 'WebSite',
-                  name: 'SBTI 人格测试',
+                  name: 'WTFTI',
                   url: getSiteUrl('/'),
-                  description: 'SBTI (Silly Behavioral Type Indicator) 是一个轻松向的人格测试。5 组切面、15 个维度、27 种人格，找到最像你的那一个。',
+                  description: 'WTFTI 多宇宙人格测试平台。同一个你，在不同主题宇宙里有完全不同的人格翻译。',
                   inLanguage: 'zh-CN',
                 },
                 {
                   '@type': 'Organization',
-                  name: 'SBTI 人格测试',
+                  name: 'WTFTI',
                   url: getSiteUrl('/'),
                   logo: getSiteUrl('/favicon.ico'),
-                  description: '一个轻松向的人格测试站点，提供 SBTI、打工人设和今日模式等测试内容。',
+                  description: 'WTFTI 多宇宙人格测试平台，提供经典、修仙、毒舌、社畜等多种主题人格测试。',
                 },
               ],
             }),
@@ -133,15 +146,15 @@ export default function RootLayout({
         <footer className="border-t border-border-subtle py-8 px-6 text-center text-text-muted text-sm">
           <div className="max-w-5xl mx-auto">
             <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
-              <Link href="/guide/" className="hover:text-text-primary transition-colors">测试说明</Link>
-              <Link href="/about/" className="hover:text-text-primary transition-colors">关于测试</Link>
-              <Link href="/types/" className="hover:text-text-primary transition-colors">人设图鉴</Link>
-              <Link href="/contact/" className="hover:text-text-primary transition-colors">联系与社群</Link>
-              <Link href="/privacy/" className="hover:text-text-primary transition-colors">隐私说明</Link>
-              <Link href="/terms/" className="hover:text-text-primary transition-colors">使用条款</Link>
+              <Link href="/guide/" prefetch={false} className="hover:text-text-primary transition-colors">测试说明</Link>
+              <Link href="/about/" prefetch={false} className="hover:text-text-primary transition-colors">关于测试</Link>
+              <Link href="/types/" prefetch={false} className="hover:text-text-primary transition-colors">人设图鉴</Link>
+              <Link href="/contact/" prefetch={false} className="hover:text-text-primary transition-colors">联系与社群</Link>
+              <Link href="/privacy/" prefetch={false} className="hover:text-text-primary transition-colors">隐私说明</Link>
+              <Link href="/terms/" prefetch={false} className="hover:text-text-primary transition-colors">使用条款</Link>
             </div>
-            <p>SBTI 更适合拿来娱乐和自我观察，不适合作为严肃的心理诊断结果。</p>
-            <p className="mt-2 opacity-60">Silly Behavioral Type Indicator</p>
+            <p>WTFTI 更适合拿来娱乐和自我观察，不适合作为严肃的心理诊断结果。</p>
+            <p className="mt-2 opacity-60">What&apos;s The F* Type Inside</p>
           </div>
         </footer>
         <Analytics />

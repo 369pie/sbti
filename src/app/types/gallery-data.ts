@@ -2,6 +2,7 @@ import { BANTI_PERSONALITIES, getBantiTypeThumbnailImage } from '@/lib/banti/per
 import { DAILY_STATUS_TYPES, getDailyTypeImage } from '@/lib/daily/statuses';
 import { DRUNK_PERSONA_TYPES, getDrunkTypeImage } from '@/lib/drunk/personas';
 import { DELTA_PERSONALITIES, getDeltaTypeThumbnailImage } from '@/lib/delta/personalities';
+import { FLOWER_PERSONALITY_TYPES, getFlowerRarity, getFlowerTypeThumbnailImage } from '@/lib/flower/personalities';
 import { KINGS_PERSONALITIES, getKingsTypeThumbnailImage } from '@/lib/kings/personalities';
 import { LOVE_PERSONALITY_TYPES, getLoveRarity, getLoveTypeImage } from '@/lib/love/personalities';
 import { getRarity, getTypeImage, getXiuxianTypeImage, PERSONALITY_TYPES } from '@/lib/personalities';
@@ -9,6 +10,7 @@ import { WTFTI_PERSONALITIES, getWtftiTypeThumbnailImage } from '@/lib/wtfti-per
 import { getWorkRarity, getWorkTypeImage, WORK_PERSONALITY_TYPES } from '@/lib/work/personalities';
 import { getXiuxianSkin } from '@/lib/xiuxian';
 import { getXiuxianLaunchOnlyTypes } from '@/lib/xiuxian-v2';
+import { XPTI_PERSONALITY_TYPES, getXptiRarity, getXptiTypeThumbnailImage } from '@/lib/xpti/personalities';
 
 export interface GalleryRarity {
   label: string;
@@ -40,10 +42,13 @@ export interface GalleryTab {
 }
 
 export interface TypesGalleryData {
-  standardSbtiTab: GalleryTab;
-  xiuxianSbtiTab: GalleryTab;
-  otherTabs: GalleryTab[];
-  standardTotalCount: number;
+  /** 核心人格: 标准版 + 修仙版 */
+  coreGroup: GalleryTab[];
+  /** 15维度 IP 宇宙: WTFTI / 班TI / 王者TI / 三角TI */
+  ipGroup: GalleryTab[];
+  /** 独立主题测试: 恋爱 / 职场 / XPTI / 花TI / 今日 / 酒后 */
+  themeGroup: GalleryTab[];
+  totalCount: number;
   seriesCount: number;
 }
 
@@ -85,10 +90,10 @@ function buildSbtiTab(isXiuxian: boolean): GalleryTab {
   });
 
   return {
-    id: 'sbti',
-    label: '人格图鉴',
-    emoji: '🧬',
-    accent: '#e8729c',
+    id: isXiuxian ? 'xiuxian' : 'sbti',
+    label: isXiuxian ? '修仙版' : '标准版',
+    emoji: isXiuxian ? '⛰️' : '🧬',
+    accent: isXiuxian ? '#a78bfa' : '#e8729c',
     testHref: isXiuxian ? '/test?skin=xiuxian' : '/test',
     description: isXiuxian
       ? `同一套核心模型，切成修仙世界观：${items.length} 张修仙结果卡，含首发隐藏卡。`
@@ -97,61 +102,7 @@ function buildSbtiTab(isXiuxian: boolean): GalleryTab {
   };
 }
 
-function buildOtherTabs(): GalleryTab[] {
-  const loveItems: GalleryItem[] = LOVE_PERSONALITY_TYPES.map((personality) => {
-    const rarity = getLoveRarity(personality.slug);
-
-    return {
-      slug: personality.slug,
-      code: personality.code,
-      name: personality.name,
-      tagline: personality.tagline,
-      color: personality.color,
-      emoji: personality.emoji,
-      image: getGalleryCardImage(getLoveTypeImage(personality.slug)),
-      href: `/love/result/${personality.slug}`,
-      rarity: { label: rarity.label, color: rarity.color, bgColor: rarity.bgColor },
-    };
-  });
-
-  const workItems: GalleryItem[] = WORK_PERSONALITY_TYPES.map((personality) => {
-    const rarity = getWorkRarity(personality.slug);
-
-    return {
-      slug: personality.slug,
-      code: personality.code,
-      name: personality.name,
-      tagline: personality.tagline,
-      color: personality.color,
-      emoji: personality.emoji,
-      image: getGalleryCardImage(getWorkTypeImage(personality.slug)),
-      href: `/work/result/${personality.slug}`,
-      rarity: { label: rarity.label, color: rarity.color, bgColor: rarity.bgColor },
-    };
-  });
-
-  const dailyItems: GalleryItem[] = DAILY_STATUS_TYPES.map((status) => ({
-    slug: status.slug,
-    code: status.code,
-    name: status.name,
-    tagline: status.tagline,
-    color: status.color,
-    emoji: status.emoji,
-    image: getGalleryCardImage(getDailyTypeImage(status.slug)),
-    href: `/daily/result/${status.slug}`,
-  }));
-
-  const drunkItems: GalleryItem[] = DRUNK_PERSONA_TYPES.map((persona) => ({
-    slug: persona.slug,
-    code: persona.code,
-    name: persona.name,
-    tagline: persona.tagline,
-    color: persona.color,
-    emoji: persona.emoji,
-    image: getGalleryCardImage(getDrunkTypeImage(persona.slug)),
-    href: `/drunk/result/${persona.slug}`,
-  }));
-
+function buildIpTabs(): GalleryTab[] {
   const wtftiItems: GalleryItem[] = WTFTI_PERSONALITIES.map((personality) => ({
     slug: personality.slug,
     code: personality.number,
@@ -233,6 +184,97 @@ function buildOtherTabs(): GalleryTab[] {
       description: `同一套 15 维度模型，翻译成三角洲行动战区语境：${deltaItems.length} 张干员人格图鉴卡，你在战场上是哪种兵。`,
       items: deltaItems,
     },
+  ];
+}
+
+function buildThemeTabs(): GalleryTab[] {
+  const loveItems: GalleryItem[] = LOVE_PERSONALITY_TYPES.map((personality) => {
+    const rarity = getLoveRarity(personality.slug);
+
+    return {
+      slug: personality.slug,
+      code: personality.code,
+      name: personality.name,
+      tagline: personality.tagline,
+      color: personality.color,
+      emoji: personality.emoji,
+      image: getGalleryCardImage(getLoveTypeImage(personality.slug)),
+      href: `/love/result/${personality.slug}`,
+      rarity: { label: rarity.label, color: rarity.color, bgColor: rarity.bgColor },
+    };
+  });
+
+  const workItems: GalleryItem[] = WORK_PERSONALITY_TYPES.map((personality) => {
+    const rarity = getWorkRarity(personality.slug);
+
+    return {
+      slug: personality.slug,
+      code: personality.code,
+      name: personality.name,
+      tagline: personality.tagline,
+      color: personality.color,
+      emoji: personality.emoji,
+      image: getGalleryCardImage(getWorkTypeImage(personality.slug)),
+      href: `/work/result/${personality.slug}`,
+      rarity: { label: rarity.label, color: rarity.color, bgColor: rarity.bgColor },
+    };
+  });
+
+  const xptiItems: GalleryItem[] = XPTI_PERSONALITY_TYPES.map((personality) => {
+    const rarity = getXptiRarity(personality.slug);
+
+    return {
+      slug: personality.slug,
+      code: personality.code,
+      name: personality.name,
+      tagline: personality.tagline,
+      color: personality.color,
+      emoji: personality.emoji,
+      image: getXptiTypeThumbnailImage(personality.slug),
+      href: `/xpti/result/${personality.slug}`,
+      rarity: { label: rarity.label, color: rarity.color, bgColor: rarity.bgColor },
+    };
+  });
+
+  const flowerItems: GalleryItem[] = FLOWER_PERSONALITY_TYPES.map((personality) => {
+    const rarity = getFlowerRarity(personality.slug);
+
+    return {
+      slug: personality.slug,
+      code: personality.code,
+      name: personality.name,
+      tagline: personality.tagline,
+      color: personality.color,
+      emoji: personality.emoji,
+      image: getFlowerTypeThumbnailImage(personality.slug),
+      href: `/flower/result/${personality.slug}`,
+      rarity: { label: rarity.label, color: rarity.color, bgColor: rarity.bgColor },
+    };
+  });
+
+  const dailyItems: GalleryItem[] = DAILY_STATUS_TYPES.map((status) => ({
+    slug: status.slug,
+    code: status.code,
+    name: status.name,
+    tagline: status.tagline,
+    color: status.color,
+    emoji: status.emoji,
+    image: getGalleryCardImage(getDailyTypeImage(status.slug)),
+    href: `/daily/result/${status.slug}`,
+  }));
+
+  const drunkItems: GalleryItem[] = DRUNK_PERSONA_TYPES.map((persona) => ({
+    slug: persona.slug,
+    code: persona.code,
+    name: persona.name,
+    tagline: persona.tagline,
+    color: persona.color,
+    emoji: persona.emoji,
+    image: getGalleryCardImage(getDrunkTypeImage(persona.slug)),
+    href: `/drunk/result/${persona.slug}`,
+  }));
+
+  return [
     {
       id: 'love',
       label: '恋爱人格',
@@ -250,6 +292,24 @@ function buildOtherTabs(): GalleryTab[] {
       testHref: '/work',
       description: '打工人在工位上的 16 种灵魂状态，总有一款是你。',
       items: workItems,
+    },
+    {
+      id: 'xpti',
+      label: 'XPTI',
+      emoji: '👩',
+      accent: '#ec4899',
+      testHref: '/xpti',
+      description: `她视角的人格解剖——${xptiItems.length} 种女性专属人格画像。`,
+      items: xptiItems,
+    },
+    {
+      id: 'flower',
+      label: '花TI',
+      emoji: '🌸',
+      accent: '#f9a8d4',
+      testHref: '/flower',
+      description: `每种人格都是一朵花——${flowerItems.length} 种花语人格。`,
+      items: flowerItems,
     },
     {
       id: 'daily',
@@ -275,17 +335,17 @@ function buildOtherTabs(): GalleryTab[] {
 export function getTypesGalleryData(): TypesGalleryData {
   const standardSbtiTab = buildSbtiTab(false);
   const xiuxianSbtiTab = buildSbtiTab(true);
-  const otherTabs = buildOtherTabs();
-  const standardTotalCount = [standardSbtiTab, ...otherTabs].reduce(
-    (sum, tab) => sum + tab.items.length,
-    0
-  );
+  const coreGroup = [standardSbtiTab, xiuxianSbtiTab];
+  const ipGroup = buildIpTabs();
+  const themeGroup = buildThemeTabs();
+  const allTabs = [...coreGroup, ...ipGroup, ...themeGroup];
+  const totalCount = allTabs.reduce((sum, tab) => sum + tab.items.length, 0);
 
   return {
-    standardSbtiTab,
-    xiuxianSbtiTab,
-    otherTabs,
-    standardTotalCount,
-    seriesCount: otherTabs.length + 1,
+    coreGroup,
+    ipGroup,
+    themeGroup,
+    totalCount,
+    seriesCount: allTabs.length,
   };
 }

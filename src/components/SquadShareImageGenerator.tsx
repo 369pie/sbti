@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
-import QRCode from 'qrcode';
+import { toQrDataUrl } from '@/lib/qr-code';
 import { getTypeImage } from '@/lib/personalities';
 import { SHARE_SITE_URL } from '@/lib/site';
 import type { SquadAnalysis } from '@/lib/squad';
@@ -93,7 +93,7 @@ function getCachedImage(src: string) {
 }
 
 async function createQrImage() {
-  const url = await QRCode.toDataURL(SHARE_SITE_URL, {
+  const url = await toQrDataUrl(SHARE_SITE_URL, {
     width: 200, margin: 1,
     color: { dark: '#2d2236', light: '#FFF9F2' },
     errorCorrectionLevel: 'M',

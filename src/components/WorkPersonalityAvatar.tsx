@@ -3,7 +3,7 @@
 import NextImage from 'next/image';
 import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
-import { getWorkTypeImage } from '@/lib/work/personalities';
+import { getWorkTypeImage, getWorkTypeThumbnailImage } from '@/lib/work/personalities';
 import type { WorkPersonalityType } from '@/lib/work/personalities';
 
 interface Props {
@@ -28,10 +28,16 @@ export function WorkPersonalityAvatar({
   fallbackClassName = 'w-full h-full flex items-center justify-center text-4xl',
 }: Props) {
   const [imageFailed, setImageFailed] = useState(false);
+  const [useOriginalImage, setUseOriginalImage] = useState(false);
 
   useEffect(() => {
     setImageFailed(false);
+    setUseOriginalImage(false);
   }, [personality.slug]);
+
+  const imageSrc = useOriginalImage
+    ? getWorkTypeImage(personality.slug)
+    : getWorkTypeThumbnailImage(personality.slug);
 
   return (
     <div className={className} style={style}>
@@ -39,14 +45,20 @@ export function WorkPersonalityAvatar({
         <div className={fallbackClassName}>{personality.emoji}</div>
       ) : (
         <NextImage
-          src={getWorkTypeImage(personality.slug)}
+          src={imageSrc}
           alt={alt ?? `${personality.name}形象`}
           fill
           unoptimized
           priority={priority}
           sizes={sizes}
           className={imageClassName}
-          onError={() => setImageFailed(true)}
+          onError={() => {
+            if (!useOriginalImage) {
+              setUseOriginalImage(true);
+              return;
+            }
+            setImageFailed(true);
+          }}
         />
       )}
     </div>

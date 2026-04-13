@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
-import QRCode from 'qrcode';
+import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
+import { toQrDataUrl } from '@/lib/qr-code';
 import type { PersonalityType } from '@/lib/personalities';
 import { getTypeImage, getXiuxianTypeImage, getRarity } from '@/lib/personalities';
 import { DIMENSIONS, MODEL_COLORS } from '@/lib/dimensions';
@@ -199,7 +199,7 @@ function getCachedImage(src: string) {
 }
 
 async function createQrImage() {
-  const qrDataUrl = await QRCode.toDataURL(SHARE_SITE_URL, {
+  const qrDataUrl = await toQrDataUrl(SHARE_SITE_URL, {
     width: 200,
     margin: 1,
     color: { dark: '#2d2236', light: '#FFF9F2' },
@@ -509,18 +509,6 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
     const shareDisplayName = isXiuxian
       ? (getXiuxianSkin(personality.slug)?.displayName ?? personality.name)
       : personality.name;
-
-    const prepareAssets = useCallback(async () => {
-      const imageSrc = isXiuxian ? getXiuxianTypeImage(personality.slug) : getTypeImage(personality.slug);
-      await Promise.all([
-        getCachedImage(imageSrc).catch(() => null),
-        createQrImage().catch(() => null),
-      ]);
-    }, [personality.slug, isXiuxian]);
-
-    useEffect(() => {
-      void prepareAssets();
-    }, [prepareAssets]);
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;

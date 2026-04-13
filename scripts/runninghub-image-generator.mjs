@@ -63,7 +63,7 @@ function validateModuleConfig(moduleKey, config) {
       throw new Error(`Module "${moduleKey}" has a type with missing slug.`);
     }
 
-    if (typeof type.ref !== 'string' || !type.ref.trim()) {
+    if (!config.text2imgMode && (typeof type.ref !== 'string' || !type.ref.trim())) {
       throw new Error(`Module "${moduleKey}" type "${type.slug}" is missing ref.`);
     }
 
@@ -223,13 +223,13 @@ async function generateOne(config, runtimeConfig, type, options) {
   }
 
   const prompt = buildTypePrompt(config, type);
-  const useText2Img = config.cardMode && type.card;
+  const useText2Img = config.text2imgMode || (config.cardMode && type.card);
 
   let submit;
 
   if (useText2Img) {
     // Card mode: 文生图，不需要参考图
-    console.log(`\n🎨 [${type.slug}] Submitting text2img (card mode)...`);
+    console.log(`\n🎨 [${type.slug}] Submitting text2img...`);
     submit = await submitTextToImageTask(runtimeConfig, prompt, runtimeConfig.aspectRatio);
   } else {
     // Normal mode: 图生图，需要参考图
@@ -273,13 +273,13 @@ function printModuleHeader(config, runtimeConfig, selectedCount, options) {
   console.log('╔══════════════════════════════════════════════════╗');
   console.log(`║   ${config.displayName.padEnd(42, ' ')}║`);
   console.log('╚══════════════════════════════════════════════════╝');
-  if (config.cardMode) {
+  if (config.text2imgMode || config.cardMode) {
     console.log(`  Endpoint: text2img (${runtimeConfig.text2imgEndpoint || '/rhart-image-n-g31-flash-official/text-to-image'})`);
   } else {
     console.log(`  Endpoint: img2img (${runtimeConfig.editEndpoint})`);
   }
   console.log(`  Series: ${config.seriesLabel}`);
-  console.log(`  Types: ${selectedCount} | Aspect Ratio: ${runtimeConfig.aspectRatio}${config.cardMode ? ' | 📇 Card Mode' : ''}`);
+  console.log(`  Types: ${selectedCount} | Aspect Ratio: ${runtimeConfig.aspectRatio}${config.cardMode ? ' | 📇 Card Mode' : ''}${config.text2imgMode ? ' | 🖼️ Text2Img' : ''}`);
   console.log(`  Output: public/images/types/${config.outputSubdir ? config.outputSubdir + '/' : config.outputPrefix + (config.cardMode ? '-card' : '') + '-'}{slug}.png`);
   if (options.force) {
     console.log('  Mode: force overwrite existing files');

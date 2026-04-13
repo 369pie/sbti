@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
-import QRCode from 'qrcode';
+import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
+import { toQrDataUrl } from '@/lib/qr-code';
 import { getTypeImage } from '@/lib/personalities';
 import { MODEL_COLORS } from '@/lib/dimensions';
 import { SHARE_SITE_URL } from '@/lib/site';
@@ -116,7 +116,7 @@ function getCachedImage(src: string) {
 }
 
 async function createQrImage() {
-  const qrDataUrl = await QRCode.toDataURL(SHARE_SITE_URL, {
+  const qrDataUrl = await toQrDataUrl(SHARE_SITE_URL, {
     width: 200, margin: 1,
     color: { dark: '#2d2236', light: '#FFF9F2' },
     errorCorrectionLevel: 'M',
@@ -422,16 +422,6 @@ export const CPShareImageGenerator = forwardRef<CPShareImageGeneratorHandle, Pro
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
-
-    const prepareAssets = useCallback(async () => {
-      await Promise.all([
-        getCachedImage(getTypeImage(cpResult.typeA.slug)).catch(() => null),
-        getCachedImage(getTypeImage(cpResult.typeB.slug)).catch(() => null),
-        createQrImage().catch(() => null),
-      ]);
-    }, [cpResult.typeA.slug, cpResult.typeB.slug]);
-
-    useEffect(() => { void prepareAssets(); }, [prepareAssets]);
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;

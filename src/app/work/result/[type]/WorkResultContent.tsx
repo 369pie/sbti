@@ -3,15 +3,16 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { WorkPersonalityAvatar } from '@/components/WorkPersonalityAvatar';
-import { WorkShareImageGenerator } from '@/components/WorkShareImageGenerator';
 import type { WorkShareImageGeneratorHandle } from '@/components/WorkShareImageGenerator';
 import { WORK_DIMENSIONS, WORK_MODEL_NAMES, WORK_MODEL_COLORS } from '@/lib/work/dimensions';
 import { WORK_PERSONALITY_TYPES, getWorkRarity } from '@/lib/work/personalities';
 import type { WorkPersonalityType } from '@/lib/work/personalities';
 import type { WorkDimensionScore } from '@/lib/work/scoring';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+
+type WorkShareImageGeneratorComponentType = typeof import('@/components/WorkShareImageGenerator')['WorkShareImageGenerator'];
 
 interface Props {
   personality: WorkPersonalityType;
@@ -21,9 +22,32 @@ interface Props {
 export function WorkResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
+  const [WorkShareImageGeneratorComponent, setWorkShareImageGeneratorComponent] = useState<WorkShareImageGeneratorComponentType | null>(null);
+  const [pendingShareGeneration, setPendingShareGeneration] = useState(false);
   const shareRef = useRef<WorkShareImageGeneratorHandle>(null);
+  const shareSectionRef = useRef<HTMLElement | null>(null);
+  const shareLoadRef = useRef<Promise<void> | null>(null);
 
   const shareUrl = getSiteUrl(`/work/result/${personality.slug}/`);
+
+  const loadShareGenerator = useCallback(() => {
+    if (WorkShareImageGeneratorComponent) {
+      return Promise.resolve();
+    }
+
+    if (!shareLoadRef.current) {
+      shareLoadRef.current = import('@/components/WorkShareImageGenerator')
+        .then((mod) => {
+          setWorkShareImageGeneratorComponent(() => mod.WorkShareImageGenerator);
+        })
+        .catch((error) => {
+          shareLoadRef.current = null;
+          throw error;
+        });
+    }
+
+    return shareLoadRef.current;
+  }, [WorkShareImageGeneratorComponent]);
 
   const copyShareText = useCallback(() => {
     const text = `我的打工人设是 ${personality.code}（${personality.name}）\n${personality.tagline}\n来测测你的 → ${shareUrl}`;
@@ -52,6 +76,44 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
     copyLink();
   }, [copyLink, personality.code, personality.name, personality.tagline, shareUrl]);
 
+  const openShareGenerator = useCallback(() => {
+    setPendingShareGeneration(true);
+    void loadShareGenerator();
+  }, [loadShareGenerator]);
+
+  useEffect(() => {
+    if (WorkShareImageGeneratorComponent) {
+      return;
+    }
+
+    const section = shareSectionRef.current;
+    if (!section || typeof IntersectionObserver === 'undefined') {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          void loadShareGenerator();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '240px 0px' },
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [WorkShareImageGeneratorComponent, loadShareGenerator]);
+
+  useEffect(() => {
+    if (!pendingShareGeneration || !WorkShareImageGeneratorComponent || !shareRef.current) {
+      return;
+    }
+
+    shareRef.current.generate();
+    setPendingShareGeneration(false);
+  }, [WorkShareImageGeneratorComponent, pendingShareGeneration]);
+
   const others = WORK_PERSONALITY_TYPES.filter(p => p.slug !== personality.slug).slice(0, 3);
   const rarity = getWorkRarity(personality.slug);
 
@@ -69,7 +131,7 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
         <div className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center relative">
           {/* Top-right share button */}
           <button
-            onClick={() => shareRef.current?.generate()}
+            onClick={openShareGenerator}
             className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-indigo-400 transition-all cursor-pointer"
             title="生成分享图片"
           >
@@ -153,7 +215,7 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
       </section>
 
       {/* Dimension Bars */}
-      <section className="max-w-2xl mx-auto px-6 pb-16">
+      <section ref={shareSectionRef} className="max-w-2xl mx-auto px-6 pb-16">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -208,7 +270,14 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
           </h2>
 
           <div className="space-y-3">
-            <WorkShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
+            {WorkShareImageGeneratorComponent ? (
+              <WorkShareImageGeneratorComponent ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
+            ) : (
+              <div className="flex items-center justify-center gap-2 rounded-xl border border-border-subtle bg-bg-elevated px-4 py-3.5 text-sm text-text-muted">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-text-muted/30 border-t-text-muted" />
+                分享工具加载中…
+              </div>
+            )}
 
             <button
               onClick={copyShareText}
@@ -235,6 +304,7 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
               </button>
               <Link
                 href="/work/test"
+                prefetch={false}
                 className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all text-center"
               >
                 重新测试

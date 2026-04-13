@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
-import { getPersonalityBySlug, getTypeImage } from '@/lib/personalities';
+import { getPersonalityBySlug, getTypeThumbnailImage } from '@/lib/personalities';
 import { calculateCP, getTierColor, getTierEmoji } from '@/lib/cp-matching';
 
 const CP_EXAMPLES = [
@@ -119,7 +119,7 @@ export default function CPLandingContent() {
                           style={{ background: `${typeA.color}15` }}
                         >
                           <NextImage
-                            src={getTypeImage(typeA.slug)}
+                            src={getTypeThumbnailImage(typeA.slug)}
                             alt={typeA.name}
                             width={40}
                             height={40}
@@ -149,7 +149,7 @@ export default function CPLandingContent() {
                           style={{ background: `${typeB.color}15` }}
                         >
                           <NextImage
-                            src={getTypeImage(typeB.slug)}
+                            src={getTypeThumbnailImage(typeB.slug)}
                             alt={typeB.name}
                             width={40}
                             height={40}

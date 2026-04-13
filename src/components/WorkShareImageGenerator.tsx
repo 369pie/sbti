@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
-import QRCode from 'qrcode';
+import { toQrDataUrl } from '@/lib/qr-code';
 import { getWorkTypeImage, getWorkRarity } from '@/lib/work/personalities';
 import type { WorkPersonalityType } from '@/lib/work/personalities';
 import { WORK_DIMENSIONS, WORK_MODEL_COLORS } from '@/lib/work/dimensions';
@@ -131,7 +131,7 @@ function drawImageContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
 async function renderWorkShareImage(personality: WorkPersonalityType, dimensionScores: WorkDimensionScore[]) {
   const [personalityImage, qrImage] = await Promise.all([
     getCachedImage(getWorkTypeImage(personality.slug)).catch(() => null),
-    QRCode.toDataURL(WORK_SHARE_URL, {
+    toQrDataUrl(WORK_SHARE_URL, {
       width: 200, margin: 1, color: { dark: '#2d2236', light: '#FFF9F2' }, errorCorrectionLevel: 'M',
     }).then(url => getCachedImage(url)).catch(() => null),
   ]);

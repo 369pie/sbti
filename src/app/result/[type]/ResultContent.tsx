@@ -3,18 +3,20 @@
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
-import { DimensionRadar, DimensionBars } from '@/components/DimensionChart';
-import { ShareImageGenerator } from '@/components/ShareImageGenerator';
 import type { ShareImageGeneratorHandle } from '@/components/ShareImageGenerator';
-import { PERSONALITY_TYPES, getTypeImage, getXiuxianTypeImage, getRarity } from '@/lib/personalities';
+import { PERSONALITY_TYPES, getTypeImage, getTypeThumbnailImage, getXiuxianTypeImage, getXiuxianTypeThumbnailImage, getRarity } from '@/lib/personalities';
 import type { PersonalityType } from '@/lib/personalities';
 import type { DimensionScore } from '@/lib/scoring';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { getXiuxianSkin } from '@/lib/xiuxian';
 import { getXiuxianLaunchOnlyTypes } from '@/lib/xiuxian-v2';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
+
+type DimensionRadarComponentType = typeof import('@/components/DimensionChart')['DimensionRadar'];
+type DimensionBarsComponentType = typeof import('@/components/DimensionChart')['DimensionBars'];
+type ShareImageGeneratorComponentType = typeof import('@/components/ShareImageGenerator')['ShareImageGenerator'];
 
 interface Props {
   personality: PersonalityType;
@@ -26,6 +28,12 @@ export function ResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [cpCopied, setCpCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
+  const [heroImageFallback, setHeroImageFallback] = useState(false);
+  const [otherImageFallbacks, setOtherImageFallbacks] = useState<Record<string, true>>({});
+  const [DimensionRadarComponent, setDimensionRadarComponent] = useState<DimensionRadarComponentType | null>(null);
+  const [DimensionBarsComponent, setDimensionBarsComponent] = useState<DimensionBarsComponentType | null>(null);
+  const [ShareImageGeneratorComponent, setShareImageGeneratorComponent] = useState<ShareImageGeneratorComponentType | null>(null);
+  const [pendingShareGeneration, setPendingShareGeneration] = useState(false);
   const [isXiuxian, setIsXiuxian] = useState(() => {
     if (typeof window === 'undefined') {
       return isLaunchOnly;
@@ -34,6 +42,10 @@ export function ResultContent({ personality, dimensionScores }: Props) {
     return querySkin || isLaunchOnly;
   });
   const shareRef = useRef<ShareImageGeneratorHandle>(null);
+  const chartSectionRef = useRef<HTMLElement | null>(null);
+  const shareSectionRef = useRef<HTMLElement | null>(null);
+  const chartLoadRef = useRef<Promise<void> | null>(null);
+  const shareLoadRef = useRef<Promise<void> | null>(null);
 
   const toggleSkin = useCallback(() => {
     if (isLaunchOnly) {
@@ -60,6 +72,135 @@ export function ResultContent({ personality, dimensionScores }: Props) {
   const skinQuery = showXiuxian ? '?skin=xiuxian' : '';
   const shareUrl = getSiteUrl(`/result/${personality.slug}${skinQuery}`);
   const xiuxianGalleryCount = PERSONALITY_TYPES.length + getXiuxianLaunchOnlyTypes().length;
+
+  const loadCharts = useCallback(() => {
+    if (DimensionRadarComponent && DimensionBarsComponent) {
+      return Promise.resolve();
+    }
+
+    if (!chartLoadRef.current) {
+      chartLoadRef.current = import('@/components/DimensionChart')
+        .then((mod) => {
+          setDimensionRadarComponent(() => mod.DimensionRadar);
+          setDimensionBarsComponent(() => mod.DimensionBars);
+        })
+        .catch((error) => {
+          chartLoadRef.current = null;
+          throw error;
+        });
+    }
+
+    return chartLoadRef.current;
+  }, [DimensionBarsComponent, DimensionRadarComponent]);
+
+  const loadShareGenerator = useCallback(() => {
+    if (ShareImageGeneratorComponent) {
+      return Promise.resolve();
+    }
+
+    if (!shareLoadRef.current) {
+      shareLoadRef.current = import('@/components/ShareImageGenerator')
+        .then((mod) => {
+          setShareImageGeneratorComponent(() => mod.ShareImageGenerator);
+        })
+        .catch((error) => {
+          shareLoadRef.current = null;
+          throw error;
+        });
+    }
+
+    return shareLoadRef.current;
+  }, [ShareImageGeneratorComponent]);
+
+  const heroImageSrc = showXiuxian
+    ? (heroImageFallback ? getXiuxianTypeImage(personality.slug) : getXiuxianTypeThumbnailImage(personality.slug))
+    : (heroImageFallback ? getTypeImage(personality.slug) : getTypeThumbnailImage(personality.slug));
+
+  const getOtherTypeImageSrc = (slug: string) => {
+    const shouldUseOriginal = Boolean(otherImageFallbacks[slug]);
+
+    if (showXiuxian) {
+      return shouldUseOriginal ? getXiuxianTypeImage(slug) : getXiuxianTypeThumbnailImage(slug);
+    }
+
+    return shouldUseOriginal ? getTypeImage(slug) : getTypeThumbnailImage(slug);
+  };
+
+  const handleOtherTypeImageError = (slug: string) => {
+    setOtherImageFallbacks((current) => {
+      if (current[slug]) {
+        return current;
+      }
+
+      return {
+        ...current,
+        [slug]: true,
+      };
+    });
+  };
+
+  const openShareGenerator = useCallback(() => {
+    setPendingShareGeneration(true);
+    void loadShareGenerator();
+  }, [loadShareGenerator]);
+
+  useEffect(() => {
+    if (DimensionRadarComponent && DimensionBarsComponent) {
+      return;
+    }
+
+    const section = chartSectionRef.current;
+    if (!section || typeof IntersectionObserver === 'undefined') {
+      void loadCharts();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          void loadCharts();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '240px 0px' },
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [DimensionBarsComponent, DimensionRadarComponent, loadCharts]);
+
+  useEffect(() => {
+    if (ShareImageGeneratorComponent) {
+      return;
+    }
+
+    const section = shareSectionRef.current;
+    if (!section || typeof IntersectionObserver === 'undefined') {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          void loadShareGenerator();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '240px 0px' },
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [ShareImageGeneratorComponent, loadShareGenerator]);
+
+  useEffect(() => {
+    if (!pendingShareGeneration || !ShareImageGeneratorComponent || !shareRef.current) {
+      return;
+    }
+
+    shareRef.current.generate();
+    setPendingShareGeneration(false);
+  }, [ShareImageGeneratorComponent, pendingShareGeneration]);
 
   const copyShareText = useCallback(() => {
     const text = showXiuxian
@@ -129,7 +270,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
               {showXiuxian ? '📋 标准版' : '🔮 修仙版'}
             </button>
             <button
-              onClick={() => shareRef.current?.generate()}
+              onClick={openShareGenerator}
               className="p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-accent transition-all cursor-pointer"
               title="生成分享图片"
             >
@@ -154,12 +295,17 @@ export function ResultContent({ personality, dimensionScores }: Props) {
             {/* Type image */}
             <div className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-6 rounded-2xl overflow-hidden" style={{ background: `${displayColor}15` }}>
               <NextImage
-                src={showXiuxian ? getXiuxianTypeImage(personality.slug) : getTypeImage(personality.slug)}
+                src={heroImageSrc}
                 alt={displayName}
                 width={192}
                 height={192}
                 className="w-full h-full object-contain p-2"
                 priority
+                onError={() => {
+                  if (!heroImageFallback) {
+                    setHeroImageFallback(true);
+                  }
+                }}
               />
             </div>
 
@@ -239,7 +385,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
       </section>
 
       {/* Radar Chart */}
-      <section className="max-w-3xl mx-auto px-6 pb-16">
+      <section ref={chartSectionRef} className="max-w-3xl mx-auto px-6 pb-16">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -249,7 +395,11 @@ export function ResultContent({ personality, dimensionScores }: Props) {
             十五维指纹
           </h2>
           <div className="rounded-2xl border border-border-subtle bg-bg-elevated p-6 sm:p-8 shadow-sm">
-            <DimensionRadar dimensions={dimensionScores} size={340} />
+            {DimensionRadarComponent ? (
+              <DimensionRadarComponent dimensions={dimensionScores} size={340} />
+            ) : (
+              <div className="mx-auto h-[340px] w-full max-w-[340px] animate-pulse rounded-full bg-bg-secondary/60" />
+            )}
           </div>
         </motion.div>
       </section>
@@ -265,7 +415,18 @@ export function ResultContent({ personality, dimensionScores }: Props) {
             {personality.code} 的典型维度落点
           </h2>
           <div className="rounded-2xl border border-border-subtle bg-bg-elevated p-6 sm:p-8 shadow-sm">
-            <DimensionBars dimensionScores={dimensionScores} />
+            {DimensionBarsComponent ? (
+              <DimensionBarsComponent dimensionScores={dimensionScores} />
+            ) : (
+              <div className="space-y-4">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <div key={index}>
+                    <div className="mb-2 h-4 w-32 animate-pulse rounded bg-bg-secondary/60" />
+                    <div className="h-2 animate-pulse rounded-full bg-bg-secondary/60" />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </motion.div>
       </section>
@@ -336,7 +497,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
       <CrossTestRecommendations currentTest="sbti" personalityName={personality.name} />
 
       {/* Share section */}
-      <section className="max-w-2xl mx-auto px-6 pb-16">
+      <section ref={shareSectionRef} className="max-w-2xl mx-auto px-6 pb-16">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -347,12 +508,19 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           </h2>
 
           <div className="space-y-3">
-            <ShareImageGenerator 
-              ref={shareRef} 
-              personality={personality} 
-              dimensionScores={dimensionScores} 
-              isXiuxian={isXiuxian} 
-            />
+            {ShareImageGeneratorComponent ? (
+              <ShareImageGeneratorComponent
+                ref={shareRef}
+                personality={personality}
+                dimensionScores={dimensionScores}
+                isXiuxian={isXiuxian}
+              />
+            ) : (
+              <div className="flex items-center justify-center gap-2 rounded-xl border border-border-subtle bg-bg-elevated px-4 py-3.5 text-sm text-text-muted">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-text-muted/30 border-t-text-muted" />
+                分享工具加载中…
+              </div>
+            )}
 
             <button
               onClick={copyShareText}
@@ -409,11 +577,12 @@ export function ResultContent({ personality, dimensionScores }: Props) {
             >
               <div className="w-16 h-16 rounded-lg overflow-hidden mb-2" style={{ background: `${p.color}15` }}>
                 <NextImage
-                  src={getTypeImage(p.slug)}
+                  src={getOtherTypeImageSrc(p.slug)}
                   alt={p.name}
                   width={64}
                   height={64}
                   className="w-full h-full object-contain p-1"
+                  onError={() => handleOtherTypeImageError(p.slug)}
                 />
               </div>
               <span className="text-xs font-mono tracking-wider block mb-1" style={{ color: p.color }}>

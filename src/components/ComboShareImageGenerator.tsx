@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
-import QRCode from 'qrcode';
+import { toQrDataUrl } from '@/lib/qr-code';
 import { getTypeImage } from '@/lib/personalities';
 import type { ComboResult } from '@/lib/combo';
 import { getComboPersonalityImage } from '@/lib/combo';
@@ -124,7 +124,7 @@ function getCachedImage(src: string) {
 }
 
 async function createQrImage() {
-  const qrDataUrl = await QRCode.toDataURL(`${SHARE_SITE_URL}/combo/`, {
+  const qrDataUrl = await toQrDataUrl(`${SHARE_SITE_URL}/combo/`, {
     width: 200, margin: 1,
     color: { dark: '#2d2236', light: '#FFF9F2' },
     errorCorrectionLevel: 'M',

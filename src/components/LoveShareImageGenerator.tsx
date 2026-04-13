@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
-import QRCode from 'qrcode';
+import { toQrDataUrl } from '@/lib/qr-code';
 import { getLoveTypeImage, getLoveRarity } from '@/lib/love/personalities';
 import type { LovePersonalityType } from '@/lib/love/personalities';
 import { LOVE_DIMENSIONS, LOVE_MODEL_COLORS } from '@/lib/love/dimensions';
@@ -131,7 +131,7 @@ function drawImageContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
 async function renderLoveShareImage(personality: LovePersonalityType, dimensionScores: LoveDimensionScore[]) {
   const [personalityImage, qrImage] = await Promise.all([
     getCachedImage(getLoveTypeImage(personality.slug)).catch(() => null),
-    QRCode.toDataURL(LOVE_SHARE_URL, {
+    toQrDataUrl(LOVE_SHARE_URL, {
       width: 200, margin: 1, color: { dark: '#000000', light: '#ffffffff' }, errorCorrectionLevel: 'M',
     }).then(url => getCachedImage(url)).catch(() => null),
   ]);
@@ -286,7 +286,7 @@ async function renderLoveShareImage(personality: LovePersonalityType, dimensionS
   // CTA
   ctx.fillStyle = DARK;
   ctx.font = `600 14px ${FONT_SANS}`;
-  ctx.fillText('测测你是哪张恋爱人设？', 36, footerY + 14);
+  ctx.fillText('测测你是哪种恋爱人设？', 36, footerY + 14);
 
   ctx.fillStyle = personality.color;
   ctx.font = `11px ${FONT_MONO}`;

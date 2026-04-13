@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import NextImage from 'next/image';
 import type { GalleryItem, GalleryTab } from './gallery-data';
@@ -76,101 +76,92 @@ function GalleryCard({ item, index }: { item: GalleryItem; index: number }) {
 }
 
 /* ── Main component ─────────────────────────────────────── */
+
+interface TabGroup {
+  label: string;
+  tabs: GalleryTab[];
+}
+
 interface TypesContentProps {
-  standardSbtiTab: GalleryTab;
-  xiuxianSbtiTab: GalleryTab;
-  otherTabs: GalleryTab[];
+  coreGroup: GalleryTab[];
+  ipGroup: GalleryTab[];
+  themeGroup: GalleryTab[];
+}
+
+const GROUP_LABELS: [string, string, string] = ['核心人格', '15维度 IP 宇宙', '独立主题测试'];
+
+function TabButton({ tab, isActive, onClick }: { tab: GalleryTab; isActive: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        relative flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium
+        transition-all duration-200 whitespace-nowrap cursor-pointer
+        ${isActive
+          ? 'text-text-primary shadow-sm'
+          : 'text-text-muted hover:text-text-secondary hover:bg-bg-elevated'
+        }
+      `}
+      style={isActive ? {
+        background: `linear-gradient(135deg, ${tab.accent}12, ${tab.accent}06)`,
+        border: `1px solid ${tab.accent}30`,
+      } : { border: '1px solid transparent' }}
+    >
+      <span className="text-base">{tab.emoji}</span>
+      <span>{tab.label}</span>
+      <span
+        className="text-[11px] font-mono ml-0.5 tabular-nums"
+        style={{ color: isActive ? tab.accent : undefined }}
+      >
+        {tab.items.length}
+      </span>
+    </button>
+  );
 }
 
 export default function TypesContent({
-  standardSbtiTab,
-  xiuxianSbtiTab,
-  otherTabs,
+  coreGroup,
+  ipGroup,
+  themeGroup,
 }: TypesContentProps) {
-  const [isXiuxian, setIsXiuxian] = useState(() =>
-    (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('skin') : null) === 'xiuxian'
-  );
-  const tabs = useMemo(
-    () => (isXiuxian ? [xiuxianSbtiTab, ...otherTabs] : [standardSbtiTab, ...otherTabs]),
-    [isXiuxian, otherTabs, standardSbtiTab, xiuxianSbtiTab]
-  );
-  const [activeId, setActiveId] = useState('sbti');
-  const activeTab = tabs.find((tab) => tab.id === activeId) ?? tabs[0];
-  const totalCount = tabs.reduce((sum, tab) => sum + tab.items.length, 0);
+  const groups: TabGroup[] = useMemo(() => [
+    { label: GROUP_LABELS[0], tabs: coreGroup },
+    { label: GROUP_LABELS[1], tabs: ipGroup },
+    { label: GROUP_LABELS[2], tabs: themeGroup },
+  ], [coreGroup, ipGroup, themeGroup]);
 
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    if (isXiuxian) {
-      url.searchParams.set('skin', 'xiuxian');
-    } else {
-      url.searchParams.delete('skin');
-    }
-    window.history.replaceState({}, '', url.toString());
-  }, [isXiuxian]);
+  const allTabs = useMemo(() => groups.flatMap(g => g.tabs), [groups]);
+  const [activeId, setActiveId] = useState(allTabs[0]?.id ?? 'sbti');
+  const activeTab = allTabs.find((tab) => tab.id === activeId) ?? allTabs[0];
+  const totalCount = allTabs.reduce((sum, tab) => sum + tab.items.length, 0);
 
   return (
     <>
       <div className="mb-6 animate-fade-up">
         <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-2">
-          Current View · {totalCount} Types · {tabs.length} Series
+          {totalCount} Types · {allTabs.length} Series
         </span>
-        <div className="inline-flex items-center rounded-full bg-bg-secondary/80 border border-border-subtle p-0.5 text-xs">
-          <button
-            onClick={() => setIsXiuxian(false)}
-            className={`px-4 py-1.5 rounded-full transition-all duration-200 cursor-pointer ${
-              !isXiuxian
-                ? 'bg-bg-elevated text-text-primary shadow-sm font-medium'
-                : 'text-text-muted hover:text-text-secondary'
-            }`}
-          >
-            标准版
-          </button>
-          <button
-            onClick={() => setIsXiuxian(true)}
-            className={`px-4 py-1.5 rounded-full transition-all duration-200 cursor-pointer ${
-              isXiuxian
-                ? 'bg-bg-elevated text-text-primary shadow-sm font-medium'
-                : 'text-text-muted hover:text-text-secondary'
-            }`}
-          >
-            修仙版
-          </button>
-        </div>
       </div>
 
-      <div className="mb-8 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto scrollbar-hide">
-        <div className="flex gap-2 min-w-max pb-1">
-          {tabs.map(tab => {
-            const isActive = tab.id === activeId;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveId(tab.id)}
-                className={`
-                  relative flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium
-                  transition-all duration-200 whitespace-nowrap
-                  ${isActive
-                    ? 'text-text-primary shadow-sm'
-                    : 'text-text-muted hover:text-text-secondary hover:bg-bg-elevated'
-                  }
-                `}
-                style={isActive ? {
-                  background: `linear-gradient(135deg, ${tab.accent}12, ${tab.accent}06)`,
-                  border: `1px solid ${tab.accent}30`,
-                } : { border: '1px solid transparent' }}
-              >
-                <span className="text-base">{tab.emoji}</span>
-                <span>{tab.label}</span>
-                <span
-                  className="text-[11px] font-mono ml-0.5 tabular-nums"
-                  style={{ color: isActive ? tab.accent : undefined }}
-                >
-                  {tab.items.length}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+      {/* ── Grouped tabs ── */}
+      <div className="mb-8 space-y-4">
+        {groups.map((group) => (
+          <div key={group.label}>
+            <span className="text-[11px] font-mono tracking-[0.15em] text-text-muted uppercase block mb-2">
+              {group.label}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {group.tabs.map(tab => (
+                <TabButton
+                  key={tab.id}
+                  tab={tab}
+                  isActive={tab.id === activeId}
+                  onClick={() => setActiveId(tab.id)}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
 
       <div

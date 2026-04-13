@@ -97,12 +97,16 @@ export function getXiuxianTypeImage(slug: string): string {
   return withBasePath(imagePath);
 }
 
+export function getXiuxianTypeThumbnailImage(slug: string): string {
+  return withBasePath(`/images/types/thumbs/xiuxian-${slug}.webp`);
+}
+
 export const PERSONALITY_TYPES: PersonalityType[] = [
   {
     slug: 'ctrl', code: 'CTRL', name: '拿捏者', tagline: '怎么样，被我拿捏了吧？',
     color: '#f59e0b', emoji: '🎯',
     description: '恭喜您，您测出了极其罕见的人格。CTRL是行走的人形自走任务管理器，普通人眼中的"规则"，在您这里只是出厂的基础参数设置；凡人所谓的"计划"，对您而言不过是心血来潮的随手涂鸦。拥有一个CTRL朋友意味着什么？意味着你的人生导航系统精准度直接拉满。CTRL会在你人生列车即将脱轨的时候轻轻一拽——车回来了，你的尊严还在。别人还在纠结要不要开始的时候，您已经做完在写复盘了。拿捏分寸、拿捏人心、拿捏一切可以拿捏的东西——这就是您。',
-    profile: { S1: 'H', S2: 'H', S3: 'H', E1: 'H', E2: 'M', E3: 'H', A1: 'M', A2: 'H', A3: 'H', Ac1: 'H', Ac2: 'H', Ac3: 'H', So1: 'M', So2: 'H', So3: 'M' },
+    profile: { S1: 'H', S2: 'H', S3: 'H', E1: 'H', E2: 'M', E3: 'H', A1: 'M', A2: 'H', A3: 'H', Ac1: 'H', Ac2: 'H', Ac3: 'H', So1: 'M', So2: 'H', So3: 'L' },
   },
   {
     slug: 'atm-er', code: 'ATM-er', name: '送钱者', tagline: '你以为我很有钱吗？',
@@ -120,7 +124,7 @@ export const PERSONALITY_TYPES: PersonalityType[] = [
     slug: 'boss', code: 'BOSS', name: '控场王', tagline: '散了吧，我接手了。',
     color: '#dc2626', emoji: '👔',
     description: '恭喜您，系统检测到您体内自带"人形指挥部"芯片。BOSS人格走进任何房间，不需要开口，空气就会自动变得严肃而高效。方圆五米内的混乱会自行整理归位，像铁屑遇到了磁铁。在您的字典里没有"等等看"三个字，只有"散了吧，我来"。别人还在讨论方案A和方案B的优劣，您已经把方案C执行完还写好了复盘报告。您不是控制欲强——您只是实在看不下去一群人像无头苍蝇一样转圈。唯一的bug是：您偶尔得学会方向盘也可以松手五秒。放心，车不一定翻。',
-    profile: { S1: 'H', S2: 'H', S3: 'H', E1: 'M', E2: 'M', E3: 'H', A1: 'H', A2: 'H', A3: 'H', Ac1: 'H', Ac2: 'H', Ac3: 'H', So1: 'H', So2: 'H', So3: 'M' },
+    profile: { S1: 'H', S2: 'H', S3: 'H', E1: 'M', E2: 'H', E3: 'H', A1: 'H', A2: 'H', A3: 'H', Ac1: 'H', Ac2: 'H', Ac3: 'H', So1: 'H', So2: 'H', So3: 'M' },
   },
   {
     slug: 'than-k', code: 'THAN-K', name: '谢天侠', tagline: '感谢苍天！感谢大地！感谢你点了进来！',
@@ -156,7 +160,7 @@ export const PERSONALITY_TYPES: PersonalityType[] = [
     slug: 'thin-k', code: 'THIN-K', name: '想太多', tagline: '先别催，我脑内还在开第三轮会。',
     color: '#6366f1', emoji: '🧠',
     description: '恭喜您，系统检测到您的大脑CPU占用率已长期保持在98%以上。在别人已经动手的时候，您还在思考——不是因为犹豫，是因为您的大脑拒绝在没有把所有可能性都推演一遍之前批准任何行动。THIN-K人格是天生的分析机器、行走的复盘系统。您擅长拆解复杂问题、发现隐藏逻辑、预判三步之外的坑。别人觉得您"想太多"，但您知道正是这些思考帮您避开了多少雷。唯一的副作用是失眠——毕竟您的大脑不太会主动关机，它觉得睡觉是在浪费算力。',
-    profile: { S1: 'M', S2: 'H', S3: 'M', E1: 'H', E2: 'L', E3: 'H', A1: 'H', A2: 'H', A3: 'M', Ac1: 'M', Ac2: 'H', Ac3: 'M', So1: 'L', So2: 'H', So3: 'L' },
+    profile: { S1: 'M', S2: 'H', S3: 'M', E1: 'H', E2: 'L', E3: 'H', A1: 'H', A2: 'H', A3: 'M', Ac1: 'M', Ac2: 'H', Ac3: 'L', So1: 'L', So2: 'H', So3: 'L' },
   },
   {
     slug: 'malo', code: 'MALO', name: '吗喽', tagline: '人生是个副本，我只是一只吗喽。',
@@ -210,7 +214,7 @@ export const PERSONALITY_TYPES: PersonalityType[] = [
     slug: 'solo', code: 'SOLO', name: '自带结界', tagline: '别邀了，你们玩吧。',
     color: '#475569', emoji: '🐺',
     description: '恭喜您，系统检测到您已成功为自己部署了"人形结界"。一个人吃火锅——那叫VIP包间；一个人看电影——那叫私人影院；一个人旅行——那叫灵魂出差。您不是不能社交，您的社交能力甚至偶尔惊人地强。但您把社交当成"可选DLC"而不是"主线任务"。在这个人人都在拉群、组局、搞人脉的时代，您就是那个在群聊中只发"收到"然后静默三天的传说。您的独处不是孤独，是一种已经修炼到满级的自给自足。朋友不在多，够用就行——况且您觉得大部分时候自己就够用了。',
-    profile: { S1: 'H', S2: 'H', S3: 'M', E1: 'H', E2: 'L', E3: 'H', A1: 'M', A2: 'H', A3: 'M', Ac1: 'H', Ac2: 'H', Ac3: 'M', So1: 'L', So2: 'H', So3: 'L' },
+    profile: { S1: 'H', S2: 'H', S3: 'H', E1: 'H', E2: 'L', E3: 'H', A1: 'M', A2: 'H', A3: 'M', Ac1: 'H', Ac2: 'H', Ac3: 'M', So1: 'L', So2: 'H', So3: 'L' },
   },
   {
     slug: 'party', code: 'PARTY', name: '气氛组组长', tagline: '有我在的地方就是主场。',
@@ -240,7 +244,7 @@ export const PERSONALITY_TYPES: PersonalityType[] = [
     slug: 'talk-er', code: 'TALK-er', name: '话痨', tagline: '等一下，我还没说完。',
     color: '#14b8a6', emoji: '🗣️',
     description: '恭喜您，您的嘴比您的脑子快零点五秒。TALK-er人格的表达欲是控制不住的——有什么想法必须说出来，看到什么有趣的事必须分享，遇到什么不公必须评论。您是朋友群里消息最多的那个人、饭局上话题永远不断的那个人、深夜两点还在和谁语音的那个人。您的社交能力不靠深度，靠覆盖面和密度。和您相处永远不会冷场——只是偶尔需要一个暂停键。可惜厂家出厂时忘装了。',
-    profile: { S1: 'M', S2: 'L', S3: 'M', E1: 'M', E2: 'M', E3: 'L', A1: 'M', A2: 'L', A3: 'M', Ac1: 'M', Ac2: 'L', Ac3: 'M', So1: 'H', So2: 'L', So3: 'H' },
+    profile: { S1: 'M', S2: 'M', S3: 'M', E1: 'M', E2: 'M', E3: 'L', A1: 'M', A2: 'L', A3: 'M', Ac1: 'M', Ac2: 'L', Ac3: 'H', So1: 'H', So2: 'L', So3: 'H' },
   },
   {
     slug: 'shy', code: 'SHY', name: '人群过敏', tagline: '能发消息就别打电话。',

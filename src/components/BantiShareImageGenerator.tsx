@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
-import QRCode from 'qrcode';
+import { toQrDataUrl } from '@/lib/qr-code';
 import type { BantiPersonality } from '@/lib/banti/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { SHARE_SITE_URL } from '@/lib/site';
@@ -131,7 +131,7 @@ function getCachedImage(src: string) {
 }
 
 async function createQrImage() {
-  const qrDataUrl = await QRCode.toDataURL(SHARE_SITE_URL, {
+  const qrDataUrl = await toQrDataUrl(SHARE_SITE_URL, {
     width: 200,
     margin: 1,
     color: { dark: '#2d2236', light: '#fcfaf6' },

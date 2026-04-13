@@ -3,7 +3,7 @@
 import NextImage from 'next/image';
 import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
-import { getDailyTypeImage } from '@/lib/daily/statuses';
+import { getDailyTypeImage, getDailyTypeThumbnailImage } from '@/lib/daily/statuses';
 import type { DailyStatusType } from '@/lib/daily/statuses';
 
 interface Props {
@@ -28,10 +28,16 @@ export function DailyStatusAvatar({
   fallbackClassName = 'w-full h-full flex items-center justify-center text-4xl',
 }: Props) {
   const [imageFailed, setImageFailed] = useState(false);
+  const [useOriginalImage, setUseOriginalImage] = useState(false);
 
   useEffect(() => {
     setImageFailed(false);
+    setUseOriginalImage(false);
   }, [status.slug]);
+
+  const imageSrc = useOriginalImage
+    ? getDailyTypeImage(status.slug)
+    : getDailyTypeThumbnailImage(status.slug);
 
   return (
     <div className={className} style={style}>
@@ -39,14 +45,20 @@ export function DailyStatusAvatar({
         <div className={fallbackClassName}>{status.emoji}</div>
       ) : (
         <NextImage
-          src={getDailyTypeImage(status.slug)}
+          src={imageSrc}
           alt={alt ?? `${status.name}形象`}
           fill
           unoptimized
           priority={priority}
           sizes={sizes}
           className={imageClassName}
-          onError={() => setImageFailed(true)}
+          onError={() => {
+            if (!useOriginalImage) {
+              setUseOriginalImage(true);
+              return;
+            }
+            setImageFailed(true);
+          }}
         />
       )}
     </div>

@@ -3,7 +3,7 @@
 import NextImage from 'next/image';
 import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
-import { getLoveTypeImage } from '@/lib/love/personalities';
+import { getLoveTypeImage, getLoveTypeThumbnailImage } from '@/lib/love/personalities';
 import type { LovePersonalityType } from '@/lib/love/personalities';
 
 interface Props {
@@ -28,10 +28,16 @@ export function LovePersonalityAvatar({
   fallbackClassName = 'w-full h-full flex items-center justify-center text-4xl',
 }: Props) {
   const [imageFailed, setImageFailed] = useState(false);
+  const [useOriginalImage, setUseOriginalImage] = useState(false);
 
   useEffect(() => {
     setImageFailed(false);
+    setUseOriginalImage(false);
   }, [personality.slug]);
+
+  const imageSrc = useOriginalImage
+    ? getLoveTypeImage(personality.slug)
+    : getLoveTypeThumbnailImage(personality.slug);
 
   return (
     <div className={className} style={style}>
@@ -39,14 +45,20 @@ export function LovePersonalityAvatar({
         <div className={fallbackClassName}>{personality.emoji}</div>
       ) : (
         <NextImage
-          src={getLoveTypeImage(personality.slug)}
+          src={imageSrc}
           alt={alt ?? `${personality.name}形象`}
           fill
           unoptimized
           priority={priority}
           sizes={sizes}
           className={imageClassName}
-          onError={() => setImageFailed(true)}
+          onError={() => {
+            if (!useOriginalImage) {
+              setUseOriginalImage(true);
+              return;
+            }
+            setImageFailed(true);
+          }}
         />
       )}
     </div>

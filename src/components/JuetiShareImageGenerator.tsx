@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
-import QRCode from 'qrcode';
+import { toQrDataUrl } from '@/lib/qr-code';
 import { getJuetiRarity, getJuetiResonance, getJuetiPersonalityBySlug } from '@/lib/jueti/personalities';
 import type { JuetiPersonalityType } from '@/lib/jueti/personalities';
 import { JUETI_DIMENSIONS, JUETI_MODEL_COLORS } from '@/lib/jueti/dimensions';
@@ -143,7 +143,7 @@ async function renderJuetiShareImage(personality: JuetiPersonalityType, dimensio
     }
   }
 
-  const qrImage = await QRCode.toDataURL(JUETI_SHARE_URL, {
+  const qrImage = await toQrDataUrl(JUETI_SHARE_URL, {
     width: 200, margin: 1, color: { dark: '#000000', light: '#ffffffff' }, errorCorrectionLevel: 'M',
   }).then(url => getCachedImage(url)).catch(() => null);
 

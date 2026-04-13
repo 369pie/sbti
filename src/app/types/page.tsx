@@ -7,9 +7,9 @@ import { getTypesGalleryData } from './gallery-data';
 const TYPES_GALLERY_DATA = getTypesGalleryData();
 
 export const metadata: Metadata = {
-  title: `SBTI 全人格图鉴馆 — ${TYPES_GALLERY_DATA.standardTotalCount} 张抽象人设卡`,
+  title: `SBTI 全人格图鉴馆 — ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡`,
   description:
-    `浏览 SBTI 全部 ${TYPES_GALLERY_DATA.standardTotalCount} 张抽象人设卡：人格图鉴、WTFTI、班TI、恋爱人格、职场人格、今日状态、酒后人设，${TYPES_GALLERY_DATA.seriesCount} 个系列一次刷完。`,
+    `浏览 SBTI 全部 ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡：核心人格、修仙版、WTFTI、班TI、王者TI、三角TI、恋爱、职场、XPTI、花TI、今日状态、酒后人设，${TYPES_GALLERY_DATA.seriesCount} 个系列一次刷完。`,
   alternates: { canonical: '/types/' },
 };
 
@@ -18,20 +18,20 @@ export default function Page() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
       <div className="mb-8 sm:mb-10 animate-fade-up">
         <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-2">
-          Gallery · {TYPES_GALLERY_DATA.standardTotalCount} Types
+          Gallery · {TYPES_GALLERY_DATA.totalCount} Types
         </span>
         <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight mb-2">
           全人格图鉴馆
         </h1>
         <p className="text-sm sm:text-base text-text-secondary leading-relaxed max-w-3xl">
-          从基础人格、WTFTI、班TI 到恋爱、职场、每日状态、酒后人设，先刷一遍图鉴，再去做对应测试，会比只记一个结果名更容易看懂这套宇宙。
+          从核心人格、IP 宇宙到独立主题测试，{TYPES_GALLERY_DATA.seriesCount} 个系列一次刷完。先刷图鉴，再去做对应测试，比只记一个结果名更容易看懂这套宇宙。
         </p>
       </div>
 
       <TypesContent
-        standardSbtiTab={TYPES_GALLERY_DATA.standardSbtiTab}
-        xiuxianSbtiTab={TYPES_GALLERY_DATA.xiuxianSbtiTab}
-        otherTabs={TYPES_GALLERY_DATA.otherTabs}
+        coreGroup={TYPES_GALLERY_DATA.coreGroup}
+        ipGroup={TYPES_GALLERY_DATA.ipGroup}
+        themeGroup={TYPES_GALLERY_DATA.themeGroup}
       />
 
       <section className="mt-12 sm:mt-16 pt-12 border-t border-border-subtle">
@@ -54,6 +54,7 @@ export default function Page() {
               <Link
                 key={article.slug}
                 href={`/guide/${article.slug}`}
+                prefetch={false}
                 className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-5 hover:shadow-md hover:border-border transition-all"
               >
                 <span className="text-xs font-mono tracking-wider text-text-muted uppercase block mb-2">

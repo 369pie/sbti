@@ -46,7 +46,7 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
   const modelNames = isXiuxian ? XIUXIAN_MODEL_NAMES : MODEL_NAMES;
   const modelColors = isXiuxian ? XIUXIAN_MODEL_COLORS : MODEL_COLORS;
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
-  const [questions] = useState(() => shuffleQuestions(QUESTIONS, 2));
+  const [questions] = useState(() => shuffleQuestions(QUESTIONS, 3));
   const drinkBranch = useMemo(() => QUESTIONS.filter(q => q.isDrinkBranch), []);
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -257,7 +257,7 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
             animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, x: direction * -60, filter: 'blur(4px)' }}
             transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-            className="w-full max-w-2xl"
+            className="w-full max-w-2xl min-h-[31rem] sm:min-h-[29rem]"
           >
             {/* Dimension badge */}
             <div className="flex justify-center mb-8">

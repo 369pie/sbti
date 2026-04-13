@@ -29,7 +29,7 @@ export default function LoveHomeContent() {
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
               你谈恋爱时
               <br />
-              <span className="bg-gradient-to-r from-pink-400 via-rose-400 to-red-400 bg-clip-text text-transparent">是哪张恋爱人设</span>
+              <span className="bg-gradient-to-r from-pink-400 via-rose-400 to-red-400 bg-clip-text text-transparent">是哪种恋爱人设</span>
             </h1>
 
             <p className="text-text-secondary text-lg sm:text-xl leading-relaxed max-w-xl mx-auto mb-10">

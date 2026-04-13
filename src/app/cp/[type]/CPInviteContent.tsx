@@ -4,7 +4,7 @@ import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import type { PersonalityType } from '@/lib/personalities';
-import { getTypeImage } from '@/lib/personalities';
+import { getTypeThumbnailImage } from '@/lib/personalities';
 
 interface Props {
   personality: PersonalityType;
@@ -40,7 +40,7 @@ export function CPInviteContent({ personality }: Props) {
               style={{ background: `${personality.color}15` }}
             >
               <NextImage
-                src={getTypeImage(personality.slug)}
+                src={getTypeThumbnailImage(personality.slug)}
                 alt={personality.name}
                 width={96}
                 height={96}
