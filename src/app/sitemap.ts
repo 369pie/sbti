@@ -12,6 +12,7 @@ import { getBantiSlugs } from '@/lib/banti/personalities';
 import { getKingsSlugs } from '@/lib/kings/personalities';
 import { getDeltaSlugs } from '@/lib/delta/personalities';
 import { getAllXptiSlugs } from '@/lib/xpti/personalities';
+import { getAllJuetiSlugs } from '@/lib/jueti/personalities';
 
 export const dynamic = 'force-static';
 
@@ -38,6 +39,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: getSiteUrl('/wtfti/kings/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/wtfti/delta/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/xpti/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: getSiteUrl('/jueti/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
   ];
 
   const guidePages: MetadataRoute.Sitemap = GUIDE_ARTICLES.map((article) => ({
@@ -117,5 +119,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages, ...kingsResultPages, ...deltaResultPages, ...xptiResultPages];
+  const juetiResultPages: MetadataRoute.Sitemap = getAllJuetiSlugs().map((slug) => ({
+    url: getSiteUrl(`/jueti/result/${slug}/`),
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages, ...kingsResultPages, ...deltaResultPages, ...xptiResultPages, ...juetiResultPages];
 }

@@ -151,17 +151,17 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
   ctx.fillText('MBTI测你是什么人，XPTI测你爱上什么人', CARD_WIDTH / 2, 68);
 
   // ============ HERO CHARACTER IMAGE ============
-  const avatarX = 100;
-  const avatarY = 96;
-  const avatarW = CARD_WIDTH - 200;
-  const avatarH = 280;
+  const avatarX = 60;
+  const avatarY = 88;
+  const avatarW = CARD_WIDTH - 120;
+  const avatarH = 400;
   fillRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 24, '#ffffff');
   strokeRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 24, hexToRgba(personality.color, 0.25));
   if (personalityImage) {
     ctx.save();
     roundRectPath(ctx, avatarX + 4, avatarY + 4, avatarW - 8, avatarH - 8, 20);
     ctx.clip();
-    drawImageContain(ctx, personalityImage, avatarX + 16, avatarY + 12, avatarW - 32, avatarH - 24);
+    drawImageContain(ctx, personalityImage, avatarX + 12, avatarY + 8, avatarW - 24, avatarH - 16);
     ctx.restore();
   } else {
     ctx.fillStyle = DARK;
@@ -170,19 +170,19 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
   }
 
   // Number + Code
-  const codeY = avatarY + avatarH + 16;
+  const codeY = avatarY + avatarH + 12;
   ctx.fillStyle = MED;
   ctx.font = `13px ${FONT_MONO}`;
   ctx.fillText(personality.number, CARD_WIDTH / 2, codeY);
 
   ctx.fillStyle = personality.color;
   ctx.font = `700 28px ${FONT_MONO}`;
-  ctx.fillText(personality.code, CARD_WIDTH / 2, codeY + 22);
+  ctx.fillText(personality.code, CARD_WIDTH / 2, codeY + 16);
 
   // Name
   ctx.fillStyle = DARK;
   ctx.font = `700 42px ${FONT_SANS}`;
-  ctx.fillText(personality.name, CARD_WIDTH / 2, codeY + 62);
+  ctx.fillText(personality.name, CARD_WIDTH / 2, codeY + 48);
 
   // Rarity pill
   const rarity = getXptiRarity(personality.slug);
@@ -190,14 +190,14 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
   ctx.font = `600 13px ${FONT_SANS}`;
   const rarityW = ctx.measureText(rarityText).width + 28;
   const rarityX = (CARD_WIDTH - rarityW) / 2;
-  const rarityY = codeY + 116;
+  const rarityY = codeY + 96;
   fillRoundedRect(ctx, rarityX, rarityY, rarityW, 28, 14, hexToRgba(rarity.color, 0.12));
   strokeRoundedRect(ctx, rarityX, rarityY, rarityW, 28, 14, hexToRgba(rarity.color, 0.3));
   ctx.fillStyle = rarity.color;
   ctx.fillText(rarityText, CARD_WIDTH / 2, rarityY + 7);
 
   // Tagline card
-  const tagY = rarityY + 40;
+  const tagY = rarityY + 34;
   const tagW = CARD_WIDTH - 72;
   fillRoundedRect(ctx, 36, tagY, tagW, 52, 16, hexToRgba(personality.color, 0.05));
   strokeRoundedRect(ctx, 36, tagY, tagW, 52, 16, hexToRgba(personality.color, 0.12));
@@ -208,7 +208,7 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
   ctx.textAlign = 'left';
 
   // ============ 4-AXIS BARS ============
-  const barSectionY = tagY + 68;
+  const barSectionY = tagY + 58;
   ctx.fillStyle = MED;
   ctx.font = `12px ${FONT_SANS}`;
   ctx.fillText('四轴画像', 36, barSectionY);
@@ -217,7 +217,7 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
     const dim = XPTI_DIMENSIONS.find(d => d.id === score.id);
     if (!dim) return;
     const color = XPTI_MODEL_COLORS[dim.model].base;
-    const rowY = barSectionY + 28 + i * 52;
+    const rowY = barSectionY + 24 + i * 46;
 
     // Pole labels
     ctx.fillStyle = MED;
@@ -247,8 +247,8 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
     ctx.textAlign = 'left';
   });
 
-  // ============ FOOTER ============
-  const footerY = barSectionY + 28 + dimensionScores.length * 52 + 16;
+  // ============ FOOTER (compact, from bottom) ============
+  const footerY = CARD_HEIGHT - 98;
   ctx.strokeStyle = DIV;
   ctx.beginPath();
   ctx.moveTo(36, footerY);
@@ -256,19 +256,19 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
   ctx.stroke();
 
   ctx.fillStyle = DARK;
-  ctx.font = `600 15px ${FONT_SANS}`;
-  ctx.fillText('测测你的恋爱XP体质？', 36, footerY + 18);
+  ctx.font = `600 14px ${FONT_SANS}`;
+  ctx.fillText('测测你的恋爱XP体质？', 36, footerY + 14);
 
   ctx.fillStyle = personality.color;
-  ctx.font = `12px ${FONT_MONO}`;
-  ctx.fillText(XPTI_SHARE_URL, 36, footerY + 46);
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.fillText(XPTI_SHARE_URL, 36, footerY + 36);
 
   // QR
-  fillRoundedRect(ctx, 424, footerY + 8, 80, 80, 12, '#ffffff');
+  fillRoundedRect(ctx, CARD_WIDTH - 36 - 72, footerY + 4, 72, 72, 12, '#ffffff');
   if (qrImage) {
-    drawImageContain(ctx, qrImage, 428, footerY + 12, 72, 72);
+    drawImageContain(ctx, qrImage, CARD_WIDTH - 36 - 68, footerY + 8, 64, 64);
   } else {
-    fillRoundedRect(ctx, 432, footerY + 16, 64, 64, 8, DIV);
+    fillRoundedRect(ctx, CARD_WIDTH - 36 - 64, footerY + 12, 56, 56, 8, DIV);
   }
 
   return canvas.toDataURL('image/png');

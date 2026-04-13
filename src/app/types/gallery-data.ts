@@ -1,6 +1,8 @@
 import { BANTI_PERSONALITIES, getBantiTypeThumbnailImage } from '@/lib/banti/personalities';
 import { DAILY_STATUS_TYPES, getDailyTypeImage } from '@/lib/daily/statuses';
 import { DRUNK_PERSONA_TYPES, getDrunkTypeImage } from '@/lib/drunk/personas';
+import { DELTA_PERSONALITIES, getDeltaTypeThumbnailImage } from '@/lib/delta/personalities';
+import { KINGS_PERSONALITIES, getKingsTypeThumbnailImage } from '@/lib/kings/personalities';
 import { LOVE_PERSONALITY_TYPES, getLoveRarity, getLoveTypeImage } from '@/lib/love/personalities';
 import { getRarity, getTypeImage, getXiuxianTypeImage, PERSONALITY_TYPES } from '@/lib/personalities';
 import { WTFTI_PERSONALITIES, getWtftiTypeThumbnailImage } from '@/lib/wtfti-personalities';
@@ -172,6 +174,28 @@ function buildOtherTabs(): GalleryTab[] {
     href: `/wtfti/work/result/${personality.slug}/`,
   }));
 
+  const kingsItems: GalleryItem[] = KINGS_PERSONALITIES.map((personality) => ({
+    slug: personality.slug,
+    code: personality.number,
+    name: personality.heroName,
+    tagline: personality.tagline,
+    color: personality.color,
+    emoji: personality.emoji,
+    image: getKingsTypeThumbnailImage(personality.slug),
+    href: `/wtfti/kings/result/${personality.slug}/`,
+  }));
+
+  const deltaItems: GalleryItem[] = DELTA_PERSONALITIES.map((personality) => ({
+    slug: personality.slug,
+    code: personality.number,
+    name: personality.heroName,
+    tagline: personality.tagline,
+    color: personality.color,
+    emoji: personality.emoji,
+    image: getDeltaTypeThumbnailImage(personality.slug),
+    href: `/wtfti/delta/result/${personality.slug}/`,
+  }));
+
   return [
     {
       id: 'wtfti',
@@ -190,6 +214,24 @@ function buildOtherTabs(): GalleryTab[] {
       testHref: '/wtfti/work/test/',
       description: `同一套 15 维度模型，翻译成办公室语境：${bantiItems.length} 张班TI 职场图鉴卡，专门描述你在工位上的样子。`,
       items: bantiItems,
+    },
+    {
+      id: 'kings',
+      label: '王者TI',
+      emoji: '⚔️',
+      accent: '#f59e0b',
+      testHref: '/wtfti/kings/test/',
+      description: `同一套 15 维度模型，翻译成王者峡谷语境：${kingsItems.length} 张峡谷人格图鉴卡，你在游戏里是哪种队友。`,
+      items: kingsItems,
+    },
+    {
+      id: 'delta',
+      label: '三角TI',
+      emoji: '🎯',
+      accent: '#84cc16',
+      testHref: '/wtfti/delta/test/',
+      description: `同一套 15 维度模型，翻译成三角洲行动战区语境：${deltaItems.length} 张干员人格图鉴卡，你在战场上是哪种兵。`,
+      items: deltaItems,
     },
     {
       id: 'love',

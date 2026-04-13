@@ -68,6 +68,9 @@ export function getRunningHubConfig() {
     apiBase: process.env.RUNNINGHUB_API_BASE || 'https://www.runninghub.cn/openapi/v2',
     editEndpoint:
       process.env.RUNNINGHUB_EDIT_ENDPOINT || '/rhart-image-v1-official/edit',
+    text2imgEndpoint:
+      process.env.RUNNINGHUB_TEXT2IMG_ENDPOINT || '/rhart-image-n-g31-flash-official/text-to-image',
+    text2imgResolution: process.env.RUNNINGHUB_TEXT2IMG_RESOLUTION || '2k',
     aspectRatio: process.env.RUNNINGHUB_ASPECT_RATIO || 'auto',
   };
 }

@@ -146,10 +146,10 @@ async function renderDrunkShareImage(persona: DrunkPersonaType, dimensionScores:
   ctx.fillText('酒后人设鉴定', CARD_WIDTH / 2, 48);
 
   // ========== Character image ==========
-  const imgX = 100;
-  const imgY = 78;
-  const imgW = CARD_WIDTH - 200;
-  const imgH = 300;
+  const imgX = 60;
+  const imgY = 68;
+  const imgW = CARD_WIDTH - 120;
+  const imgH = 420;
 
   fillRoundedRect(ctx, imgX, imgY, imgW, imgH, 20, '#ffffff');
   strokeRoundedRect(ctx, imgX, imgY, imgW, imgH, 20, hexToRgba(persona.color, 0.18));
@@ -158,7 +158,7 @@ async function renderDrunkShareImage(persona: DrunkPersonaType, dimensionScores:
     ctx.save();
     roundRectPath(ctx, imgX + 4, imgY + 4, imgW - 8, imgH - 8, 16);
     ctx.clip();
-    drawImageContain(ctx, charImage, imgX + 12, imgY + 12, imgW - 24, imgH - 24);
+    drawImageContain(ctx, charImage, imgX + 8, imgY + 8, imgW - 16, imgH - 16);
     ctx.restore();
   } else {
     ctx.font = `120px ${FONT_SANS}`;
@@ -166,18 +166,18 @@ async function renderDrunkShareImage(persona: DrunkPersonaType, dimensionScores:
   }
 
   // ========== Name + Code ==========
-  const nameY = imgY + imgH + 20;
+  const nameY = imgY + imgH + 14;
   ctx.fillStyle = DARK;
   ctx.font = `700 40px ${FONT_SANS}`;
   ctx.fillText(persona.name, CARD_WIDTH / 2, nameY);
 
   ctx.fillStyle = persona.color;
   ctx.font = `600 16px ${FONT_MONO}`;
-  ctx.fillText(persona.code, CARD_WIDTH / 2, nameY + 50);
+  ctx.fillText(persona.code, CARD_WIDTH / 2, nameY + 44);
   ctx.textAlign = 'left';
 
   // ========== Tagline ==========
-  const tagY = nameY + 82;
+  const tagY = nameY + 72;
   const tagW = CARD_WIDTH - 80;
   fillRoundedRect(ctx, 40, tagY, tagW, 44, 14, hexToRgba(persona.color, 0.06));
   strokeRoundedRect(ctx, 40, tagY, tagW, 44, 14, hexToRgba(persona.color, 0.15));
@@ -188,7 +188,7 @@ async function renderDrunkShareImage(persona: DrunkPersonaType, dimensionScores:
   ctx.textAlign = 'left';
 
   // ========== Dimension bars ==========
-  const barY = tagY + 60;
+  const barY = tagY + 52;
   ctx.fillStyle = MED;
   ctx.font = `11px ${FONT_MONO}`;
   ctx.fillText('五维数据', 44, barY);
@@ -218,7 +218,7 @@ async function renderDrunkShareImage(persona: DrunkPersonaType, dimensionScores:
   });
 
   // ========== Divider ==========
-  const footerDivY = barY + 24 + dimensionScores.length * 28 + 18;
+  const footerDivY = CARD_HEIGHT - 96;
   ctx.strokeStyle = DIV;
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -227,14 +227,14 @@ async function renderDrunkShareImage(persona: DrunkPersonaType, dimensionScores:
   ctx.stroke();
 
   // ========== Footer ==========
-  const ftY = footerDivY + 18;
+  const ftY = footerDivY + 14;
   ctx.fillStyle = DARK;
-  ctx.font = `600 14px ${FONT_SANS}`;
+  ctx.font = `600 13px ${FONT_SANS}`;
   ctx.fillText('测测你的酒后人设？', 48, ftY);
 
   ctx.fillStyle = persona.color;
-  ctx.font = `11px ${FONT_MONO}`;
-  ctx.fillText(DRUNK_SHARE_URL, 48, ftY + 24);
+  ctx.font = `10px ${FONT_MONO}`;
+  ctx.fillText(DRUNK_SHARE_URL, 48, ftY + 22);
 
   // QR
   const qrS = 60;

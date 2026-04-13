@@ -207,10 +207,10 @@ async function renderWtftiShareImage(p: WtftiPersonality, imgUrl?: string) {
   ctx.fillText('在WTFTI人格图鉴中，我被鉴定为', CARD_W / 2, 68);
 
   // ========== 4. 人格图鉴图 ==========
-  const imgX = 90;
-  const imgY = 100;
-  const imgW = CARD_W - 180;
-  const imgH = 360;
+  const imgX = 60;
+  const imgY = 88;
+  const imgW = CARD_W - 120;
+  const imgH = 400;
 
   fillRoundedRect(ctx, imgX, imgY, imgW, imgH, 24, '#ffffff');
   strokeRoundedRect(ctx, imgX, imgY, imgW, imgH, 24, hexToRgba(accent, 0.25));
@@ -219,7 +219,7 @@ async function renderWtftiShareImage(p: WtftiPersonality, imgUrl?: string) {
     ctx.save();
     roundRectPath(ctx, imgX + 4, imgY + 4, imgW - 8, imgH - 8, 20);
     ctx.clip();
-    drawImageContain(ctx, typeImage, imgX + 20, imgY + 20, imgW - 40, imgH - 40);
+    drawImageContain(ctx, typeImage, imgX + 12, imgY + 12, imgW - 24, imgH - 24);
     ctx.restore();
   } else {
     ctx.fillStyle = DARK;
@@ -228,18 +228,18 @@ async function renderWtftiShareImage(p: WtftiPersonality, imgUrl?: string) {
   }
 
   // ========== 5. 人格名 + code ==========
-  const nameY = imgY + imgH + 24;
+  const nameY = imgY + imgH + 16;
   ctx.fillStyle = DARK;
   ctx.font = `700 48px ${FONT_SANS}`;
   ctx.fillText(p.wtftiName, CARD_W / 2, nameY);
 
-  const codeY = nameY + 58;
+  const codeY = nameY + 50;
   ctx.fillStyle = accent;
   ctx.font = `600 18px ${FONT_MONO}`;
   ctx.fillText(p.code, CARD_W / 2, codeY);
 
   // ========== 6. 一句话标签 ==========
-  const tagY = codeY + 38;
+  const tagY = codeY + 30;
   ctx.fillStyle = accent;
   ctx.font = `600 16px ${FONT_SANS}`;
   const tagLines = wrapText(ctx, `"${p.tagline}"`, CARD_W - 96, 2);
@@ -281,8 +281,8 @@ async function renderWtftiShareImage(p: WtftiPersonality, imgUrl?: string) {
     ctx.fillText(line, CARD_W / 2, hitY + i * 20);
   });
 
-  // ========== 9. 底部 CTA + 二维码 ==========
-  const footerDivY = CARD_H - 110;
+  // ========== 9. Footer (compact, from bottom) ==========
+  const footerDivY = CARD_H - 98;
   ctx.textAlign = 'left';
 
   ctx.strokeStyle = DIV;
@@ -293,19 +293,19 @@ async function renderWtftiShareImage(p: WtftiPersonality, imgUrl?: string) {
   ctx.stroke();
 
   ctx.fillStyle = DARK;
-  ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText('测测你的 WTF 人格', 36, footerDivY + 20);
+  ctx.font = `600 14px ${FONT_SANS}`;
+  ctx.fillText('测测你的 WTF 人格', 36, footerDivY + 14);
 
   ctx.fillStyle = accent;
-  ctx.font = `12px ${FONT_MONO}`;
-  ctx.fillText(SHARE_SITE_URL, 36, footerDivY + 50);
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.fillText(SHARE_SITE_URL, 36, footerDivY + 36);
 
   // QR Code
-  fillRoundedRect(ctx, CARD_W - 36 - 80, footerDivY - 4, 80, 80, 12, '#ffffff');
+  fillRoundedRect(ctx, CARD_W - 36 - 72, footerDivY + 4, 72, 72, 12, '#ffffff');
   if (qrImage) {
-    drawImageContain(ctx, qrImage, CARD_W - 36 - 76, footerDivY, 72, 72);
+    drawImageContain(ctx, qrImage, CARD_W - 36 - 68, footerDivY + 8, 64, 64);
   } else {
-    fillRoundedRect(ctx, CARD_W - 36 - 72, footerDivY + 4, 64, 64, 8, DIV);
+    fillRoundedRect(ctx, CARD_W - 36 - 64, footerDivY + 12, 56, 56, 8, DIV);
   }
 
   return canvas.toDataURL('image/png');

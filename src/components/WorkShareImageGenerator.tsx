@@ -184,17 +184,17 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   ctx.fillText('在打工人设测试里，我是这一挂', CARD_WIDTH / 2, 68);
 
   // ============ HERO CHARACTER IMAGE ============
-  const avatarX = 100;
-  const avatarY = 100;
-  const avatarW = CARD_WIDTH - 200;
-  const avatarH = 320;
+  const avatarX = 60;
+  const avatarY = 88;
+  const avatarW = CARD_WIDTH - 120;
+  const avatarH = 400;
   fillRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 24, '#ffffff');
   strokeRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 24, hexToRgba(personality.color, 0.25));
   if (personalityImage) {
     ctx.save();
     roundRectPath(ctx, avatarX + 4, avatarY + 4, avatarW - 8, avatarH - 8, 20);
     ctx.clip();
-    drawImageContain(ctx, personalityImage, avatarX + 20, avatarY + 15, avatarW - 40, avatarH - 30);
+    drawImageContain(ctx, personalityImage, avatarX + 12, avatarY + 8, avatarW - 24, avatarH - 16);
     ctx.restore();
   } else {
     ctx.fillStyle = DARK;
@@ -203,7 +203,7 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   }
 
   // Name
-  const nameY = avatarY + avatarH + 24;
+  const nameY = avatarY + avatarH + 16;
   ctx.fillStyle = DARK;
   ctx.font = `700 48px ${FONT_SANS}`;
   ctx.fillText(personality.name, CARD_WIDTH / 2, nameY);
@@ -211,7 +211,7 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   // Code
   ctx.fillStyle = personality.color;
   ctx.font = `600 18px ${FONT_MONO}`;
-  ctx.fillText(personality.code, CARD_WIDTH / 2, nameY + 60);
+  ctx.fillText(personality.code, CARD_WIDTH / 2, nameY + 52);
 
   // Rarity pill
   const workRarity = getWorkRarity(personality.slug);
@@ -219,7 +219,7 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   ctx.font = `600 13px ${FONT_SANS}`;
   const rarityW = ctx.measureText(rarityText).width + 28;
   const rarityX = (CARD_WIDTH - rarityW) / 2;
-  const rarityY = nameY + 86;
+  const rarityY = nameY + 78;
   fillRoundedRect(ctx, rarityX, rarityY, rarityW, 28, 14, hexToRgba(workRarity.color, 0.12));
   strokeRoundedRect(ctx, rarityX, rarityY, rarityW, 28, 14, hexToRgba(workRarity.color, 0.3));
   ctx.fillStyle = workRarity.color;
@@ -228,7 +228,7 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   ctx.textAlign = 'left';
 
   // Tagline card
-  const tagY = nameY + 124;
+  const tagY = nameY + 108;
   const tagW = CARD_WIDTH - 72;
   fillRoundedRect(ctx, 36, tagY, tagW, 56, 16, hexToRgba(personality.color, 0.04));
   strokeRoundedRect(ctx, 36, tagY, tagW, 56, 16, hexToRgba(personality.color, 0.10));
@@ -239,14 +239,14 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
   ctx.textAlign = 'left';
 
   // Description
-  const descY = tagY + 72;
+  const descY = tagY + 64;
   ctx.fillStyle = DARK;
   ctx.font = `14px ${FONT_SANS}`;
   const lines = wrapText(ctx, personality.description, CARD_WIDTH - 72, 3);
-  lines.forEach((line, i) => ctx.fillText(line, 36, descY + i * 24));
+  lines.forEach((line, i) => ctx.fillText(line, 36, descY + i * 22));
 
   // Dimension bars
-  const barY = descY + lines.length * 24 + 20;
+  const barY = descY + lines.length * 22 + 16;
   ctx.fillStyle = MED;
   ctx.font = `12px ${FONT_SANS}`;
   ctx.fillText('五维画像', 36, barY);
@@ -255,7 +255,7 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
     const dim = WORK_DIMENSIONS.find(d => d.id === score.id);
     if (!dim) return;
     const color = WORK_MODEL_COLORS[dim.model].base;
-    const rowY = barY + 30 + i * 32;
+    const rowY = barY + 26 + i * 28;
     const barX = 120;
     const barW = 336;
     const pct = ((score.score - 1) / 2);
@@ -275,8 +275,8 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
     ctx.textAlign = 'left';
   });
 
-  // Divider
-  const footerY = barY + 30 + dimensionScores.length * 32 + 16;
+  // Footer (compact, from bottom)
+  const footerY = CARD_HEIGHT - 98;
   ctx.strokeStyle = DIV;
   ctx.beginPath();
   ctx.moveTo(36, footerY);
@@ -285,19 +285,19 @@ async function renderWorkShareImage(personality: WorkPersonalityType, dimensionS
 
   // CTA
   ctx.fillStyle = DARK;
-  ctx.font = `600 16px ${FONT_SANS}`;
-  ctx.fillText('测测你是哪种打工人设？', 36, footerY + 20);
+  ctx.font = `600 14px ${FONT_SANS}`;
+  ctx.fillText('测测你是哪种打工人设？', 36, footerY + 14);
 
   ctx.fillStyle = personality.color;
-  ctx.font = `12px ${FONT_MONO}`;
-  ctx.fillText(WORK_SHARE_URL, 36, footerY + 50);
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.fillText(WORK_SHARE_URL, 36, footerY + 36);
 
   // QR
-  fillRoundedRect(ctx, 424, footerY + 10, 80, 80, 12, '#ffffff');
+  fillRoundedRect(ctx, CARD_WIDTH - 36 - 72, footerY + 4, 72, 72, 12, '#ffffff');
   if (qrImage) {
-    drawImageContain(ctx, qrImage, 428, footerY + 14, 72, 72);
+    drawImageContain(ctx, qrImage, CARD_WIDTH - 36 - 68, footerY + 8, 64, 64);
   } else {
-    fillRoundedRect(ctx, 432, footerY + 18, 64, 64, 8, DIV);
+    fillRoundedRect(ctx, CARD_WIDTH - 36 - 64, footerY + 12, 56, 56, 8, DIV);
   }
 
   return canvas.toDataURL('image/png');

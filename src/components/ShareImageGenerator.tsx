@@ -292,10 +292,10 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   ctx.fillText(isXiuxian ? '在SBTI测定中，我的本命灵兽被鉴定为' : '在SBTI商业性格测定中，我被鉴定为', CARD_WIDTH / 2, 68);
 
   // ============ HERO CHARACTER IMAGE ============
-  const imageCardX = 90;
-  const imageCardY = 100;
-  const imageCardWidth = CARD_WIDTH - 180;
-  const imageCardHeight = 380;
+  const imageCardX = 60;
+  const imageCardY = 88;
+  const imageCardWidth = CARD_WIDTH - 120;
+  const imageCardHeight = 420;
   fillRoundedRect(ctx, imageCardX, imageCardY, imageCardWidth, imageCardHeight, 24, '#ffffff');
   strokeRoundedRect(ctx, imageCardX, imageCardY, imageCardWidth, imageCardHeight, 24, hexToRgba(accentColor, 0.25));
 
@@ -303,7 +303,7 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
     ctx.save();
     roundRectPath(ctx, imageCardX + 4, imageCardY + 4, imageCardWidth - 8, imageCardHeight - 8, 20);
     ctx.clip();
-    drawImageContain(ctx, typeImage, imageCardX + 20, imageCardY + 20, imageCardWidth - 40, imageCardHeight - 40);
+    drawImageContain(ctx, typeImage, imageCardX + 12, imageCardY + 12, imageCardWidth - 24, imageCardHeight - 24);
     ctx.restore();
   } else {
     ctx.fillStyle = DARK;
@@ -324,7 +324,7 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   ctx.fillText(badgeText, badgeX + 12, badgeY + 7);
 
   // Name + Code centered (adaptive for long xiuxian titles)
-  const nameY = imageCardY + imageCardHeight + 24;
+  const nameY = imageCardY + imageCardHeight + 16;
   const titleMaxWidth = CARD_WIDTH - 72;
   let titleFontSize = isXiuxian ? 52 : 48;
   let titleLines: string[] = [];
@@ -350,14 +350,14 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
     ctx.fillText(line, CARD_WIDTH / 2, nameY + index * titleLineHeight);
   });
 
-  const codeY = nameY + titleLines.length * titleLineHeight + 8;
+  const codeY = nameY + titleLines.length * titleLineHeight + 4;
   ctx.fillStyle = accentColor;
   ctx.font = `600 18px ${FONT_MONO}`;
   ctx.fillText(personality.code, CARD_WIDTH / 2, codeY);
 
   // Rarity badge + population %
   const rarity = getRarity(personality.slug);
-  const rarityY = codeY + 38;
+  const rarityY = codeY + 32;
   const rarityText = isXiuxian && xiuxianSkin ? xiuxianSkin.realm : rarity.label;
   ctx.font = `600 13px ${FONT_SANS}`;
   const rarityW = ctx.measureText(rarityText).width + 28;
@@ -484,11 +484,11 @@ async function renderShareImage(personality: PersonalityType, dimensionScores: D
   ctx.stroke();
 
   ctx.fillStyle = DARK;
-  ctx.font = `600 16px ${FONT_SANS}`;
+  ctx.font = `600 14px ${FONT_SANS}`;
   ctx.fillText('测测你的隐藏人格', 36, footerTitleY);
 
   ctx.fillStyle = accentColor;
-  ctx.font = `12px ${FONT_MONO}`;
+  ctx.font = `11px ${FONT_MONO}`;
   ctx.fillText(SHARE_SITE_URL, 36, footerUrlY);
 
   fillRoundedRect(ctx, 424, qrCardY, 80, 80, 12, '#ffffff');
