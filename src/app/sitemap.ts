@@ -9,6 +9,9 @@ import { GUIDE_ARTICLES } from '@/lib/guides';
 import { getXiuxianLaunchOnlySlugs } from '@/lib/xiuxian-v2';
 import { getWtftiSlugs } from '@/lib/wtfti-personalities';
 import { getBantiSlugs } from '@/lib/banti/personalities';
+import { getKingsSlugs } from '@/lib/kings/personalities';
+import { getDeltaSlugs } from '@/lib/delta/personalities';
+import { getAllXptiSlugs } from '@/lib/xpti/personalities';
 
 export const dynamic = 'force-static';
 
@@ -32,6 +35,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: getSiteUrl('/drunk/'), lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: getSiteUrl('/wtfti/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/wtfti/work/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: getSiteUrl('/wtfti/kings/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: getSiteUrl('/wtfti/delta/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: getSiteUrl('/xpti/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
   ];
 
   const guidePages: MetadataRoute.Sitemap = GUIDE_ARTICLES.map((article) => ({
@@ -90,5 +96,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages];
+  const kingsResultPages: MetadataRoute.Sitemap = getKingsSlugs().map((slug) => ({
+    url: getSiteUrl(`/wtfti/kings/result/${slug}/`),
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  const deltaResultPages: MetadataRoute.Sitemap = getDeltaSlugs().map((slug) => ({
+    url: getSiteUrl(`/wtfti/delta/result/${slug}/`),
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  const xptiResultPages: MetadataRoute.Sitemap = getAllXptiSlugs().map((slug) => ({
+    url: getSiteUrl(`/xpti/result/${slug}/`),
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages, ...kingsResultPages, ...deltaResultPages, ...xptiResultPages];
 }

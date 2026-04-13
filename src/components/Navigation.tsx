@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { href: '/cp/', label: 'CP配对' },
   { href: '/work/', label: '打工人设' },
   { href: '/love/', label: '恋爱人设' },
+  { href: '/xpti/', label: '💜 恋爱XP' },
   { href: '/daily/', label: '今日模式' },
   { href: '/drunk/', label: '酒后人设' },
   { href: '/squad/', label: '组局测试' },

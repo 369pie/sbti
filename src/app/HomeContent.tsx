@@ -428,6 +428,35 @@ export default function HomeContent() {
         </div>
       </section>
 
+      {/* XPTI promo */}
+      <section className="py-20 px-6 border-t border-border-subtle">
+        <div className="max-w-3xl mx-auto">
+          <div className="rounded-2xl border border-purple-500/20 bg-purple-500/5 p-8 sm:p-10 text-center animate-fade-up">
+            <div className="text-4xl mb-4">💜</div>
+            <span className="inline-block text-xs font-mono tracking-[0.2em] text-purple-400 uppercase mb-3">
+              XPTI · Hot
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">
+              恋爱XP体质测试
+            </h2>
+            <p className="text-text-secondary leading-relaxed max-w-md mx-auto mb-6">
+              4 个恋爱XP维度 · 20 道灵魂拷问 · 16 种恋爱体质
+              <br />
+              MBTI测你是什么人，XPTI测你爱上什么人。
+            </p>
+            <Link
+              href="/xpti/"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-purple-500 text-white font-medium text-base hover:bg-purple-600 transition-all duration-200"
+            >
+              去测恋爱XP体质
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Drunk Persona promo */}
       <section className="py-20 px-6 border-t border-border-subtle">
         <div className="max-w-3xl mx-auto">
