@@ -238,14 +238,19 @@ async function renderBirdShareImage(p: BirdPersonality, imgUrl?: string) {
     ctx.fillText(line, 32, 68 + i * 44);
   });
 
-  // Code (bird call)
-  const codeY = 68 + titleLines.length * 44 + 8;
-  ctx.fillStyle = accent;
-  ctx.font = `700 18px ${FONT_MONO}`;
-  ctx.fillText(p.code, 32, codeY);
+  // Code (bird call) with Backronym
+  const codeY = 68 + titleLines.length * 44 + 6;
+  ctx.fillStyle = DARK;
+  ctx.font = `900 28px ${FONT_MONO}`;
+  const formattedCode = p.code.split('').join('-');
+  ctx.fillText(formattedCode, 32, codeY);
+
+  const codeWidth = ctx.measureText(formattedCode).width;
+  ctx.font = `700 14px ${FONT_SANS}`;
+  ctx.fillText(`(${p.backronym})`, 32 + codeWidth + 8, codeY + 12);
 
   // Tagline
-  const tagY = codeY + 32;
+  const tagY = codeY + 40;
   ctx.fillStyle = hexToRgba(DARK, 0.88);
   ctx.font = `600 15px ${FONT_SANS}`;
   const tagLines = wrapText(ctx, `"${p.tagline}"`, CARD_W - 64, 2);

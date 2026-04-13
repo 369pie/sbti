@@ -96,9 +96,14 @@ export function BirdResultContent({ birdPersonality: p, dimensionScores }: Props
               priority
             />
 
-            {/* Code */}
-            <div className="text-sm font-mono tracking-[0.3em] uppercase mb-3" style={{ color: p.color }}>
-              {p.code}
+            {/* Code & Backronym */}
+            <div className="flex flex-wrap items-baseline justify-center gap-2 mb-3">
+              <span className="text-2xl font-black font-mono tracking-widest text-[#1A2340]">
+                {p.code.split('').join('-')}
+              </span>
+              <span className="text-sm font-bold opacity-80" style={{ color: p.color }}>
+                ({p.backronym})
+              </span>
             </div>
 
             {/* Name */}
