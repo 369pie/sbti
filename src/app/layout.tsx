@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Geist, Geist_Mono, Playfair_Display, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
+import { FollowMeInline } from '@/components/FollowMeLinks';
 import { getLegacyRedirectScript, getSiteLabel, getSiteOrigin, getSiteUrl, isLegacyPagesBuild } from "@/lib/site";
 
 const geistSans = Geist({
@@ -153,6 +154,7 @@ export default function RootLayout({
               <Link href="/privacy/" prefetch={false} className="hover:text-text-primary transition-colors">隐私说明</Link>
               <Link href="/terms/" prefetch={false} className="hover:text-text-primary transition-colors">使用条款</Link>
             </div>
+            <FollowMeInline />
             <p>WTFTI 更适合拿来娱乐和自我观察，不适合作为严肃的心理诊断结果。</p>
             <p className="mt-2 opacity-60">What&apos;s The F* Type Inside</p>
           </div>

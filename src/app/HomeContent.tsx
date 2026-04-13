@@ -3,6 +3,7 @@ import NextImage from 'next/image';
 import { PERSONALITY_TYPES, getTypeThumbnailImage } from '@/lib/personalities';
 import { getLiveUniverses } from '@/lib/universes';
 import { withBasePath } from '@/lib/site';
+import { FollowMeCard, FollowMeFloating } from '@/components/FollowMeLinks';
 
 // ─── Universe descriptions for the hub cards ─────────────────────────────────
 
@@ -25,6 +26,7 @@ const FUN_ITEMS = [
   { href: '/love/', emoji: '💗', label: '恋爱人设', desc: '16 种恋爱角色' },
   { href: '/daily/', emoji: '🎲', label: '今日模式', desc: '每天换一种人格' },
   { href: '/drunk/', emoji: '🍺', label: '酒后人设', desc: '12 种醉后真面目' },
+  { href: '/identify/', emoji: '🔍', label: '好友鉴定', desc: '帮朋友鉴定人格' },
   { href: '/squad/', emoji: '🎯', label: '组局测试', desc: '拉上朋友一起来' },
   { href: '/combo/', emoji: '🧩', label: '人格拼盘', desc: '拼出你的多面体' },
 ];
@@ -360,6 +362,8 @@ export default function HomeContent() {
         </div>
       </section>
 
+      <FollowMeCard />
+
       {/* ── Bottom CTA ── */}
       <section className="py-24 px-6 text-center">
         <div className="max-w-lg mx-auto">
@@ -382,6 +386,8 @@ export default function HomeContent() {
           </Link>
         </div>
       </section>
+
+      <FollowMeFloating />
     </div>
   );
 }

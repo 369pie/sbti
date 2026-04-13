@@ -1,3 +1,4 @@
+import { sampleQuestionsByDimension } from '../question-pool';
 import type { LoveModelType } from './dimensions';
 
 export interface LoveAnswerOption {
@@ -50,6 +51,22 @@ export const LOVE_QUESTIONS: LoveQuestion[] = [
       { value: 3, label: '不行，那跟没在谈恋爱有什么区别？', key: 'C' },
     ],
   },
+  {
+    id: 16, text: '对方忙起来一整天没空找我，我通常也能把自己的日子过完整。', dimension: 'L1', model: 'depend', reversed: true,
+    options: [
+      { value: 3, label: '能，我甚至未必会立刻注意到。', key: 'A' },
+      { value: 2, label: '大体能，但还是会惦记一下。', key: 'B' },
+      { value: 1, label: '很难，我会明显觉得这一天少了点什么。', key: 'C' },
+    ],
+  },
+  {
+    id: 17, text: '对象临时改掉已经说好的见面计划，我的情绪会被带走一截。', dimension: 'L1', model: 'depend', reversed: false,
+    options: [
+      { value: 1, label: '还好，改就改吧，我有自己的安排。', key: 'A' },
+      { value: 2, label: '会有点失落，但缓一会儿就过。', key: 'B' },
+      { value: 3, label: '会，期待感一下子就塌掉不少。', key: 'C' },
+    ],
+  },
 
   // ══════════════════════════════════════
   //  吃醋指数 (Jealous)  L2
@@ -76,6 +93,22 @@ export const LOVE_QUESTIONS: LoveQuestion[] = [
       { value: 1, label: '人家有自己的社交很正常。', key: 'A' },
       { value: 2, label: '好奇会问一嘴，但不强求看。', key: 'B' },
       { value: 3, label: '开始在脑子里上演完整的出轨剧情。', key: 'C' },
+    ],
+  },
+  {
+    id: 18, text: '对象和异性朋友单独吃饭，只要提前说过，我基本能放下。', dimension: 'L2', model: 'jealous', reversed: true,
+    options: [
+      { value: 3, label: '能，说清楚了我就不太往下脑补。', key: 'A' },
+      { value: 2, label: '理智上能放下，心里还是会留一点刺。', key: 'B' },
+      { value: 1, label: '很难，知道归知道，还是会一直介意。', key: 'C' },
+    ],
+  },
+  {
+    id: 19, text: '看到对象和某个人聊天语气突然变软，我很难完全不往心里去。', dimension: 'L2', model: 'jealous', reversed: false,
+    options: [
+      { value: 1, label: '真不会，我对这种细节不太敏感。', key: 'A' },
+      { value: 2, label: '会留意一下，但不一定上升。', key: 'B' },
+      { value: 3, label: '会，我的雷达会立刻响。', key: 'C' },
     ],
   },
 
@@ -106,6 +139,22 @@ export const LOVE_QUESTIONS: LoveQuestion[] = [
       { value: 3, label: '立刻放下手里所有事去哄。', key: 'C' },
     ],
   },
+  {
+    id: 20, text: '谈恋爱之后，我也不会轻易打乱自己的生活节奏。', dimension: 'L3', model: 'brain', reversed: true,
+    options: [
+      { value: 3, label: '基本不会，我还是照自己的轨道过。', key: 'A' },
+      { value: 2, label: '会改一点，但不至于全盘让路。', key: 'B' },
+      { value: 1, label: '很难，恋爱一来我的安排就会跟着变。', key: 'C' },
+    ],
+  },
+  {
+    id: 21, text: '只要对方说一句「我想见你」，我就很容易把原计划往后挪。', dimension: 'L3', model: 'brain', reversed: false,
+    options: [
+      { value: 1, label: '不太会，先看我原计划值不值得动。', key: 'A' },
+      { value: 2, label: '会动一点，但不至于次次让路。', key: 'B' },
+      { value: 3, label: '会，我常常先顾眼前这份心情。', key: 'C' },
+    ],
+  },
 
   // ══════════════════════════════════════
   //  安全感 (Secure)  L4
@@ -132,6 +181,22 @@ export const LOVE_QUESTIONS: LoveQuestion[] = [
       { value: 3, label: '行动比语言重要，不说也没关系。', key: 'A' },
       { value: 2, label: '能接受，但偶尔还是想听到。', key: 'B' },
       { value: 1, label: '不说=不爱，每天都想确认。', key: 'C' },
+    ],
+  },
+  {
+    id: 22, text: '关系稳定下来以后，我还是会经常自己吓自己。', dimension: 'L4', model: 'secure', reversed: true,
+    options: [
+      { value: 3, label: '会，对方稍微一冷一点我就开始乱想。', key: 'A' },
+      { value: 2, label: '偶尔会，但多数时候还能劝住自己。', key: 'B' },
+      { value: 1, label: '不会，我通常能把心放回原位。', key: 'C' },
+    ],
+  },
+  {
+    id: 23, text: '闹了点别扭之后，我通常还是相信这段关系扛得住。', dimension: 'L4', model: 'secure', reversed: false,
+    options: [
+      { value: 1, label: '不太信，我会先往坏处想。', key: 'A' },
+      { value: 2, label: '看事情大小，小事能信。', key: 'B' },
+      { value: 3, label: '会，我不容易因为一两次波动就否定整段关系。', key: 'C' },
     ],
   },
 
@@ -162,13 +227,24 @@ export const LOVE_QUESTIONS: LoveQuestion[] = [
       { value: 3, label: '必须搞点事情，不闹不是爱情。', key: 'C' },
     ],
   },
+  {
+    id: 24, text: '吵架的时候，我更想把话说清楚，而不是故意晾着对方。', dimension: 'L5', model: 'drama', reversed: true,
+    options: [
+      { value: 3, label: '是，能说清楚就不想演。', key: 'A' },
+      { value: 2, label: '看当时多上头，有时说有时晾。', key: 'B' },
+      { value: 1, label: '很难，我就是会先冷着看对方急不急。', key: 'C' },
+    ],
+  },
+  {
+    id: 25, text: '关系一平稳太久，我偶尔会想试一试自己在对方心里到底有多重。', dimension: 'L5', model: 'drama', reversed: false,
+    options: [
+      { value: 1, label: '不会，稳定对我来说就是好事。', key: 'A' },
+      { value: 2, label: '偶尔会闪过这种念头，但通常忍住。', key: 'B' },
+      { value: 3, label: '会，有时候就是想确认一下。', key: 'C' },
+    ],
+  },
 ];
 
 export function shuffleLoveQuestions(questions: LoveQuestion[]): LoveQuestion[] {
-  const shuffled = [...questions];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
+  return sampleQuestionsByDimension(questions, 4);
 }

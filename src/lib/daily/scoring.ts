@@ -4,6 +4,8 @@ import { DAILY_STATUS_TYPES } from './statuses';
 import type { DailyStatusType } from './statuses';
 import type { DailyQuestion } from './questions';
 import { DAILY_QUESTIONS } from './questions';
+import { sampleQuestionsByDimension } from '../question-pool';
+import { buildResultDiagnostics, type ResultDiagnostics } from '../result-diagnostics';
 
 export type Answer = 1 | 2 | 3;
 
@@ -16,6 +18,7 @@ export interface DailyDimensionScore {
 export interface DailyTestResult {
   status: DailyStatusType;
   dimensions: DailyDimensionScore[];
+  diagnostics: ResultDiagnostics;
 }
 
 /* ── Seeded PRNG (mulberry32) ── */
@@ -36,48 +39,15 @@ function dateSeed(d: Date): number {
 }
 
 /**
- * Pick today's 6 questions from the full bank:
- *   1 per dimension (5), then 1 bonus from the remaining pool.
+ * Pick today's 10 questions from the full bank:
+ *   2 per dimension, date-seeded so everyone gets the same set that day.
  *   Order is shuffled with the same daily seed.
  */
 export function getDailyQuestions(date?: Date): DailyQuestion[] {
   const seed = dateSeed(date ?? new Date());
   const rand = mulberry32(seed);
 
-  // Group by dimension
-  const byDim = new Map<string, DailyQuestion[]>();
-  for (const q of DAILY_QUESTIONS) {
-    const arr = byDim.get(q.dimension) ?? [];
-    arr.push(q);
-    byDim.set(q.dimension, [...arr]);
-  }
-
-  const dims = ['D1', 'D2', 'D3', 'D4', 'D5'];
-  const picked: DailyQuestion[] = [];
-
-  // 1 per dimension
-  for (const dim of dims) {
-    const pool = byDim.get(dim) ?? [];
-    const idx = Math.floor(rand() * pool.length);
-    picked.push(pool[idx]);
-    pool.splice(idx, 1);
-    byDim.set(dim, pool);
-  }
-
-  // 1 bonus from remaining pool
-  const remaining = dims.flatMap(d => byDim.get(d) ?? []);
-  if (remaining.length > 0) {
-    const idx = Math.floor(rand() * remaining.length);
-    picked.push(remaining[idx]);
-  }
-
-  // Shuffle picked questions
-  for (let i = picked.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
-    [picked[i], picked[j]] = [picked[j], picked[i]];
-  }
-
-  return picked;
+  return sampleQuestionsByDimension(DAILY_QUESTIONS, 2, { random: rand });
 }
 
 /* ── Scoring ── */
@@ -113,7 +83,16 @@ export function calculateDailyResult(
   });
 
   const status = matchDailyStatus(dimensions);
-  return { status, dimensions };
+  const diagnostics = buildResultDiagnostics({
+    answers,
+    questions,
+    dimensions: DAILY_DIMENSIONS,
+    dimensionScores: dimensions,
+    candidates: DAILY_STATUS_TYPES,
+    matchedSlug: status.slug,
+  });
+
+  return { status, dimensions, diagnostics };
 }
 
 function levelToNum(l: DimensionLevel): number {

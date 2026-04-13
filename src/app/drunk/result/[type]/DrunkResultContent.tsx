@@ -9,9 +9,13 @@ import type { DrunkDimensionScore } from '@/lib/drunk/scoring';
 import { DrunkShareImageGenerator } from '@/components/DrunkShareImageGenerator';
 import type { DrunkShareImageGeneratorHandle } from '@/components/DrunkShareImageGenerator';
 import { DrunkPersonaAvatar } from '@/components/DrunkPersonaAvatar';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { loadStoredQuizResult } from '@/lib/quiz-result-session';
+import { ResultDiagnosticsPanel } from '@/components/ResultDiagnosticsPanel';
+
+const emptySubscribe = () => () => {};
 
 interface Props {
   persona: DrunkPersonaType;
@@ -19,11 +23,22 @@ interface Props {
 }
 
 export function DrunkResultContent({ persona, dimensionScores }: Props) {
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<DrunkShareImageGeneratorHandle>(null);
 
   const shareUrl = getSiteUrl(`/drunk/result/${persona.slug}/`);
+  const sessionResult = useMemo(() => {
+    if (!mounted) {
+      return null;
+    }
+
+    const stored = loadStoredQuizResult<DrunkDimensionScore>('drunk');
+    return stored?.slug === persona.slug ? stored : null;
+  }, [mounted, persona.slug]);
+  const activeDimensionScores = sessionResult?.dimensionScores ?? dimensionScores;
+  const diagnostics = sessionResult?.diagnostics ?? null;
 
   const copyLink = useCallback(() => {
     navigator.clipboard.writeText(shareUrl);
@@ -85,12 +100,20 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
         </motion.div>
       </section>
 
+      {diagnostics && (
+        <section className="max-w-2xl mx-auto px-6 pb-16">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25, duration: 0.5 }}>
+            <ResultDiagnosticsPanel diagnostics={diagnostics} accent={persona.color} title="这次酒后判定说明" />
+          </motion.div>
+        </section>
+      )}
+
       {/* Dimension Bars */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.5 }}>
-          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">{persona.code} 的五维数据</h2>
+          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">{diagnostics ? `${persona.code} 的本次五维落点` : `${persona.code} 的五维数据`}</h2>
           <div className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 sm:p-8 space-y-5">
-            {dimensionScores.map(ds => {
+            {activeDimensionScores.map(ds => {
               const dim = DRUNK_DIMENSIONS.find(d => d.id === ds.id);
               if (!dim) return null;
               const color = DRUNK_MODEL_COLORS[dim.model];
@@ -125,7 +148,7 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 0.5 }}>
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4 text-center">分享你的酒后人设</h2>
           <div className="space-y-3">
-            <DrunkShareImageGenerator ref={shareRef} persona={persona} dimensionScores={dimensionScores} />
+            <DrunkShareImageGenerator ref={shareRef} persona={persona} dimensionScores={activeDimensionScores} />
             <button onClick={copyShareText}
               className="w-full py-3 rounded-xl border border-amber-500/20 bg-amber-500/5 text-sm text-amber-400 hover:bg-amber-500/10 transition-all cursor-pointer">
               {textCopied ? '已复制分享文案 ✓' : '📋 复制分享文案'}

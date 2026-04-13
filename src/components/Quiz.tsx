@@ -14,6 +14,7 @@ import { XIUXIAN_V2_QUESTION_SKINS, XIUXIAN_V2_DEFAULT_OPTIONS } from '@/lib/xiu
 import { XIUXIAN_MODEL_NAMES, XIUXIAN_MODEL_COLORS } from '@/lib/xiuxian';
 import { UniversePicker } from '@/components/UniversePicker';
 import type { Universe } from '@/lib/universes';
+import { saveStoredQuizResult } from '@/lib/quiz-result-session';
 
 const MODEL_CLASS: Record<ModelType, string> = {
   self: 'model-self',
@@ -100,6 +101,14 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
     setIsFinishing(true);
 
     const result = calculateResult(finalAnswers, QUESTIONS);
+    const resultNamespace = resultPrefix === '/wtfti' ? 'wtfti' : 'sbti';
+
+    saveStoredQuizResult(resultNamespace, {
+      slug: result.personality.slug,
+      storedAt: Date.now(),
+      dimensionScores: result.dimensions,
+      diagnostics: result.diagnostics,
+    });
 
     if (finishTimeoutRef.current !== null) {
       window.clearTimeout(finishTimeoutRef.current);

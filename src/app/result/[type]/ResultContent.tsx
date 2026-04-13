@@ -7,16 +7,21 @@ import type { ShareImageGeneratorHandle } from '@/components/ShareImageGenerator
 import { PERSONALITY_TYPES, getTypeImage, getTypeThumbnailImage, getXiuxianTypeImage, getXiuxianTypeThumbnailImage, getRarity } from '@/lib/personalities';
 import type { PersonalityType } from '@/lib/personalities';
 import type { DimensionScore } from '@/lib/scoring';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { getXiuxianSkin } from '@/lib/xiuxian';
 import { getXiuxianLaunchOnlyTypes } from '@/lib/xiuxian-v2';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
+import { loadStoredQuizResult } from '@/lib/quiz-result-session';
+import { ResultDiagnosticsPanel } from '@/components/ResultDiagnosticsPanel';
+import { FollowMeCard, FollowMeFloating } from '@/components/FollowMeLinks';
 
 type DimensionRadarComponentType = typeof import('@/components/DimensionChart')['DimensionRadar'];
 type DimensionBarsComponentType = typeof import('@/components/DimensionChart')['DimensionBars'];
 type ShareImageGeneratorComponentType = typeof import('@/components/ShareImageGenerator')['ShareImageGenerator'];
+
+const emptySubscribe = () => () => {};
 
 interface Props {
   personality: PersonalityType;
@@ -25,6 +30,7 @@ interface Props {
 
 export function ResultContent({ personality, dimensionScores }: Props) {
   const isLaunchOnly = Boolean(personality.isLaunchOnly);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [copied, setCopied] = useState(false);
   const [cpCopied, setCpCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
@@ -72,6 +78,19 @@ export function ResultContent({ personality, dimensionScores }: Props) {
   const skinQuery = showXiuxian ? '?skin=xiuxian' : '';
   const shareUrl = getSiteUrl(`/result/${personality.slug}${skinQuery}`);
   const xiuxianGalleryCount = PERSONALITY_TYPES.length + getXiuxianLaunchOnlyTypes().length;
+  const storageNamespace = mounted && typeof window !== 'undefined' && window.location.pathname.includes('/wtfti/')
+    ? 'wtfti'
+    : 'sbti';
+  const sessionResult = useMemo(() => {
+    if (!mounted) {
+      return null;
+    }
+
+    const stored = loadStoredQuizResult<DimensionScore>(storageNamespace);
+    return stored?.slug === personality.slug ? stored : null;
+  }, [mounted, personality.slug, storageNamespace]);
+  const activeDimensionScores = sessionResult?.dimensionScores ?? dimensionScores;
+  const diagnostics = sessionResult?.diagnostics ?? null;
 
   const loadCharts = useCallback(() => {
     if (DimensionRadarComponent && DimensionBarsComponent) {
@@ -384,6 +403,18 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         </motion.div>
       </section>
 
+      {diagnostics && (
+        <section className="max-w-2xl mx-auto px-6 pb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.5 }}
+          >
+            <ResultDiagnosticsPanel diagnostics={diagnostics} accent={displayColor} title="这次人格判定说明" />
+          </motion.div>
+        </section>
+      )}
+
       {/* Radar Chart */}
       <section ref={chartSectionRef} className="max-w-3xl mx-auto px-6 pb-16">
         <motion.div
@@ -392,11 +423,11 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           transition={{ delay: 0.3, duration: 0.5 }}
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6 text-center">
-            十五维指纹
+            {diagnostics ? '本次十五维落点' : '十五维指纹'}
           </h2>
           <div className="rounded-2xl border border-border-subtle bg-bg-elevated p-6 sm:p-8 shadow-sm">
             {DimensionRadarComponent ? (
-              <DimensionRadarComponent dimensions={dimensionScores} size={340} />
+              <DimensionRadarComponent dimensions={activeDimensionScores} size={340} />
             ) : (
               <div className="mx-auto h-[340px] w-full max-w-[340px] animate-pulse rounded-full bg-bg-secondary/60" />
             )}
@@ -412,11 +443,11 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           transition={{ delay: 0.4, duration: 0.5 }}
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
-            {personality.code} 的典型维度落点
+            {diagnostics ? `${personality.code} 的本次维度落点` : `${personality.code} 的典型维度落点`}
           </h2>
           <div className="rounded-2xl border border-border-subtle bg-bg-elevated p-6 sm:p-8 shadow-sm">
             {DimensionBarsComponent ? (
-              <DimensionBarsComponent dimensionScores={dimensionScores} />
+              <DimensionBarsComponent dimensionScores={activeDimensionScores} />
             ) : (
               <div className="space-y-4">
                 {Array.from({ length: 5 }).map((_, index) => (
@@ -512,7 +543,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
               <ShareImageGeneratorComponent
                 ref={shareRef}
                 personality={personality}
-                dimensionScores={dimensionScores}
+                dimensionScores={activeDimensionScores}
                 isXiuxian={isXiuxian}
               />
             ) : (
@@ -561,6 +592,8 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         <UniverseResultBar slug={personality.slug} current={isXiuxian ? 'xiuxian' : 'standard'} />
       </section>
 
+      <FollowMeCard />
+
       {/* Other types */}
       <section className="max-w-3xl mx-auto px-6 pb-24">
         <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
@@ -605,6 +638,8 @@ export function ResultContent({ personality, dimensionScores }: Props) {
           </Link>
         </div>
       </section>
+
+      <FollowMeFloating />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { sampleQuestionsByDimension } from '../question-pool';
 import type { FlowerModelType } from './dimensions';
 
 export interface FlowerAnswerOption {
@@ -66,6 +67,14 @@ export const FLOWER_QUESTIONS: FlowerQuestion[] = [
       { value: 1, label: '隐居+偶尔出山。大部分时间和自己相处。', key: 'C' },
     ],
   },
+  {
+    id: 21, text: '如果接下来一整周都没有任何局、也没人找你聊天，你会？', dimension: 'F1', model: 'photosynthesis', reversed: false,
+    options: [
+      { value: 3, label: '开始主动约人，不然这一周像没开机。', key: 'A' },
+      { value: 2, label: '前两天挺爽，后面会有点想见人。', key: 'B' },
+      { value: 1, label: '太好了，这周终于完整属于我自己。', key: 'C' },
+    ],
+  },
 
   // ══════════════════════════════════════
   //  花期轴 (Bloom) F2 — B(盛放) ↔ L(蓄蕾)
@@ -109,6 +118,14 @@ export const FLOWER_QUESTIONS: FlowerQuestion[] = [
       { value: 3, label: '我是一本打开的书——什么情绪都藏不住。', key: 'A' },
       { value: 2, label: '半开半合吧，看心情也看对象。', key: 'B' },
       { value: 1, label: '我是一本上了锁的日记——丰富得很，但你看不到。', key: 'C' },
+    ],
+  },
+  {
+    id: 22, text: '情绪上来的时候，我第一反应通常是先压住，不太想让人当场看见。', dimension: 'F2', model: 'bloom', reversed: true,
+    options: [
+      { value: 3, label: '对，我宁可回去自己消化。', key: 'A' },
+      { value: 2, label: '分情况，有时能藏住有时藏不住。', key: 'B' },
+      { value: 1, label: '不太对，我脸上和语气都会先出卖我。', key: 'C' },
     ],
   },
 
@@ -156,6 +173,14 @@ export const FLOWER_QUESTIONS: FlowerQuestion[] = [
       { value: 1, label: '开心！立刻回复+聊一个小时，感觉友谊完全没断。', key: 'C' },
     ],
   },
+  {
+    id: 23, text: '你更舒服的人际状态是：', dimension: 'F3', model: 'root', reversed: false,
+    options: [
+      { value: 3, label: '固定几个人，联系不算多，但都很深。', key: 'A' },
+      { value: 2, label: '有核心圈，也有不少轻松来往的人。', key: 'B' },
+      { value: 1, label: '认识的人越多越安心，到哪都最好有人接得住。', key: 'C' },
+    ],
+  },
 
   // ══════════════════════════════════════
   //  铠甲轴 (Armor) F4 — R(带刺) ↔ O(无刺)
@@ -201,33 +226,16 @@ export const FLOWER_QUESTIONS: FlowerQuestion[] = [
       { value: 1, label: '"善良不吃亏，世界还是好人多。"', key: 'C' },
     ],
   },
+  {
+    id: 24, text: '别人一开口求助，我常常还没想好就先答应了。', dimension: 'F4', model: 'armor', reversed: true,
+    options: [
+      { value: 3, label: '对，不好意思拒绝几乎是本能。', key: 'A' },
+      { value: 2, label: '看事情大小，偶尔会先应下来。', key: 'B' },
+      { value: 1, label: '不太会，我会先判断自己愿不愿意。', key: 'C' },
+    ],
+  },
 ];
 
 export function shuffleFlowerQuestions(questions: FlowerQuestion[]): FlowerQuestion[] {
-  const groups = new Map<string, FlowerQuestion[]>();
-  for (const q of questions) {
-    const arr = groups.get(q.dimension) ?? [];
-    arr.push(q);
-    groups.set(q.dimension, arr);
-  }
-
-  const shuffled: FlowerQuestion[] = [];
-  const dims = [...groups.keys()];
-
-  // Interleave dimensions: take one from each dimension in round-robin
-  let round = 0;
-  let remaining = true;
-  while (remaining) {
-    remaining = false;
-    for (const dim of dims) {
-      const arr = groups.get(dim)!;
-      if (round < arr.length) {
-        shuffled.push(arr[round]);
-        remaining = true;
-      }
-    }
-    round++;
-  }
-
-  return shuffled;
+  return sampleQuestionsByDimension(questions, 5);
 }

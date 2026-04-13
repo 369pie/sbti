@@ -19,7 +19,7 @@ interface Props {
 
 // ─── 设计 Token（与原版 ShareImageGenerator 一致）───
 const CARD_W = 540;
-const CARD_H = 1040;
+const MAX_H = 4000;          // oversized canvas, will be cropped
 const SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
@@ -87,27 +87,46 @@ function strokeRoundedRect(
   ctx.stroke();
 }
 
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number) {
+/** Wrap text within maxWidth, respecting newlines */
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
   const lines: string[] = [];
-  let index = 0;
-  while (index < text.length && lines.length < maxLines) {
-    let line = '';
-    while (index < text.length) {
-      const char = text[index];
-      if (char === '\n') { index += 1; break; }
-      const candidate = line + char;
-      if (line && ctx.measureText(candidate).width > maxWidth) break;
-      line = candidate;
-      index += 1;
+  for (const paragraph of text.split('\n')) {
+    if (!paragraph.trim()) { lines.push(''); continue; }
+    let current = '';
+    for (const char of paragraph) {
+      const test = current + char;
+      if (ctx.measureText(test).width > maxWidth && current) {
+        lines.push(current);
+        current = char;
+      } else {
+        current = test;
+      }
     }
-    lines.push(line.trimStart());
-  }
-  if (index < text.length && lines.length > 0) {
-    let last = lines[lines.length - 1];
-    while (last && ctx.measureText(`${last}…`).width > maxWidth) last = last.slice(0, -1);
-    lines[lines.length - 1] = `${last}…`;
+    if (current) lines.push(current);
   }
   return lines;
+}
+
+/** Draw a centered decorative divider */
+function drawDivider(ctx: CanvasRenderingContext2D, y: number, color: string) {
+  const cx = CARD_W / 2;
+  ctx.lineWidth = 0.8;
+  const grad = ctx.createLinearGradient(cx - 90, 0, cx + 90, 0);
+  grad.addColorStop(0, 'rgba(0,0,0,0)');
+  grad.addColorStop(0.3, color);
+  grad.addColorStop(0.5, color);
+  grad.addColorStop(0.7, color);
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.strokeStyle = grad;
+  ctx.beginPath();
+  ctx.moveTo(cx - 90, y);
+  ctx.lineTo(cx + 90, y);
+  ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.font = `8px ${FONT_SANS}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('·', cx, y - 4);
+  ctx.textAlign = 'left';
 }
 
 async function loadImage(src: string): Promise<HTMLImageElement> {
@@ -166,17 +185,18 @@ async function renderWtftiShareImage(p: WtftiPersonality, imgUrl?: string) {
 
   const canvas = document.createElement('canvas');
   canvas.width = CARD_W * SCALE;
-  canvas.height = CARD_H * SCALE;
+  canvas.height = MAX_H * SCALE;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas context unavailable');
   ctx.scale(SCALE, SCALE);
   ctx.textBaseline = 'top';
 
   const accent = p.color;
+  const LIGHT = '#A8A29E';
 
   // ========== 1. Cream 背景 ==========
   ctx.fillStyle = BG;
-  ctx.fillRect(0, 0, CARD_W, CARD_H);
+  ctx.fillRect(0, 0, CARD_W, MAX_H);
 
   // 微弱色彩晕染
   const wash = ctx.createRadialGradient(270, 280, 0, 270, 280, 300);
@@ -185,130 +205,184 @@ async function renderWtftiShareImage(p: WtftiPersonality, imgUrl?: string) {
   ctx.fillStyle = wash;
   ctx.fillRect(0, 0, CARD_W, 560);
 
-  // ========== 2. 双层边框 + 角饰 ==========
-  strokeRoundedRect(ctx, 14, 14, CARD_W - 28, CARD_H - 28, 24, hexToRgba(accent, 0.25), 2.5);
-  strokeRoundedRect(ctx, 22, 22, CARD_W - 44, CARD_H - 44, 18, hexToRgba(accent, 0.08), 1);
+  // ========== y tracks the current vertical position ==========
+  let y = 46;
 
-  ctx.fillStyle = hexToRgba(accent, 0.35);
-  ctx.font = `14px ${FONT_SANS}`;
-  ctx.textAlign = 'center';
-  ctx.fillText('✦', 36, 28);
-  ctx.fillText('✦', CARD_W - 36, 28);
-  ctx.fillText('✦', 36, CARD_H - 44);
-  ctx.fillText('✦', CARD_W - 36, CARD_H - 44);
-
-  // ========== 3. Header ==========
+  // ── Header ──
   ctx.fillStyle = accent;
   ctx.font = `600 12px ${FONT_MONO}`;
-  ctx.fillText(`WTFTI · WTF ${p.number}`, CARD_W / 2, 46);
+  ctx.textAlign = 'center';
+  ctx.fillText(`WTFTI · WTF ${p.number}`, CARD_W / 2, y);
+  y += 22;
 
   ctx.fillStyle = MED;
   ctx.font = `13px ${FONT_SANS}`;
-  ctx.fillText('在WTFTI人格图鉴中，我被鉴定为', CARD_W / 2, 68);
+  ctx.fillText('在WTFTI人格图鉴中，我被鉴定为', CARD_W / 2, y);
+  y += 24;
+  ctx.textAlign = 'left';
 
-  // ========== 4. 人格图鉴图 ==========
+  // ============ 人格图鉴图 ============
   const imgX = 60;
-  const imgY = 88;
   const imgW = CARD_W - 120;
   const imgH = 400;
 
-  fillRoundedRect(ctx, imgX, imgY, imgW, imgH, 24, '#ffffff');
-  strokeRoundedRect(ctx, imgX, imgY, imgW, imgH, 24, hexToRgba(accent, 0.25));
+  fillRoundedRect(ctx, imgX, y, imgW, imgH, 24, '#ffffff');
+  strokeRoundedRect(ctx, imgX, y, imgW, imgH, 24, hexToRgba(accent, 0.25));
 
   if (typeImage) {
     ctx.save();
-    roundRectPath(ctx, imgX + 4, imgY + 4, imgW - 8, imgH - 8, 20);
+    roundRectPath(ctx, imgX + 4, y + 4, imgW - 8, imgH - 8, 20);
     ctx.clip();
-    drawImageContain(ctx, typeImage, imgX + 12, imgY + 12, imgW - 24, imgH - 24);
+    drawImageContain(ctx, typeImage, imgX + 12, y + 12, imgW - 24, imgH - 24);
     ctx.restore();
   } else {
     ctx.fillStyle = DARK;
     ctx.font = `120px ${FONT_SANS}`;
-    ctx.fillText(p.emoji, CARD_W / 2, imgY + 110);
+    ctx.textAlign = 'center';
+    ctx.fillText(p.emoji, CARD_W / 2, y + 110);
+    ctx.textAlign = 'left';
   }
+  y += imgH + 16;
 
-  // ========== 5. 人格名 + code ==========
-  const nameY = imgY + imgH + 16;
-  ctx.fillStyle = DARK;
-  ctx.font = `700 48px ${FONT_SANS}`;
-  ctx.fillText(p.wtftiName, CARD_W / 2, nameY);
-
-  const codeY = nameY + 50;
+  // ── Code ──
+  ctx.textAlign = 'center';
   ctx.fillStyle = accent;
   ctx.font = `600 18px ${FONT_MONO}`;
-  ctx.fillText(p.code, CARD_W / 2, codeY);
+  ctx.fillText(p.code, CARD_W / 2, y);
+  y += 28;
 
-  // ========== 6. 一句话标签 ==========
-  const tagY = codeY + 30;
-  ctx.fillStyle = accent;
-  ctx.font = `600 16px ${FONT_SANS}`;
-  const tagLines = wrapText(ctx, `"${p.tagline}"`, CARD_W - 96, 2);
-  tagLines.forEach((line, i) => {
-    ctx.fillText(line, CARD_W / 2, tagY + i * 22);
-  });
-
-  // ========== 7. 隐藏症状清单（取前3条） ==========
-  const listTopY = tagY + tagLines.length * 22 + 20;
-  const listX = 36;
-  const listW = CARD_W - 72;
-  const listH = 110;
-
-  fillRoundedRect(ctx, listX, listTopY, listW, listH, 16, hexToRgba(accent, 0.04));
-  strokeRoundedRect(ctx, listX, listTopY, listW, listH, 16, hexToRgba(accent, 0.10));
-
-  ctx.textAlign = 'left';
-  ctx.fillStyle = MED;
-  ctx.font = `12px ${FONT_SANS}`;
-  ctx.fillText('隐藏症状清单', listX + 24, listTopY + 14);
-
-  const symptoms = p.copy.symptoms.slice(0, 3);
+  // Name
   ctx.fillStyle = DARK;
-  ctx.font = `13px ${FONT_SANS}`;
-  symptoms.forEach((s, i) => {
-    const lines = wrapText(ctx, `✓ ${s}`, listW - 48, 1);
-    lines.forEach((line, li) => {
-      ctx.fillText(line, listX + 24, listTopY + 36 + i * 24 + li * 16);
-    });
-  });
+  ctx.font = `700 48px ${FONT_SANS}`;
+  ctx.fillText(p.wtftiName, CARD_W / 2, y);
+  y += 56;
 
-  // ========== 8. WTF 一击 ==========
-  const hitY = listTopY + listH + 16;
+  // ============ ★ QUOTE CARD (wtfHit — the punchy social sharing line) ============
+  ctx.textAlign = 'left';
+  const quoteText = `"${p.copy.wtfHit}"`;
+  ctx.font = `600 17px ${FONT_SANS}`;
+  const quoteW = CARD_W - 72;
+  const quoteLines = wrapText(ctx, quoteText, quoteW - 32);
+  const quoteH = Math.max(52, quoteLines.length * 26 + 20);
+  fillRoundedRect(ctx, 36, y, quoteW, quoteH, 16, hexToRgba(accent, 0.04));
+  strokeRoundedRect(ctx, 36, y, quoteW, quoteH, 16, hexToRgba(accent, 0.10));
   ctx.fillStyle = accent;
-  ctx.font = `600 14px ${FONT_SANS}`;
+  ctx.font = `600 17px ${FONT_SANS}`;
   ctx.textAlign = 'center';
-  const hitLines = wrapText(ctx, `"${p.copy.wtfHit}"`, CARD_W - 96, 2);
-  hitLines.forEach((line, i) => {
-    ctx.fillText(line, CARD_W / 2, hitY + i * 20);
+  quoteLines.forEach((line, i) => {
+    ctx.fillText(line, CARD_W / 2, y + 12 + i * 26);
   });
+  ctx.textAlign = 'left';
+  y += quoteH + 20;
 
-  // ========== 9. Footer (compact, from bottom) ==========
-  const footerDivY = CARD_H - 98;
+  // ============ ★ CLOSER (warm reflection) ============
+  drawDivider(ctx, y, hexToRgba(accent, 0.3));
+  y += 16;
+
+  ctx.fillStyle = LIGHT;
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('ABOUT YOU', CARD_W / 2, y);
+  y += 20;
   ctx.textAlign = 'left';
 
+  ctx.fillStyle = DARK;
+  ctx.font = `13.5px ${FONT_SANS}`;
+  const closerLines = wrapText(ctx, p.copy.closer, CARD_W - 80);
+  const maxCloserLines = Math.min(closerLines.length, 8);
+  for (let i = 0; i < maxCloserLines; i++) {
+    ctx.fillText(closerLines[i], 40, y);
+    y += 21;
+  }
+  y += 10;
+
+  // ============ ★ SYMPTOMS (compact list replacing dimension bars) ============
+  drawDivider(ctx, y, hexToRgba(accent, 0.3));
+  y += 16;
+
+  ctx.fillStyle = LIGHT;
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('隐藏症状', CARD_W / 2, y);
+  y += 20;
+  ctx.textAlign = 'left';
+
+  const symptoms = p.copy.symptoms.slice(0, 4);
+  ctx.font = `13px ${FONT_SANS}`;
+  symptoms.forEach((s) => {
+    ctx.fillStyle = accent;
+    ctx.fillText('✓', 40, y);
+    ctx.fillStyle = DARK;
+    const sLines = wrapText(ctx, s, CARD_W - 100);
+    sLines.forEach((line, li) => {
+      ctx.fillText(line, 58, y + li * 20);
+    });
+    y += sLines.length * 20 + 6;
+  });
+  y += 8;
+
+  // ============ TAGLINE (warm closing) ============
+  drawDivider(ctx, y, hexToRgba(accent, 0.2));
+  y += 14;
+
+  ctx.fillStyle = MED;
+  ctx.font = `italic 12px ${FONT_SANS}`;
+  ctx.textAlign = 'center';
+  ctx.fillText(p.tagline, CARD_W / 2, y);
+  y += 28;
+  ctx.textAlign = 'left';
+
+  // ============ FOOTER ============
+  const CARD_H = y + 80;
+
+  const footerY = CARD_H - 80;
   ctx.strokeStyle = DIV;
-  ctx.lineWidth = 1;
+  ctx.lineWidth = 0.8;
   ctx.beginPath();
-  ctx.moveTo(36, footerDivY);
-  ctx.lineTo(CARD_W - 36, footerDivY);
+  ctx.moveTo(36, footerY);
+  ctx.lineTo(CARD_W - 36, footerY);
   ctx.stroke();
 
   ctx.fillStyle = DARK;
   ctx.font = `600 14px ${FONT_SANS}`;
-  ctx.fillText('测测你的 WTF 人格', 36, footerDivY + 14);
+  ctx.textAlign = 'left';
+  ctx.fillText('测测你的 WTF 人格', 36, footerY + 12);
 
   ctx.fillStyle = accent;
   ctx.font = `11px ${FONT_MONO}`;
-  ctx.fillText(SHARE_SITE_URL, 36, footerDivY + 36);
+  ctx.fillText(SHARE_SITE_URL, 36, footerY + 34);
 
   // QR Code
-  fillRoundedRect(ctx, CARD_W - 36 - 72, footerDivY + 4, 72, 72, 12, '#ffffff');
+  fillRoundedRect(ctx, CARD_W - 36 - 60, footerY + 4, 60, 60, 10, '#ffffff');
   if (qrImage) {
-    drawImageContain(ctx, qrImage, CARD_W - 36 - 68, footerDivY + 8, 64, 64);
+    drawImageContain(ctx, qrImage, CARD_W - 36 - 56, footerY + 8, 52, 52);
   } else {
-    fillRoundedRect(ctx, CARD_W - 36 - 64, footerDivY + 12, 56, 56, 8, DIV);
+    fillRoundedRect(ctx, CARD_W - 36 - 52, footerY + 12, 44, 44, 6, DIV);
   }
 
-  return canvas.toDataURL('image/png');
+  // ========== CROP to actual height & draw border ==========
+  const croppedCanvas = document.createElement('canvas');
+  croppedCanvas.width = CARD_W * SCALE;
+  croppedCanvas.height = CARD_H * SCALE;
+  const cctx = croppedCanvas.getContext('2d');
+  if (!cctx) throw new Error('Canvas context unavailable');
+  cctx.drawImage(canvas, 0, 0);
+
+  cctx.scale(SCALE, SCALE);
+  strokeRoundedRect(cctx, 14, 14, CARD_W - 28, CARD_H - 28, 24, hexToRgba(accent, 0.25), 2.5);
+  strokeRoundedRect(cctx, 22, 22, CARD_W - 44, CARD_H - 44, 18, hexToRgba(accent, 0.08), 1);
+
+  // Corner ornaments
+  cctx.fillStyle = hexToRgba(accent, 0.35);
+  cctx.font = `14px ${FONT_SANS}`;
+  cctx.textAlign = 'center';
+  cctx.textBaseline = 'top';
+  cctx.fillText('✦', 36, 28);
+  cctx.fillText('✦', CARD_W - 36, 28);
+  cctx.fillText('✦', 36, CARD_H - 44);
+  cctx.fillText('✦', CARD_W - 36, CARD_H - 44);
+
+  return croppedCanvas.toDataURL('image/png');
 }
 
 // ─── React 组件 ───

@@ -9,9 +9,13 @@ import type { DailyDimensionScore } from '@/lib/daily/scoring';
 import { DailyShareImageGenerator } from '@/components/DailyShareImageGenerator';
 import type { DailyShareImageGeneratorHandle } from '@/components/DailyShareImageGenerator';
 import { DailyStatusAvatar } from '@/components/DailyStatusAvatar';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { loadStoredQuizResult } from '@/lib/quiz-result-session';
+import { ResultDiagnosticsPanel } from '@/components/ResultDiagnosticsPanel';
+
+const emptySubscribe = () => () => {};
 
 interface Props {
   status: DailyStatusType;
@@ -19,11 +23,22 @@ interface Props {
 }
 
 export function DailyResultContent({ status, dimensionScores }: Props) {
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<DailyShareImageGeneratorHandle>(null);
 
   const shareUrl = getSiteUrl(`/daily/result/${status.slug}/`);
+  const sessionResult = useMemo(() => {
+    if (!mounted) {
+      return null;
+    }
+
+    const stored = loadStoredQuizResult<DailyDimensionScore>('daily');
+    return stored?.slug === status.slug ? stored : null;
+  }, [mounted, status.slug]);
+  const activeDimensionScores = sessionResult?.dimensionScores ?? dimensionScores;
+  const diagnostics = sessionResult?.diagnostics ?? null;
 
   const copyLink = useCallback(() => {
     navigator.clipboard.writeText(shareUrl);
@@ -126,6 +141,18 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
         </motion.div>
       </section>
 
+      {diagnostics && (
+        <section className="max-w-2xl mx-auto px-6 pb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.5 }}
+          >
+            <ResultDiagnosticsPanel diagnostics={diagnostics} accent={status.color} title="这次今日判定说明" />
+          </motion.div>
+        </section>
+      )}
+
       {/* Dimension Bars */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
         <motion.div
@@ -134,10 +161,10 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
           transition={{ delay: 0.3, duration: 0.5 }}
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
-            {status.code} 的五维数据
+            {diagnostics ? `${status.code} 的本次五维落点` : `${status.code} 的五维数据`}
           </h2>
           <div className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 sm:p-8 space-y-5">
-            {dimensionScores.map(ds => {
+            {activeDimensionScores.map(ds => {
               const dim = DAILY_DIMENSIONS.find(d => d.id === ds.id);
               if (!dim) return null;
               const color = DAILY_MODEL_COLORS[dim.model];
@@ -182,7 +209,7 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
           </h2>
 
           <div className="space-y-3">
-            <DailyShareImageGenerator ref={shareRef} status={status} dimensionScores={dimensionScores} />
+            <DailyShareImageGenerator ref={shareRef} status={status} dimensionScores={activeDimensionScores} />
 
             <button
               onClick={copyShareText}

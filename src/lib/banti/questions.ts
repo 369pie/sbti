@@ -1,3 +1,4 @@
+import { sampleQuestionsByDimension } from '../question-pool';
 import type { AnswerOption, Question } from '../questions';
 
 export const BANTI_DEFAULT_OPTIONS: AnswerOption[] = [
@@ -20,6 +21,30 @@ export const BANTI_QUESTIONS: Question[] = [
     ],
   },
   {
+    id: 116,
+    text: '别人一句“你可能不太适合这个方向”，会让我回去反复想很久。',
+    dimension: 'S1',
+    model: 'self',
+    reversed: true,
+    options: [
+      { value: 3, label: '会，嘴上没事，回去已经开始自我怀疑。', key: 'A' },
+      { value: 2, label: '看是谁说的，会受一点影响。', key: 'B' },
+      { value: 1, label: '不会，我会听，但不至于被一句话带走。', key: 'C' },
+    ],
+  },
+  {
+    id: 133,
+    text: '年终述职前，看着别人把成果排得满满当当，你更像？',
+    dimension: 'S1',
+    model: 'self',
+    reversed: false,
+    options: [
+      { value: 1, label: '先焦虑：是不是就我拿不出手。', key: 'A' },
+      { value: 2, label: '会紧一下，但还能慢慢把自己的东西拎出来。', key: 'B' },
+      { value: 3, label: '我知道自己这年干了什么，不至于先慌。', key: 'C' },
+    ],
+  },
+  {
     id: 102,
     text: '领导突然问“你最适合在团队里扮演什么角色？”你会？',
     dimension: 'S2',
@@ -29,6 +54,30 @@ export const BANTI_QUESTIONS: Question[] = [
       { value: 1, label: '脑子空白，临场编一个听起来还行的。', key: 'A' },
       { value: 2, label: '能说个大概，但总觉得还不够准。', key: 'B' },
       { value: 3, label: '这题我熟，我连自己的短板都能一起讲。', key: 'C' },
+    ],
+  },
+  {
+    id: 117,
+    text: '如果让你给自己的工位人设写一句简介，你通常会？',
+    dimension: 'S2',
+    model: 'self',
+    reversed: false,
+    options: [
+      { value: 1, label: '写不出来，我每天来上班都像临时客串。', key: 'A' },
+      { value: 2, label: '能写个大概，但总觉得还差点准头。', key: 'B' },
+      { value: 3, label: '这题我会，我连自己怎么被人记住都知道。', key: 'C' },
+    ],
+  },
+  {
+    id: 134,
+    text: '换了一个项目组之后，我经常要过很久才知道自己该以什么角色出现。',
+    dimension: 'S2',
+    model: 'self',
+    reversed: true,
+    options: [
+      { value: 3, label: '是，经常边做边找定位。', key: 'A' },
+      { value: 2, label: '新环境会这样，但适应后会好一些。', key: 'B' },
+      { value: 1, label: '不会，我通常很快知道自己该站哪。', key: 'C' },
     ],
   },
   {
@@ -44,6 +93,30 @@ export const BANTI_QUESTIONS: Question[] = [
     ],
   },
   {
+    id: 118,
+    text: '有些活哪怕很容易露脸，只要我从心底不认同，也很难做得起劲。',
+    dimension: 'S3',
+    model: 'self',
+    reversed: false,
+    options: [
+      { value: 1, label: '露脸更重要，先做了再说。', key: 'A' },
+      { value: 2, label: '会纠结，边做边看看能不能说服自己。', key: 'B' },
+      { value: 3, label: '是，不认同的事我很难长期硬演。', key: 'C' },
+    ],
+  },
+  {
+    id: 135,
+    text: '如果有一份更稳定但更无感的岗位摆在面前，你会？',
+    dimension: 'S3',
+    model: 'self',
+    reversed: false,
+    options: [
+      { value: 1, label: '稳定就够了，热不热爱以后再说。', key: 'A' },
+      { value: 2, label: '会认真权衡，毕竟人也不能只靠一口气活着。', key: 'B' },
+      { value: 3, label: '我还是想选更像自己的那条线，哪怕难一点。', key: 'C' },
+    ],
+  },
+  {
     id: 104,
     text: '你把重要材料发给领导，对方 6 小时没回。你的脑内弹幕更接近？',
     dimension: 'E1',
@@ -53,6 +126,30 @@ export const BANTI_QUESTIONS: Question[] = [
       { value: 1, label: '完了，是不是我写得太烂了。', key: 'A' },
       { value: 2, label: '有点虚，但还能劝自己先别想太多。', key: 'B' },
       { value: 3, label: '大概率只是忙，回头自然会看。', key: 'C' },
+    ],
+  },
+  {
+    id: 119,
+    text: '领导回我一句“收到，晚点聊”，我就容易开始复盘自己是不是哪句写砸了。',
+    dimension: 'E1',
+    model: 'emotion',
+    reversed: true,
+    options: [
+      { value: 3, label: '是，能从这四个字里脑补一整场危机。', key: 'A' },
+      { value: 2, label: '偶尔会多想一下，但还能拉回来。', key: 'B' },
+      { value: 1, label: '不会，我默认只是对方真的在忙。', key: 'C' },
+    ],
+  },
+  {
+    id: 136,
+    text: '你把版本发出去后，对方很久没有反馈，你通常会？',
+    dimension: 'E1',
+    model: 'emotion',
+    reversed: false,
+    options: [
+      { value: 1, label: '一边等一边越来越心虚。', key: 'A' },
+      { value: 2, label: '会有点悬着，但还能先干别的。', key: 'B' },
+      { value: 3, label: '先继续往下做，真有问题对方会来找我。', key: 'C' },
     ],
   },
   {
@@ -68,6 +165,30 @@ export const BANTI_QUESTIONS: Question[] = [
     ],
   },
   {
+    id: 120,
+    text: '一个项目还没正式到我手里，我已经开始替它想后路了。',
+    dimension: 'E2',
+    model: 'emotion',
+    reversed: false,
+    options: [
+      { value: 1, label: '不至于，先别投入太多。', key: 'A' },
+      { value: 2, label: '会想一点，但还保留观察期。', key: 'B' },
+      { value: 3, label: '是，我很容易提前进入操心模式。', key: 'C' },
+    ],
+  },
+  {
+    id: 137,
+    text: '项目一旦遇到阻力，我会先提醒自己别太上头，免得白搭进去。',
+    dimension: 'E2',
+    model: 'emotion',
+    reversed: true,
+    options: [
+      { value: 3, label: '会，我本能先收一点情绪。', key: 'A' },
+      { value: 2, label: '看这事值不值得。', key: 'B' },
+      { value: 1, label: '不会，我越在意越想把它救回来。', key: 'C' },
+    ],
+  },
+  {
     id: 106,
     text: '晚上十点，同事还在群里连发十几条消息催你看。你会怎么想？',
     dimension: 'E3',
@@ -77,6 +198,30 @@ export const BANTI_QUESTIONS: Question[] = [
       { value: 1, label: '回啊，既然看到就顺手解决了。', key: 'A' },
       { value: 2, label: '回一点，但会暗暗希望对方赶紧收手。', key: 'B' },
       { value: 3, label: '已读都嫌多，下班后请退出我的领地。', key: 'C' },
+    ],
+  },
+  {
+    id: 121,
+    text: '哪怕已经下班，只要同事来敲我，我还是很难完全不理。',
+    dimension: 'E3',
+    model: 'emotion',
+    reversed: true,
+    options: [
+      { value: 3, label: '是，看到消息就容易回。', key: 'A' },
+      { value: 2, label: '分人分事，急的会管。', key: 'B' },
+      { value: 1, label: '不会，下班后我会先把自己收回来。', key: 'C' },
+    ],
+  },
+  {
+    id: 138,
+    text: '休假时有人来问一个其实不急的问题，你更可能？',
+    dimension: 'E3',
+    model: 'emotion',
+    reversed: false,
+    options: [
+      { value: 1, label: '顺手就回了，回一下也不费事。', key: 'A' },
+      { value: 2, label: '看关系和事情大小。', key: 'B' },
+      { value: 3, label: '大概率等我回来再说，休假本来就不是在线待命。', key: 'C' },
     ],
   },
   {
@@ -92,6 +237,30 @@ export const BANTI_QUESTIONS: Question[] = [
     ],
   },
   {
+    id: 122,
+    text: '跨部门的人来找我合作，我默认更像哪种预设？',
+    dimension: 'A1',
+    model: 'attitude',
+    reversed: false,
+    options: [
+      { value: 1, label: '先看看会不会把锅甩我头上。', key: 'A' },
+      { value: 2, label: '边合作边观察，先不下结论。', key: 'B' },
+      { value: 3, label: '先按好意理解，能把事成了比先设防更重要。', key: 'C' },
+    ],
+  },
+  {
+    id: 139,
+    text: '在职场里，别人突然对你好一点，我通常会先怀疑背后是不是有交换条件。',
+    dimension: 'A1',
+    model: 'attitude',
+    reversed: true,
+    options: [
+      { value: 3, label: '会，这种事很少无缘无故。', key: 'A' },
+      { value: 2, label: '偶尔会想一下，但不至于逢好必疑。', key: 'B' },
+      { value: 1, label: '不会，我还是愿意先把好意当好意。', key: 'C' },
+    ],
+  },
+  {
     id: 108,
     text: '流程还没完全走完，但 deadline 已经贴脸。你通常会？',
     dimension: 'A2',
@@ -101,6 +270,30 @@ export const BANTI_QUESTIONS: Question[] = [
       { value: 1, label: '先干再说，流程是给有空的人走的。', key: 'A' },
       { value: 2, label: '能补的流程先补，补不上的边做边解释。', key: 'B' },
       { value: 3, label: '再急也得把规矩对齐，不然迟早返工。', key: 'C' },
+    ],
+  },
+  {
+    id: 123,
+    text: '只要最后结果能过，流程能省一点是一点。',
+    dimension: 'A2',
+    model: 'attitude',
+    reversed: true,
+    options: [
+      { value: 3, label: '对，规矩是拿来服务结果的。', key: 'A' },
+      { value: 2, label: '看代价，多数时候能省则省。', key: 'B' },
+      { value: 1, label: '不太对，流程没对齐后面通常更麻烦。', key: 'C' },
+    ],
+  },
+  {
+    id: 140,
+    text: '遇到模糊需求时，我会先做哪件事？',
+    dimension: 'A2',
+    model: 'attitude',
+    reversed: false,
+    options: [
+      { value: 1, label: '先上手干，边干边想。', key: 'A' },
+      { value: 2, label: '一边问一边干，别卡太久。', key: 'B' },
+      { value: 3, label: '先把边界、口径和步骤弄清楚，再动。', key: 'C' },
     ],
   },
   {
@@ -116,6 +309,30 @@ export const BANTI_QUESTIONS: Question[] = [
     ],
   },
   {
+    id: 124,
+    text: '对我来说，上班更多还是把今天过完，未必非要从里面找什么方向感。',
+    dimension: 'A3',
+    model: 'attitude',
+    reversed: true,
+    options: [
+      { value: 3, label: '是，先活着再说。', key: 'A' },
+      { value: 2, label: '大部分时候这样，偶尔也会想远一点。', key: 'B' },
+      { value: 1, label: '不太是，我还是希望工作能和我想成的人有点关系。', key: 'C' },
+    ],
+  },
+  {
+    id: 141,
+    text: '就算是打工，我也想在简历上留下点真正能代表我的东西。',
+    dimension: 'A3',
+    model: 'attitude',
+    reversed: false,
+    options: [
+      { value: 1, label: '没有，别太为难自己。', key: 'A' },
+      { value: 2, label: '有一点，但不至于每件事都上价值。', key: 'B' },
+      { value: 3, label: '有，我还是想留下点能让我自己认的痕迹。', key: 'C' },
+    ],
+  },
+  {
     id: 110,
     text: '看到同龄同事升职了，你的第一反应通常是？',
     dimension: 'Ac1',
@@ -125,6 +342,30 @@ export const BANTI_QUESTIONS: Question[] = [
       { value: 1, label: '与我无关，我先把今天混过去。', key: 'A' },
       { value: 2, label: '会被刺激一下，但不至于立刻开卷。', key: 'B' },
       { value: 3, label: '行，我也得往上挪一格了。', key: 'C' },
+    ],
+  },
+  {
+    id: 125,
+    text: '没人盯的时候，我也会偷偷给自己再抬一点标准。',
+    dimension: 'Ac1',
+    model: 'action',
+    reversed: false,
+    options: [
+      { value: 1, label: '不会，及格就行。', key: 'A' },
+      { value: 2, label: '偶尔会，取决于这事配不配我认真。', key: 'B' },
+      { value: 3, label: '会，我很难只满足于刚刚过线。', key: 'C' },
+    ],
+  },
+  {
+    id: 142,
+    text: '只要能稳稳交差，我其实不太主动给自己加码。',
+    dimension: 'Ac1',
+    model: 'action',
+    reversed: true,
+    options: [
+      { value: 3, label: '对，先别给自己找更多事。', key: 'A' },
+      { value: 2, label: '大多数时候这样，除非我真的被点燃。', key: 'B' },
+      { value: 1, label: '不太对，我常会想能不能再往前多推一步。', key: 'C' },
     ],
   },
   {
@@ -140,6 +381,30 @@ export const BANTI_QUESTIONS: Question[] = [
     ],
   },
   {
+    id: 126,
+    text: '真正要拍板时，我会忍不住想再等等，看会不会冒出更好的选项。',
+    dimension: 'Ac2',
+    model: 'action',
+    reversed: true,
+    options: [
+      { value: 3, label: '会，尤其选项都不差的时候更难拍。', key: 'A' },
+      { value: 2, label: '偶尔会拖一下，但不会太久。', key: 'B' },
+      { value: 1, label: '不会，我通常能在信息够用时就定。', key: 'C' },
+    ],
+  },
+  {
+    id: 143,
+    text: '会里两版方案都各有问题，大家都在等你开口。你更像？',
+    dimension: 'Ac2',
+    model: 'action',
+    reversed: false,
+    options: [
+      { value: 1, label: '我会先看别人有没有更稳的意见。', key: 'A' },
+      { value: 2, label: '快速捋一下利弊，再给偏向。', key: 'B' },
+      { value: 3, label: '我会先拍一个方向，后面边做边修。', key: 'C' },
+    ],
+  },
+  {
     id: 112,
     text: '会前 30 分钟才收到“顺手帮我润色下这 10 页 PPT”，你的执行模式更像？',
     dimension: 'Ac3',
@@ -149,6 +414,30 @@ export const BANTI_QUESTIONS: Question[] = [
       { value: 1, label: '先崩五分钟，然后边骂边拖。', key: 'A' },
       { value: 2, label: '挑关键的救一遍，能交差就交。', key: 'B' },
       { value: 3, label: '立刻进入战斗模式，能救多少救多少。', key: 'C' },
+    ],
+  },
+  {
+    id: 127,
+    text: '任务拆得再细，我也可能一直拖到最后那一下才真正启动。',
+    dimension: 'Ac3',
+    model: 'action',
+    reversed: true,
+    options: [
+      { value: 3, label: '对，不逼到份上很难动。', key: 'A' },
+      { value: 2, label: '看事，有的能早开，有的会拖。', key: 'B' },
+      { value: 1, label: '不太会，我通常一旦接了就会先动起来。', key: 'C' },
+    ],
+  },
+  {
+    id: 144,
+    text: '事情已经乱成一团时，我反而更容易进入处理模式。',
+    dimension: 'Ac3',
+    model: 'action',
+    reversed: false,
+    options: [
+      { value: 1, label: '不，我会先想逃离现场。', key: 'A' },
+      { value: 2, label: '能处理，但需要先缓一口气。', key: 'B' },
+      { value: 3, label: '是，越乱我越想先把它摁住。', key: 'C' },
     ],
   },
   {
@@ -164,6 +453,30 @@ export const BANTI_QUESTIONS: Question[] = [
     ],
   },
   {
+    id: 128,
+    text: '被拉进一个谁都不熟的新项目群，我通常会？',
+    dimension: 'So1',
+    model: 'social',
+    reversed: false,
+    options: [
+      { value: 1, label: '先潜着，尽量少冒头。', key: 'A' },
+      { value: 2, label: '等别人说几句，再挑合适的时机接话。', key: 'B' },
+      { value: 3, label: '会主动打个招呼，顺手把自己摆上台面。', key: 'C' },
+    ],
+  },
+  {
+    id: 145,
+    text: '除非别人先来找我，不然我在职场里通常能潜水就潜水。',
+    dimension: 'So1',
+    model: 'social',
+    reversed: true,
+    options: [
+      { value: 3, label: '是，我不太想主动刷存在感。', key: 'A' },
+      { value: 2, label: '看场合，必要时会出来。', key: 'B' },
+      { value: 1, label: '不会，我很多时候是会先开的那个人。', key: 'C' },
+    ],
+  },
+  {
     id: 114,
     text: '刚熟一点的同事突然问你工资、感情和私生活近况，你的身体反应是？',
     dimension: 'So2',
@@ -176,6 +489,30 @@ export const BANTI_QUESTIONS: Question[] = [
     ],
   },
   {
+    id: 129,
+    text: '聊到兴头上，我很容易把私事说超线，回头才觉得不该讲那么多。',
+    dimension: 'So2',
+    model: 'social',
+    reversed: true,
+    options: [
+      { value: 3, label: '是，经常说完才反应过来。', key: 'A' },
+      { value: 2, label: '偶尔会，看对象。', key: 'B' },
+      { value: 1, label: '不会，我心里一般有条线。', key: 'C' },
+    ],
+  },
+  {
+    id: 146,
+    text: '刚认识的同事想加我私人微信，我更接近哪种反应？',
+    dimension: 'So2',
+    model: 'social',
+    reversed: false,
+    options: [
+      { value: 1, label: '加呗，私域公域我分得没那么细。', key: 'A' },
+      { value: 2, label: '分人，看聊到哪一步。', key: 'B' },
+      { value: 3, label: '我会先判断要不要放进生活区，不会默认全开。', key: 'C' },
+    ],
+  },
+  {
     id: 115,
     text: '在领导面前的你，和在熟同事面前的你，通常差很多。',
     dimension: 'So3',
@@ -185,6 +522,30 @@ export const BANTI_QUESTIONS: Question[] = [
       { value: 3, label: '差很多，简直像在切换两个操作系统。', key: 'A' },
       { value: 2, label: '会微调，但核心人格没换。', key: 'B' },
       { value: 1, label: '差不多，我在哪都不太演。', key: 'C' },
+    ],
+  },
+  {
+    id: 130,
+    text: '就算对着老板、客户和熟同事，我说话方式会调，但底层那个我差不多没换。',
+    dimension: 'So3',
+    model: 'social',
+    reversed: false,
+    options: [
+      { value: 1, label: '不太是，我不同场景差得挺多。', key: 'A' },
+      { value: 2, label: '会调不少，但不至于完全换人。', key: 'B' },
+      { value: 3, label: '基本是，我只是调频，不是换系统。', key: 'C' },
+    ],
+  },
+  {
+    id: 147,
+    text: '一进职场场景，我就会不自觉切成一个太标准的版本，连自己都觉得陌生。',
+    dimension: 'So3',
+    model: 'social',
+    reversed: true,
+    options: [
+      { value: 3, label: '是，像在扮演一个更安全的人。', key: 'A' },
+      { value: 2, label: '偶尔会，尤其在强权场景。', key: 'B' },
+      { value: 1, label: '不会，我再收着也还是我自己。', key: 'C' },
     ],
   },
   {
@@ -216,11 +577,7 @@ export const BANTI_QUESTIONS: Question[] = [
 ];
 
 export function shuffleBantiQuestions(questions: Question[]): Question[] {
-  const main = questions.filter(q => !q.isDrinkBranch);
-  const shuffled = [...main];
-  for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const nextIndex = Math.floor(Math.random() * (index + 1));
-    [shuffled[index], shuffled[nextIndex]] = [shuffled[nextIndex], shuffled[index]];
-  }
-  return shuffled;
+  return sampleQuestionsByDimension(questions, 2, {
+    keep: (question) => Boolean(question.isDrinkTrigger),
+  });
 }

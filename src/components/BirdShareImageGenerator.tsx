@@ -220,75 +220,90 @@ async function renderBirdShareImage(p: BirdPersonality, imgUrl?: string) {
   ctx.fillRect(0, CARD_H * 0.58, CARD_W, CARD_H * 0.42);
 
   // ========== 4. Top text: badge → birdName + birdTitle → code → tagline ==========
+  const leftX = 36;
   const badgeText = `鸟TI · 鸟类宇宙 · ${p.number}`;
-  ctx.font = `700 11px ${FONT_MONO}`;
-  const badgeW = ctx.measureText(badgeText).width + 24;
-  fillRoundedRect(ctx, 28, 28, badgeW, 24, 12, hexToRgba(accent, 0.18));
+  ctx.font = `700 12px ${FONT_MONO}`;
+  const badgeW = ctx.measureText(badgeText).width + 28;
+  fillRoundedRect(ctx, leftX, 36, badgeW, 26, 13, hexToRgba(accent, 0.15));
   ctx.fillStyle = accent;
   ctx.textAlign = 'center';
-  ctx.fillText(badgeText, 28 + badgeW / 2, 34);
+  ctx.fillText(badgeText, leftX + badgeW / 2, 42);
 
   // Bird name + title
   ctx.textAlign = 'left';
   ctx.fillStyle = DARK;
-  ctx.font = `900 38px ${FONT_SANS}`;
-  const titleText = `${p.birdName}·${p.birdTitle}`;
-  const titleLines = wrapText(ctx, titleText, CARD_W - 64, 2);
-  titleLines.forEach((line, i) => {
-    ctx.fillText(line, 32, 68 + i * 44);
+  ctx.font = `900 44px ${FONT_SANS}`; // 加大标题字号
+  const titleText = `${p.birdName} · ${p.birdTitle}`;
+  const titleLines = wrapText(ctx, titleText, CARD_W - leftX * 2, 2);
+  let currentY = 82;
+  titleLines.forEach((line) => {
+    ctx.fillText(line, leftX, currentY);
+    currentY += 50;
   });
 
-  // Code (bird call) with Backronym
-  const codeY = 68 + titleLines.length * 44 + 6;
+  // Code (bird call) with Backronym (分两行展示，增强 LOGO 质感)
+  currentY += 4;
   ctx.fillStyle = DARK;
-  ctx.font = `900 28px ${FONT_MONO}`;
-  const formattedCode = p.code.split('').join('-');
-  ctx.fillText(formattedCode, 32, codeY);
-
-  const codeWidth = ctx.measureText(formattedCode).width;
-  ctx.font = `700 14px ${FONT_SANS}`;
-  ctx.fillText(`(${p.backronym})`, 32 + codeWidth + 8, codeY + 12);
+  ctx.font = `900 36px ${FONT_MONO}`;
+  // 用空格连字符增加自带字间距效果
+  const formattedCode = p.code.split('').join(' - ');
+  ctx.fillText(formattedCode, leftX, currentY);
+  
+  currentY += 44;
+  ctx.fillStyle = hexToRgba(DARK, 0.55); // 高级灰
+  ctx.font = `600 15px ${FONT_SANS}`;
+  ctx.fillText(`(${p.backronym})`, leftX, currentY);
 
   // Tagline
-  const tagY = codeY + 40;
-  ctx.fillStyle = hexToRgba(DARK, 0.88);
-  ctx.font = `600 15px ${FONT_SANS}`;
-  const tagLines = wrapText(ctx, `"${p.tagline}"`, CARD_W - 64, 2);
-  tagLines.forEach((line, i) => {
-    ctx.fillText(line, 32, tagY + i * 22);
+  currentY += 32;
+  ctx.fillStyle = accent; // 用各自的主题色高亮 tagline
+  ctx.font = `italic 600 18px ${FONT_SANS}`;
+  const tagLines = wrapText(ctx, `"${p.tagline}"`, CARD_W - leftX * 2, 2);
+  tagLines.forEach((line) => {
+    ctx.fillText(line, leftX, currentY);
+    currentY += 26;
   });
 
   // ========== 5. Bottom: 3 feature cards ==========
-  const cardsY = CARD_H - 206;
-  const cardGap = 10;
-  const cardW = (CARD_W - 64 - cardGap * 2) / 3;
-  const cardH = 82;
+  const cardsY = CARD_H - 210;
+  const cardGap = 12;
+  const cardW = (CARD_W - leftX * 2 - cardGap * 2) / 3;
+  const cardH = 88;
 
   p.tags.forEach((tag, i) => {
-    const cardX = 32 + i * (cardW + cardGap);
+    const cardX = leftX + i * (cardW + cardGap);
     const { emoji, text } = parseTagEmoji(tag);
 
-    fillRoundedRect(ctx, cardX, cardsY, cardW, cardH, 14, 'rgba(255, 255, 255, 0.16)');
-    strokeRoundedRect(ctx, cardX, cardsY, cardW, cardH, 14, 'rgba(255, 255, 255, 0.28)', 1);
+    // 提高白度，增加毛玻璃通透感，加强高光描边
+    fillRoundedRect(ctx, cardX, cardsY, cardW, cardH, 16, 'rgba(255, 255, 255, 0.25)');
+    strokeRoundedRect(ctx, cardX, cardsY, cardW, cardH, 16, 'rgba(255, 255, 255, 0.55)', 1);
 
     ctx.textAlign = 'center';
 
     if (emoji) {
-      ctx.font = `28px ${FONT_SANS}`;
-      ctx.fillText(emoji, cardX + cardW / 2, cardsY + 8);
+      ctx.font = `30px ${FONT_SANS}`;
+      ctx.fillText(emoji, cardX + cardW / 2, cardsY + 12);
     }
 
+    // 文字白度加强，并加入轻微投影提升可读性
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+    ctx.shadowBlur = 2;
+    ctx.shadowOffsetY = 1;
     ctx.fillStyle = '#ffffff';
-    ctx.font = `600 11px ${FONT_SANS}`;
-    const lines = wrapText(ctx, text, cardW - 14, 2);
+    ctx.font = `600 12px ${FONT_SANS}`;
+    const lines = wrapText(ctx, text, cardW - 16, 2);
     lines.forEach((line, li) => {
-      ctx.fillText(line, cardX + cardW / 2, cardsY + (emoji ? 44 : 22) + li * 15);
+      ctx.fillText(line, cardX + cardW / 2, cardsY + (emoji ? 48 : 24) + li * 16);
     });
+    // 关闭投影以免影响后面的渲染
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
   });
 
   // ========== 6. Quote bar ==========
-  const quoteY = cardsY + cardH + 14;
-  fillRoundedRect(ctx, 24, quoteY, CARD_W - 48, 54, 14, hexToRgba(accent, 0.88));
+  const quoteY = cardsY + cardH + 16;
+  fillRoundedRect(ctx, 24, quoteY, CARD_W - 48, 54, 14, hexToRgba(accent, 0.92));
   ctx.fillStyle = '#ffffff';
   ctx.font = `600 14px ${FONT_SANS}`;
   ctx.textAlign = 'center';

@@ -1,3 +1,4 @@
+import { sampleQuestionsByDimension } from '../question-pool';
 import type { XptiModelType } from './dimensions';
 
 export interface XptiAnswerOption {
@@ -66,6 +67,14 @@ export const XPTI_QUESTIONS: XptiQuestion[] = [
       { value: 1, label: '观众。坐好看戏就很开心了。', key: 'C' },
     ],
   },
+  {
+    id: 21, text: '只要对方安排得周到，我其实挺享受被带着走。', dimension: 'X1', model: 'power', reversed: true,
+    options: [
+      { value: 3, label: '对，省心又舒服。', key: 'A' },
+      { value: 2, label: '看对象，也看我当天想不想管。', key: 'B' },
+      { value: 1, label: '不太行，我还是更想掌握节奏。', key: 'C' },
+    ],
+  },
 
   // ══════════════════════════════════════
   //  感知轴 (Sense) X2 — S(氛围) ↔ I(直觉)
@@ -109,6 +118,14 @@ export const XPTI_QUESTIONS: XptiQuestion[] = [
       { value: 3, label: '被精心设计的、充满仪式感的瞬间。', key: 'A' },
       { value: 2, label: '两种都有吧。', key: 'B' },
       { value: 1, label: '两个人自然而然地相视一笑，什么都不用说。', key: 'C' },
+    ],
+  },
+  {
+    id: 22, text: '真正让我上头的，往往是对方把氛围做得特别对。', dimension: 'X2', model: 'sense', reversed: false,
+    options: [
+      { value: 3, label: '是，灯光、场景、细节一对，我就很容易沦陷。', key: 'A' },
+      { value: 2, label: '氛围会加分，但不至于一锤定音。', key: 'B' },
+      { value: 1, label: '比起布置氛围，我更吃某句突然说进心里的话。', key: 'C' },
     ],
   },
 
@@ -156,6 +173,14 @@ export const XPTI_QUESTIONS: XptiQuestion[] = [
       { value: 1, label: '每一段都有终点，精彩就够了。', key: 'C' },
     ],
   },
+  {
+    id: 23, text: '关系没彻底说定之前，我不会只把注意力放在一个人身上。', dimension: 'X3', model: 'focus', reversed: true,
+    options: [
+      { value: 3, label: '对，没定下来之前我会保持流动。', key: 'A' },
+      { value: 2, label: '理智上会留余地，情绪上不一定做得到。', key: 'B' },
+      { value: 1, label: '不太对，我一旦对某个人上头就很难再分心。', key: 'C' },
+    ],
+  },
 
   // ══════════════════════════════════════
   //  想象轴 (Imagine) X4 — F(幻想) ↔ R(务实)
@@ -201,13 +226,16 @@ export const XPTI_QUESTIONS: XptiQuestion[] = [
       { value: 1, label: '找一个聊得来、靠得住、能一起解决问题的队友。', key: 'C' },
     ],
   },
+  {
+    id: 24, text: '我喜欢一个人时，通常先爱上的是那种故事感。', dimension: 'X4', model: 'imagine', reversed: false,
+    options: [
+      { value: 3, label: '对，我会先被那个画面和想象击中。', key: 'A' },
+      { value: 2, label: '故事感会加分，但我也会看现实。', key: 'B' },
+      { value: 1, label: '不太是，我会先看这个人能不能把日子过稳。', key: 'C' },
+    ],
+  },
 ];
 
 export function shuffleXptiQuestions(questions: XptiQuestion[]): XptiQuestion[] {
-  const shuffled = [...questions];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
+  return sampleQuestionsByDimension(questions, 5);
 }

@@ -3,6 +3,7 @@ import { DIMENSIONS } from './dimensions';
 import { PERSONALITY_TYPES } from './personalities';
 import type { PersonalityType } from './personalities';
 import type { Question } from './questions';
+import { buildResultDiagnostics, type ResultDiagnostics } from './result-diagnostics';
 
 export type Answer = 1 | 2 | 3; // 不认同 | 中立 | 认同
 
@@ -16,6 +17,7 @@ export interface TestResult {
   personality: PersonalityType;
   dimensions: DimensionScore[];
   drinkTriggered: boolean;
+  diagnostics: ResultDiagnostics;
 }
 
 function getScore(answer: Answer, reversed: boolean): number {
@@ -60,7 +62,19 @@ export function calculateResult(
   // Match to personality type
   const personality = matchPersonality(dimensions, drinkTriggered);
 
-  return { personality, dimensions, drinkTriggered };
+  const candidates = drinkTriggered
+    ? PERSONALITY_TYPES
+    : PERSONALITY_TYPES.filter(p => !p.isSpecial || p.slug !== 'drunk');
+  const diagnostics = buildResultDiagnostics({
+    answers,
+    questions,
+    dimensions: DIMENSIONS,
+    dimensionScores: dimensions,
+    candidates,
+    matchedSlug: personality.slug,
+  });
+
+  return { personality, dimensions, drinkTriggered, diagnostics };
 }
 
 function levelToNum(l: DimensionLevel): number {

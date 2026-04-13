@@ -18,7 +18,7 @@ interface Props {
 }
 
 const CARD_WIDTH = 540;
-const CARD_HEIGHT = 1060;
+const MAX_H = 4000;          // oversized canvas, will be cropped
 const CARD_SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
@@ -95,6 +95,61 @@ function drawImageContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
   ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
 }
 
+/** Wrap text within maxWidth, respecting newlines */
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const lines: string[] = [];
+  for (const paragraph of text.split('\n')) {
+    if (!paragraph.trim()) { lines.push(''); continue; }
+    let current = '';
+    for (const char of paragraph) {
+      const test = current + char;
+      if (ctx.measureText(test).width > maxWidth && current) {
+        lines.push(current);
+        current = char;
+      } else {
+        current = test;
+      }
+    }
+    if (current) lines.push(current);
+  }
+  return lines;
+}
+
+/** Extract the 翻译你的恋爱DNA section from xpti description */
+function extractShortDesc(description: string): string {
+  const sections = description.split(/【(.*?)】/).filter(Boolean);
+  for (let i = 0; i < sections.length; i++) {
+    if (sections[i].includes('翻译你的恋爱DNA') && sections[i + 1]) {
+      return sections[i + 1].trim();
+    }
+  }
+  // Fallback: get early meaningful paragraphs
+  const paragraphs = description.split('\n').filter(l => l.trim() && !l.startsWith('【') && !l.startsWith('✓'));
+  return paragraphs.slice(0, 4).join('\n');
+}
+
+/** Draw a centered decorative divider */
+function drawDivider(ctx: CanvasRenderingContext2D, y: number, color: string) {
+  const cx = CARD_WIDTH / 2;
+  ctx.lineWidth = 0.8;
+  const grad = ctx.createLinearGradient(cx - 90, 0, cx + 90, 0);
+  grad.addColorStop(0, 'rgba(0,0,0,0)');
+  grad.addColorStop(0.3, color);
+  grad.addColorStop(0.5, color);
+  grad.addColorStop(0.7, color);
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.strokeStyle = grad;
+  ctx.beginPath();
+  ctx.moveTo(cx - 90, y);
+  ctx.lineTo(cx + 90, y);
+  ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.font = `8px ${FONT_SANS}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('·', cx, y - 4);
+  ctx.textAlign = 'left';
+}
+
 async function renderXptiShareImage(personality: XptiPersonalityType, dimensionScores: XptiDimensionScore[]) {
   const [personalityImage, qrImage] = await Promise.all([
     getCachedImage(getXptiTypeImage(personality.slug)).catch(() => null),
@@ -105,21 +160,22 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
 
   const canvas = document.createElement('canvas');
   canvas.width = CARD_WIDTH * CARD_SCALE;
-  canvas.height = CARD_HEIGHT * CARD_SCALE;
+  canvas.height = MAX_H * CARD_SCALE;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas context unavailable');
 
   ctx.scale(CARD_SCALE, CARD_SCALE);
   ctx.textBaseline = 'top';
 
-  // ========== Cream background ==========
+  // ========== Color system ==========
   const BG = '#FFF5F7';
   const DARK = '#2D2236';
   const MED = '#6B5F72';
+  const LIGHT = '#A89DB0';
   const DIV = '#e8dce6';
 
   ctx.fillStyle = BG;
-  ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
+  ctx.fillRect(0, 0, CARD_WIDTH, MAX_H);
 
   // Subtle gradient wash
   const wash = ctx.createRadialGradient(270, 200, 0, 270, 200, 300);
@@ -128,61 +184,60 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
   ctx.fillStyle = wash;
   ctx.fillRect(0, 0, CARD_WIDTH, 400);
 
-  // Card border
-  strokeRoundedRect(ctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 24, hexToRgba(personality.color, 0.25), 2.5);
-  strokeRoundedRect(ctx, 22, 22, CARD_WIDTH - 44, CARD_HEIGHT - 44, 18, hexToRgba(personality.color, 0.08), 1);
+  // ========== y tracks the current vertical position ==========
+  let y = 46;
 
-  // Corner ornaments
-  ctx.fillStyle = hexToRgba(personality.color, 0.35);
-  ctx.font = `14px ${FONT_SANS}`;
-  ctx.textAlign = 'center';
-  ctx.fillText('✦', 36, 28);
-  ctx.fillText('✦', CARD_WIDTH - 36, 28);
-  ctx.fillText('✦', 36, CARD_HEIGHT - 44);
-  ctx.fillText('✦', CARD_WIDTH - 36, CARD_HEIGHT - 44);
-
-  // Header
+  // ── Header ──
   ctx.fillStyle = personality.color;
   ctx.font = `600 12px ${FONT_MONO}`;
-  ctx.fillText('XPTI 恋爱XP体质报告', CARD_WIDTH / 2, 46);
+  ctx.textAlign = 'center';
+  ctx.fillText('XPTI 恋爱XP体质报告', CARD_WIDTH / 2, y);
+  y += 22;
 
   ctx.fillStyle = MED;
   ctx.font = `13px ${FONT_SANS}`;
-  ctx.fillText('MBTI测你是什么人，XPTI测你爱上什么人', CARD_WIDTH / 2, 68);
+  ctx.fillText('MBTI测你是什么人，XPTI测你爱上什么人', CARD_WIDTH / 2, y);
+  y += 24;
+  ctx.textAlign = 'left';
 
   // ============ HERO CHARACTER IMAGE ============
   const avatarX = 60;
-  const avatarY = 88;
   const avatarW = CARD_WIDTH - 120;
   const avatarH = 400;
-  fillRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 24, '#ffffff');
-  strokeRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 24, hexToRgba(personality.color, 0.25));
+  fillRoundedRect(ctx, avatarX, y, avatarW, avatarH, 24, '#ffffff');
+  strokeRoundedRect(ctx, avatarX, y, avatarW, avatarH, 24, hexToRgba(personality.color, 0.25));
   if (personalityImage) {
     ctx.save();
-    roundRectPath(ctx, avatarX + 4, avatarY + 4, avatarW - 8, avatarH - 8, 20);
+    roundRectPath(ctx, avatarX + 4, y + 4, avatarW - 8, avatarH - 8, 20);
     ctx.clip();
-    drawImageContain(ctx, personalityImage, avatarX + 12, avatarY + 8, avatarW - 24, avatarH - 16);
+    drawImageContain(ctx, personalityImage, avatarX + 12, y + 8, avatarW - 24, avatarH - 16);
     ctx.restore();
   } else {
     ctx.fillStyle = DARK;
     ctx.font = `120px ${FONT_SANS}`;
-    ctx.fillText(personality.emoji, CARD_WIDTH / 2, avatarY + 60);
+    ctx.textAlign = 'center';
+    ctx.fillText(personality.emoji, CARD_WIDTH / 2, y + 60);
+    ctx.textAlign = 'left';
   }
+  y += avatarH + 16;
 
-  // Number + Code
-  const codeY = avatarY + avatarH + 12;
+  // ── Number + Code ──
+  ctx.textAlign = 'center';
   ctx.fillStyle = MED;
   ctx.font = `13px ${FONT_MONO}`;
-  ctx.fillText(personality.number, CARD_WIDTH / 2, codeY);
+  ctx.fillText(personality.number, CARD_WIDTH / 2, y);
+  y += 18;
 
   ctx.fillStyle = personality.color;
   ctx.font = `700 28px ${FONT_MONO}`;
-  ctx.fillText(personality.code, CARD_WIDTH / 2, codeY + 16);
+  ctx.fillText(personality.code, CARD_WIDTH / 2, y);
+  y += 36;
 
   // Name
   ctx.fillStyle = DARK;
   ctx.font = `700 42px ${FONT_SANS}`;
-  ctx.fillText(personality.name, CARD_WIDTH / 2, codeY + 48);
+  ctx.fillText(personality.name, CARD_WIDTH / 2, y);
+  y += 50;
 
   // Rarity pill
   const rarity = getXptiRarity(personality.slug);
@@ -190,66 +245,113 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
   ctx.font = `600 13px ${FONT_SANS}`;
   const rarityW = ctx.measureText(rarityText).width + 28;
   const rarityX = (CARD_WIDTH - rarityW) / 2;
-  const rarityY = codeY + 96;
-  fillRoundedRect(ctx, rarityX, rarityY, rarityW, 28, 14, hexToRgba(rarity.color, 0.12));
-  strokeRoundedRect(ctx, rarityX, rarityY, rarityW, 28, 14, hexToRgba(rarity.color, 0.3));
+  fillRoundedRect(ctx, rarityX, y, rarityW, 28, 14, hexToRgba(rarity.color, 0.12));
+  strokeRoundedRect(ctx, rarityX, y, rarityW, 28, 14, hexToRgba(rarity.color, 0.3));
   ctx.fillStyle = rarity.color;
-  ctx.fillText(rarityText, CARD_WIDTH / 2, rarityY + 7);
+  ctx.fillText(rarityText, CARD_WIDTH / 2, y + 7);
+  y += 40;
 
-  // Tagline card
-  const tagY = rarityY + 34;
-  const tagW = CARD_WIDTH - 72;
-  fillRoundedRect(ctx, 36, tagY, tagW, 52, 16, hexToRgba(personality.color, 0.05));
-  strokeRoundedRect(ctx, 36, tagY, tagW, 52, 16, hexToRgba(personality.color, 0.12));
+  // ============ ★ QUOTE CARD (tagline — the social sharing core) ============
+  ctx.textAlign = 'left';
+  const quoteText = `"${personality.tagline}"`;
+  ctx.font = `600 17px ${FONT_SANS}`;
+  const quoteW = CARD_WIDTH - 72;
+  const quoteLines = wrapText(ctx, quoteText, quoteW - 32);
+  const quoteH = Math.max(52, quoteLines.length * 26 + 20);
+  fillRoundedRect(ctx, 36, y, quoteW, quoteH, 16, hexToRgba(personality.color, 0.06));
+  strokeRoundedRect(ctx, 36, y, quoteW, quoteH, 16, hexToRgba(personality.color, 0.15));
   ctx.fillStyle = personality.color;
-  ctx.font = `600 15px ${FONT_SANS}`;
-  ctx.fillText(`"${personality.tagline}"`, CARD_WIDTH / 2, tagY + 16);
+  ctx.font = `600 17px ${FONT_SANS}`;
+  ctx.textAlign = 'center';
+  quoteLines.forEach((line, i) => {
+    ctx.fillText(line, CARD_WIDTH / 2, y + 12 + i * 26);
+  });
+  ctx.textAlign = 'left';
+  y += quoteH + 20;
 
+  // ============ ★ DESCRIPTION (warm narrative, not data) ============
+  drawDivider(ctx, y, hexToRgba(personality.color, 0.3));
+  y += 16;
+
+  ctx.fillStyle = LIGHT;
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('ABOUT YOU', CARD_WIDTH / 2, y);
+  y += 20;
   ctx.textAlign = 'left';
 
-  // ============ 4-AXIS BARS ============
-  const barSectionY = tagY + 58;
-  ctx.fillStyle = MED;
-  ctx.font = `12px ${FONT_SANS}`;
-  ctx.fillText('四轴画像', 36, barSectionY);
+  const shortDesc = extractShortDesc(personality.description);
+  ctx.fillStyle = DARK;
+  ctx.font = `13.5px ${FONT_SANS}`;
+  const descLines = wrapText(ctx, shortDesc, CARD_WIDTH - 80);
+  const maxDescLines = Math.min(descLines.length, 8);
+  for (let i = 0; i < maxDescLines; i++) {
+    ctx.fillText(descLines[i], 40, y);
+    y += 21;
+  }
+  y += 10;
 
-  dimensionScores.forEach((score, i) => {
+  // ============ ★ COMPACT SPECTRUM (dot-matrix replacing bars) ============
+  drawDivider(ctx, y, hexToRgba(personality.color, 0.3));
+  y += 16;
+
+  ctx.fillStyle = LIGHT;
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('XP光谱', CARD_WIDTH / 2, y);
+  y += 20;
+
+  dimensionScores.forEach((score) => {
     const dim = XPTI_DIMENSIONS.find(d => d.id === score.id);
     if (!dim) return;
     const color = XPTI_MODEL_COLORS[dim.model].base;
-    const rowY = barSectionY + 24 + i * 46;
 
-    // Pole labels
-    ctx.fillStyle = MED;
+    // Pole labels on left & right
     ctx.font = `11px ${FONT_SANS}`;
+    ctx.fillStyle = MED;
     ctx.textAlign = 'left';
-    ctx.fillText(`${dim.poleA} ${dim.poleALabel}`, 36, rowY);
+    ctx.fillText(dim.poleALabel, 40, y);
     ctx.textAlign = 'right';
-    ctx.fillText(`${dim.poleBLabel} ${dim.poleB}`, CARD_WIDTH - 36, rowY);
+    ctx.fillText(dim.poleBLabel, CARD_WIDTH - 40, y);
 
-    // Bar background
-    const barX = 36;
-    const barW = CARD_WIDTH - 72;
-    const barY = rowY + 20;
-    fillRoundedRect(ctx, barX, barY, barW, 10, 5, DIV);
+    // Dot matrix: 5 dots
+    const dotsX = 155;
+    const dotsW = CARD_WIDTH - 310;
+    const dotSpacing = dotsW / 4;
+    const pct = (score.score - 1) / 2;
+    const filledDots = pct >= 0.75 ? 5 : pct >= 0.55 ? 4 : pct >= 0.4 ? 3 : pct >= 0.2 ? 2 : 1;
 
-    // Filled bar
-    const pct = ((score.score - 1) / 2);
-    const pw = Math.max(36, pct * barW);
-    fillRoundedRect(ctx, barX, barY, pw, 10, 5, color);
-
-    // Level indicator
-    ctx.fillStyle = color;
-    ctx.font = `600 11px ${FONT_MONO}`;
-    ctx.textAlign = 'center';
-    ctx.fillText(score.level, barX + pw, barY + 18);
+    for (let d = 0; d < 5; d++) {
+      const dx = dotsX + d * dotSpacing;
+      const dy = y + 5;
+      ctx.beginPath();
+      ctx.arc(dx, dy, 4, 0, Math.PI * 2);
+      ctx.fillStyle = d < filledDots ? color : DIV;
+      ctx.fill();
+    }
 
     ctx.textAlign = 'left';
+    y += 28;
   });
+  y += 8;
 
-  // ============ FOOTER (compact, from bottom) ============
-  const footerY = CARD_HEIGHT - 98;
+  // ============ TAGLINE (warm closing) ============
+  drawDivider(ctx, y, hexToRgba(personality.color, 0.2));
+  y += 14;
+
+  ctx.fillStyle = MED;
+  ctx.font = `italic 12px ${FONT_SANS}`;
+  ctx.textAlign = 'center';
+  ctx.fillText(personality.tagline, CARD_WIDTH / 2, y);
+  y += 28;
+  ctx.textAlign = 'left';
+
+  // ============ FOOTER ============
+  const CARD_HEIGHT = y + 80;
+
+  const footerY = CARD_HEIGHT - 80;
   ctx.strokeStyle = DIV;
+  ctx.lineWidth = 0.8;
   ctx.beginPath();
   ctx.moveTo(36, footerY);
   ctx.lineTo(CARD_WIDTH - 36, footerY);
@@ -257,21 +359,44 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
 
   ctx.fillStyle = DARK;
   ctx.font = `600 14px ${FONT_SANS}`;
-  ctx.fillText('测测你的恋爱XP体质？', 36, footerY + 14);
+  ctx.textAlign = 'left';
+  ctx.fillText('测测你的恋爱XP体质？', 36, footerY + 12);
 
   ctx.fillStyle = personality.color;
   ctx.font = `11px ${FONT_MONO}`;
-  ctx.fillText(XPTI_SHARE_URL, 36, footerY + 36);
+  ctx.fillText(XPTI_SHARE_URL, 36, footerY + 34);
 
   // QR
-  fillRoundedRect(ctx, CARD_WIDTH - 36 - 72, footerY + 4, 72, 72, 12, '#ffffff');
+  fillRoundedRect(ctx, CARD_WIDTH - 36 - 60, footerY + 4, 60, 60, 10, '#ffffff');
   if (qrImage) {
-    drawImageContain(ctx, qrImage, CARD_WIDTH - 36 - 68, footerY + 8, 64, 64);
+    drawImageContain(ctx, qrImage, CARD_WIDTH - 36 - 56, footerY + 8, 52, 52);
   } else {
-    fillRoundedRect(ctx, CARD_WIDTH - 36 - 64, footerY + 12, 56, 56, 8, DIV);
+    fillRoundedRect(ctx, CARD_WIDTH - 36 - 52, footerY + 12, 44, 44, 6, DIV);
   }
 
-  return canvas.toDataURL('image/png');
+  // ========== CROP to actual height & draw border ==========
+  const croppedCanvas = document.createElement('canvas');
+  croppedCanvas.width = CARD_WIDTH * CARD_SCALE;
+  croppedCanvas.height = CARD_HEIGHT * CARD_SCALE;
+  const cctx = croppedCanvas.getContext('2d');
+  if (!cctx) throw new Error('Canvas context unavailable');
+  cctx.drawImage(canvas, 0, 0);
+
+  cctx.scale(CARD_SCALE, CARD_SCALE);
+  strokeRoundedRect(cctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 24, hexToRgba(personality.color, 0.25), 2.5);
+  strokeRoundedRect(cctx, 22, 22, CARD_WIDTH - 44, CARD_HEIGHT - 44, 18, hexToRgba(personality.color, 0.08), 1);
+
+  // Corner ornaments
+  cctx.fillStyle = hexToRgba(personality.color, 0.35);
+  cctx.font = `14px ${FONT_SANS}`;
+  cctx.textAlign = 'center';
+  cctx.textBaseline = 'top';
+  cctx.fillText('✦', 36, 28);
+  cctx.fillText('✦', CARD_WIDTH - 36, 28);
+  cctx.fillText('✦', 36, CARD_HEIGHT - 44);
+  cctx.fillText('✦', CARD_WIDTH - 36, CARD_HEIGHT - 44);
+
+  return croppedCanvas.toDataURL('image/png');
 }
 
 export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle, Props>(

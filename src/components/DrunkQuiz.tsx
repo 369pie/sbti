@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getDrunkQuestions, calculateDrunkResult } from '@/lib/drunk/scoring';
 import type { Answer } from '@/lib/drunk/scoring';
 import type { DrunkAnswerOption } from '@/lib/drunk/questions';
-import { DRUNK_QUESTIONS } from '@/lib/drunk/questions';
 import { DRUNK_MODEL_NAMES, DRUNK_MODEL_COLORS } from '@/lib/drunk/dimensions';
 import { basePath } from '@/lib/site';
+import { saveStoredQuizResult } from '@/lib/quiz-result-session';
 
 const emptySubscribe = () => () => {};
 
@@ -55,7 +55,14 @@ export function DrunkQuiz() {
     isFinishingRef.current = true;
     setIsFinishing(true);
 
-    const result = calculateDrunkResult(finalAnswers, DRUNK_QUESTIONS);
+    const result = calculateDrunkResult(finalAnswers, questions);
+
+    saveStoredQuizResult('drunk', {
+      slug: result.persona.slug,
+      storedAt: Date.now(),
+      dimensionScores: result.dimensions,
+      diagnostics: result.diagnostics,
+    });
 
     if (finishTimeoutRef.current !== null) {
       window.clearTimeout(finishTimeoutRef.current);
@@ -64,7 +71,7 @@ export function DrunkQuiz() {
     finishTimeoutRef.current = window.setTimeout(() => {
       window.location.href = `${basePath}/drunk/result/${encodeURIComponent(result.persona.slug)}/`;
     }, 800);
-  }, []);
+  }, [questions]);
 
   const handleAnswer = useCallback((questionId: number, value: Answer) => {
     if (!currentQ) return;

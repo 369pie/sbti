@@ -8,13 +8,44 @@
 - 站内功能代码后置，等素材齐了之后再统一接入页面、测试页、结果页与图鉴馆。
 - 优先保证三件事：一眼能认出 IP 气质、仍然像 SBTI 梗图、可以批量稳定生图。
 
-## 二、统一生产规则
+## 二、统一生产规则与全局标准 Prompt (V3.0)
 
-- 视觉基底继续使用 SBTI 经典低多边形纸艺梗图体系，不切到 BanTI 的充气玩具风，也不走复杂背景。
-- 参考底图直接使用 [public/images/types/wtfti](../public/images/types/wtfti) 里的 29 张经典角色图，确保比例、表情张力、站姿和识别度都沿用同一套骨架。
-- 新宇宙输出统一落在 [public/images/types](../public/images/types) 根目录，命名为 `genshin-{slug}.png`、`idv-{slug}.png`、`naruto-{slug}.png`。
-- 角色提示词只借用 IP 的标志性轮廓、服装语言、道具和颜色，不直接复刻官方立绘、UI、Logo、文案或武器细节。
-- 所有图都保持：纯白背景、单角色、无文字、无 logo、无 UI、无多角色同框。
+从今往后，所有新扩展宇宙的图鉴主视觉（不论是职场、修仙、游戏IP），**默认均采用这套「端到端 AIGC 文本排版+角色融合成图」的 V3.0 Prompt 架构**。该架构利用 Z坐标分层控制，解决了文字遮挡与主体占据画幅的矛盾。
+
+### 2.1 全局标准图鉴生成 Prompt 模板
+
+生图模型需支持精确的中英文双语生成（如 Nanobanana/Flux 等高精度排版模型）。每次切换宇宙时，只需灵活替换 `[Overall Style & Visual Hierarchy]` 中的画风约束词（例如：`low-poly`,`anime style`, `wuxia`, `realistic`, `inflatable vinyl toy`, `blind box toy`等）。
+
+```text
+[Overall Style & Visual Hierarchy]
+A high-quality personality test result card, vertical format (3:4 ratio), 【此处替换目标宇宙基底画风，如：aesthetic minimalist editorial flat design style / inflatable oversized vinyl toy figure / vintage Chinese Wuxia style】. The background is a soft, solid light grey color. 
+CRITICAL LAYER RULE (Z-INDEX): All typography (text) MUST be on the absolute top layer (foreground). The central character MUST be on the layer behind the text. The character is massive and occupies at least 50% to 60% of the canvas, BUT whenever the character and text intersect, the TEXT MUST CLEARY OVERLAY THE CHARACTER. The character must NEVER obscure, block, or hide any part of the text.
+
+[Primary Visual - Dominant Subject]
+Positioned boldly in the center: 【此处替换：角色的外貌与画面特征描述，如 a detailed flat-style Voldemort holding a wand】. Close-up or half-body shot, massive presence. It serves as a visual background for the typography above and below it.
+
+[Typography Layer - Top Foreground]
+ALL TEXT HERE MUST SURMOUNT THE CHARACTER'S HEAD IF THEY OVERLAP.
+At the very top edge, small fine text reading "【宇宙名，如：社畜宇宙 / 原神宇宙】". 
+Below it, massive, impactful, bold typography text reading "【主标题名字，如：无鼻狂怒尊者】". 
+Below the title, stylized prominent text reading "【Code及翻译，如：N-O-S-E (No one smells everything)】".
+Underneath, a short expressive tagline text reading "【一句话标签，如：你是那种...就算没有鼻子也要把别人的空气吸干的人】".
+Ensure high contrast so the text remains 100% readable even if it covers the character's forehead or hair.
+
+[Typography Layer - Bottom Foreground]
+Layered intimately near the bottom of the canvas, vividly superimposed over the character's lower torso or clothes:
+Three cleanly designed info-graphic boxes lined up horizontally. 
+The first box: "【标签1内容】".
+The second box: "【标签2内容】".
+The third box: "【标签3内容】".
+At the absolute bottom center edge, stylish elegant text serving as the punchline, reading: "【底部金句内容】".
+```
+
+### 2.2 资产入库标准
+
+- 抛弃原本复杂繁琐的前端 Canvas 字体绘制和坐标对齐，前端直接展示此 prompt 生成并经过筛选的最终结果图。
+- 新宇宙输出统一落在 [public/images/types](../public/images/types) 的对应子目录内。
+- 每张新图必须通过“文字图层是否叠底于上半身”、“角色主体占比是否达到至少 50%”的校对准则。
 
 ## 三、审图顺序
 

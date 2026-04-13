@@ -65,6 +65,10 @@ export function getJuetiTypeImage(slug: string): string {
   return withBasePath(`/images/types/jueti-card-${slug}.png`);
 }
 
+export function getJuetiTypeThumbnailImage(slug: string): string {
+  return withBasePath(`/images/types/jueti-card-${slug}.png`);
+}
+
 // ═══════════════════════════════════════════════════════════════════════
 //  16 觉TI 人格类型
 //

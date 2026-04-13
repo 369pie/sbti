@@ -1,3 +1,4 @@
+import { sampleQuestionsByDimension } from '../question-pool';
 import type { WorkModelType } from './dimensions';
 
 export interface WorkAnswerOption {
@@ -50,6 +51,22 @@ export const WORK_QUESTIONS: WorkQuestion[] = [
       { value: 3, label: '暗暗跟自己较劲，必须追上。', key: 'C' },
     ],
   },
+  {
+    id: 16, text: '没有明确 deadline 的事，我很容易先往后放。', dimension: 'W1', model: 'drive', reversed: true,
+    options: [
+      { value: 3, label: '是，没截止就像没开始。', key: 'A' },
+      { value: 2, label: '偶尔会拖一下，但不会拖太久。', key: 'B' },
+      { value: 1, label: '不会，我通常会先推一点把它启动。', key: 'C' },
+    ],
+  },
+  {
+    id: 17, text: '就算没人看见，我也想把手上的东西做得像回事。', dimension: 'W1', model: 'drive', reversed: false,
+    options: [
+      { value: 1, label: '能交就行，别上升成作品。', key: 'A' },
+      { value: 2, label: '重要的事会，普通活看情况。', key: 'B' },
+      { value: 3, label: '会，我对自己交出去的东西还是有要求。', key: 'C' },
+    ],
+  },
 
   // ══════════════════════════════════════
   //  职场社交 (Social)  W2
@@ -76,6 +93,22 @@ export const WORK_QUESTIONS: WorkQuestion[] = [
       { value: 1, label: '我连自己部门有几个人都数不清。', key: 'A' },
       { value: 2, label: '认识几个常打照面的。', key: 'B' },
       { value: 3, label: '大部分都能叫出来，社交达人不是白叫的。', key: 'C' },
+    ],
+  },
+  {
+    id: 18, text: '如果开会前要和一屋子不熟的人寒暄，我心里会先叹口气。', dimension: 'W2', model: 'social', reversed: true,
+    options: [
+      { value: 3, label: '会，光想想就累。', key: 'A' },
+      { value: 2, label: '分场合，熟一点还好。', key: 'B' },
+      { value: 1, label: '不会，这种场面对我不算难。', key: 'C' },
+    ],
+  },
+  {
+    id: 19, text: '跨部门拉群、约人碰口径这种事，我通常不太怵。', dimension: 'W2', model: 'social', reversed: false,
+    options: [
+      { value: 1, label: '挺怵的，能躲就想躲。', key: 'A' },
+      { value: 2, label: '能做，但要先做点心理建设。', key: 'B' },
+      { value: 3, label: '不太怵，有时候我还会顺手把场子带起来。', key: 'C' },
     ],
   },
 
@@ -106,6 +139,22 @@ export const WORK_QUESTIONS: WorkQuestion[] = [
       { value: 3, label: '出了公司门就把工作忘了，沾枕头就睡。', key: 'C' },
     ],
   },
+  {
+    id: 20, text: '白天挨完一顿说，晚上我很难真的下班。', dimension: 'W3', model: 'stress', reversed: true,
+    options: [
+      { value: 3, label: '是，脑子会一直回放。', key: 'A' },
+      { value: 2, label: '偶尔会带回家，但不至于每次。', key: 'B' },
+      { value: 1, label: '不会太久，我通常能把情绪慢慢放下。', key: 'C' },
+    ],
+  },
+  {
+    id: 21, text: '事情一多，我反而更容易先把轻重缓急捋出来。', dimension: 'W3', model: 'stress', reversed: false,
+    options: [
+      { value: 1, label: '不太行，我会先乱。', key: 'A' },
+      { value: 2, label: '能捋一点，但偶尔还是会卡住。', key: 'B' },
+      { value: 3, label: '是，越乱我越想先排序。', key: 'C' },
+    ],
+  },
 
   // ══════════════════════════════════════
   //  摸鱼指数 (Slack)  W4
@@ -132,6 +181,22 @@ export const WORK_QUESTIONS: WorkQuestion[] = [
       { value: 1, label: '不行，过程也得对得起良心。', key: 'A' },
       { value: 2, label: '有道理但不完全同意。', key: 'B' },
       { value: 3, label: '完全同意，打工人的核心奥义。', key: 'C' },
+    ],
+  },
+  {
+    id: 22, text: '只要流程能自己跑一会儿，我会给自己争取点喘气时间。', dimension: 'W4', model: 'slack', reversed: false,
+    options: [
+      { value: 1, label: '不会，我闲下来就会找下一个活。', key: 'A' },
+      { value: 2, label: '偶尔会，看今天忙不忙。', key: 'B' },
+      { value: 3, label: '会，能省出来的空我一般不会白白放过。', key: 'C' },
+    ],
+  },
+  {
+    id: 23, text: '手头一空，我反而会本能找点正事把自己塞满。', dimension: 'W4', model: 'slack', reversed: true,
+    options: [
+      { value: 3, label: '是，闲着我会不自在。', key: 'A' },
+      { value: 2, label: '看状态，有时想歇有时想补活。', key: 'B' },
+      { value: 1, label: '不会，有空我当然先透口气。', key: 'C' },
     ],
   },
 
@@ -162,13 +227,24 @@ export const WORK_QUESTIONS: WorkQuestion[] = [
       { value: 3, label: '必须的，老板椅迟早是我的。', key: 'C' },
     ],
   },
+  {
+    id: 24, text: '比起往上爬，我更在意这份工作能不能让我安稳睡觉。', dimension: 'W5', model: 'ambition', reversed: true,
+    options: [
+      { value: 3, label: '是，稳定对我更重要。', key: 'A' },
+      { value: 2, label: '两边都重要，要看阶段。', key: 'B' },
+      { value: 1, label: '不太是，我还是会盯着更高的位置。', key: 'C' },
+    ],
+  },
+  {
+    id: 25, text: '看到更高的位置空出来，我会认真想自己能不能去坐。', dimension: 'W5', model: 'ambition', reversed: false,
+    options: [
+      { value: 1, label: '第一反应是别找我加活。', key: 'A' },
+      { value: 2, label: '会想，但不一定真上。', key: 'B' },
+      { value: 3, label: '会，而且通常会盘一盘怎么争。', key: 'C' },
+    ],
+  },
 ];
 
 export function shuffleWorkQuestions(questions: WorkQuestion[]): WorkQuestion[] {
-  const shuffled = [...questions];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
+  return sampleQuestionsByDimension(questions, 4);
 }

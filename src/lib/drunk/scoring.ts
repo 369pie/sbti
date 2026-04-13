@@ -4,6 +4,8 @@ import { DRUNK_PERSONA_TYPES } from './personas';
 import type { DrunkPersonaType } from './personas';
 import type { DrunkQuestion } from './questions';
 import { DRUNK_QUESTIONS } from './questions';
+import { sampleQuestionsByDimension } from '../question-pool';
+import { buildResultDiagnostics, type ResultDiagnostics } from '../result-diagnostics';
 
 export type Answer = 1 | 2 | 3;
 
@@ -16,6 +18,7 @@ export interface DrunkDimensionScore {
 export interface DrunkTestResult {
   persona: DrunkPersonaType;
   dimensions: DrunkDimensionScore[];
+  diagnostics: ResultDiagnostics;
 }
 
 /* ── Seeded PRNG (mulberry32) ── */
@@ -31,44 +34,15 @@ function mulberry32(seed: number) {
 }
 
 /**
- * Pick 6 questions from the bank:
- *   1 per dimension (5), then 1 bonus from the remaining pool.
+ * Pick 10 questions from the bank:
+ *   2 per dimension, seeded by a random value per session.
  *   Seeded by a random value per session (not date-based).
  */
 export function getDrunkQuestions(seed?: number): DrunkQuestion[] {
   const s = seed ?? Math.floor(Math.random() * 1_000_000);
   const rand = mulberry32(s);
 
-  const byDim = new Map<string, DrunkQuestion[]>();
-  for (const q of DRUNK_QUESTIONS) {
-    const arr = byDim.get(q.dimension) ?? [];
-    arr.push(q);
-    byDim.set(q.dimension, [...arr]);
-  }
-
-  const dims = ['D1', 'D2', 'D3', 'D4', 'D5'];
-  const picked: DrunkQuestion[] = [];
-
-  for (const dim of dims) {
-    const pool = byDim.get(dim) ?? [];
-    const idx = Math.floor(rand() * pool.length);
-    picked.push(pool[idx]);
-    pool.splice(idx, 1);
-    byDim.set(dim, pool);
-  }
-
-  const remaining = dims.flatMap(d => byDim.get(d) ?? []);
-  if (remaining.length > 0) {
-    const idx = Math.floor(rand() * remaining.length);
-    picked.push(remaining[idx]);
-  }
-
-  for (let i = picked.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
-    [picked[i], picked[j]] = [picked[j], picked[i]];
-  }
-
-  return picked;
+  return sampleQuestionsByDimension(DRUNK_QUESTIONS, 2, { random: rand });
 }
 
 /* ── Scoring ── */
@@ -104,7 +78,16 @@ export function calculateDrunkResult(
   });
 
   const persona = matchDrunkPersona(dimensions);
-  return { persona, dimensions };
+  const diagnostics = buildResultDiagnostics({
+    answers,
+    questions,
+    dimensions: DRUNK_DIMENSIONS,
+    dimensionScores: dimensions,
+    candidates: DRUNK_PERSONA_TYPES,
+    matchedSlug: persona.slug,
+  });
+
+  return { persona, dimensions, diagnostics };
 }
 
 function levelToNum(l: DimensionLevel): number {

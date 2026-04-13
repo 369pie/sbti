@@ -36,6 +36,7 @@ const FUN_ITEMS = [
   { href: '/love/', label: '恋爱人设', emoji: '💗', desc: '你的恋爱角色' },
   { href: '/daily/', label: '今日模式', emoji: '🎲', desc: '每天换一种人格' },
   { href: '/drunk/', label: '酒后人设', emoji: '🍺', desc: '喝多了你变什么样' },
+  { href: '/identify/', label: '好友鉴定', emoji: '🔍', desc: '帮朋友鉴定人格' },
   { href: '/squad/', label: '组局测试', emoji: '🎯', desc: '朋友一起来测' },
   { href: '/combo/', label: '人格拼盘', emoji: '🧩', desc: '拼出你的多面人格' },
 ];

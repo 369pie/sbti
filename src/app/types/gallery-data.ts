@@ -4,6 +4,7 @@ import { DAILY_STATUS_TYPES, getDailyTypeImage } from '@/lib/daily/statuses';
 import { DRUNK_PERSONA_TYPES, getDrunkTypeImage } from '@/lib/drunk/personas';
 import { DELTA_PERSONALITIES, getDeltaTypeThumbnailImage } from '@/lib/delta/personalities';
 import { FLOWER_PERSONALITY_TYPES, getFlowerRarity, getFlowerTypeThumbnailImage } from '@/lib/flower/personalities';
+import { JUETI_PERSONALITY_TYPES, getJuetiRarity, getJuetiTypeThumbnailImage } from '@/lib/jueti/personalities';
 import { KINGS_PERSONALITIES, getKingsTypeThumbnailImage } from '@/lib/kings/personalities';
 import { LOVE_PERSONALITY_TYPES, getLoveRarity, getLoveTypeImage } from '@/lib/love/personalities';
 import { getRarity, getTypeImage, getXiuxianTypeImage, PERSONALITY_TYPES } from '@/lib/personalities';
@@ -295,6 +296,22 @@ function buildThemeTabs(): GalleryTab[] {
     href: `/drunk/result/${persona.slug}`,
   }));
 
+  const juetiItems: GalleryItem[] = JUETI_PERSONALITY_TYPES.map((personality) => {
+    const rarity = getJuetiRarity(personality.slug);
+
+    return {
+      slug: personality.slug,
+      code: personality.code,
+      name: personality.name,
+      tagline: personality.tagline,
+      color: personality.color,
+      emoji: personality.emoji,
+      image: getJuetiTypeThumbnailImage(personality.slug),
+      href: `/jueti/result/${personality.slug}`,
+      rarity: { label: rarity.label, color: rarity.color, bgColor: rarity.bgColor },
+    };
+  });
+
   return [
     {
       id: 'love',
@@ -349,6 +366,15 @@ function buildThemeTabs(): GalleryTab[] {
       testHref: '/drunk',
       description: '喝多了你是哪种人？12 种酒后人格解剖报告。',
       items: drunkItems,
+    },
+    {
+      id: 'jueti',
+      label: '觉TI',
+      emoji: '🪷',
+      accent: '#a89968',
+      testHref: '/jueti',
+      description: `向内看见自然人格觉察——${juetiItems.length} 种自然力人格，三分钟的镜子。`,
+      items: juetiItems,
     },
   ];
 }

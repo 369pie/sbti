@@ -1,3 +1,4 @@
+import { sampleQuestionsByDimension, shuffleArray } from '../question-pool';
 import type { JuetiModelType } from './dimensions';
 
 export interface JuetiAnswerOption {
@@ -96,6 +97,14 @@ export const JUETI_QUESTIONS: JuetiQuestion[] = [
       { value: 1, label: '"挺好的"——哪怕不太好，也不想被看穿', key: 'C' },
     ],
   },
+  {
+    id: 21, text: '白天的你，突然对一件新东西起了兴趣，通常会——', dimension: 'J4', model: 'spark', reversed: false, act: 1,
+    options: [
+      { value: 3, label: '先把它排进接下来几天的时间里，慢慢啃', key: 'A' },
+      { value: 2, label: '先记下来，等有空再认真碰', key: 'B' },
+      { value: 1, label: '当场热一阵，之后可能就被别的事冲走', key: 'C' },
+    ],
+  },
 
   // ══════════════════════════════════════════════════════════
   //  Act 2 · 深夜的你 (Q8–Q14)
@@ -170,6 +179,14 @@ export const JUETI_QUESTIONS: JuetiQuestion[] = [
       { value: 1, label: '反而有点期待。不确定性是有趣的', key: 'C' },
     ],
   },
+  {
+    id: 22, text: '深夜有人忽然发来很长一段情绪，你更像——', dimension: 'J3', model: 'edge', reversed: false, act: 2,
+    options: [
+      { value: 3, label: '会认真读完，哪怕自己也被一起卷进去', key: 'A' },
+      { value: 2, label: '能陪一会儿，但会提醒自己别沉太深', key: 'B' },
+      { value: 1, label: '先稳住边界，等我有余力再接这份重量', key: 'C' },
+    ],
+  },
 
   // ══════════════════════════════════════════════════════════
   //  Act 3 · 梦里的你 (Q15–Q20)
@@ -234,22 +251,28 @@ export const JUETI_QUESTIONS: JuetiQuestion[] = [
       { value: 1, label: '闪电。短暂地照亮整个夜空，然后归于沉默', key: 'C' },
     ],
   },
+  {
+    id: 23, text: '如果梦里的你要变成一种水，你更像——', dimension: 'J1', model: 'tide', reversed: false, act: 3,
+    options: [
+      { value: 3, label: '潮水。不断拍岸，不断向外抵达', key: 'A' },
+      { value: 2, label: '雨。来时很真，停时也很快', key: 'B' },
+      { value: 1, label: '井水。安静地在深处，没人看见也在流', key: 'C' },
+    ],
+  },
+  {
+    id: 24, text: '一个让你安心的梦，更接近——', dimension: 'J2', model: 'root', reversed: false, act: 3,
+    options: [
+      { value: 3, label: '有门牌号的房子，灯是亮的，人也都在', key: 'A' },
+      { value: 2, label: '一条熟路，虽然天有点暗，但知道自己会走回去', key: 'B' },
+      { value: 1, label: '一张没有终点的船票，风往哪吹就往哪去', key: 'C' },
+    ],
+  },
 ];
 
 export function shuffleJuetiQuestions(questions: JuetiQuestion[]): JuetiQuestion[] {
-  // Shuffle within each act, preserving act order
-  const act1 = questions.filter(q => q.act === 1);
-  const act2 = questions.filter(q => q.act === 2);
-  const act3 = questions.filter(q => q.act === 3);
+  const sampled = sampleQuestionsByDimension(questions, 5);
 
-  const shuffle = <T,>(arr: T[]): T[] => {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  };
-
-  return [...shuffle(act1), ...shuffle(act2), ...shuffle(act3)];
+  return ([1, 2, 3] as const).flatMap((act) =>
+    shuffleArray(sampled.filter((question) => question.act === act)),
+  );
 }

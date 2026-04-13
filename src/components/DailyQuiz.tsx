@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getDailyQuestions, calculateDailyResult } from '@/lib/daily/scoring';
 import type { Answer } from '@/lib/daily/scoring';
 import type { DailyAnswerOption } from '@/lib/daily/questions';
-import { DAILY_QUESTIONS } from '@/lib/daily/questions';
 import { DAILY_MODEL_NAMES, DAILY_MODEL_COLORS } from '@/lib/daily/dimensions';
 import { basePath } from '@/lib/site';
+import { saveStoredQuizResult } from '@/lib/quiz-result-session';
 
 const emptySubscribe = () => () => {};
 
@@ -57,7 +57,14 @@ export function DailyQuiz() {
     isFinishingRef.current = true;
     setIsFinishing(true);
 
-    const result = calculateDailyResult(finalAnswers, DAILY_QUESTIONS);
+    const result = calculateDailyResult(finalAnswers, questions);
+
+    saveStoredQuizResult('daily', {
+      slug: result.status.slug,
+      storedAt: Date.now(),
+      dimensionScores: result.dimensions,
+      diagnostics: result.diagnostics,
+    });
 
     if (finishTimeoutRef.current !== null) {
       window.clearTimeout(finishTimeoutRef.current);
@@ -66,7 +73,7 @@ export function DailyQuiz() {
     finishTimeoutRef.current = window.setTimeout(() => {
       window.location.href = `${basePath}/daily/result/${encodeURIComponent(result.status.slug)}/`;
     }, 800);
-  }, []);
+  }, [questions]);
 
   const handleAnswer = useCallback((questionId: number, value: Answer) => {
     if (!currentQ) return;
