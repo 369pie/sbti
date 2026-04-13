@@ -1,4 +1,5 @@
 import { BANTI_PERSONALITIES, getBantiTypeThumbnailImage } from '@/lib/banti/personalities';
+import { BIRD_PERSONALITIES, getBirdTypeThumbnailImage } from '@/lib/bird/personalities';
 import { DAILY_STATUS_TYPES, getDailyTypeImage } from '@/lib/daily/statuses';
 import { DRUNK_PERSONA_TYPES, getDrunkTypeImage } from '@/lib/drunk/personas';
 import { DELTA_PERSONALITIES, getDeltaTypeThumbnailImage } from '@/lib/delta/personalities';
@@ -114,6 +115,17 @@ function buildIpTabs(): GalleryTab[] {
     href: `/wtfti/result/${personality.slug}/`,
   }));
 
+  const birdItems: GalleryItem[] = BIRD_PERSONALITIES.map((personality) => ({
+    slug: personality.slug,
+    code: personality.number,
+    name: `${personality.birdName}·${personality.birdTitle}`,
+    tagline: personality.tagline,
+    color: personality.color,
+    emoji: personality.emoji,
+    image: getBirdTypeThumbnailImage(personality.slug),
+    href: `/bird/result/${personality.slug}/`,
+  }));
+
   const bantiItems: GalleryItem[] = BANTI_PERSONALITIES.map((personality) => ({
     slug: personality.slug,
     code: personality.number,
@@ -156,6 +168,15 @@ function buildIpTabs(): GalleryTab[] {
       testHref: '/wtfti/test/',
       description: `同一套 15 维度模型，切进另一个命名宇宙：${wtftiItems.length} 张 WTF 人格图鉴，张张都像在当面拆你。`,
       items: wtftiItems,
+    },
+    {
+      id: 'bird',
+      label: '鸟TI',
+      emoji: '🐦',
+      accent: '#f97316',
+      testHref: '/bird/',
+      description: `同一套 15 维度模型，翻译成鸟类人格：${birdItems.length} 种禽况图鉴，每只鸟都是你本人。`,
+      items: birdItems,
     },
     {
       id: 'banti',
