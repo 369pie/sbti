@@ -2,7 +2,7 @@
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import QRCode from 'qrcode';
-import { getXptiRarity } from '@/lib/xpti/personalities';
+import { getXptiRarity, getXptiTypeImage } from '@/lib/xpti/personalities';
 import type { XptiPersonalityType } from '@/lib/xpti/personalities';
 import { XPTI_DIMENSIONS, XPTI_MODEL_COLORS } from '@/lib/xpti/dimensions';
 import { SHARE_SITE_URL } from '@/lib/site';
@@ -18,7 +18,7 @@ interface Props {
 }
 
 const CARD_WIDTH = 540;
-const CARD_HEIGHT = 960;
+const CARD_HEIGHT = 1060;
 const CARD_SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
@@ -96,9 +96,12 @@ function drawImageContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
 }
 
 async function renderXptiShareImage(personality: XptiPersonalityType, dimensionScores: XptiDimensionScore[]) {
-  const qrImage = await QRCode.toDataURL(XPTI_SHARE_URL, {
-    width: 200, margin: 1, color: { dark: '#000000', light: '#ffffffff' }, errorCorrectionLevel: 'M',
-  }).then(url => getCachedImage(url)).catch(() => null);
+  const [personalityImage, qrImage] = await Promise.all([
+    getCachedImage(getXptiTypeImage(personality.slug)).catch(() => null),
+    QRCode.toDataURL(XPTI_SHARE_URL, {
+      width: 200, margin: 1, color: { dark: '#000000', light: '#ffffffff' }, errorCorrectionLevel: 'M',
+    }).then(url => getCachedImage(url)).catch(() => null),
+  ]);
 
   const canvas = document.createElement('canvas');
   canvas.width = CARD_WIDTH * CARD_SCALE;
@@ -147,12 +150,27 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
   ctx.font = `13px ${FONT_SANS}`;
   ctx.fillText('MBTI测你是什么人，XPTI测你爱上什么人', CARD_WIDTH / 2, 68);
 
-  // ============ BIG EMOJI ============
-  ctx.font = `120px ${FONT_SANS}`;
-  ctx.fillText(personality.emoji, CARD_WIDTH / 2, 110);
+  // ============ HERO CHARACTER IMAGE ============
+  const avatarX = 100;
+  const avatarY = 96;
+  const avatarW = CARD_WIDTH - 200;
+  const avatarH = 280;
+  fillRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 24, '#ffffff');
+  strokeRoundedRect(ctx, avatarX, avatarY, avatarW, avatarH, 24, hexToRgba(personality.color, 0.25));
+  if (personalityImage) {
+    ctx.save();
+    roundRectPath(ctx, avatarX + 4, avatarY + 4, avatarW - 8, avatarH - 8, 20);
+    ctx.clip();
+    drawImageContain(ctx, personalityImage, avatarX + 16, avatarY + 12, avatarW - 32, avatarH - 24);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = DARK;
+    ctx.font = `120px ${FONT_SANS}`;
+    ctx.fillText(personality.emoji, CARD_WIDTH / 2, avatarY + 60);
+  }
 
   // Number + Code
-  const codeY = 260;
+  const codeY = avatarY + avatarH + 16;
   ctx.fillStyle = MED;
   ctx.font = `13px ${FONT_MONO}`;
   ctx.fillText(personality.number, CARD_WIDTH / 2, codeY);
