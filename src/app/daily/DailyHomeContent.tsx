@@ -3,6 +3,7 @@ import NextImage from 'next/image';
 import { DAILY_MODEL_NAMES, DAILY_MODEL_COLORS } from '@/lib/daily/dimensions';
 import type { DailyModelType } from '@/lib/daily/dimensions';
 import { DAILY_STATUS_TYPES, getDailyTypeThumbnailImage } from '@/lib/daily/statuses';
+import { DailyTodayCTA } from '@/components/DailyTodayCTA';
 
 const MODELS: { key: DailyModelType; label: string }[] = [
   { key: 'energy', label: '你今天有多少电' },
@@ -13,6 +14,9 @@ const MODELS: { key: DailyModelType; label: string }[] = [
 ];
 
 export default function DailyHomeContent() {
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+
   return (
     <div className="min-h-screen">
       {/* Hero */}
@@ -20,9 +24,12 @@ export default function DailyHomeContent() {
 
         <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
           <div className="animate-fade-up">
-            <span className="inline-block text-xs font-mono tracking-[0.25em] text-text-muted mb-6 uppercase">
+            <span className="inline-block text-xs font-mono tracking-[0.25em] text-text-muted mb-2 uppercase">
               Daily Status Check · 每天题目不同
             </span>
+            <div className="text-sm font-mono text-teal-400 tracking-wider mb-6">
+              {dateStr}
+            </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
               今天的你
@@ -36,24 +43,7 @@ export default function DailyHomeContent() {
               一分钟测出你今天开了什么模式。每天题目不一样。
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/daily/test"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-teal-500 text-white font-medium text-base hover:bg-teal-600 transition-all duration-200"
-              >
-                测一测今天开了什么模式
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
-              <Link
-                href="/"
-                prefetch={false}
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:border-border hover:bg-bg-secondary/50 transition-all duration-200 text-base"
-              >
-                ← 返回首页
-              </Link>
-            </div>
+            <DailyTodayCTA />
           </div>
 
           {/* Stats */}

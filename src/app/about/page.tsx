@@ -1,11 +1,23 @@
 import type { Metadata } from 'next';
+import { getSiteUrl } from '@/lib/site';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: '关于 SBTI 人格测试',
   description:
     '了解 SBTI 人格测试的五组切面、十五维结构、结果解释方式，以及它和 MBTI 的区别。',
+  keywords: ['SBTI', '人格测试', '关于SBTI', 'SBTI介绍', 'MBTI区别'],
   alternates: { canonical: '/about/' },
+  openGraph: {
+    title: '关于 SBTI 人格测试',
+    description: '了解 SBTI 人格测试的五组切面、十五维结构、结果解释方式。',
+    url: getSiteUrl('/about/'),
+  },
+  twitter: {
+    card: 'summary',
+    title: '关于 SBTI 人格测试',
+    description: '了解 SBTI 的五组切面、十五维结构和结果解释方式。',
+  },
 };
 
 export default function AboutPage() {

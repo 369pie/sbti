@@ -8,6 +8,8 @@ import type { GalleryItem, GalleryTab } from './gallery-data';
 /* ── Gallery card ───────────────────────────────────────── */
 function GalleryCard({ item, index }: { item: GalleryItem; index: number }) {
   const shouldPrioritizeImage = index < 4;
+  const [hasImageError, setHasImageError] = useState(false);
+  const showImage = Boolean(item.image) && !hasImageError;
 
   return (
     <div className="animate-fade-up" style={{ animationDelay: `${index * 25}ms` }}>
@@ -20,15 +22,23 @@ function GalleryCard({ item, index }: { item: GalleryItem; index: number }) {
           className="relative w-full aspect-square flex items-center justify-center overflow-hidden"
           style={{ background: `linear-gradient(135deg, ${item.color}08, ${item.color}15)` }}
         >
-          <NextImage
-            src={item.image}
-            alt={item.name}
-            width={384}
-            height={384}
-            loading={shouldPrioritizeImage ? 'eager' : 'lazy'}
-            fetchPriority={shouldPrioritizeImage ? 'high' : 'auto'}
-            className="w-[75%] h-[75%] object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
-          />
+          {showImage ? (
+            <NextImage
+              src={item.image}
+              alt={item.name}
+              width={384}
+              height={384}
+              loading={shouldPrioritizeImage ? 'eager' : 'lazy'}
+              fetchPriority={shouldPrioritizeImage ? 'high' : 'auto'}
+              onError={() => setHasImageError(true)}
+              className="w-[75%] h-[75%] object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-[75%] w-[75%] flex-col items-center justify-center rounded-2xl border border-white/30 bg-white/30 text-center backdrop-blur-sm">
+              <span className="text-4xl leading-none">{item.emoji ?? '🌿'}</span>
+              <span className="mt-2 px-3 text-sm font-medium text-text-primary/85 line-clamp-2">{item.name}</span>
+            </div>
+          )}
           {item.isSpecial && (
             <span className="absolute top-3 right-3 text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full bg-accent-dim text-accent backdrop-blur-sm">
               特殊

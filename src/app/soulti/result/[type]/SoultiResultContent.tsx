@@ -2,38 +2,42 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { JUETI_DIMENSIONS, JUETI_MODEL_NAMES, JUETI_MODEL_COLORS } from '@/lib/jueti/dimensions';
-import { JUETI_PERSONALITY_TYPES, getJuetiRarity, getJuetiResonance } from '@/lib/jueti/personalities';
-import type { JuetiPersonalityType } from '@/lib/jueti/personalities';
-import type { JuetiDimensionScore } from '@/lib/jueti/scoring';
-import { JuetiShareImageGenerator } from '@/components/JuetiShareImageGenerator';
-import type { JuetiShareImageGeneratorHandle } from '@/components/JuetiShareImageGenerator';
+import { SOULTI_DIMENSIONS, SOULTI_MODEL_NAMES, SOULTI_MODEL_COLORS } from '@/lib/soulti/dimensions';
+import { SOULTI_PERSONALITY_TYPES, getSoultiRarity, getSoultiResonance } from '@/lib/soulti/personalities';
+import type { SoultiPersonalityType } from '@/lib/soulti/personalities';
+import type { SoultiDimensionScore } from '@/lib/soulti/scoring';
+import { SoultiShareImageGenerator } from '@/components/SoultiShareImageGenerator';
+import type { SoultiShareImageGeneratorHandle } from '@/components/SoultiShareImageGenerator';
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
+import { UgcShareCTA } from '@/components/UgcShareCTA';
+import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
+import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 
 interface Props {
-  personality: JuetiPersonalityType;
-  dimensionScores: JuetiDimensionScore[];
+  personality: SoultiPersonalityType;
+  dimensionScores: SoultiDimensionScore[];
 }
 
 const serifFont = "Georgia, 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif";
 
-export function JuetiResultContent({ personality, dimensionScores }: Props) {
+export function SoultiResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
-  const shareRef = useRef<JuetiShareImageGeneratorHandle>(null);
+  const shareRef = useRef<SoultiShareImageGeneratorHandle>(null);
 
-  const shareUrl = getSiteUrl(`/jueti/result/${personality.slug}/`);
-  const resonance = getJuetiResonance(personality.slug);
-  const rarity = getJuetiRarity(personality.slug);
+  const shareUrl = getSiteUrl(`/soulti/result/${personality.slug}/`);
+  const resonance = getSoultiResonance(personality.slug);
+  const rarity = getSoultiRarity(personality.slug);
 
-  const mirrorType = resonance ? JUETI_PERSONALITY_TYPES.find(p => p.slug === resonance.mirrorSlug) : undefined;
-  const oppositeType = resonance ? JUETI_PERSONALITY_TYPES.find(p => p.slug === resonance.oppositeSlug) : undefined;
+  const mirrorType = resonance ? SOULTI_PERSONALITY_TYPES.find(p => p.slug === resonance.mirrorSlug) : undefined;
+  const oppositeType = resonance ? SOULTI_PERSONALITY_TYPES.find(p => p.slug === resonance.oppositeSlug) : undefined;
 
   const copyShareText = useCallback(() => {
-    const text = `我的自然人格是「${personality.name}」${personality.code}\n${personality.tagline}\n来觉察你的 → ${shareUrl}`;
+    const text = `我的自然人格是「${personality.name}」${personality.code}\n${personality.tagline}\n来探寻你的灵魂 → ${shareUrl}`;
     navigator.clipboard.writeText(text);
     setTextCopied(true);
     setTimeout(() => setTextCopied(false), 2000);
@@ -82,10 +86,10 @@ export function JuetiResultContent({ personality, dimensionScores }: Props) {
         transition={{ duration: 0.6 }}
       >
         <span className="text-xs tracking-[0.15em] text-text-muted" style={{ fontFamily: serifFont }}>
-          觉TI
+          SoulTI
         </span>
         <span className="text-xs tracking-wider text-text-muted font-mono">
-          {personality.number} / 16
+          {personality.number} / 32
         </span>
       </motion.header>
 
@@ -131,7 +135,7 @@ export function JuetiResultContent({ personality, dimensionScores }: Props) {
             className="text-xs text-text-muted/60 mb-6 tracking-wider"
             style={{ fontFamily: serifFont, fontStyle: 'italic' }}
           >
-            — 向内觉察 · 自然人格
+            — 向内探索 · 自然人格
           </p>
 
           {/* Chinese name */}
@@ -157,7 +161,7 @@ export function JuetiResultContent({ personality, dimensionScores }: Props) {
               {rarity.label}
             </span>
             <span className="text-[10px] text-text-muted/50 tracking-wider">
-              {rarity.populationPct}% 的觉察者
+              {rarity.populationPct}% 的同频灵魂
             </span>
           </div>
         </motion.div>
@@ -327,7 +331,7 @@ export function JuetiResultContent({ personality, dimensionScores }: Props) {
           <div className="grid grid-cols-2 gap-3">
             {mirrorType && (
               <Link
-                href={`/jueti/result/${mirrorType.slug}`}
+                href={`/soulti/result/${mirrorType.slug}`}
                 className="group rounded-2xl border border-border-subtle/80 p-6 transition-all hover:border-border hover:shadow-sm"
                 style={{ background: '#FDFCFA' }}
               >
@@ -348,7 +352,7 @@ export function JuetiResultContent({ personality, dimensionScores }: Props) {
             )}
             {oppositeType && (
               <Link
-                href={`/jueti/result/${oppositeType.slug}`}
+                href={`/soulti/result/${oppositeType.slug}`}
                 className="group rounded-2xl border border-border-subtle/80 p-6 transition-all hover:border-border hover:shadow-sm"
                 style={{ background: '#FDFCFA' }}
               >
@@ -382,21 +386,21 @@ export function JuetiResultContent({ personality, dimensionScores }: Props) {
           className="text-[11px] tracking-[0.3em] text-text-muted/50 uppercase mb-6"
           style={{ fontFamily: serifFont }}
         >
-          {personality.code} · 四轴画像
+          {personality.code} · 五轴画像
         </h3>
 
         <div className="rounded-2xl border border-border-subtle/60 p-6 sm:p-8 space-y-6" style={{ background: '#FDFCFA' }}>
           {dimensionScores.map(ds => {
-            const dim = JUETI_DIMENSIONS.find(d => d.id === ds.id);
+            const dim = SOULTI_DIMENSIONS.find(d => d.id === ds.id);
             if (!dim) return null;
-            const color = JUETI_MODEL_COLORS[dim.model];
+            const color = SOULTI_MODEL_COLORS[dim.model];
             const pct = ((ds.score - 1) / 2) * 100;
             return (
               <div key={ds.id}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-mono" style={{ color: color.base }}>{ds.id}</span>
-                    <span className="text-sm text-text-primary">{JUETI_MODEL_NAMES[dim.model]}</span>
+                    <span className="text-sm text-text-primary">{SOULTI_MODEL_NAMES[dim.model]}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-text-muted">
                     <span>{dim.poleALabel}</span>
@@ -434,12 +438,12 @@ export function JuetiResultContent({ personality, dimensionScores }: Props) {
           className="text-sm leading-[2] text-text-muted/60"
           style={{ fontFamily: serifFont, fontStyle: 'italic' }}
         >
-          觉察不是为了改变你，<br />
+          探索不是为了改变你，<br />
           而是让你看见——你已经是了。
         </p>
       </motion.section>
 
-      <CrossTestRecommendations currentTest="jueti" personalityName={personality.name} />
+      <CrossTestRecommendations currentTest="soulti" personalityName={personality.name} />
 
       {/* ── Share section ── */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
@@ -452,11 +456,11 @@ export function JuetiResultContent({ personality, dimensionScores }: Props) {
             className="text-[11px] tracking-[0.3em] text-text-muted/50 uppercase mb-6 text-center"
             style={{ fontFamily: serifFont }}
           >
-            发给朋友一起觉察
+            发给朋友一起共振
           </h3>
 
           <div className="space-y-3">
-            <JuetiShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
+            <SoultiShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
 
             <button
               onClick={copyShareText}
@@ -482,10 +486,10 @@ export function JuetiResultContent({ personality, dimensionScores }: Props) {
                 快速分享
               </button>
               <Link
-                href="/jueti/test"
+                href="/soulti/test"
                 className="flex-1 py-3 rounded-xl border border-border-subtle text-sm text-text-muted hover:text-text-secondary hover:bg-bg-secondary/30 transition-all text-center"
               >
-                重新觉察
+                重新探索
               </Link>
             </div>
           </div>
@@ -501,10 +505,10 @@ export function JuetiResultContent({ personality, dimensionScores }: Props) {
           更多自然人格
         </h3>
         <div className="grid grid-cols-4 gap-2">
-          {JUETI_PERSONALITY_TYPES.filter(p => p.slug !== personality.slug).slice(0, 8).map(p => (
+          {SOULTI_PERSONALITY_TYPES.filter(p => p.slug !== personality.slug).slice(0, 12).map(p => (
             <Link
               key={p.slug}
-              href={`/jueti/result/${p.slug}`}
+              href={`/soulti/result/${p.slug}`}
               className="group rounded-xl border border-border-subtle/60 hover:border-border p-3 text-center transition-all"
               style={{ background: '#FDFCFA' }}
             >
@@ -523,7 +527,11 @@ export function JuetiResultContent({ personality, dimensionScores }: Props) {
         </div>
       </section>
 
+      <DailyCheckInCTA />
+      <UniversePreviewCards currentUniverse="soulti" />
+      <IdentifyViralCTA personalityName={personality.name} />
       <WtfCardCTA />
+      <UgcShareCTA />
     </div>
   );
 }

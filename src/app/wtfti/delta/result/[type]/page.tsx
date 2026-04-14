@@ -6,6 +6,7 @@ import type { DimensionLevel } from '@/lib/dimensions';
 import { DeltaResultContent } from './DeltaResultContent';
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
+import { getDeltaTypeImage } from '@/lib/delta/personalities';
 
 type PageProps = {
   params: Promise<{ type: string }>;
@@ -29,6 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: `三角TI · 我在三角洲居然是${dp.heroName}？？`,
       description: dp.tagline,
       url: getSiteUrl(`/wtfti/delta/result/${type}/`),
+      images: [{ url: getDeltaTypeImage(type), width: 256, height: 256, alt: dp.heroName }],
     },
     twitter: {
       card: 'summary',

@@ -11,7 +11,7 @@ import { getKingsPersonality } from './kings/personalities';
 import { getDeltaPersonality } from './delta/personalities';
 import { BIRD_PERSONALITIES } from './bird/personalities';
 import { getFlowerPersonalityBySlug } from './flower/personalities';
-import { getJuetiPersonalityBySlug } from './jueti/personalities';
+import { getSoultiPersonalityBySlug } from './soulti/personalities';
 import { getXptiPersonalityBySlug } from './xpti/personalities';
 
 export interface ResolvedPersonality {
@@ -55,8 +55,8 @@ export function resolvePersonality(universeId: string, slug: string): ResolvedPe
       const p = getFlowerPersonalityBySlug(slug);
       return p ? { name: p.name, emoji: p.emoji } : null;
     }
-    case 'jueti': {
-      const p = getJuetiPersonalityBySlug(slug);
+    case 'soulti': {
+      const p = getSoultiPersonalityBySlug(slug);
       return p ? { name: p.name, emoji: p.emoji } : null;
     }
     case 'xpti': {

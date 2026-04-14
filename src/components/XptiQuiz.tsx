@@ -57,7 +57,7 @@ export function XptiQuiz() {
     isFinishingRef.current = true;
     setIsFinishing(true);
 
-    const result = calculateXptiResult(finalAnswers, XPTI_QUESTIONS);
+    const result = calculateXptiResult(finalAnswers, questions);
 
     // Record to WTF Card
     recordUniverseResult('xpti', result.personality.slug);
@@ -69,7 +69,7 @@ export function XptiQuiz() {
     finishTimeoutRef.current = window.setTimeout(() => {
       window.location.href = `${basePath}/xpti/result/${encodeURIComponent(result.personality.slug)}/`;
     }, 800);
-  }, []);
+  }, [questions]);
 
   const handleAnswer = useCallback((questionId: number, value: Answer) => {
     if (!currentQ) return;

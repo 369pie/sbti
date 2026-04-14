@@ -9,11 +9,12 @@ import type { DailyDimensionScore } from '@/lib/daily/scoring';
 import { DailyShareImageGenerator } from '@/components/DailyShareImageGenerator';
 import type { DailyShareImageGeneratorHandle } from '@/components/DailyShareImageGenerator';
 import { DailyStatusAvatar } from '@/components/DailyStatusAvatar';
-import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
 import { ResultDiagnosticsPanel } from '@/components/ResultDiagnosticsPanel';
+import { generateDailyFortune, loadTodayResult, msUntilMidnight, cacheDailyResult } from '@/lib/daily/fortune';
 
 const emptySubscribe = () => () => {};
 
@@ -27,6 +28,38 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<DailyShareImageGeneratorHandle>(null);
+  const [countdown, setCountdown] = useState('');
+
+  // Ensure today's result is cached (handles direct link access)
+  useEffect(() => {
+    if (!mounted) return;
+    const cached = loadTodayResult();
+    if (!cached) cacheDailyResult(status.slug);
+  }, [mounted, status.slug]);
+
+  // Fortune data
+  const allSlugs = useMemo(() => DAILY_STATUS_TYPES.map(s => s.slug), []);
+  const fortune = useMemo(() => {
+    const today = new Date();
+    const ds = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    return generateDailyFortune(ds, status.slug, allSlugs);
+  }, [status.slug, allSlugs]);
+  const compatibleStatus = useMemo(() => DAILY_STATUS_TYPES.find(s => s.slug === fortune.compatibleStatus), [fortune.compatibleStatus]);
+
+  // Countdown to midnight
+  useEffect(() => {
+    if (!mounted) return;
+    const tick = () => {
+      const ms = msUntilMidnight();
+      const h = Math.floor(ms / 3600000);
+      const m = Math.floor((ms % 3600000) / 60000);
+      const s = Math.floor((ms % 60000) / 1000);
+      setCountdown(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [mounted]);
 
   const shareUrl = getSiteUrl(`/daily/result/${status.slug}/`);
   const sessionResult = useMemo(() => {
@@ -141,6 +174,71 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
         </motion.div>
       </section>
 
+      {/* Fortune Card */}
+      <section className="max-w-2xl mx-auto px-6 pb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25, duration: 0.5 }}
+          className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm overflow-hidden"
+        >
+          <div className="px-6 sm:px-8 pt-6 sm:pt-8 pb-4">
+            <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-5">
+              🔮 今日运势
+            </h2>
+            <div className="grid grid-cols-2 gap-4">
+              {/* Lucky Color */}
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-8 h-8 rounded-lg flex-shrink-0 border border-black/5"
+                  style={{ background: fortune.luckyColor.hex }}
+                />
+                <div>
+                  <div className="text-xs text-text-muted">幸运色</div>
+                  <div className="text-sm font-medium text-text-primary">{fortune.luckyColor.name}</div>
+                </div>
+              </div>
+              {/* Lucky Number */}
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-bg-tertiary flex items-center justify-center text-sm font-mono font-bold" style={{ color: status.color }}>
+                  {fortune.luckyNumber}
+                </div>
+                <div>
+                  <div className="text-xs text-text-muted">幸运数字</div>
+                  <div className="text-sm font-medium text-text-primary">{fortune.luckyNumber}</div>
+                </div>
+              </div>
+              {/* Keyword */}
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-bg-tertiary flex items-center justify-center text-base">🏷️</div>
+                <div>
+                  <div className="text-xs text-text-muted">今日关键词</div>
+                  <div className="text-sm font-medium text-text-primary">{fortune.keyword}</div>
+                </div>
+              </div>
+              {/* Compatible */}
+              {compatibleStatus && (
+                <Link href={`/daily/result/${compatibleStatus.slug}`} className="flex items-center gap-3 group">
+                  <div className="w-8 h-8 rounded-lg bg-bg-tertiary flex items-center justify-center text-base">{compatibleStatus.emoji}</div>
+                  <div>
+                    <div className="text-xs text-text-muted">最搭模式</div>
+                    <div className="text-sm font-medium text-text-primary group-hover:underline">{compatibleStatus.name}</div>
+                  </div>
+                </Link>
+              )}
+            </div>
+          </div>
+          {/* Advice banner */}
+          <div className="px-6 sm:px-8 py-4 bg-bg-tertiary/50 border-t border-border-subtle">
+            <p className="text-sm text-text-secondary leading-relaxed">💡 {fortune.advice}</p>
+          </div>
+          {/* Motto */}
+          <div className="px-6 sm:px-8 py-4 border-t border-border-subtle">
+            <p className="text-center text-sm text-text-muted italic">&ldquo;{fortune.motto}&rdquo;</p>
+          </div>
+        </motion.div>
+      </section>
+
       {diagnostics && (
         <section className="max-w-2xl mx-auto px-6 pb-16">
           <motion.div
@@ -226,15 +324,33 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
                 {copied ? '已复制 ✓' : '复制链接'}
               </button>
               <Link
-                href="/daily/test"
+                href="/daily/"
                 className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all text-center"
               >
-                重新测试
+                返回今日模式
               </Link>
             </div>
           </div>
         </motion.div>
       </section>
+
+      {/* Countdown to next day */}
+      {mounted && countdown && (
+        <section className="max-w-2xl mx-auto px-6 pb-8">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.5 }}
+            className="text-center rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6"
+          >
+            <div className="text-sm text-text-muted mb-2">新模式将在以下时间刷新</div>
+            <div className="text-3xl font-mono font-semibold tracking-widest" style={{ color: status.color }}>
+              {countdown}
+            </div>
+            <div className="text-xs text-text-muted mt-2">明天回来，看看你开了什么新模式 ✨</div>
+          </motion.div>
+        </section>
+      )}
 
       {/* Other statuses */}
       <section className="max-w-3xl mx-auto px-6 pb-24">

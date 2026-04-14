@@ -8,12 +8,24 @@ import type { DailyAnswerOption } from '@/lib/daily/questions';
 import { DAILY_MODEL_NAMES, DAILY_MODEL_COLORS } from '@/lib/daily/dimensions';
 import { basePath } from '@/lib/site';
 import { saveStoredQuizResult } from '@/lib/quiz-result-session';
+import { cacheDailyResult, loadTodayResult } from '@/lib/daily/fortune';
 
 const emptySubscribe = () => () => {};
 
 export function DailyQuiz() {
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [questions] = useState(() => getDailyQuestions());
+  const [redirecting, setRedirecting] = useState(false);
+
+  // Auto-redirect if already tested today
+  useEffect(() => {
+    if (!mounted) return;
+    const cached = loadTodayResult();
+    if (cached) {
+      setRedirecting(true);
+      window.location.href = `${basePath}/daily/result/${encodeURIComponent(cached)}/`;
+    }
+  }, [mounted]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Map<number, Answer>>(new Map());
@@ -66,6 +78,9 @@ export function DailyQuiz() {
       diagnostics: result.diagnostics,
     });
 
+    // Cache today's result for daily lock
+    cacheDailyResult(result.status.slug);
+
     if (finishTimeoutRef.current !== null) {
       window.clearTimeout(finishTimeoutRef.current);
     }
@@ -114,7 +129,7 @@ export function DailyQuiz() {
     };
   }, [answers, currentIndex, currentQ, finishTest, mounted, questions.length]);
 
-  if (!mounted || !currentQ) {
+  if (!mounted || !currentQ || redirecting) {
     return (
       <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center">
         <div className="w-5 h-5 rounded-full border-2 border-accent border-t-transparent animate-spin" />

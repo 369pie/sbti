@@ -6,6 +6,7 @@ import type { DimensionLevel } from '@/lib/dimensions';
 import { BantiResultContent } from './BantiResultContent';
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
+import { getBantiTypeImage } from '@/lib/banti/personalities';
 
 type PageProps = {
   params: Promise<{ type: string }>;
@@ -29,6 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: `班TI · 我在职场居然是${bp.workName}？？`,
       description: bp.tagline,
       url: getSiteUrl(`/wtfti/work/result/${type}/`),
+      images: [{ url: getBantiTypeImage(type), width: 256, height: 256, alt: bp.workName }],
     },
     twitter: {
       card: 'summary',

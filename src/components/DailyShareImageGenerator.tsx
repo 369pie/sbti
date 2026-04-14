@@ -7,6 +7,8 @@ import { getDailyTypeImage } from '@/lib/daily/statuses';
 import { DAILY_DIMENSIONS, DAILY_MODEL_COLORS } from '@/lib/daily/dimensions';
 import { SHARE_SITE_URL } from '@/lib/site';
 import type { DailyDimensionScore } from '@/lib/daily/scoring';
+import { generateDailyFortune } from '@/lib/daily/fortune';
+import { DAILY_STATUS_TYPES } from '@/lib/daily/statuses';
 
 export interface DailyShareImageGeneratorHandle {
   generate: () => void;
@@ -261,6 +263,54 @@ async function renderDailyShareImage(status: DailyStatusType, dimensionScores: D
     y += 21;
   }
   y += 10;
+
+  // ============ ★ DAILY FORTUNE ============
+  drawDivider(ctx, y, hexToRgba(status.color, 0.3));
+  y += 16;
+
+  ctx.fillStyle = LIGHT;
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('🔮 今日运势', CARD_WIDTH / 2, y);
+  y += 22;
+  ctx.textAlign = 'left';
+
+  const allSlugs = DAILY_STATUS_TYPES.map(s => s.slug);
+  const fortune = generateDailyFortune(dateStr.replace(/\./g, '-'), status.slug, allSlugs);
+  const fortuneItems = [
+    { label: '幸运色', value: fortune.luckyColor.name, color: fortune.luckyColor.hex },
+    { label: '幸运数字', value: String(fortune.luckyNumber), color: status.color },
+    { label: '关键词', value: fortune.keyword, color: status.color },
+  ];
+
+  const colW = (CARD_WIDTH - 80) / 3;
+  fortuneItems.forEach((item, i) => {
+    const cx = 40 + colW * i + colW / 2;
+    // Color dot
+    ctx.beginPath();
+    ctx.arc(cx, y + 6, 5, 0, Math.PI * 2);
+    ctx.fillStyle = item.color;
+    ctx.fill();
+    // Label
+    ctx.fillStyle = LIGHT;
+    ctx.font = `10px ${FONT_MONO}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(item.label, cx, y + 18);
+    // Value
+    ctx.fillStyle = DARK;
+    ctx.font = `600 13px ${FONT_SANS}`;
+    ctx.fillText(item.value, cx, y + 32);
+  });
+  ctx.textAlign = 'left';
+  y += 52;
+
+  // Fortune motto
+  ctx.fillStyle = MED;
+  ctx.font = `italic 12px ${FONT_SANS}`;
+  ctx.textAlign = 'center';
+  ctx.fillText(`"${fortune.motto}"`, CARD_WIDTH / 2, y);
+  ctx.textAlign = 'left';
+  y += 24;
 
   // ============ ★ COMPACT SPECTRUM (dot-matrix) ============
   drawDivider(ctx, y, hexToRgba(status.color, 0.3));

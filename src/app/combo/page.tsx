@@ -1,12 +1,24 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { getSiteUrl } from '@/lib/site';
 import { ComboContent } from './ComboContent';
 
 export const metadata: Metadata = {
-  title: '人格拼盘 — SBTI × MBTI × 星座',
+  title: '人格拼盘 — SBTI × MBTI × 星座组合解锁',
   description: '把你的 SBTI 人格、MBTI 类型和星座拼在一起，解锁专属的组合称号和毒舌分析。',
+  keywords: ['人格拼盘', 'SBTI MBTI', 'MBTI 星座', '人格组合', '性格配对', '人格测试'],
   alternates: { canonical: '/combo/' },
   robots: { index: true, follow: true },
+  openGraph: {
+    title: '人格拼盘 — SBTI × MBTI × 星座组合解锁',
+    description: '把 SBTI 人格、MBTI 和星座拼在一起，解锁专属组合称号和毒舌分析。',
+    url: getSiteUrl('/combo/'),
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '人格拼盘 — SBTI × MBTI × 星座组合解锁',
+    description: '把 SBTI 人格、MBTI 和星座拼在一起，解锁专属组合称号和毒舌分析。',
+  },
 };
 
 export default function ComboPage() {

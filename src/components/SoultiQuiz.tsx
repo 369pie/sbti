@@ -2,20 +2,20 @@
 
 import { useState, useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { JUETI_QUESTIONS, JUETI_ACT_NAMES, shuffleJuetiQuestions } from '@/lib/jueti/questions';
-import type { JuetiAnswerOption } from '@/lib/jueti/questions';
-import { calculateJuetiResult } from '@/lib/jueti/scoring';
-import type { Answer } from '@/lib/jueti/scoring';
-import { JUETI_MODEL_NAMES, JUETI_MODEL_COLORS } from '@/lib/jueti/dimensions';
+import { SOULTI_QUESTIONS, SOULTI_ACT_NAMES, shuffleSoultiQuestions } from '@/lib/soulti/questions';
+import type { SoultiAnswerOption } from '@/lib/soulti/questions';
+import { calculateSoultiResult } from '@/lib/soulti/scoring';
+import type { Answer } from '@/lib/soulti/scoring';
+import { SOULTI_MODEL_NAMES, SOULTI_MODEL_COLORS } from '@/lib/soulti/dimensions';
 import { basePath } from '@/lib/site';
 import { recordUniverseResult } from '@/lib/wtf-card';
 import { UniversePicker } from '@/components/UniversePicker';
 
 const emptySubscribe = () => () => {};
 
-export function JuetiQuiz() {
+export function SoultiQuiz() {
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
-  const [questions] = useState(() => shuffleJuetiQuestions(JUETI_QUESTIONS));
+  const [questions] = useState(() => shuffleSoultiQuestions(SOULTI_QUESTIONS));
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Map<number, Answer>>(new Map());
@@ -31,7 +31,7 @@ export function JuetiQuiz() {
   const total = questions.length;
   const progress = ((currentIndex) / total) * 100;
 
-  const modelColor = currentQ ? JUETI_MODEL_COLORS[currentQ.model] : JUETI_MODEL_COLORS.tide;
+  const modelColor = currentQ ? SOULTI_MODEL_COLORS[currentQ.model] : SOULTI_MODEL_COLORS.tide;
 
   useLayoutEffect(() => {
     activeQuestionIdRef.current = currentQuestionId;
@@ -57,19 +57,19 @@ export function JuetiQuiz() {
     isFinishingRef.current = true;
     setIsFinishing(true);
 
-    const result = calculateJuetiResult(finalAnswers, JUETI_QUESTIONS);
+    const result = calculateSoultiResult(finalAnswers, questions);
 
     // Record to WTF Card
-    recordUniverseResult('jueti', result.personality.slug);
+    recordUniverseResult('soulti', result.personality.slug);
 
     if (finishTimeoutRef.current !== null) {
       window.clearTimeout(finishTimeoutRef.current);
     }
 
     finishTimeoutRef.current = window.setTimeout(() => {
-      window.location.href = `${basePath}/jueti/result/${encodeURIComponent(result.personality.slug)}/`;
+      window.location.href = `${basePath}/soulti/result/${encodeURIComponent(result.personality.slug)}/`;
     }, 800);
-  }, []);
+  }, [questions]);
 
   const handleAnswer = useCallback((questionId: number, value: Answer) => {
     if (!currentQ) return;
@@ -117,12 +117,12 @@ export function JuetiQuiz() {
     );
   }
 
-  const actName = JUETI_ACT_NAMES[currentQ.act];
+  const actName = SOULTI_ACT_NAMES[currentQ.act];
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] flex flex-col">
       <div className="px-6 pt-4 max-w-2xl mx-auto w-full flex justify-center">
-        <UniversePicker current="jueti" />
+        <UniversePicker current="soulti" />
       </div>
 
       {/* Progress */}
@@ -135,7 +135,7 @@ export function JuetiQuiz() {
             <span className="text-text-muted">{actName}</span>
             <span className="text-text-muted">·</span>
             <span style={{ color: modelColor.base }}>
-              {JUETI_MODEL_NAMES[currentQ.model]}
+              {SOULTI_MODEL_NAMES[currentQ.model]}
             </span>
           </div>
         </div>
@@ -184,7 +184,7 @@ export function JuetiQuiz() {
 
             {/* Answer buttons */}
             <div className="flex flex-col gap-3 max-w-md mx-auto">
-              {currentQ.options.map((opt: JuetiAnswerOption) => {
+              {currentQ.options.map((opt: SoultiAnswerOption) => {
                 const selected = answers.get(currentQ.id) === opt.value;
                 return (
                   <motion.button
@@ -216,7 +216,7 @@ export function JuetiQuiz() {
                     </div>
                     {selected && (
                       <motion.div
-                        layoutId="jueti-selected-ring"
+                        layoutId="soulti-selected-ring"
                         className="absolute inset-0 rounded-2xl"
                         style={{ boxShadow: `0 0 12px ${modelColor.bg}` }}
                         transition={{ duration: 0.2 }}

@@ -14,6 +14,10 @@ import { getXiuxianSkin } from '@/lib/xiuxian';
 import { getXiuxianLaunchOnlyTypes } from '@/lib/xiuxian-v2';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
+import { UgcShareCTA } from '@/components/UgcShareCTA';
+import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
+import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
 import { ResultDiagnosticsPanel } from '@/components/ResultDiagnosticsPanel';
 import { FollowMeCard, FollowMeFloating } from '@/components/FollowMeLinks';
@@ -640,7 +644,11 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         </div>
       </section>
 
+      <DailyCheckInCTA />
+      <UniversePreviewCards currentUniverse={showXiuxian ? 'xiuxian' : 'standard'} />
+      <IdentifyViralCTA personalityName={personality.name} />
       <WtfCardCTA />
+      <UgcShareCTA />
       <FollowMeFloating />
     </div>
   );

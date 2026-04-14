@@ -22,7 +22,7 @@ const ALL_TESTS: TestRecommendation[] = [
   { id: 'squad', emoji: '🎪', title: '组局测试', hook: '看看你们这群人有多抽象', href: '/squad', accent: '#fb923c' },
   { id: 'combo', emoji: '🧩', title: '人格拼盘', hook: 'SBTI × MBTI × 星座三合一', href: '/combo', accent: '#a78bfa' },
   { id: 'xpti', emoji: '💜', title: 'XPTI 恋爱XP', hook: '你的恋爱DNA是什么体质？', href: '/xpti', accent: '#c084fc' },
-  { id: 'jueti', emoji: '🌙', title: '觉TI 自然人格', hook: '向内看见你是哪种自然力', href: '/jueti', accent: '#8b7355' },
+  { id: 'soulti', emoji: '🌙', title: 'SoulTI 自然人格', hook: '向内看见你是哪种自然力', href: '/soulti', accent: '#8b7355' },
   { id: 'flower', emoji: '🌸', title: '花TI 花格鉴定', hook: '测测你像自然界的哪朵花', href: '/flower', accent: '#e11d48' },
   { id: 'identify', emoji: '🔍', title: '好友鉴定器', hook: '帮你朋友鉴定ta是什么人格', href: '/identify', accent: '#ec4899' },
 ];

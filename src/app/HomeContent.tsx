@@ -4,6 +4,7 @@ import { PERSONALITY_TYPES, getTypeThumbnailImage } from '@/lib/personalities';
 import { getLiveUniverses } from '@/lib/universes';
 import { withBasePath } from '@/lib/site';
 import { FollowMeCard, FollowMeFloating } from '@/components/FollowMeLinks';
+import { WtfCardBanner } from '@/components/WtfCardBanner';
 
 // ─── Universe descriptions for the hub cards ─────────────────────────────────
 
@@ -16,8 +17,8 @@ const UNIVERSE_CARDS: Record<string, { tagline: string; stats: string }> = {
   bird: { tagline: '你是哪种禽 · 鸟类人格鉴定', stats: '29 种 · 31 题' },
   flower: { tagline: '花格鉴定 · 测测你像哪朵花', stats: '16 种 · 20 题' },
   delta: { tagline: '三角洲行动 × 人格联名', stats: '29 种 · ~32 题' },
-  jueti: { tagline: '觉察深层自我 · 文艺内省版', stats: '16 种 · 20 题' },
-  xpti: { tagline: '恋爱XP体质 · 你爱上什么人', stats: '16 种 · 20 题' },
+  soulti: { tagline: '觉察深层自我 · 文艺内省版', stats: '16 种 · 20 题' },
+  xpti: { tagline: '恋爱XP体质 · 你爱上什么人', stats: '16 种 · 随机20题' },
 };
 
 const FUN_ITEMS = [
@@ -29,6 +30,9 @@ const FUN_ITEMS = [
   { href: '/identify/', emoji: '🔍', label: '好友鉴定', desc: '帮朋友鉴定人格' },
   { href: '/squad/', emoji: '🎯', label: '组局测试', desc: '拉上朋友一起来' },
   { href: '/combo/', emoji: '🧩', label: '人格拼盘', desc: '拼出你的多面体' },
+  { href: '/rank/', emoji: '🏆', label: '群组排行', desc: '看看谁人格最多' },
+  { href: '/puzzle/', emoji: '🧩', label: '闺蜜拼图', desc: '四人人格拼图' },
+  { href: '/share-templates/', emoji: '📕', label: '分享文案', desc: '一键复制发小红书' },
 ];
 
 const FAQS = [
@@ -185,6 +189,9 @@ export default function HomeContent() {
           </div>
         </div>
       </section>
+
+      {/* ── WTF Card Banner ── */}
+      <WtfCardBanner />
 
       {/* ── Fun Plays ── */}
       <section className="py-20 px-6 border-t border-border-subtle">

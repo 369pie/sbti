@@ -4,7 +4,7 @@ import { DAILY_STATUS_TYPES, getDailyTypeImage } from '@/lib/daily/statuses';
 import { DRUNK_PERSONA_TYPES, getDrunkTypeImage } from '@/lib/drunk/personas';
 import { DELTA_PERSONALITIES, getDeltaTypeThumbnailImage } from '@/lib/delta/personalities';
 import { FLOWER_PERSONALITY_TYPES, getFlowerRarity, getFlowerTypeThumbnailImage } from '@/lib/flower/personalities';
-import { JUETI_PERSONALITY_TYPES, getJuetiRarity, getJuetiTypeThumbnailImage } from '@/lib/jueti/personalities';
+import { SOULTI_PERSONALITY_TYPES, getSoultiRarity, getSoultiTypeThumbnailImage } from '@/lib/soulti/personalities';
 import { KINGS_PERSONALITIES, getKingsTypeThumbnailImage } from '@/lib/kings/personalities';
 import { LOVE_PERSONALITY_TYPES, getLoveRarity, getLoveTypeImage } from '@/lib/love/personalities';
 import { getRarity, getTypeImage, getXiuxianTypeImage, PERSONALITY_TYPES } from '@/lib/personalities';
@@ -296,8 +296,8 @@ function buildThemeTabs(): GalleryTab[] {
     href: `/drunk/result/${persona.slug}`,
   }));
 
-  const juetiItems: GalleryItem[] = JUETI_PERSONALITY_TYPES.map((personality) => {
-    const rarity = getJuetiRarity(personality.slug);
+  const soultiItems: GalleryItem[] = SOULTI_PERSONALITY_TYPES.map((personality) => {
+    const rarity = getSoultiRarity(personality.slug);
 
     return {
       slug: personality.slug,
@@ -306,8 +306,8 @@ function buildThemeTabs(): GalleryTab[] {
       tagline: personality.tagline,
       color: personality.color,
       emoji: personality.emoji,
-      image: getJuetiTypeThumbnailImage(personality.slug),
-      href: `/jueti/result/${personality.slug}`,
+      image: getSoultiTypeThumbnailImage(personality.slug),
+      href: `/soulti/result/${personality.slug}`,
       rarity: { label: rarity.label, color: rarity.color, bgColor: rarity.bgColor },
     };
   });
@@ -368,13 +368,13 @@ function buildThemeTabs(): GalleryTab[] {
       items: drunkItems,
     },
     {
-      id: 'jueti',
-      label: '觉TI',
+      id: 'soulti',
+      label: 'SoulTI',
       emoji: '🪷',
       accent: '#a89968',
-      testHref: '/jueti',
-      description: `向内看见自然人格觉察——${juetiItems.length} 种自然力人格，三分钟的镜子。`,
-      items: juetiItems,
+      testHref: '/soulti',
+      description: `向内看见自然人格觉察——${soultiItems.length} 种自然力人格，三分钟的镜子。`,
+      items: soultiItems,
     },
   ];
 }

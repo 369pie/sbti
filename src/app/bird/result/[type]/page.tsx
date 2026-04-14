@@ -6,6 +6,7 @@ import type { DimensionLevel } from '@/lib/dimensions';
 import { BirdResultContent } from './BirdResultContent';
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
+import { getBirdTypeImage } from '@/lib/bird/personalities';
 
 type PageProps = {
   params: Promise<{ type: string }>;
@@ -29,6 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: `鸟TI · 我居然是${bp.birdName}？？`,
       description: bp.tagline,
       url: getSiteUrl(`/bird/result/${type}/`),
+      images: [{ url: getBirdTypeImage(type), width: 256, height: 256, alt: bp.birdName }],
     },
     twitter: {
       card: 'summary',

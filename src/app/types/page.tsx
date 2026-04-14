@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { GUIDE_ARTICLES } from '@/lib/guides';
+import { getSiteUrl } from '@/lib/site';
 import TypesContent from './TypesContent';
 import { getTypesGalleryData } from './gallery-data';
 
@@ -10,11 +11,40 @@ export const metadata: Metadata = {
   title: `SBTI 全人格图鉴馆 — ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡`,
   description:
     `浏览 SBTI 全部 ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡：核心人格、修仙版、WTFTI、班TI、王者TI、三角TI、恋爱、职场、XPTI、花TI、今日状态、酒后人设，${TYPES_GALLERY_DATA.seriesCount} 个系列一次刷完。`,
+  keywords: ['SBTI人格图鉴', '人格类型大全', '人格图鉴馆', '抽象人设卡', 'SBTI全部类型', '人格测试类型'],
   alternates: { canonical: '/types/' },
+  openGraph: {
+    title: `SBTI 全人格图鉴馆 — ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡`,
+    description: `${TYPES_GALLERY_DATA.seriesCount} 个系列、${TYPES_GALLERY_DATA.totalCount} 张人设卡，一次刷完全部人格类型。`,
+    url: getSiteUrl('/types/'),
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `SBTI 全人格图鉴馆 — ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡`,
+    description: `${TYPES_GALLERY_DATA.seriesCount} 个系列、${TYPES_GALLERY_DATA.totalCount} 张人设卡，一次刷完。`,
+  },
 };
 
 export default function Page() {
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: `SBTI 全人格图鉴馆`,
+          description: `${TYPES_GALLERY_DATA.seriesCount} 个系列、${TYPES_GALLERY_DATA.totalCount} 张人设卡，一次刷完全部人格类型。`,
+          url: getSiteUrl('/types/'),
+          breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'SBTI', item: getSiteUrl('/') },
+              { '@type': 'ListItem', position: 2, name: '全人格图鉴馆', item: getSiteUrl('/types/') },
+            ],
+          },
+        }) }}
+      />
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
       <div className="mb-8 sm:mb-10 animate-fade-up">
         <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-2">
@@ -68,5 +98,6 @@ export default function Page() {
         </div>
       </section>
     </div>
+    </>
   );
 }

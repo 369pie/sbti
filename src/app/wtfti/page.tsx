@@ -20,5 +20,26 @@ export const metadata: Metadata = {
 };
 
 export default function WtftiPage() {
-  return <WtftiLandingContent />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'WebPage',
+          name: 'WTFTI 人格图鉴',
+          description: '29 种 WTF 人格，每一种都说中你。来测测你的 WTF 人格。',
+          url: getSiteUrl('/wtfti/'),
+          breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'SBTI', item: getSiteUrl('/') },
+              { '@type': 'ListItem', position: 2, name: 'WTFTI', item: getSiteUrl('/wtfti/') },
+            ],
+          },
+        }) }}
+      />
+      <WtftiLandingContent />
+    </>
+  );
 }

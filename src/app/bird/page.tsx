@@ -20,5 +20,26 @@ export const metadata: Metadata = {
 };
 
 export default function BirdPage() {
-  return <BirdLandingContent />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'WebPage',
+          name: '鸟TI 鸟类宇宙',
+          description: '29 种鸟格类型，每一种都是你。30 道鸟界场景题，测测你是哪种鸟。',
+          url: getSiteUrl('/bird/'),
+          breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
+              { '@type': 'ListItem', position: 2, name: '鸟TI', item: getSiteUrl('/bird/') },
+            ],
+          },
+        }) }}
+      />
+      <BirdLandingContent />
+    </>
+  );
 }

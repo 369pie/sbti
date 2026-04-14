@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
-import { getJuetiPersonalityBySlug, getAllJuetiSlugs } from '@/lib/jueti/personalities';
-import { JUETI_DIMENSIONS } from '@/lib/jueti/dimensions';
-import type { DimensionLevel } from '@/lib/jueti/dimensions';
-import { JuetiResultContent } from './JuetiResultContent';
+import { getSoultiPersonalityBySlug, getAllSoultiSlugs } from '@/lib/soulti/personalities';
+import { SOULTI_DIMENSIONS } from '@/lib/soulti/dimensions';
+import type { DimensionLevel } from '@/lib/soulti/dimensions';
+import { SoultiResultContent } from './SoultiResultContent';
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
 
@@ -11,20 +11,22 @@ type PageProps = {
 };
 
 export async function generateStaticParams() {
-  return getAllJuetiSlugs().map(slug => ({ type: slug }));
+  return getAllSoultiSlugs().map(slug => ({ type: slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { type } = await params;
-  const p = getJuetiPersonalityBySlug(type);
+  const p = getSoultiPersonalityBySlug(type);
   if (!p) return {};
   return {
-    title: `${p.code}「${p.name}」— 觉TI 自然人格觉察结果`,
-    description: `${p.tagline} — 觉TI 自然人格觉察结果：${p.name}，四轴觉察画像。`,
-    alternates: { canonical: `/jueti/result/${type}/` },
+    title: `${p.code}「${p.name}」— SoulTI 自然人格探索结果`,
+    description: `${p.tagline} — SoulTI 自然人格探索结果：${p.name}，五轴画像。`,
+    alternates: { canonical: `/soulti/result/${type}/` },
     openGraph: {
       title: `我的自然人格是「${p.name}」${p.code}`,
       description: p.tagline,
+      url: getSiteUrl(`/soulti/result/${type}/`),
+      images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: p.name }],
     },
     twitter: {
       card: 'summary',
@@ -34,12 +36,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function JuetiResultPage({ params }: PageProps) {
+export default async function SoultiResultPage({ params }: PageProps) {
   const { type } = await params;
-  const personality = getJuetiPersonalityBySlug(type);
+  const personality = getSoultiPersonalityBySlug(type);
   if (!personality) notFound();
 
-  const dimensionScores = JUETI_DIMENSIONS.map(dim => {
+  const dimensionScores = SOULTI_DIMENSIONS.map(dim => {
     const level = personality.profile[dim.id] as DimensionLevel;
     const score = level === 'H' ? 2.7 : level === 'M' ? 2.0 : 1.3;
     return { id: dim.id, score, level };
@@ -56,8 +58,8 @@ export default async function JuetiResultPage({ params }: PageProps) {
               '@type': 'BreadcrumbList',
               itemListElement: [
                 { '@type': 'ListItem', position: 1, name: 'SBTI 人格测试', item: getSiteUrl('/') },
-                { '@type': 'ListItem', position: 2, name: '觉TI 自然人格', item: getSiteUrl('/jueti/') },
-                { '@type': 'ListItem', position: 3, name: personality.name, item: getSiteUrl(`/jueti/result/${personality.slug}/`) },
+                { '@type': 'ListItem', position: 2, name: 'SoulTI 自然人格', item: getSiteUrl('/soulti/') },
+                { '@type': 'ListItem', position: 3, name: personality.name, item: getSiteUrl(`/soulti/result/${personality.slug}/`) },
               ],
             },
             {
@@ -65,15 +67,15 @@ export default async function JuetiResultPage({ params }: PageProps) {
               mainEntity: [
                 {
                   '@type': 'Question',
-                  name: `觉TI ${personality.code}「${personality.name}」是什么？`,
-                  acceptedAnswer: { '@type': 'Answer', text: `${personality.name}是觉TI 自然人格觉察测试的 16 种类型之一。${personality.tagline}` },
+                  name: `SoulTI ${personality.code}「${personality.name}」是什么？`,
+                  acceptedAnswer: { '@type': 'Answer', text: `${personality.name}是 SoulTI 自然人格探索测试的 32 种类型之一。${personality.tagline}` },
                 },
               ],
             },
           ],
         }) }}
       />
-      <JuetiResultContent personality={personality} dimensionScores={dimensionScores} />
+      <SoultiResultContent personality={personality} dimensionScores={dimensionScores} />
     </>
   );
 }

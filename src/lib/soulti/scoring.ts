@@ -1,20 +1,25 @@
 import type { DimensionLevel } from './dimensions';
-import { JUETI_DIMENSIONS } from './dimensions';
-import { JUETI_PERSONALITY_TYPES } from './personalities';
-import type { JuetiPersonalityType } from './personalities';
-import type { JuetiQuestion } from './questions';
+import { SOULTI_DIMENSIONS } from './dimensions';
+import { SOULTI_PERSONALITY_TYPES } from './personalities';
+import type { SoultiPersonalityType } from './personalities';
+import type { SoultiQuestion } from './questions';
 
 export type Answer = 1 | 2 | 3;
 
-export interface JuetiDimensionScore {
+export interface SoultiDimensionScore {
   id: string;
   score: number;
   level: DimensionLevel;
 }
 
-export interface JuetiTestResult {
-  personality: JuetiPersonalityType;
-  dimensions: JuetiDimensionScore[];
+export interface SoultiTestResult {
+  personality: SoultiPersonalityType;
+  dimensions: SoultiDimensionScore[];
+}
+
+function getScore(answer: Answer, reversed: boolean): number {
+  if (reversed) return 4 - answer;
+  return answer;
 }
 
 function toLevel(score: number): DimensionLevel {
@@ -24,23 +29,26 @@ function toLevel(score: number): DimensionLevel {
 }
 
 /**
- * Build a 4-letter axis code from dimension averages.
+ * Build a 5-letter axis code from dimension averages.
  *   J1 >= 2.0 → T (涌), else S (静)
  *   J2 >= 2.0 → R (根), else W (风)
  *   J3 >= 2.0 → O (融), else B (壁)
  *   J4 >= 2.0 → F (焰), else E (烬)
+ *   J5 >= 2.0 → G (生), else K (矿)
  */
 function buildCode(dimAvg: Map<string, number>): string {
   const j1 = dimAvg.get('J1') ?? 2;
   const j2 = dimAvg.get('J2') ?? 2;
   const j3 = dimAvg.get('J3') ?? 2;
   const j4 = dimAvg.get('J4') ?? 2;
+  const j5 = dimAvg.get('J5') ?? 2;
 
   return (
     (j1 >= 2.0 ? 'T' : 'S') +
     (j2 >= 2.0 ? 'R' : 'W') +
     (j3 >= 2.0 ? 'O' : 'B') +
-    (j4 >= 2.0 ? 'F' : 'E')
+    (j4 >= 2.0 ? 'F' : 'E') +
+    (j5 >= 2.0 ? 'G' : 'K')
   );
 }
 
@@ -52,23 +60,24 @@ function codeDistance(a: string, b: string): number {
   return d;
 }
 
-export function calculateJuetiResult(
+export function calculateSoultiResult(
   answers: Map<number, Answer>,
-  questions: JuetiQuestion[],
-): JuetiTestResult {
+  questions: SoultiQuestion[],
+): SoultiTestResult {
   // Collect scores per dimension
   const dimScores = new Map<string, number[]>();
   for (const q of questions) {
     const a = answers.get(q.id);
     if (a === undefined) continue;
+    const s = getScore(a, q.reversed);
     const arr = dimScores.get(q.dimension) ?? [];
-    arr.push(a);
+    arr.push(s);
     dimScores.set(q.dimension, arr);
   }
 
   // Average per dimension
   const dimAvg = new Map<string, number>();
-  const dimensions: JuetiDimensionScore[] = JUETI_DIMENSIONS.map(d => {
+  const dimensions: SoultiDimensionScore[] = SOULTI_DIMENSIONS.map(d => {
     const scores = dimScores.get(d.id) ?? [];
     const avg = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 2;
     dimAvg.set(d.id, avg);
@@ -77,12 +86,12 @@ export function calculateJuetiResult(
 
   // Build code and try exact match
   const code = buildCode(dimAvg);
-  let personality = JUETI_PERSONALITY_TYPES.find(p => p.code === code);
+  let personality = SOULTI_PERSONALITY_TYPES.find(p => p.code === code);
 
   // Fallback: find nearest code by Hamming distance
   if (!personality) {
     let bestDist = Infinity;
-    for (const p of JUETI_PERSONALITY_TYPES) {
+    for (const p of SOULTI_PERSONALITY_TYPES) {
       const dist = codeDistance(code, p.code);
       if (dist < bestDist) {
         bestDist = dist;
@@ -91,9 +100,9 @@ export function calculateJuetiResult(
     }
   }
 
-  return { personality: personality ?? JUETI_PERSONALITY_TYPES[0], dimensions };
+  return { personality: personality ?? SOULTI_PERSONALITY_TYPES[0], dimensions };
 }
 
-export function normalizeJuetiScore(score: number): number {
+export function normalizeSoultiScore(score: number): number {
   return Math.round(((score - 1) / 2) * 100);
 }

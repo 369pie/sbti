@@ -12,6 +12,10 @@ import type { BantiShareImageHandle } from '@/components/BantiShareImageGenerato
 import { BantiTypeArt } from '@/components/BantiTypeArt';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
+import { UgcShareCTA } from '@/components/UgcShareCTA';
+import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
+import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 
 interface Props {
   bantiPersonality: BantiPersonality;
@@ -322,7 +326,11 @@ export function BantiResultContent({ bantiPersonality: p, dimensionScores }: Pro
         </div>
       </section>
 
+      <DailyCheckInCTA />
+      <UniversePreviewCards currentUniverse="banti" />
+      <IdentifyViralCTA personalityName={p.workName} />
       <WtfCardCTA />
+      <UgcShareCTA />
     </div>
   );
 }

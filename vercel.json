@@ -1,0 +1,28 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        { "type": "host", "value": "wtfti.com" }
+      ],
+      "destination": "https://www.wtfti.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        { "type": "host", "value": "sbtinb.com" }
+      ],
+      "destination": "https://www.wtfti.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        { "type": "host", "value": "www.sbtinb.com" }
+      ],
+      "destination": "https://www.wtfti.com/:path*",
+      "permanent": true
+    }
+  ]
+}

@@ -118,6 +118,47 @@ function ComparisonView({ myCard, theirCard }: { myCard: WtfCardData; theirCard:
   const similarity = calculateSimilarity(myCard, theirCard);
   const roast = similarity != null ? getComparisonRoast(similarity) : null;
   const theirLit = getLitCount(theirCard);
+  const myLit = getLitCount(myCard);
+
+  // If the viewer has no tests yet, show a challenge-style CTA
+  if (myLit === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-8 rounded-2xl border-2 border-accent/30 bg-gradient-to-b from-accent-dim to-transparent p-6 text-center"
+      >
+        <div className="text-3xl mb-3">⚡</div>
+        <p className="text-sm text-text-muted mb-1">
+          {theirCard.nickname || '对方'} 已点亮 {theirLit} 个宇宙
+        </p>
+        <h3 className="text-lg font-semibold text-text-primary mb-2">
+          来测测你们有多像？
+        </h3>
+        <p className="text-xs text-text-secondary mb-5">
+          完成任意宇宙测试后，自动生成你的 WTF Card 并对比灵魂相似度
+        </p>
+        <div className="flex flex-col sm:flex-row gap-2 justify-center">
+          <Link
+            href="/test/"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-white font-medium text-sm transition-all hover:brightness-110"
+            style={{
+              background: 'linear-gradient(135deg, #ff4d6d, #e06088)',
+              boxShadow: '0 4px 16px rgba(255,77,109,0.25)',
+            }}
+          >
+            开始经典测试 →
+          </Link>
+          <Link
+            href="/wtfti/test/"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-border text-text-secondary text-sm font-medium hover:text-text-primary hover:bg-bg-secondary transition-colors"
+          >
+            🤯 毒舌版测试
+          </Link>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -133,7 +174,7 @@ function ComparisonView({ myCard, theirCard }: { myCard: WtfCardData; theirCard:
           <div className="text-4xl font-bold text-accent mt-2">{similarity}%</div>
           <p className="text-sm text-text-secondary mt-1">灵魂相似度</p>
           {roast && (
-            <p className="text-sm text-text-primary mt-3 italic">"{roast}"</p>
+            <p className="text-sm text-text-primary mt-3 italic">&ldquo;{roast}&rdquo;</p>
           )}
         </>
       ) : (
@@ -207,6 +248,7 @@ function NicknameEditor({
 
 function ShareButton({ card, onShareImage }: { card: WtfCardData; onShareImage: () => void }) {
   const [copied, setCopied] = useState(false);
+  const [challengeCopied, setChallengeCopied] = useState(false);
 
   const shareUrl = `${SHARE_SITE_URL}card/?c=${encodeCardData(card)}`;
 
@@ -216,7 +258,6 @@ function ShareButton({ card, onShareImage }: { card: WtfCardData; onShareImage: 
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // fallback
       const ta = document.createElement('textarea');
       ta.value = shareUrl;
       document.body.appendChild(ta);
@@ -228,19 +269,36 @@ function ShareButton({ card, onShareImage }: { card: WtfCardData; onShareImage: 
     }
   }, [shareUrl]);
 
+  const copyChallenge = useCallback(async () => {
+    const text = `我的 WTF Card 已点亮 ${getLitCount(card)}/${getTotalCount()} 个宇宙，来看看你和我有多像？\n${shareUrl}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      setChallengeCopied(true);
+      setTimeout(() => setChallengeCopied(false), 2000);
+    } catch { /* ok */ }
+  }, [card, shareUrl]);
+
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-3 justify-center">
+    <div className="space-y-3">
+      <div className="flex flex-col sm:flex-row items-center gap-3 justify-center">
+        <button
+          onClick={onShareImage}
+          className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors cursor-pointer"
+        >
+          生成分享卡片
+        </button>
+        <button
+          onClick={copyLink}
+          className="w-full sm:w-auto px-6 py-2.5 rounded-full border border-border text-text-secondary text-sm font-medium hover:border-accent/40 hover:text-accent transition-colors cursor-pointer"
+        >
+          {copied ? '✓ 已复制' : '复制链接'}
+        </button>
+      </div>
       <button
-        onClick={onShareImage}
-        className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"
+        onClick={copyChallenge}
+        className="w-full py-3 rounded-xl border border-accent/20 bg-accent-dim text-sm text-accent hover:bg-accent/10 transition-all cursor-pointer"
       >
-        生成分享卡片
-      </button>
-      <button
-        onClick={copyLink}
-        className="w-full sm:w-auto px-6 py-2.5 rounded-full border border-border text-text-secondary text-sm font-medium hover:border-accent/40 hover:text-accent transition-colors"
-      >
-        {copied ? '✓ 已复制' : '复制链接'}
+        {challengeCopied ? '已复制对比挑战文案 ✓' : '📩 复制对比挑战文案，发给好友'}
       </button>
     </div>
   );
@@ -300,6 +358,11 @@ export function CardContent() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-8"
       >
+        {theirCard && (
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/20 bg-accent-dim text-xs text-accent mb-4">
+            ⚡ {theirCard.nickname || '好友'}发来了对比挑战
+          </div>
+        )}
         <p className="section-label mb-2">WTF CARD</p>
         <h1 className="text-2xl sm:text-3xl font-bold text-text-primary">
           我的多宇宙人格卡

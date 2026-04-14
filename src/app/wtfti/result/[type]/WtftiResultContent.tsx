@@ -12,6 +12,10 @@ import { WtftiShareImageGenerator } from '@/components/WtftiShareImageGenerator'
 import type { WtftiShareImageHandle } from '@/components/WtftiShareImageGenerator';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
+import { UgcShareCTA } from '@/components/UgcShareCTA';
+import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
+import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 
 interface Props {
   wtftiPersonality: WtftiPersonality;
@@ -309,7 +313,11 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
         </div>
       </section>
 
+      <DailyCheckInCTA />
+      <UniversePreviewCards currentUniverse="wtfti" />
+      <IdentifyViralCTA personalityName={p.wtftiName} />
       <WtfCardCTA />
+      <UgcShareCTA />
     </div>
   );
 }

@@ -12,6 +12,10 @@ import type { BirdShareImageHandle } from '@/components/BirdShareImageGenerator'
 import { BirdTypeArt } from '@/components/BirdTypeArt';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
+import { UgcShareCTA } from '@/components/UgcShareCTA';
+import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
+import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 
 interface Props {
   birdPersonality: BirdPersonality;
@@ -328,7 +332,11 @@ export function BirdResultContent({ birdPersonality: p, dimensionScores }: Props
         </div>
       </section>
 
+      <DailyCheckInCTA />
+      <UniversePreviewCards currentUniverse="bird" />
+      <IdentifyViralCTA personalityName={p.birdName} />
       <WtfCardCTA />
+      <UgcShareCTA />
     </div>
   );
 }

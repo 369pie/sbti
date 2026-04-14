@@ -12,6 +12,10 @@ import { KingsShareImageGenerator } from '@/components/KingsShareImageGenerator'
 import type { KingsShareImageHandle } from '@/components/KingsShareImageGenerator';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
+import { UgcShareCTA } from '@/components/UgcShareCTA';
+import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
+import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 
 interface Props {
   kingsPersonality: KingsPersonality;
@@ -304,7 +308,11 @@ export function KingsResultContent({ kingsPersonality: p, dimensionScores }: Pro
         </div>
       </section>
 
+      <DailyCheckInCTA />
+      <UniversePreviewCards currentUniverse="kings" />
+      <IdentifyViralCTA personalityName={p.heroName} />
       <WtfCardCTA />
+      <UgcShareCTA />
     </div>
   );
 }

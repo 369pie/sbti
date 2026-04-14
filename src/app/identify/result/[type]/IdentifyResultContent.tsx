@@ -10,7 +10,7 @@ import type { IdentifyDimensionScore } from '@/lib/identify/scoring';
 import { IdentifyShareImageGenerator } from '@/components/IdentifyShareImageGenerator';
 import type { IdentifyShareImageGeneratorHandle } from '@/components/IdentifyShareImageGenerator';
 import { useCallback, useMemo, useRef, useState, useEffect, useSyncExternalStore } from 'react';
-import { getSiteUrl } from '@/lib/site';
+import { getSiteUrl, SHARE_SITE_URL } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
 
@@ -96,6 +96,20 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
     setTextCopied(true);
     setTimeout(() => setTextCopied(false), 2000);
   }, [persona.code, persona.name, persona.tagline, displayName]);
+
+  // Challenge link for reverse invitation
+  const challengeUrl = useMemo(() => {
+    const params = new URLSearchParams({ t: persona.slug });
+    if (friendName) params.set('n', friendName);
+    return `${SHARE_SITE_URL}identify/challenge/?${params.toString()}`;
+  }, [persona.slug, friendName]);
+
+  const [challengeCopied, setChallengeCopied] = useState(false);
+  const copyChallenge = useCallback(() => {
+    navigator.clipboard.writeText(challengeUrl);
+    setChallengeCopied(true);
+    setTimeout(() => setChallengeCopied(false), 2000);
+  }, [challengeUrl]);
 
   // Symptom checklist state
   const [checkedSymptoms, setCheckedSymptoms] = useState<Set<number>>(new Set());
@@ -261,23 +275,47 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
         </motion.div>
       </section>
 
-      {/* Call to action — "不服自己来测" */}
+      {/* Challenge CTA — "发给 TA 看看" (viral loop trigger) */}
       <section className="max-w-2xl mx-auto px-6 pb-12">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45, duration: 0.5 }}>
-          <div className="rounded-2xl border-2 border-dashed border-pink-500/20 bg-pink-500/5 p-6 sm:p-8 text-center">
-            <div className="text-3xl mb-3">😤</div>
-            <h3 className="text-lg font-semibold mb-2">被冤枉了？</h3>
-            <p className="text-sm text-text-secondary mb-4">
-              {displayName}觉得不准？让 ta 自己来测一下对比看看
+          <div className="rounded-2xl border-2 border-pink-500/20 bg-gradient-to-b from-pink-500/10 to-transparent p-6 sm:p-8 text-center">
+            <div className="text-3xl mb-3">📩</div>
+            <h3 className="text-lg font-semibold mb-2">发给 {displayName} 看看准不准？</h3>
+            <p className="text-sm text-text-secondary mb-5">
+              生成一条专属链接，{displayName}打开就能看到你对 ta 的鉴定
+            </p>
+            <button
+              onClick={copyChallenge}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-medium text-sm hover:from-pink-600 hover:to-rose-600 transition-all cursor-pointer"
+            >
+              {challengeCopied ? (
+                '已复制挑战链接 ✓'
+              ) : (
+                <>
+                  复制链接，发给 {displayName}
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </>
+              )}
+            </button>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Call to action — "不服自己来测" */}
+      <section className="max-w-2xl mx-auto px-6 pb-12">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5, duration: 0.5 }}>
+          <div className="rounded-2xl border border-dashed border-border bg-bg-secondary/30 p-6 sm:p-8 text-center">
+            <div className="text-2xl mb-2">😤</div>
+            <p className="text-sm text-text-secondary mb-3">
+              {displayName}觉得不准？让 ta 自己来测
             </p>
             <Link
               href="/test"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-medium text-sm hover:from-pink-600 hover:to-rose-600 transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-border text-text-secondary font-medium text-sm hover:text-text-primary hover:bg-bg-secondary transition-all"
             >
-              让 ta 自己来测
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              让 ta 自己来测 →
             </Link>
           </div>
         </motion.div>

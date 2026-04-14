@@ -12,6 +12,10 @@ import { DeltaShareImageGenerator } from '@/components/DeltaShareImageGenerator'
 import type { DeltaShareImageHandle } from '@/components/DeltaShareImageGenerator';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
+import { UgcShareCTA } from '@/components/UgcShareCTA';
+import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
+import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 
 interface Props {
   deltaPersonality: DeltaPersonality;
@@ -304,7 +308,11 @@ export function DeltaResultContent({ deltaPersonality: p, dimensionScores }: Pro
         </div>
       </section>
 
+      <DailyCheckInCTA />
+      <UniversePreviewCards currentUniverse="delta" />
+      <IdentifyViralCTA personalityName={p.heroName} />
       <WtfCardCTA />
+      <UgcShareCTA />
     </div>
   );
 }

@@ -1,11 +1,23 @@
 import type { Metadata } from 'next';
+import { getSiteUrl } from '@/lib/site';
 import NextImage from 'next/image';
 import { withBasePath } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: '联系与社群',
   description: '查看 SBTI 人格测试的社群入口、微信群与 QQ 群信息，获取反馈和交流渠道。',
+  keywords: ['SBTI社群', 'SBTI微信群', 'SBTI QQ群', '人格测试社群'],
   alternates: { canonical: '/contact/' },
+  openGraph: {
+    title: '联系与社群 — SBTI',
+    description: '加入 SBTI 社群，和同类一起讨论人格测试结果。',
+    url: getSiteUrl('/contact/'),
+  },
+  twitter: {
+    card: 'summary',
+    title: '联系与社群 — SBTI',
+    description: '加入 SBTI 社群，和同类一起讨论人格测试结果。',
+  },
 };
 
 export default function ContactPage() {

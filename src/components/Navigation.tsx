@@ -24,7 +24,7 @@ function getUniverseDesc(id: string): string {
     bird: '测测你是哪种禽',
     flower: '测测你像哪朵花',
     delta: '三角洲行动 × 人格联名',
-    jueti: '镜像觉察 · 深度人格',
+    soulti: '镜像觉察 · 深度人格',
     xpti: '恋爱 XP 人格鉴定',
   };
   return map[id] ?? '';
@@ -40,6 +40,9 @@ const FUN_ITEMS = [
   { href: '/identify/', label: '好友鉴定', emoji: '🔍', desc: '帮朋友鉴定人格' },
   { href: '/squad/', label: '组局测试', emoji: '🎯', desc: '朋友一起来测' },
   { href: '/combo/', label: '人格拼盘', emoji: '🧩', desc: '拼出你的多面人格' },
+  { href: '/rank/', label: '群组排行', emoji: '🏆', desc: '看看谁最多' },
+  { href: '/puzzle/', label: '闺蜜拼图', emoji: '🧩', desc: '四人人格拼图' },
+  { href: '/share-templates/', label: '分享文案', emoji: '📕', desc: '一键复制发小红书' },
 ];
 
 // ─── Dropdown hook ───────────────────────────────────────────────────────────

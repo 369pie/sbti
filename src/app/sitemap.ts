@@ -12,7 +12,7 @@ import { getBantiSlugs } from '@/lib/banti/personalities';
 import { getKingsSlugs } from '@/lib/kings/personalities';
 import { getDeltaSlugs } from '@/lib/delta/personalities';
 import { getAllXptiSlugs } from '@/lib/xpti/personalities';
-import { getAllJuetiSlugs } from '@/lib/jueti/personalities';
+import { getAllSoultiSlugs } from '@/lib/soulti/personalities';
 import { getBirdSlugs } from '@/lib/bird/personalities';
 import { getAllFlowerSlugs } from '@/lib/flower/personalities';
 import { getAllIdentifySlugs } from '@/lib/identify/personas';
@@ -42,7 +42,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: getSiteUrl('/wtfti/kings/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/wtfti/delta/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/xpti/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: getSiteUrl('/jueti/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: getSiteUrl('/soulti/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/bird/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/flower/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/identify/'), lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
@@ -126,8 +126,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  const juetiResultPages: MetadataRoute.Sitemap = getAllJuetiSlugs().map((slug) => ({
-    url: getSiteUrl(`/jueti/result/${slug}/`),
+  const soultiResultPages: MetadataRoute.Sitemap = getAllSoultiSlugs().map((slug) => ({
+    url: getSiteUrl(`/soulti/result/${slug}/`),
     lastModified: now,
     changeFrequency: 'monthly' as const,
     priority: 0.7,
@@ -161,5 +161,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }));
 
-  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages, ...kingsResultPages, ...deltaResultPages, ...xptiResultPages, ...juetiResultPages, ...birdResultPages, ...flowerResultPages, ...identifyResultPages, ...symptomsPages];
+  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages, ...kingsResultPages, ...deltaResultPages, ...xptiResultPages, ...soultiResultPages, ...birdResultPages, ...flowerResultPages, ...identifyResultPages, ...symptomsPages];
 }

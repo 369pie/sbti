@@ -226,7 +226,7 @@ export async function createSocialImageResponse() {
                 alignItems: 'center',
               }}
             >
-              <span>sbtinb.com</span>
+              <span>wtfti.com</span>
               <span style={{ display: 'flex', marginLeft: '12px', fontFamily: 'Noto Sans SC', letterSpacing: 0 }}>
                 中文语境人格测试
               </span>

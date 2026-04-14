@@ -2,19 +2,19 @@
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
-import { getJuetiRarity, getJuetiResonance, getJuetiPersonalityBySlug } from '@/lib/jueti/personalities';
-import type { JuetiPersonalityType } from '@/lib/jueti/personalities';
-import { JUETI_DIMENSIONS, JUETI_MODEL_COLORS } from '@/lib/jueti/dimensions';
+import { getSoultiRarity, getSoultiResonance, getSoultiPersonalityBySlug } from '@/lib/soulti/personalities';
+import type { SoultiPersonalityType } from '@/lib/soulti/personalities';
+import { SOULTI_DIMENSIONS, SOULTI_MODEL_COLORS } from '@/lib/soulti/dimensions';
 import { SHARE_SITE_URL } from '@/lib/site';
-import type { JuetiDimensionScore } from '@/lib/jueti/scoring';
+import type { SoultiDimensionScore } from '@/lib/soulti/scoring';
 
-export interface JuetiShareImageGeneratorHandle {
+export interface SoultiShareImageGeneratorHandle {
   generate: () => void;
 }
 
 interface Props {
-  personality: JuetiPersonalityType;
-  dimensionScores: JuetiDimensionScore[];
+  personality: SoultiPersonalityType;
+  dimensionScores: SoultiDimensionScore[];
 }
 
 const CARD_WIDTH = 540;
@@ -25,7 +25,7 @@ const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, 
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
 const FONT_SERIF = 'Georgia, "Noto Serif SC", "Songti SC", serif';
 
-const JUETI_SHARE_URL = SHARE_SITE_URL + 'jueti/';
+const SOULTI_SHARE_URL = SHARE_SITE_URL + 'soulti/';
 
 function isMobile() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -128,11 +128,11 @@ function drawDivider(ctx: CanvasRenderingContext2D, y: number, color: string, cx
   ctx.stroke();
 }
 
-async function renderJuetiShareImage(personality: JuetiPersonalityType, dimensionScores: JuetiDimensionScore[]) {
-  const resonance = getJuetiResonance(personality.slug);
-  const rarity = getJuetiRarity(personality.slug);
-  const mirrorType = resonance ? getJuetiPersonalityBySlug(resonance.mirrorSlug) : undefined;
-  const oppositeType = resonance ? getJuetiPersonalityBySlug(resonance.oppositeSlug) : undefined;
+async function renderSoultiShareImage(personality: SoultiPersonalityType, dimensionScores: SoultiDimensionScore[]) {
+  const resonance = getSoultiResonance(personality.slug);
+  const rarity = getSoultiRarity(personality.slug);
+  const mirrorType = resonance ? getSoultiPersonalityBySlug(resonance.mirrorSlug) : undefined;
+  const oppositeType = resonance ? getSoultiPersonalityBySlug(resonance.oppositeSlug) : undefined;
 
   // Parse description sections
   const descSections = personality.description.split(/【(.*?)】/).filter(Boolean);
@@ -143,7 +143,7 @@ async function renderJuetiShareImage(personality: JuetiPersonalityType, dimensio
     }
   }
 
-  const qrImage = await toQrDataUrl(JUETI_SHARE_URL, {
+  const qrImage = await toQrDataUrl(SOULTI_SHARE_URL, {
     width: 200, margin: 1, color: { dark: '#000000', light: '#ffffffff' }, errorCorrectionLevel: 'M',
   }).then(url => getCachedImage(url)).catch(() => null);
 
@@ -180,10 +180,10 @@ async function renderJuetiShareImage(personality: JuetiPersonalityType, dimensio
   ctx.textAlign = 'left';
   ctx.fillStyle = LIGHT;
   ctx.font = `italic 11px ${FONT_SERIF}`;
-  ctx.fillText('觉TI', PAD, y);
+  ctx.fillText('SoulTI', PAD, y);
   ctx.textAlign = 'right';
   ctx.font = `11px ${FONT_MONO}`;
-  ctx.fillText(`${personality.number} / 16`, CARD_WIDTH - PAD, y);
+  ctx.fillText(`${personality.number} / 32`, CARD_WIDTH - PAD, y);
   y += 28;
 
   ctx.textAlign = 'center';
@@ -201,7 +201,7 @@ async function renderJuetiShareImage(personality: JuetiPersonalityType, dimensio
 
   ctx.fillStyle = hexToRgba(LIGHT, 0.6);
   ctx.font = `italic 10px ${FONT_SERIF}`;
-  ctx.fillText('— 向内觉察 · 自然人格', CARD_WIDTH / 2, y);
+  ctx.fillText('— 向内探索 · 自然人格', CARD_WIDTH / 2, y);
   y += 26;
 
   // ─── CHINESE NAME ───
@@ -335,13 +335,13 @@ async function renderJuetiShareImage(personality: JuetiPersonalityType, dimensio
   ctx.textAlign = 'left';
   ctx.fillStyle = hexToRgba(LIGHT, 0.5);
   ctx.font = `10px ${FONT_SERIF}`;
-  ctx.fillText(`${personality.code} · 四轴画像`, PAD, y);
+  ctx.fillText(`${personality.code} · 五轴画像`, PAD, y);
   y += 24;
 
   for (const score of dimensionScores) {
-    const dim = JUETI_DIMENSIONS.find(d => d.id === score.id);
+    const dim = SOULTI_DIMENSIONS.find(d => d.id === score.id);
     if (!dim) continue;
-    const color = JUETI_MODEL_COLORS[dim.model].base;
+    const color = SOULTI_MODEL_COLORS[dim.model].base;
 
     ctx.fillStyle = MED;
     ctx.font = `10px ${FONT_SANS}`;
@@ -413,7 +413,7 @@ async function renderJuetiShareImage(personality: JuetiPersonalityType, dimensio
   y += 12;
   ctx.fillStyle = hexToRgba(LIGHT, 0.5);
   ctx.font = `italic 11px ${FONT_SERIF}`;
-  ctx.fillText('觉察不是为了改变你，而是让你看见——你已经是了。', CARD_WIDTH / 2, y);
+  ctx.fillText('探索不是为了改变你，而是让你看见——你已经是了。', CARD_WIDTH / 2, y);
   y += 20;
 
   // ─── FOOTER ───
@@ -435,11 +435,11 @@ async function renderJuetiShareImage(personality: JuetiPersonalityType, dimensio
   ctx.textAlign = 'left';
   ctx.fillStyle = DARK;
   ctx.font = `12px ${FONT_SANS}`;
-  ctx.fillText('来觉察你的自然人格？', PAD, y + 6);
+  ctx.fillText('来探寻你的灵魂人格？', PAD, y + 6);
 
   ctx.fillStyle = personality.color;
   ctx.font = `10px ${FONT_MONO}`;
-  ctx.fillText(JUETI_SHARE_URL, PAD, y + 26);
+  ctx.fillText(SOULTI_SHARE_URL, PAD, y + 26);
 
   // Final y = bottom of QR + small padding
   y += qrSize + 16;
@@ -461,8 +461,8 @@ async function renderJuetiShareImage(personality: JuetiPersonalityType, dimensio
   return finalCanvas.toDataURL('image/png');
 }
 
-export const JuetiShareImageGenerator = forwardRef<JuetiShareImageGeneratorHandle, Props>(
-  function JuetiShareImageGenerator({ personality, dimensionScores }, ref) {
+export const SoultiShareImageGenerator = forwardRef<SoultiShareImageGeneratorHandle, Props>(
+  function SoultiShareImageGenerator({ personality, dimensionScores }, ref) {
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
@@ -472,7 +472,7 @@ export const JuetiShareImageGenerator = forwardRef<JuetiShareImageGeneratorHandl
       setGenerating(true);
       setSaveHint(null);
       try {
-        const dataUrl = await renderJuetiShareImage(personality, dimensionScores);
+        const dataUrl = await renderSoultiShareImage(personality, dimensionScores);
         setPreviewUrl(dataUrl);
       } catch (e) {
         console.error('Share image generation failed:', e);
@@ -484,7 +484,7 @@ export const JuetiShareImageGenerator = forwardRef<JuetiShareImageGeneratorHandl
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `jueti-${personality.code}.png`, { type: 'image/png' });
+      return new File([blob], `soulti-${personality.code}.png`, { type: 'image/png' });
     }, [personality.code, previewUrl]);
 
     const handleDownload = useCallback(async () => {
@@ -494,7 +494,7 @@ export const JuetiShareImageGenerator = forwardRef<JuetiShareImageGeneratorHandl
           const file = await createPreviewFile();
           if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
             setSaveHint('请在系统菜单里选择“保存到照片”或“存储到文件”。');
-            await navigator.share({ files: [file], title: `jueti-${personality.code}.png` });
+            await navigator.share({ files: [file], title: `soulti-${personality.code}.png` });
             return;
           }
         } catch (error) {
@@ -504,7 +504,7 @@ export const JuetiShareImageGenerator = forwardRef<JuetiShareImageGeneratorHandl
         return;
       }
       const link = document.createElement('a');
-      link.download = `jueti-${personality.code}.png`;
+      link.download = `soulti-${personality.code}.png`;
       link.href = previewUrl;
       link.click();
     }, [createPreviewFile, personality.code, previewUrl]);

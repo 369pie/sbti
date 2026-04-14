@@ -1,4 +1,4 @@
-const DEFAULT_SHARE_SITE_ORIGIN = 'https://www.sbtinb.com';
+const DEFAULT_SHARE_SITE_ORIGIN = 'https://www.wtfti.com';
 const LEGACY_SITE_HOSTS = ['369pie.github.io'];
 const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const rawSiteBasePath = process.env.NEXT_PUBLIC_SITE_BASE_PATH ?? '';

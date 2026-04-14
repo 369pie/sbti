@@ -13,6 +13,10 @@ import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
+import { UgcShareCTA } from '@/components/UgcShareCTA';
+import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
+import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 
 interface Props {
   personality: FlowerPersonalityType;
@@ -306,7 +310,11 @@ export function FlowerResultContent({ personality, dimensionScores }: Props) {
         </div>
       </section>
 
+      <DailyCheckInCTA />
+      <UniversePreviewCards currentUniverse="flower" />
+      <IdentifyViralCTA personalityName={personality.name} />
       <WtfCardCTA />
+      <UgcShareCTA />
     </div>
   );
 }

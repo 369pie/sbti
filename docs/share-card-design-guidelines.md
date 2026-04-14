@@ -51,7 +51,7 @@
 
 ### A. 奶油卡 + 居中图片（Standard Card）
 
-适用模块：SBTI / Love / Work / XPTI / WTFTI / Drunk / Daily / Jueti
+适用模块：SBTI / Love / Work / XPTI / WTFTI / Drunk / Daily / Soulti
 
 | 参数 | 标准值 |
 |------|--------|
@@ -137,7 +137,7 @@
 | XPTI | `#FFF5F7` | `#2D2236` | `#6B5F72` | `#e8dce6` |
 | Love / Work | `#FFF9F2` | `#2D2A26` | `#6B6560` | `#e8e0d6` |
 | Drunk / Daily | `#FFF9F2` | `#2d2236` | `#6b6380` | `#e8e0d6` |
-| Jueti | `#FDFAF6` | `#3D3530` | `#7A6E65` | `#E8E0D8` |
+| Soulti | `#FDFAF6` | `#3D3530` | `#7A6E65` | `#E8E0D8` |
 | Banti | full-bleed | cream→transparent | — | — |
 | Kings | full-bleed | warm gold tones | — | — |
 | Delta | full-bleed | olive green tones | — | — |

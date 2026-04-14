@@ -52,7 +52,7 @@ export default function XptiHomeContent() {
             </p>
 
             <p className="text-sm text-text-muted/50 mb-12">
-              4 大恋爱轴 · 20 道灵魂拷问 · 16 种XP体质
+              4 大恋爱轴 · 随机 20 题 · 16 种XP体质
             </p>
 
             <Link
@@ -67,7 +67,7 @@ export default function XptiHomeContent() {
             </Link>
 
             <p className="mt-5 text-xs text-text-muted/50 tracking-wider">
-              预计用时 3 分钟 · 三分钟测出你的恋爱DNA
+              预计用时 3 分钟 · 大题池随机抽题，重测会换题
             </p>
           </div>
 
@@ -268,8 +268,8 @@ export default function XptiHomeContent() {
               SBTI 标准版
             </Link>
             <span>·</span>
-            <Link href="/jueti/" className="hover:text-text-muted transition-colors">
-              觉TI 觉察版
+            <Link href="/soulti/" className="hover:text-text-muted transition-colors">
+              SoulTI 觉察版
             </Link>
             <span>·</span>
             <Link href="/wtfti/" className="hover:text-text-muted transition-colors">

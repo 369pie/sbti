@@ -1,9 +1,20 @@
 import type { Metadata } from 'next';
+import { getSiteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: '使用条款',
   description: '查看 SBTI 人格测试的使用范围、结果性质、分享规范和免责声明。',
   alternates: { canonical: '/terms/' },
+  openGraph: {
+    title: '使用条款 — SBTI',
+    description: 'SBTI 人格测试的使用范围与免责声明。',
+    url: getSiteUrl('/terms/'),
+  },
+  twitter: {
+    card: 'summary',
+    title: '使用条款 — SBTI',
+    description: 'SBTI 人格测试的使用范围与免责声明。',
+  },
 };
 
 export default function TermsPage() {

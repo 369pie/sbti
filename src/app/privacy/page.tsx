@@ -1,9 +1,20 @@
 import type { Metadata } from 'next';
+import { getSiteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: '隐私说明',
   description: '查看 SBTI 人格测试关于测试答案、分享图片、本地计算与基础访问日志的隐私说明。',
   alternates: { canonical: '/privacy/' },
+  openGraph: {
+    title: '隐私说明 — SBTI',
+    description: 'SBTI 人格测试的数据处理与隐私保护说明。',
+    url: getSiteUrl('/privacy/'),
+  },
+  twitter: {
+    card: 'summary',
+    title: '隐私说明 — SBTI',
+    description: 'SBTI 人格测试的数据处理与隐私保护说明。',
+  },
 };
 
 export default function PrivacyPage() {

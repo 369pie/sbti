@@ -6,6 +6,7 @@ import type { DimensionLevel } from '@/lib/dimensions';
 import { KingsResultContent } from './KingsResultContent';
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
+import { getKingsTypeImage } from '@/lib/kings/personalities';
 
 type PageProps = {
   params: Promise<{ type: string }>;
@@ -28,8 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `王者TI · 我在峡谷居然是${kp.heroName}？？`,
       description: kp.tagline,
-      url: getSiteUrl(`/wtfti/kings/result/${type}/`),
-    },
+      url: getSiteUrl(`/wtfti/kings/result/${type}/`),      images: [{ url: getKingsTypeImage(type), width: 256, height: 256, alt: kp.heroName }],    },
     twitter: {
       card: 'summary',
       title: `王者TI · 我在峡谷居然是${kp.heroName}？？`,

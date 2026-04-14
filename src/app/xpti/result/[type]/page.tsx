@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getXptiPersonalityBySlug, getAllXptiSlugs } from '@/lib/xpti/personalities';
+import { getXptiPersonalityBySlug, getAllXptiSlugs, getXptiTypeImage } from '@/lib/xpti/personalities';
 import { XPTI_DIMENSIONS } from '@/lib/xpti/dimensions';
 import type { DimensionLevel } from '@/lib/xpti/dimensions';
 import { XptiResultContent } from './XptiResultContent';
@@ -25,6 +25,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `我的恋爱XP体质是 ${p.code}（${p.name}）`,
       description: p.tagline,
+      url: getSiteUrl(`/xpti/result/${type}/`),
+      images: [{ url: getXptiTypeImage(type), width: 256, height: 256, alt: p.name }],
     },
     twitter: {
       card: 'summary',

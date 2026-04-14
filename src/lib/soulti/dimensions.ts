@@ -1,7 +1,7 @@
-export interface JuetiDimension {
+export interface SoultiDimension {
   id: string;
   name: string;
-  model: JuetiModelType;
+  model: SoultiModelType;
   description: string;
   poleA: string;
   poleB: string;
@@ -14,24 +14,26 @@ export interface JuetiDimension {
   };
 }
 
-export type JuetiModelType = 'tide' | 'root' | 'edge' | 'spark';
+export type SoultiModelType = 'tide' | 'root' | 'edge' | 'spark' | 'metamorphosis';
 export type DimensionLevel = 'H' | 'M' | 'L';
 
-export const JUETI_MODEL_NAMES: Record<JuetiModelType, string> = {
+export const SOULTI_MODEL_NAMES: Record<SoultiModelType, string> = {
   tide: '潮汐轴',
   root: '锚定轴',
   edge: '界限轴',
   spark: '火焰轴',
+  metamorphosis: '蜕变轴',
 };
 
-export const JUETI_MODEL_COLORS: Record<JuetiModelType, { base: string; light: string; bg: string }> = {
+export const SOULTI_MODEL_COLORS: Record<SoultiModelType, { base: string; light: string; bg: string }> = {
   tide:  { base: '#5b8a72', light: '#7eb09a', bg: 'rgba(91,138,114,0.10)' },
   root:  { base: '#8b7355', light: '#b09a78', bg: 'rgba(139,115,85,0.10)' },
   edge:  { base: '#7a6b8a', light: '#a090b0', bg: 'rgba(122,107,138,0.10)' },
   spark: { base: '#b07850', light: '#d09a70', bg: 'rgba(176,120,80,0.10)' },
+  metamorphosis: { base: '#6b8a85', light: '#8ab0aa', bg: 'rgba(107,138,133,0.10)' },
 };
 
-export const JUETI_DIMENSIONS: JuetiDimension[] = [
+export const SOULTI_DIMENSIONS: SoultiDimension[] = [
   {
     id: 'J1', name: '潮汐轴', model: 'tide',
     description: '你的能量是向外涌动还是向内沉淀',
@@ -76,8 +78,19 @@ export const JUETI_DIMENSIONS: JuetiDimension[] = [
       L: '你的火是爆发的——来了倾尽全力，走了就暗下去。',
     },
   },
+  {
+    id: 'J5', name: '蜕变轴', model: 'metamorphosis',
+    description: '受伤之后，你是生长出新的东西还是凝固成更坚硬的自己',
+    poleA: 'G', poleB: 'K',
+    poleALabel: '生', poleBLabel: '矿',
+    levels: {
+      H: '你受伤后会生长——伤口会长出新的枝条、新的可能。',
+      M: '有时候会长出新东西，有时候会变硬，取决于伤的深浅。',
+      L: '你受伤后会结晶——疼痛会凝固成更坚硬、更不可摧的东西。',
+    },
+  },
 ];
 
-export function getJuetiDimensionById(id: string): JuetiDimension | undefined {
-  return JUETI_DIMENSIONS.find(d => d.id === id);
+export function getSoultiDimensionById(id: string): SoultiDimension | undefined {
+  return SOULTI_DIMENSIONS.find(d => d.id === id);
 }

@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 // Use NEXT_PUBLIC_BASE_PATH to set basePath explicitly.
-// With a custom domain (e.g. www.sbtinb.com), basePath should be empty.
+// With a custom domain (e.g. www.wtfti.com), basePath should be empty.
 // Only set NEXT_PUBLIC_BASE_PATH=/sbti if deploying to user.github.io/sbti/ without custom domain.
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 

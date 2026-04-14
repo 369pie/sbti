@@ -188,144 +188,153 @@ async function renderBirdShareImage(p: BirdPersonality, imgUrl?: string) {
   ctx.textBaseline = 'top';
 
   const accent = p.color;
+  const bg = '#F5F8FF';
 
-  // ========== 1. Full-bleed AI image or fallback background ==========
+  // ─── 1. 背景 ───
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, CARD_W, CARD_H);
+
+  // 顶部大面积淡色光晕
+  const halo = ctx.createRadialGradient(CARD_W / 2, 280, 40, CARD_W / 2, 280, 460);
+  halo.addColorStop(0, hexToRgba(accent, 0.10));
+  halo.addColorStop(0.55, hexToRgba(accent, 0.04));
+  halo.addColorStop(1, hexToRgba(accent, 0));
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, CARD_W, CARD_H);
+
+  // ─── 2. 巨幅插画区（占据上半部绝大部分空间）───
+  const imgX = 16;
+  const imgY = 20;
+  const imgW = 508;
+  const imgH = 508;
+  const imgR = 28;
+
+  // 底座阴影
+  ctx.shadowColor = 'rgba(26, 35, 64, 0.12)';
+  ctx.shadowBlur = 48;
+  ctx.shadowOffsetY = 20;
+  fillRoundedRect(ctx, imgX, imgY, imgW, imgH, imgR, '#FFFFFF');
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+
+  // 细边框
+  strokeRoundedRect(ctx, imgX, imgY, imgW, imgH, imgR, '#E3EAF5', 1);
+
+  // 插画（留少量边距，让鸟占满框）
+  const imgPad = 18;
   if (typeImage) {
-    drawImageCover(ctx, typeImage, 0, 0, CARD_W, CARD_H);
+    drawImageContain(ctx, typeImage, imgX + imgPad, imgY + imgPad, imgW - imgPad * 2, imgH - imgPad * 2);
   } else {
-    // Fallback: sky-blue tinted background with emoji
-    ctx.fillStyle = '#F5F8FF';
-    ctx.fillRect(0, 0, CARD_W, CARD_H);
-    ctx.fillStyle = hexToRgba(accent, 0.08);
-    ctx.fillRect(0, 0, CARD_W, CARD_H);
     ctx.textAlign = 'center';
-    ctx.font = `160px ${FONT_SANS}`;
-    ctx.fillText(p.emoji, CARD_W / 2, CARD_H * 0.28);
+    ctx.font = `180px ${FONT_SANS}`;
+    ctx.fillStyle = hexToRgba(accent, 0.10);
+    ctx.fillText(p.emoji, CARD_W / 2, imgY + imgH / 2 - 72);
   }
 
-  // ========== 2. Top gradient overlay ==========
-  const topGrad = ctx.createLinearGradient(0, 0, 0, CARD_H * 0.40);
-  topGrad.addColorStop(0, 'rgba(245, 248, 255, 0.92)');
-  topGrad.addColorStop(0.55, 'rgba(245, 248, 255, 0.72)');
-  topGrad.addColorStop(1, 'rgba(245, 248, 255, 0)');
-  ctx.fillStyle = topGrad;
-  ctx.fillRect(0, 0, CARD_W, CARD_H * 0.40);
+  // ─── 3. 编号章（画框内右上角）───
+  const badgeCX = imgX + imgW - 36;
+  const badgeCY = imgY + 36;
+  const badgeR = 20;
 
-  // ========== 3. Bottom gradient overlay ==========
-  const botGrad = ctx.createLinearGradient(0, CARD_H * 0.58, 0, CARD_H);
-  botGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-  botGrad.addColorStop(0.35, 'rgba(0, 0, 0, 0.40)');
-  botGrad.addColorStop(1, 'rgba(0, 0, 0, 0.75)');
-  ctx.fillStyle = botGrad;
-  ctx.fillRect(0, CARD_H * 0.58, CARD_W, CARD_H * 0.42);
+  ctx.beginPath();
+  ctx.arc(badgeCX, badgeCY, badgeR, 0, Math.PI * 2);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = accent;
+  ctx.stroke();
 
-  // ========== 4. Top text: badge → birdName + birdTitle → code → tagline ==========
-  const leftX = 36;
-  const badgeText = `鸟TI · 鸟类宇宙 · ${p.number}`;
-  ctx.font = `700 12px ${FONT_MONO}`;
-  const badgeW = ctx.measureText(badgeText).width + 28;
-  fillRoundedRect(ctx, leftX, 36, badgeW, 26, 13, hexToRgba(accent, 0.15));
-  ctx.fillStyle = accent;
+  ctx.beginPath();
+  ctx.arc(badgeCX, badgeCY, badgeR - 6, 0, Math.PI * 2);
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = hexToRgba(accent, 0.35);
+  ctx.stroke();
+
   ctx.textAlign = 'center';
-  ctx.fillText(badgeText, leftX + badgeW / 2, 42);
+  ctx.fillStyle = DARK;
+  ctx.font = `800 12px ${FONT_MONO}`;
+  ctx.fillText(p.number, badgeCX, badgeCY - 3);
 
-  // Bird name + title
+  // ─── 4. 品牌字标（画框内左上角）───
   ctx.textAlign = 'left';
-  ctx.fillStyle = DARK;
-  ctx.font = `900 44px ${FONT_SANS}`; // 加大标题字号
-  const titleText = `${p.birdName} · ${p.birdTitle}`;
-  const titleLines = wrapText(ctx, titleText, CARD_W - leftX * 2, 2);
-  let currentY = 82;
-  titleLines.forEach((line) => {
-    ctx.fillText(line, leftX, currentY);
-    currentY += 50;
-  });
+  ctx.fillStyle = hexToRgba(DARK, 0.28);
+  ctx.font = `700 11px ${FONT_SANS}`;
+  ctx.fillText('BIRDTI', imgX + 20, imgY + 22);
 
-  // Code (bird call) with Backronym (分两行展示，增强 LOGO 质感)
-  currentY += 4;
+  // ─── 5. 文字区（紧凑排在下半部）───
+  let cursorY = imgY + imgH + 36;
+
+  // 鸟格名称
+  ctx.textAlign = 'center';
   ctx.fillStyle = DARK;
-  ctx.font = `900 36px ${FONT_MONO}`;
-  // 用空格连字符增加自带字间距效果
-  const formattedCode = p.code.split('').join(' - ');
-  ctx.fillText(formattedCode, leftX, currentY);
-  
-  currentY += 44;
-  ctx.fillStyle = hexToRgba(DARK, 0.55); // 高级灰
-  ctx.font = `600 15px ${FONT_SANS}`;
-  ctx.fillText(`(${p.backronym})`, leftX, currentY);
+  ctx.font = `800 36px ${FONT_SANS}`;
+  ctx.fillText(p.birdTitle, CARD_W / 2, cursorY);
+  cursorY += 44;
+
+  // 装饰短横线
+  fillRoundedRect(ctx, (CARD_W - 32) / 2, cursorY, 32, 4, 2, hexToRgba(accent, 0.28));
+  cursorY += 16;
+
+  // 鸟种名 + Code
+  ctx.fillStyle = MED;
+  ctx.font = `500 15px ${FONT_SANS}`;
+  ctx.fillText(`${p.birdName}  ·  ${p.code}`, CARD_W / 2, cursorY);
+  cursorY += 26;
 
   // Tagline
-  currentY += 32;
-  ctx.fillStyle = accent; // 用各自的主题色高亮 tagline
-  ctx.font = `italic 600 18px ${FONT_SANS}`;
-  const tagLines = wrapText(ctx, `"${p.tagline}"`, CARD_W - leftX * 2, 2);
+  ctx.fillStyle = accent;
+  ctx.font = `600 16px ${FONT_SANS}`;
+  const tagLines = wrapText(ctx, `「${p.tagline}」`, CARD_W - 120, 2);
   tagLines.forEach((line) => {
-    ctx.fillText(line, leftX, currentY);
-    currentY += 26;
+    ctx.fillText(line, CARD_W / 2, cursorY);
+    cursorY += 24;
   });
+  cursorY += 10;
 
-  // ========== 5. Bottom: 3 feature cards ==========
-  const cardsY = CARD_H - 210;
-  const cardGap = 12;
-  const cardW = (CARD_W - leftX * 2 - cardGap * 2) / 3;
-  const cardH = 88;
-
-  p.tags.forEach((tag, i) => {
-    const cardX = leftX + i * (cardW + cardGap);
-    const { emoji, text } = parseTagEmoji(tag);
-
-    // 提高白度，增加毛玻璃通透感，加强高光描边
-    fillRoundedRect(ctx, cardX, cardsY, cardW, cardH, 16, 'rgba(255, 255, 255, 0.25)');
-    strokeRoundedRect(ctx, cardX, cardsY, cardW, cardH, 16, 'rgba(255, 255, 255, 0.55)', 1);
-
-    ctx.textAlign = 'center';
-
-    if (emoji) {
-      ctx.font = `30px ${FONT_SANS}`;
-      ctx.fillText(emoji, cardX + cardW / 2, cardsY + 12);
-    }
-
-    // 文字白度加强，并加入轻微投影提升可读性
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-    ctx.shadowBlur = 2;
-    ctx.shadowOffsetY = 1;
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `600 12px ${FONT_SANS}`;
-    const lines = wrapText(ctx, text, cardW - 16, 2);
-    lines.forEach((line, li) => {
-      ctx.fillText(line, cardX + cardW / 2, cardsY + (emoji ? 48 : 24) + li * 16);
-    });
-    // 关闭投影以免影响后面的渲染
-    ctx.shadowColor = 'transparent';
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetY = 0;
-  });
-
-  // ========== 6. Quote bar ==========
-  const quoteY = cardsY + cardH + 16;
-  fillRoundedRect(ctx, 24, quoteY, CARD_W - 48, 54, 14, hexToRgba(accent, 0.92));
-  ctx.fillStyle = '#ffffff';
-  ctx.font = `600 14px ${FONT_SANS}`;
+  // ─── 6. Tags — 垂直列表（干净、不用算宽度、永远不会错）───
+  const tagTexts = p.tags.map(parseTagEmoji);
+  const tagLineH = 22;
+  ctx.font = `500 13px ${FONT_SANS}`;
+  ctx.fillStyle = hexToRgba(DARK, 0.72);
   ctx.textAlign = 'center';
-  const quoteLines = wrapText(ctx, p.quote, CARD_W - 96, 2);
-  const qOffset = quoteLines.length === 1 ? 17 : 9;
-  quoteLines.forEach((line, i) => {
-    ctx.fillText(line, CARD_W / 2, quoteY + qOffset + i * 20);
-  });
 
-  // ========== 7. Footer ==========
-  const footY = CARD_H - 46;
+  tagTexts.forEach(t => {
+    const label = t.emoji ? `${t.emoji}  ${t.text}` : t.text;
+    ctx.fillText(label, CARD_W / 2, cursorY);
+    cursorY += tagLineH;
+  });
+  cursorY += 16;
+
+  // ─── 7. Quote bar ───
+  const quoteH = 42;
+  const quoteMaxW = CARD_W - 100;
+  ctx.font = `600 13px ${FONT_SANS}`;
+  const quoteLines = wrapText(ctx, p.quote, quoteMaxW, 2);
+  fillRoundedRect(ctx, (CARD_W - quoteMaxW) / 2, cursorY, quoteMaxW, quoteH, 12, accent);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'center';
+  const quoteLineH = 18;
+  const quoteStartY = cursorY + quoteH / 2 - (quoteLines.length * quoteLineH) / 2 + 2;
+  quoteLines.forEach((line, i) => {
+    ctx.fillText(line, CARD_W / 2, quoteStartY + i * quoteLineH);
+  });
+  cursorY += quoteH;
+
+  // ─── 8. Footer ───
+  const footY = CARD_H - 30;
   ctx.textAlign = 'left';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+  ctx.fillStyle = hexToRgba(DARK, 0.40);
   ctx.font = `600 12px ${FONT_SANS}`;
-  ctx.fillText('测测你是什么鸟 →', 32, footY);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.50)';
+  ctx.fillText('测测你是什么鸟', 36, footY);
+  ctx.fillStyle = hexToRgba(DARK, 0.22);
   ctx.font = `10px ${FONT_MONO}`;
-  ctx.fillText(SHARE_SITE_URL, 32, footY + 18);
+  ctx.fillText(SHARE_SITE_URL, 36, footY + 16);
 
   if (qrImage) {
-    fillRoundedRect(ctx, CARD_W - 74, footY - 6, 46, 46, 8, 'rgba(255, 255, 255, 0.92)');
-    drawImageContain(ctx, qrImage, CARD_W - 71, footY - 3, 40, 40);
+    const qrS = 38;
+    fillRoundedRect(ctx, CARD_W - 36 - qrS, footY - 8, qrS, qrS, 8, '#FFFFFF');
+    drawImageContain(ctx, qrImage, CARD_W - 33 - qrS, footY - 5, qrS - 6, qrS - 6);
   }
 
   return canvas.toDataURL('image/png');

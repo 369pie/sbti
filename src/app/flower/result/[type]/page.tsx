@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getFlowerPersonalityBySlug, getAllFlowerSlugs } from '@/lib/flower/personalities';
+import { getFlowerPersonalityBySlug, getAllFlowerSlugs, getFlowerTypeImage } from '@/lib/flower/personalities';
 import { FLOWER_DIMENSIONS } from '@/lib/flower/dimensions';
 import type { DimensionLevel } from '@/lib/flower/dimensions';
 import { FlowerResultContent } from './FlowerResultContent';
@@ -25,6 +25,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `我的花格是 ${p.flower}（${p.name}）`,
       description: p.flowerLang,
+      url: getSiteUrl(`/flower/result/${type}/`),
+      images: [{ url: getFlowerTypeImage(type), width: 256, height: 256, alt: p.flower }],
     },
     twitter: {
       card: 'summary',

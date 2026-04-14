@@ -6,6 +6,7 @@ import type { DimensionLevel } from '@/lib/dimensions';
 import { WtftiResultContent } from './WtftiResultContent';
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
+import { getWtftiTypeImage } from '@/lib/wtfti-personalities';
 
 type PageProps = {
   params: Promise<{ type: string }>;
@@ -29,6 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: `WTF 我居然是${wp.wtftiName}？？`,
       description: wp.tagline,
       url: getSiteUrl(`/wtfti/result/${type}/`),
+      images: [{ url: getWtftiTypeImage(type), width: 256, height: 256, alt: wp.wtftiName }],
     },
     twitter: {
       card: 'summary',

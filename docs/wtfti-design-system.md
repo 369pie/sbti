@@ -18,7 +18,7 @@
 | 全局文字 | `#2D2A26`（暖深棕）/ `#6B6560`（次要）/ `#9C9590`（灰） |
 | 默认字体 | Geist Sans（西文）+ PingFang SC / Noto Sans SC（中文） |
 | 等宽字体 | Geist Mono（人格编码、维度代号） |
-| 衬线字体 | 保留为宇宙专属（如觉TI 用 Georgia + Noto Serif SC） |
+| 衬线字体 | 保留为宇宙专属（如SoulTI 用 Georgia + Noto Serif SC） |
 
 ### 1.2 品牌语言
 
@@ -59,7 +59,7 @@
 | **鸟TI** | `#38bdf8` 天蓝 | Geist Sans | 荒诞萌系 | 鸟类色卡、叫声拟声词 |
 | **花TI** | `#e11d48` 玫红 | Geist Sans 纤细 | 温暖治愈 | 磨砂玻璃、极光渐变 |
 | **三角TI** | `#84cc16` 草绿 | Geist Sans | 硬核军事 | 军绿、战术标记 |
-| **觉TI** | `#8b7355` 烟棕 | **全衬线**（Georgia + Noto Serif SC） | 文艺内省 | 留白、极简、斜体引文 |
+| **SoulTI** | `#8b7355` 烟棕 | **全衬线**（Georgia + Noto Serif SC） | 文艺内省 | 留白、极简、斜体引文 |
 | **恋爱XP** | `#a855f7` 紫粉 | Geist Sans | 撩人暧昧 | 紫→粉渐变、磨砂玻璃 |
 
 ### 2.3 新宇宙上线 Checklist
@@ -175,7 +175,7 @@ WTFTI 主页不是某个具体测试的入口，而是 **"宇宙中心" / 门户
 
 ## 五、各宇宙视觉详细参考
 
-### 觉TI — 文艺内省范本
+### SoulTI — 文艺内省范本
 
 **做对了什么：**
 - 全衬线字体（Georgia + Noto Serif SC）与平台默认无衬线形成强烈区隔
