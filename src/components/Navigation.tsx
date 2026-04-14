@@ -7,7 +7,7 @@ import { getLiveUniverses } from '@/lib/universes';
 // ─── Static data ─────────────────────────────────────────────────────────────
 
 const UNIVERSE_ITEMS = getLiveUniverses().map(u => ({
-  href: u.testPath,
+  href: u.landingPath,
   label: u.name,
   emoji: u.emoji,
   accent: u.accent,
@@ -31,6 +31,7 @@ function getUniverseDesc(id: string): string {
 }
 
 const FUN_ITEMS = [
+  { href: '/card/', label: 'WTF Card', emoji: '🃏', desc: '你的多宇宙人格卡' },
   { href: '/cp/', label: 'CP 配对', emoji: '💕', desc: '看看谁和你最配' },
   { href: '/work/', label: '打工人设', emoji: '💼', desc: '你的职场角色' },
   { href: '/love/', label: '恋爱人设', emoji: '💗', desc: '你的恋爱角色' },

@@ -11,6 +11,7 @@ import { BantiShareImageGenerator } from '@/components/BantiShareImageGenerator'
 import type { BantiShareImageHandle } from '@/components/BantiShareImageGenerator';
 import { BantiTypeArt } from '@/components/BantiTypeArt';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
+import { WtfCardCTA } from '@/components/WtfCardCTA';
 
 interface Props {
   bantiPersonality: BantiPersonality;
@@ -320,6 +321,8 @@ export function BantiResultContent({ bantiPersonality: p, dimensionScores }: Pro
           </Link>
         </div>
       </section>
+
+      <WtfCardCTA />
     </div>
   );
 }

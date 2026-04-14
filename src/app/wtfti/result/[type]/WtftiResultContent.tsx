@@ -11,6 +11,7 @@ import { getSiteUrl } from '@/lib/site';
 import { WtftiShareImageGenerator } from '@/components/WtftiShareImageGenerator';
 import type { WtftiShareImageHandle } from '@/components/WtftiShareImageGenerator';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
+import { WtfCardCTA } from '@/components/WtfCardCTA';
 
 interface Props {
   wtftiPersonality: WtftiPersonality;
@@ -179,6 +180,16 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
               </li>
             ))}
           </ul>
+          <div className="mt-5 pt-4 border-t border-border-subtle text-center">
+            <Link
+              href={`/wtfti/symptoms/${p.slug}/`}
+              prefetch={false}
+              className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors hover:brightness-110"
+              style={{ color: p.color }}
+            >
+              发给朋友打勾 — 看 ta 中了几枪 →
+            </Link>
+          </div>
         </motion.div>
       </section>
 
@@ -297,6 +308,8 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
           </Link>
         </div>
       </section>
+
+      <WtfCardCTA />
     </div>
   );
 }

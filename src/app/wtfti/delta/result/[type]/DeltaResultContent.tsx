@@ -11,6 +11,7 @@ import { DeltaTypeArt } from '@/components/DeltaTypeArt';
 import { DeltaShareImageGenerator } from '@/components/DeltaShareImageGenerator';
 import type { DeltaShareImageHandle } from '@/components/DeltaShareImageGenerator';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
+import { WtfCardCTA } from '@/components/WtfCardCTA';
 
 interface Props {
   deltaPersonality: DeltaPersonality;
@@ -302,6 +303,8 @@ export function DeltaResultContent({ deltaPersonality: p, dimensionScores }: Pro
           </Link>
         </div>
       </section>
+
+      <WtfCardCTA />
     </div>
   );
 }

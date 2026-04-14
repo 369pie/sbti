@@ -12,6 +12,7 @@ import type { XptiShareImageGeneratorHandle } from '@/components/XptiShareImageG
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { WtfCardCTA } from '@/components/WtfCardCTA';
 
 interface Props {
   personality: XptiPersonalityType;
@@ -292,6 +293,8 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
           ))}
         </div>
       </section>
+
+      <WtfCardCTA />
     </div>
   );
 }

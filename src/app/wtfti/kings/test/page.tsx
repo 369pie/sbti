@@ -12,6 +12,7 @@ export default function KingsTestPage() {
   return (
     <Suspense>
       <Quiz
+        universeId="kings"
         resultPrefix="/wtfti/kings"
         variant="wtfti"
         finishingOverlay={{ emoji: '⚔️', text: '正在翻译你的峡谷人格…' }}

@@ -8,6 +8,8 @@ import { calculateFlowerResult } from '@/lib/flower/scoring';
 import type { Answer } from '@/lib/flower/scoring';
 import { FLOWER_MODEL_NAMES, FLOWER_MODEL_COLORS } from '@/lib/flower/dimensions';
 import { basePath } from '@/lib/site';
+import { recordUniverseResult } from '@/lib/wtf-card';
+import { UniversePicker } from '@/components/UniversePicker';
 
 const emptySubscribe = () => () => {};
 
@@ -56,6 +58,9 @@ export function FlowerQuiz() {
     setIsFinishing(true);
 
     const result = calculateFlowerResult(finalAnswers, FLOWER_QUESTIONS);
+
+    // Record to WTF Card
+    recordUniverseResult('flower', result.personality.slug);
 
     if (finishTimeoutRef.current !== null) {
       window.clearTimeout(finishTimeoutRef.current);
@@ -114,6 +119,10 @@ export function FlowerQuiz() {
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] flex flex-col">
+      <div className="px-6 pt-4 max-w-2xl mx-auto w-full flex justify-center">
+        <UniversePicker current="flower" />
+      </div>
+
       {/* Progress */}
       <div className="px-6 pt-6 pb-2 max-w-2xl mx-auto w-full">
         <div className="flex items-center justify-between text-xs text-text-muted mb-3">

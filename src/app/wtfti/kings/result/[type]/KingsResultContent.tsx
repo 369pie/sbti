@@ -11,6 +11,7 @@ import { KingsTypeArt } from '@/components/KingsTypeArt';
 import { KingsShareImageGenerator } from '@/components/KingsShareImageGenerator';
 import type { KingsShareImageHandle } from '@/components/KingsShareImageGenerator';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
+import { WtfCardCTA } from '@/components/WtfCardCTA';
 
 interface Props {
   kingsPersonality: KingsPersonality;
@@ -302,6 +303,8 @@ export function KingsResultContent({ kingsPersonality: p, dimensionScores }: Pro
           </Link>
         </div>
       </section>
+
+      <WtfCardCTA />
     </div>
   );
 }

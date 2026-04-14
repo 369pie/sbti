@@ -12,6 +12,7 @@ export default function WtftiTestPage() {
   return (
     <Suspense>
       <Quiz
+        universeId="wtfti"
         resultPrefix="/wtfti"
         variant="wtfti"
         finishingOverlay={{ emoji: '🤯', text: 'WTF…正在翻译你的人格…' }}

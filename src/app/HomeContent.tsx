@@ -150,7 +150,7 @@ export default function HomeContent() {
               return (
                 <Link
                   key={u.id}
-                  href={u.testPath.replace(/\/test\/$/, '/').replace(/\/test\/\?/, '/?')}
+                  href={u.landingPath}
                   prefetch={false}
                   className="group animate-fade-up block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-lg transition-all duration-300 overflow-hidden"
                   style={{ animationDelay: `${i * 60}ms` }}

@@ -30,7 +30,7 @@ export function UniversePicker({ current, onSelect }: UniversePickerProps) {
         return (
           <Link
             key={u.id}
-            href={u.testPath}
+            href={u.landingPath}
             prefetch={false}
             onClick={(e) => {
               if (onSelect?.(u)) {

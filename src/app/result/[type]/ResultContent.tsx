@@ -13,6 +13,7 @@ import { CrossTestRecommendations } from '@/components/CrossTestRecommendations'
 import { getXiuxianSkin } from '@/lib/xiuxian';
 import { getXiuxianLaunchOnlyTypes } from '@/lib/xiuxian-v2';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
+import { WtfCardCTA } from '@/components/WtfCardCTA';
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
 import { ResultDiagnosticsPanel } from '@/components/ResultDiagnosticsPanel';
 import { FollowMeCard, FollowMeFloating } from '@/components/FollowMeLinks';
@@ -639,6 +640,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         </div>
       </section>
 
+      <WtfCardCTA />
       <FollowMeFloating />
     </div>
   );

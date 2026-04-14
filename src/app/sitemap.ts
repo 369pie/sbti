@@ -46,6 +46,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: getSiteUrl('/bird/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/flower/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/identify/'), lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    { url: getSiteUrl('/wtfti/symptoms/'), lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
   ];
 
   const guidePages: MetadataRoute.Sitemap = GUIDE_ARTICLES.map((article) => ({
@@ -153,5 +154,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages, ...kingsResultPages, ...deltaResultPages, ...xptiResultPages, ...juetiResultPages, ...birdResultPages, ...flowerResultPages, ...identifyResultPages];
+  const symptomsPages: MetadataRoute.Sitemap = getWtftiSlugs().map((slug) => ({
+    url: getSiteUrl(`/wtfti/symptoms/${slug}/`),
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
+  }));
+
+  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages, ...kingsResultPages, ...deltaResultPages, ...xptiResultPages, ...juetiResultPages, ...birdResultPages, ...flowerResultPages, ...identifyResultPages, ...symptomsPages];
 }

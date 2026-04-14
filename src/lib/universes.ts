@@ -21,8 +21,10 @@ export interface Universe {
   status: 'live' | 'coming-soon';
   /** Theme accent colour (hex) */
   accent: string;
-  /** URL path for the test page */
+  /** URL path for the test page (quiz directly) */
   testPath: string;
+  /** URL path for the landing / intro page (before test) */
+  landingPath: string;
   /** URL path prefix for result pages (before /result/) */
   resultPrefix: string;
   /** Gallery tab id in TypesContent (matches gallery-data.ts tab.id) */
@@ -42,6 +44,7 @@ export const UNIVERSES: Universe[] = [
     status: 'live',
     accent: '#e8729c',
     testPath: '/test/',
+    landingPath: '/',
     resultPrefix: '',
     galleryTabId: 'sbti',
     activeClass: 'bg-bg-elevated text-text-primary shadow-sm font-medium',
@@ -54,6 +57,7 @@ export const UNIVERSES: Universe[] = [
     status: 'live',
     accent: '#a855f7',
     testPath: '/test/?skin=xiuxian',
+    landingPath: '/?skin=xiuxian',
     resultPrefix: '',
     galleryTabId: 'sbti',
     activeClass: 'bg-purple-100 text-purple-700 shadow-sm font-medium',
@@ -66,6 +70,7 @@ export const UNIVERSES: Universe[] = [
     status: 'live',
     accent: '#ef4444',
     testPath: '/wtfti/test/',
+    landingPath: '/wtfti/',
     resultPrefix: '/wtfti',
     galleryTabId: 'wtfti',
     activeClass: 'bg-rose-100 text-rose-700 shadow-sm font-medium',
@@ -78,6 +83,7 @@ export const UNIVERSES: Universe[] = [
     status: 'live',
     accent: '#0ea5e9',
     testPath: '/wtfti/work/test/',
+    landingPath: '/wtfti/work/',
     resultPrefix: '/wtfti/work',
     galleryTabId: 'banti',
     activeClass: 'bg-sky-100 text-sky-700 shadow-sm font-medium',
@@ -90,6 +96,7 @@ export const UNIVERSES: Universe[] = [
     status: 'live',
     accent: '#f59e0b',
     testPath: '/wtfti/kings/test/',
+    landingPath: '/wtfti/kings/',
     resultPrefix: '/wtfti/kings',
     galleryTabId: 'kings',
     activeClass: 'bg-amber-100 text-amber-700 shadow-sm font-medium',
@@ -102,6 +109,7 @@ export const UNIVERSES: Universe[] = [
     status: 'live',
     accent: '#38bdf8',
     testPath: '/bird/test/',
+    landingPath: '/bird/',
     resultPrefix: '/bird',
     galleryTabId: 'bird',
     activeClass: 'bg-sky-50 text-sky-600 shadow-sm font-medium',
@@ -114,6 +122,7 @@ export const UNIVERSES: Universe[] = [
     status: 'live',
     accent: '#e11d48',
     testPath: '/flower/test/',
+    landingPath: '/flower/',
     resultPrefix: '/flower',
     galleryTabId: undefined,
     activeClass: 'bg-rose-50 text-rose-600 shadow-sm font-medium',
@@ -127,6 +136,7 @@ export const UNIVERSES: Universe[] = [
     status: 'live',
     accent: '#84cc16',
     testPath: '/wtfti/delta/test/',
+    landingPath: '/wtfti/delta/',
     resultPrefix: '/wtfti/delta',
     galleryTabId: 'delta',
     activeClass: 'bg-lime-100 text-lime-700 shadow-sm font-medium',
@@ -139,6 +149,7 @@ export const UNIVERSES: Universe[] = [
     status: 'live',
     accent: '#8b7355',
     testPath: '/jueti/test/',
+    landingPath: '/jueti/',
     resultPrefix: '/jueti',
     galleryTabId: 'jueti',
     activeClass: 'bg-stone-100 text-stone-700 shadow-sm font-medium',
@@ -151,6 +162,7 @@ export const UNIVERSES: Universe[] = [
     status: 'live',
     accent: '#a855f7',
     testPath: '/xpti/test/',
+    landingPath: '/xpti/',
     resultPrefix: '/xpti',
     galleryTabId: undefined,
     activeClass: 'bg-purple-50 text-purple-600 shadow-sm font-medium',

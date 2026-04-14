@@ -12,6 +12,7 @@ import type { FlowerShareImageGeneratorHandle } from '@/components/FlowerShareIm
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { WtfCardCTA } from '@/components/WtfCardCTA';
 
 interface Props {
   personality: FlowerPersonalityType;
@@ -304,6 +305,8 @@ export function FlowerResultContent({ personality, dimensionScores }: Props) {
           ))}
         </div>
       </section>
+
+      <WtfCardCTA />
     </div>
   );
 }

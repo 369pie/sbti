@@ -9,6 +9,7 @@ import type { Answer } from '@/lib/scoring';
 import { MODEL_NAMES, MODEL_COLORS } from '@/lib/dimensions';
 import type { ModelType } from '@/lib/dimensions';
 import { basePath } from '@/lib/site';
+import { recordUniverseResult } from '@/lib/wtf-card';
 import { UniversePicker } from '@/components/UniversePicker';
 
 const MODEL_CLASS: Record<ModelType, string> = {
@@ -76,6 +77,9 @@ export function BantiQuiz() {
     setIsFinishing(true);
 
     const result = calculateResult(finalAnswers, BANTI_QUESTIONS);
+
+    // Record to WTF Card
+    recordUniverseResult('banti', result.personality.slug);
 
     if (finishTimeoutRef.current !== null) {
       window.clearTimeout(finishTimeoutRef.current);

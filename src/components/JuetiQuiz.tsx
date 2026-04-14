@@ -8,6 +8,8 @@ import { calculateJuetiResult } from '@/lib/jueti/scoring';
 import type { Answer } from '@/lib/jueti/scoring';
 import { JUETI_MODEL_NAMES, JUETI_MODEL_COLORS } from '@/lib/jueti/dimensions';
 import { basePath } from '@/lib/site';
+import { recordUniverseResult } from '@/lib/wtf-card';
+import { UniversePicker } from '@/components/UniversePicker';
 
 const emptySubscribe = () => () => {};
 
@@ -56,6 +58,9 @@ export function JuetiQuiz() {
     setIsFinishing(true);
 
     const result = calculateJuetiResult(finalAnswers, JUETI_QUESTIONS);
+
+    // Record to WTF Card
+    recordUniverseResult('jueti', result.personality.slug);
 
     if (finishTimeoutRef.current !== null) {
       window.clearTimeout(finishTimeoutRef.current);
@@ -116,6 +121,10 @@ export function JuetiQuiz() {
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] flex flex-col">
+      <div className="px-6 pt-4 max-w-2xl mx-auto w-full flex justify-center">
+        <UniversePicker current="jueti" />
+      </div>
+
       {/* Progress */}
       <div className="px-6 pt-6 pb-2 max-w-2xl mx-auto w-full">
         <div className="flex items-center justify-between text-xs text-text-muted mb-3">

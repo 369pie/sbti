@@ -11,6 +11,7 @@ import type { JuetiShareImageGeneratorHandle } from '@/components/JuetiShareImag
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { WtfCardCTA } from '@/components/WtfCardCTA';
 
 interface Props {
   personality: JuetiPersonalityType;
@@ -521,6 +522,8 @@ export function JuetiResultContent({ personality, dimensionScores }: Props) {
           ))}
         </div>
       </section>
+
+      <WtfCardCTA />
     </div>
   );
 }

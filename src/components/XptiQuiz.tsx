@@ -8,6 +8,8 @@ import { calculateXptiResult } from '@/lib/xpti/scoring';
 import type { Answer } from '@/lib/xpti/scoring';
 import { XPTI_MODEL_NAMES, XPTI_MODEL_COLORS } from '@/lib/xpti/dimensions';
 import { basePath } from '@/lib/site';
+import { recordUniverseResult } from '@/lib/wtf-card';
+import { UniversePicker } from '@/components/UniversePicker';
 
 const emptySubscribe = () => () => {};
 
@@ -56,6 +58,9 @@ export function XptiQuiz() {
     setIsFinishing(true);
 
     const result = calculateXptiResult(finalAnswers, XPTI_QUESTIONS);
+
+    // Record to WTF Card
+    recordUniverseResult('xpti', result.personality.slug);
 
     if (finishTimeoutRef.current !== null) {
       window.clearTimeout(finishTimeoutRef.current);
@@ -114,6 +119,10 @@ export function XptiQuiz() {
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] flex flex-col">
+      <div className="px-6 pt-4 max-w-2xl mx-auto w-full flex justify-center">
+        <UniversePicker current="xpti" />
+      </div>
+
       {/* Progress */}
       <div className="px-6 pt-6 pb-2 max-w-2xl mx-auto w-full">
         <div className="flex items-center justify-between text-xs text-text-muted mb-3">

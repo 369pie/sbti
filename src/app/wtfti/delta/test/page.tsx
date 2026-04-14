@@ -12,6 +12,7 @@ export default function DeltaTestPage() {
   return (
     <Suspense>
       <Quiz
+        universeId="delta"
         resultPrefix="/wtfti/delta"
         variant="wtfti"
         finishingOverlay={{ emoji: '🎯', text: '正在翻译你的战区人格…' }}

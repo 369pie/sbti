@@ -1,0 +1,69 @@
+/**
+ * Unified personality resolver — maps (universeId, slug) → display info.
+ * Used by WTF Card to show personality names from any universe.
+ */
+
+import { getPersonalityBySlug } from './personalities';
+import { getWtftiPersonality } from './wtfti-personalities';
+import { getXiuxianV2Skin } from './xiuxian-v2';
+import { getBantiPersonality } from './banti/personalities';
+import { getKingsPersonality } from './kings/personalities';
+import { getDeltaPersonality } from './delta/personalities';
+import { BIRD_PERSONALITIES } from './bird/personalities';
+import { getFlowerPersonalityBySlug } from './flower/personalities';
+import { getJuetiPersonalityBySlug } from './jueti/personalities';
+import { getXptiPersonalityBySlug } from './xpti/personalities';
+
+export interface ResolvedPersonality {
+  name: string;
+  emoji: string;
+}
+
+const BIRD_MAP = new Map(BIRD_PERSONALITIES.map(b => [b.slug, b]));
+
+export function resolvePersonality(universeId: string, slug: string): ResolvedPersonality | null {
+  switch (universeId) {
+    case 'standard': {
+      const p = getPersonalityBySlug(slug);
+      return p ? { name: p.name, emoji: p.emoji } : null;
+    }
+    case 'xiuxian': {
+      const p = getXiuxianV2Skin(slug);
+      return p ? { name: p.name, emoji: p.emoji } : null;
+    }
+    case 'wtfti': {
+      const p = getWtftiPersonality(slug);
+      return p ? { name: p.wtftiName, emoji: p.emoji } : null;
+    }
+    case 'banti': {
+      const p = getBantiPersonality(slug);
+      return p ? { name: p.workName, emoji: p.emoji } : null;
+    }
+    case 'kings': {
+      const p = getKingsPersonality(slug);
+      return p ? { name: p.heroName, emoji: p.emoji } : null;
+    }
+    case 'delta': {
+      const p = getDeltaPersonality(slug);
+      return p ? { name: p.heroName, emoji: p.emoji } : null;
+    }
+    case 'bird': {
+      const b = BIRD_MAP.get(slug);
+      return b ? { name: b.birdName, emoji: b.emoji } : null;
+    }
+    case 'flower': {
+      const p = getFlowerPersonalityBySlug(slug);
+      return p ? { name: p.name, emoji: p.emoji } : null;
+    }
+    case 'jueti': {
+      const p = getJuetiPersonalityBySlug(slug);
+      return p ? { name: p.name, emoji: p.emoji } : null;
+    }
+    case 'xpti': {
+      const p = getXptiPersonalityBySlug(slug);
+      return p ? { name: p.name, emoji: p.emoji } : null;
+    }
+    default:
+      return null;
+  }
+}

@@ -11,6 +11,7 @@ import { BirdShareImageGenerator } from '@/components/BirdShareImageGenerator';
 import type { BirdShareImageHandle } from '@/components/BirdShareImageGenerator';
 import { BirdTypeArt } from '@/components/BirdTypeArt';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
+import { WtfCardCTA } from '@/components/WtfCardCTA';
 
 interface Props {
   birdPersonality: BirdPersonality;
@@ -326,6 +327,8 @@ export function BirdResultContent({ birdPersonality: p, dimensionScores }: Props
           </Link>
         </div>
       </section>
+
+      <WtfCardCTA />
     </div>
   );
 }

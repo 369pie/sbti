@@ -15,6 +15,7 @@ import { XIUXIAN_MODEL_NAMES, XIUXIAN_MODEL_COLORS } from '@/lib/xiuxian';
 import { UniversePicker } from '@/components/UniversePicker';
 import type { Universe } from '@/lib/universes';
 import { saveStoredQuizResult } from '@/lib/quiz-result-session';
+import { recordUniverseResult } from '@/lib/wtf-card';
 
 const MODEL_CLASS: Record<ModelType, string> = {
   self: 'model-self',
@@ -33,11 +34,13 @@ interface QuizProps {
   showSkinToggle?: boolean;
   /** Which variant is active: 'standard' or 'wtfti' */
   variant?: 'standard' | 'wtfti';
+  /** Explicit universe id for UniversePicker highlight (e.g. 'kings', 'delta') */
+  universeId?: string;
   /** Custom finishing overlay emoji + text */
   finishingOverlay?: { emoji: string; text: string };
 }
 
-export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'standard', finishingOverlay }: QuizProps = {}) {
+export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'standard', universeId, finishingOverlay }: QuizProps = {}) {
   const searchParams = useSearchParams();
   const cpPartner = searchParams.get('cp');
   const [skinMode, setSkinMode] = useState<'standard' | 'xiuxian'>(() =>
@@ -109,6 +112,14 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
       dimensionScores: result.dimensions,
       diagnostics: result.diagnostics,
     });
+
+    // Record to WTF Card
+    const cardUniverseId =
+      resultPrefix === '/wtfti/kings' ? 'kings' :
+      resultPrefix === '/wtfti/delta' ? 'delta' :
+      resultPrefix === '/wtfti' ? 'wtfti' :
+      isXiuxian ? 'xiuxian' : 'standard';
+    recordUniverseResult(cardUniverseId, result.personality.slug);
 
     if (finishTimeoutRef.current !== null) {
       window.clearTimeout(finishTimeoutRef.current);
@@ -217,7 +228,7 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
       {showSkinToggle && (
       <div className="px-6 pt-4 max-w-2xl mx-auto w-full flex justify-center">
         <UniversePicker
-          current={variant === 'wtfti' ? 'wtfti' : isXiuxian ? 'xiuxian' : 'standard'}
+          current={universeId ?? (isXiuxian ? 'xiuxian' : 'standard')}
           onSelect={(u: Universe) => {
             // standard ↔ xiuxian can switch in-page without navigation
             if (variant === 'standard' && (u.id === 'standard' || u.id === 'xiuxian')) {
