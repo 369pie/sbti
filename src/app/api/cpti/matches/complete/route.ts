@@ -1,13 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/supabase/with-auth';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
-import { computeMatchResult, type Answer } from '@/lib/cpti/server/scoring-service';
+import {
+  computeMatchFromProfiles,
+  profileFromSnapshot,
+  scoreUser,
+  type Answer,
+  type CptiDimensionScore,
+  type UserProfile,
+} from '@/lib/cpti/server/scoring-service';
+import { CPTI_RELATIONSHIP_TYPES } from '@/lib/cpti/relationships';
 import type { User } from '@supabase/supabase-js';
 
 interface CompleteMatchBody {
   matchId: string;
   initiatorAnswers: Record<number, 1 | 2 | 3>;
   participantAnswers: Record<number, 1 | 2 | 3>;
+}
+
+interface SnapshotRow {
+  id: string;
+  personality_slug: string;
+  dimension_scores: CptiDimensionScore[];
 }
 
 // POST handler: complete a match
@@ -78,33 +92,41 @@ export const POST = withAuth(async (
       );
     }
 
-    // Compute match result using scoring service
-    const result = computeMatchResult(
-      initiatorAnswers as Record<number, Answer>,
-      participantAnswers as Record<number, Answer>
-    );
+    let initiatorProfile: UserProfile | null = null;
+    let initiatorSnapshotId = match.initiator_snapshot_id as string | null;
 
-    // Create profile snapshot for initiator
-    const { data: initiatorSnapshot, error: initiatorSnapshotError } = await adminClient
-      .from('cpti_profile_snapshots')
-      .insert({
-        user_id: match.initiator_user_id,
-        source: 'pair_flow',
-        personality_slug: result.initiatorProfile.personality.slug,
-        dimension_scores: result.initiatorProfile.dimensions,
-        raw_answers: initiatorAnswers,
-        created_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
+    if (Object.keys(initiatorAnswers).length > 0) {
+      initiatorProfile = scoreUser(initiatorAnswers as Record<number, Answer>);
+    } else if (initiatorSnapshotId) {
+      const { data: existingInitiatorSnapshot, error: existingInitiatorSnapshotError } = await adminClient
+        .from('cpti_profile_snapshots')
+        .select('id, personality_slug, dimension_scores')
+        .eq('id', initiatorSnapshotId)
+        .single();
 
-    if (initiatorSnapshotError) {
-      console.error('[matches/complete POST] Failed to create initiator snapshot:', initiatorSnapshotError);
+      if (existingInitiatorSnapshotError || !existingInitiatorSnapshot) {
+        console.error('[matches/complete POST] Failed to load initiator snapshot:', existingInitiatorSnapshotError);
+        return NextResponse.json(
+          { error: 'Failed to load initiator profile snapshot' },
+          { status: 500 }
+        );
+      }
+
+      initiatorProfile = profileFromSnapshot({
+        personalitySlug: (existingInitiatorSnapshot as SnapshotRow).personality_slug,
+        dimensionScores: (existingInitiatorSnapshot as SnapshotRow).dimension_scores,
+      });
+    }
+
+    if (!initiatorProfile) {
       return NextResponse.json(
-        { error: 'Failed to create initiator profile snapshot' },
-        { status: 500 }
+        { error: 'Initiator profile is missing. Ask the inviter to generate a fresh pair code.' },
+        { status: 409 }
       );
     }
+
+    const participantProfile = scoreUser(participantAnswers as Record<number, Answer>);
+    const result = computeMatchFromProfiles(initiatorProfile, participantProfile);
 
     // Create profile snapshot for participant
     const { data: participantSnapshot, error: participantSnapshotError } = await adminClient
@@ -128,6 +150,31 @@ export const POST = withAuth(async (
       );
     }
 
+    if (!initiatorSnapshotId) {
+      const { data: initiatorSnapshot, error: initiatorSnapshotError } = await adminClient
+        .from('cpti_profile_snapshots')
+        .insert({
+          user_id: match.initiator_user_id,
+          source: 'pair_flow',
+          personality_slug: result.initiatorProfile.personality.slug,
+          dimension_scores: result.initiatorProfile.dimensions,
+          raw_answers: initiatorAnswers,
+          created_at: new Date().toISOString(),
+        })
+        .select('id')
+        .single();
+
+      if (initiatorSnapshotError || !initiatorSnapshot) {
+        console.error('[matches/complete POST] Failed to create initiator snapshot:', initiatorSnapshotError);
+        return NextResponse.json(
+          { error: 'Failed to create initiator profile snapshot' },
+          { status: 500 }
+        );
+      }
+
+      initiatorSnapshotId = initiatorSnapshot.id;
+    }
+
     // Insert relationship into cpti_relationships
     const { data: relationship, error: relationshipError } = await adminClient
       .from('cpti_relationships')
@@ -135,7 +182,7 @@ export const POST = withAuth(async (
         match_id: matchId,
         initiator_user_id: match.initiator_user_id,
         participant_user_id: match.participant_user_id,
-        initiator_snapshot_id: initiatorSnapshot.id,
+        initiator_snapshot_id: initiatorSnapshotId,
         participant_snapshot_id: participantSnapshot.id,
         relationship_slug: result.relationship.slug,
         relationship_tier: result.relationship.tier,
@@ -306,12 +353,15 @@ export const POST = withAuth(async (
       compatibility: result.compatibility,
     });
 
+    const currentUserAtlas = atlasUpdate[currentUserId] ?? { newUnlock: false, totalUnlocks: 0 };
+
     return NextResponse.json({
       matchId,
       relationship: {
         id: relationship.id,
         slug: relationship.relationship_slug,
         tier: relationship.relationship_tier,
+        code: result.relationship.code,
         compatibility: relationship.compatibility,
         name: result.relationship.name,
         tagline: result.relationship.tagline,
@@ -322,7 +372,7 @@ export const POST = withAuth(async (
       initiatorProfile: {
         personality: result.initiatorProfile.personality,
         dimensions: result.initiatorProfile.dimensions,
-        snapshotId: initiatorSnapshot.id,
+        snapshotId: initiatorSnapshotId,
       },
       participantProfile: {
         personality: result.participantProfile.personality,
@@ -332,6 +382,10 @@ export const POST = withAuth(async (
       compatibility: result.compatibility,
       completedAt,
       atlasUpdate,
+      collectionProgress: {
+        collected: currentUserAtlas.totalUnlocks,
+        total: CPTI_RELATIONSHIP_TYPES.length,
+      },
     });
   } catch (error) {
     console.error('[matches/complete POST] Failed to complete match:', error);

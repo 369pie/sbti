@@ -33,28 +33,50 @@ function InviteInner() {
   // Resolve pair code from URL on mount
   useEffect(() => {
     if (!pairCode) return;
-    setPairLoading(true);
-    setPairError(null);
-    cptiApi.resolvePairCode(pairCode)
-      .then((res: { id: string; code: string; inviterNickname: string | null; inviterPersonalitySlug: string | null }) => {
+    let active = true;
+
+    const resolvePairCode = async () => {
+      setPairLoading(true);
+      setPairError(null);
+
+      try {
+        const res = await cptiApi.resolvePairCode(pairCode);
+        if (!active) return;
+
         setResolved({
           id: res.id,
           code: res.code,
           inviterNickname: res.inviterNickname,
           inviterPersonalitySlug: res.inviterPersonalitySlug,
         });
-      })
-      .catch((err: any) => {
-        setPairError(err?.message || '配对码无效或已过期');
-      })
-      .finally(() => {
-        setPairLoading(false);
-      });
+      } catch (err: unknown) {
+        if (!active) return;
+        const message = err instanceof Error ? err.message : '配对码无效或已过期';
+        setPairError(message);
+      } finally {
+        if (active) {
+          setPairLoading(false);
+        }
+      }
+    };
+
+    void resolvePairCode();
+
+    return () => {
+      active = false;
+    };
   }, [pairCode]);
 
   const handleStartTest = useCallback(() => {
     if (!resolved) return;
-    router.push(`/cpti/test?pairCodeId=${encodeURIComponent(resolved.id)}&mode=pair`);
+    const next = new URLSearchParams({
+      pairCodeId: resolved.id,
+      mode: 'pair',
+    });
+    if (resolved.inviterNickname) {
+      next.set('partnerNickname', resolved.inviterNickname);
+    }
+    router.push(`/cpti/test?${next.toString()}`);
   }, [resolved, router]);
 
   if (!mounted) {

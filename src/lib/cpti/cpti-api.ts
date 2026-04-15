@@ -38,6 +38,7 @@ interface CompletedMatchResponse {
     id: string;
     slug: string;
     tier: string;
+    code: string;
     compatibility: number;
     name: string;
     tagline: string;
@@ -62,6 +63,10 @@ interface CompletedMatchResponse {
   compatibility: number;
   completedAt: string;
   atlasUpdate: Record<string, { newUnlock: boolean; totalUnlocks: number }>;
+  collectionProgress: {
+    collected: number;
+    total: number;
+  };
 }
 
 interface CollectionResponse {

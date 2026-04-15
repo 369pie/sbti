@@ -37,9 +37,17 @@ interface CptiQuizProps {
   targetNickname?: string;
   /** Pair code ID for server-side paired flow (from /cpti/join) */
   pairCodeId?: string;
+  /** Optional inviter nickname for six-digit pair code flow */
+  pairPartnerNickname?: string;
 }
 
-export function CptiQuiz({ mode: initialMode = 'solo', inviteData, targetNickname, pairCodeId }: CptiQuizProps = {}) {
+export function CptiQuiz({
+  mode: initialMode = 'solo',
+  inviteData,
+  targetNickname,
+  pairCodeId,
+  pairPartnerNickname,
+}: CptiQuizProps = {}) {
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const isPeerMode = initialMode === 'peer' && inviteData;
@@ -101,7 +109,7 @@ export function CptiQuiz({ mode: initialMode = 'solo', inviteData, targetNicknam
   }, []);
 
   // ── Finish: self-assessment done ──
-  const finishSelfTest = useCallback((finalAnswers: Map<number, Answer>) => {
+  const finishSelfTest = useCallback(async (finalAnswers: Map<number, Answer>) => {
     if (isFinishingRef.current) return;
 
     isFinishingRef.current = true;
@@ -114,25 +122,6 @@ export function CptiQuiz({ mode: initialMode = 'solo', inviteData, targetNicknam
 
     // Also persist to backend DB (fire-and-forget, don't block navigation)
     const source = pairCodeId ? 'pair_flow' : 'self_test';
-    cptiApi
-      .bootstrap()
-      .then(() =>
-        cptiApi.saveProfile({
-          personalitySlug: result.personality.slug,
-          dimensionScores: result.dimensions,
-          source,
-        }),
-      )
-      .then(() => {
-        // If paired flow, start a match linked to the pair code
-        if (pairCodeId) {
-          return cptiApi.startMatch({ pairCodeId });
-        }
-      })
-      .catch((err) => {
-        console.warn('[CPTI] Failed to save profile to backend:', err);
-      });
-
     // Write CPTI personality to WTF Card
     recordUniverseResult('cpti', result.personality.slug);
 
@@ -140,11 +129,64 @@ export function CptiQuiz({ mode: initialMode = 'solo', inviteData, targetNicknam
       window.clearTimeout(finishTimeoutRef.current);
     }
 
-    // Always go straight to result page
+    try {
+      await cptiApi.bootstrap();
+      await cptiApi.saveProfile({
+        personalitySlug: result.personality.slug,
+        dimensionScores: result.dimensions,
+        source,
+      });
+
+      if (pairCodeId) {
+        const participantAnswers = Object.fromEntries(
+          Array.from(finalAnswers.entries()).map(([qid, value]) => [qid, value as number]),
+        );
+
+        const startRes = await cptiApi.startMatch({ pairCodeId });
+        const completeRes = await cptiApi.completeMatch({
+          matchId: startRes.matchId,
+          initiatorAnswers: {},
+          participantAnswers,
+        });
+
+        recordRelationship({
+          slug: completeRes.relationship.slug,
+          partnerNickname: pairPartnerNickname || '对方',
+          mySlug: completeRes.participantProfile.personality.slug,
+          partnerSlug: completeRes.initiatorProfile.personality.slug,
+          compatibility: completeRes.compatibility,
+        });
+
+        try {
+          sessionStorage.setItem('cpti-relationship-backend', JSON.stringify(completeRes));
+        } catch {
+          // ignore storage failures
+        }
+
+        storeRelationshipResult({
+          relationship: completeRes.relationship,
+          pairs: [],
+          compatibility: completeRes.compatibility,
+          nicknameA: pairPartnerNickname || '对方',
+          personalitySlugA: completeRes.initiatorProfile.personality.slug,
+          personalitySlugB: completeRes.participantProfile.personality.slug,
+          dimsA: completeRes.initiatorProfile.dimensions,
+          dimsB: completeRes.participantProfile.dimensions,
+        });
+
+        finishTimeoutRef.current = window.setTimeout(() => {
+          window.location.href = `${basePath}/cpti/relationship/`;
+        }, 800);
+        return;
+      }
+    } catch (err) {
+      console.warn('[CPTI] Failed to complete paired backend flow:', err);
+    }
+
     finishTimeoutRef.current = window.setTimeout(() => {
       window.location.href = `${basePath}/cpti/result/${encodeURIComponent(result.personality.slug)}/`;
     }, 800);
-  }, [pairCodeId]);
+  }, [pairCodeId, pairPartnerNickname, storeRelationshipResult]);
 
   // ── Finish: peer-assessment done ──
   const finishPeerTest = useCallback((finalAnswers: Map<number, Answer>) => {

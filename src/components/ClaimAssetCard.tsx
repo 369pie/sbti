@@ -45,8 +45,8 @@ const COPY = {
     claimed: {
       title: '这份资产已经保住了',
       description: '这份结果已经和你当前会话绑定，之后再升级成正式账号也能继续带走。',
-      primaryButton: '去看我的 WTF CARD',
-      secondaryButton: '先继续分享',
+      primaryButton: '继续认领账号',
+      secondaryButton: '去看我的 WTF CARD',
     },
     error: {
       title: '保存失败',
@@ -71,8 +71,8 @@ const COPY = {
     claimed: {
       title: '已同步到你的 WTF CARD',
       description: '之后的新关系、新图鉴和排行榜记录都会继续累计。',
-      primaryButton: '去看我的总图鉴',
-      secondaryButton: '继续解锁更多关系',
+      primaryButton: '继续认领账号',
+      secondaryButton: '去看我的总图鉴',
     },
     error: {
       title: '保存失败',
@@ -183,7 +183,7 @@ export function ClaimAssetCard({
     if (claimState === 'idle' || claimState === 'error') {
       handleClaim();
     } else if (claimState === 'claimed') {
-      window.location.href = '/card';
+      window.location.href = '/auth/claimed?next=/card';
     }
   }, [claimState, handleClaim]);
 

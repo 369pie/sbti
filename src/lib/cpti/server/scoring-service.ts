@@ -63,6 +63,11 @@ export interface MatchResult {
   pairs: DimensionPair[];
 }
 
+export interface SnapshotProfileInput {
+  personalitySlug: string;
+  dimensionScores: CptiDimensionScore[];
+}
+
 // ─── Service Functions ─────────────────────────────────────────────────────
 
 /**
@@ -92,6 +97,26 @@ export function computeMatchResult(
 ): MatchResult {
   const initiatorProfile = scoreUser(initiatorAnswers);
   const participantProfile = scoreUser(participantAnswers);
+
+  return computeMatchFromProfiles(initiatorProfile, participantProfile);
+}
+
+export function profileFromSnapshot(snapshot: SnapshotProfileInput): UserProfile | null {
+  const personality = getCptiPersonalityBySlug(snapshot.personalitySlug);
+  if (!personality) {
+    return null;
+  }
+
+  return {
+    personality,
+    dimensions: snapshot.dimensionScores,
+  };
+}
+
+export function computeMatchFromProfiles(
+  initiatorProfile: UserProfile,
+  participantProfile: UserProfile,
+): MatchResult {
 
   const relationshipResult = matchRelationship(
     initiatorProfile.dimensions,

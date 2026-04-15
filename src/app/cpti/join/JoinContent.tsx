@@ -93,10 +93,6 @@ export default function JoinContent() {
 
     try {
       const res = await cptiApi.resolvePairCode(code);
-      const personality = res.inviterPersonalitySlug
-        ? getCptiPersonalityBySlug(res.inviterPersonalitySlug)
-        : null;
-
       setResolved({
         id: res.id,
         code: res.code,
@@ -104,8 +100,9 @@ export default function JoinContent() {
         inviterPersonalitySlug: res.inviterPersonalitySlug,
       });
       setStep('resolved');
-    } catch (err: any) {
-      setError(err?.message || '配对码无效或已过期');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '配对码无效或已过期';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -113,7 +110,14 @@ export default function JoinContent() {
 
   const handleStartTest = useCallback(() => {
     if (!resolved) return;
-    router.push(`/cpti/test?pairCodeId=${encodeURIComponent(resolved.id)}&mode=pair`);
+    const next = new URLSearchParams({
+      pairCodeId: resolved.id,
+      mode: 'pair',
+    });
+    if (resolved.inviterNickname) {
+      next.set('partnerNickname', resolved.inviterNickname);
+    }
+    router.push(`/cpti/test?${next.toString()}`);
   }, [resolved, router]);
 
   const handleReset = useCallback(() => {
