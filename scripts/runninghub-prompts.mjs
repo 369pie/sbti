@@ -42,8 +42,60 @@ export function buildSbtiImagePrompt({ seriesLabel, seriesTone, concept, extraNo
 
 // ─── Card Mode: 图鉴卡面模式 (文案烘焙进图片) ───
 
-export function buildUniverseCardPrompt({ seriesLabel, concept, card, themeColor }) {
+export function buildUniverseCardPrompt({ seriesLabel, artStyle, seriesTone, concept, card, themeColor }) {
   const { name, number, code, backronym, tagline, tags, quote } = card;
+  const { typeTitle, punchline } = card; // For alternative structures like XPTI
+
+  if (artStyle === 'shoujo-romance-card') {
+    const safeTags = tags || [];
+
+    return [
+      `[Overall Style & Card Structure]`,
+      `A premium relationship atlas card, vertical 3:4 format, Japanese shoujo anime illustration, healing romance vibe, delicate cel shading, soft pastel lighting, emotionally readable at first glance.`,
+      `${seriesTone}`,
+      `[Top Typography Zone on light background]`,
+      `At the top, small clean text reading "${seriesLabel}".`,
+      `Below it, very large bold Chinese title text reading "${typeTitle || name}".`,
+      `Below the title, prominent code text reading "${code}"${backronym ? ` and smaller explanatory text "(${backronym})"` : ''}.`,
+      `Below that, one-line description text reading "你们是那种……${tagline}".`,
+      `All text must be highly readable, accurate Chinese with no garbling.`,
+      `[Center Illustration Zone]`,
+      `Main illustration occupies the middle area of the card. ${concept}`,
+      `The characters must stay behind the text layer if overlapping. Do not let the characters block the title or code.`,
+      `[Bottom Information Zone]`,
+      `Near the lower part of the card, place three rounded information cards in one row, each with a large emoji icon above and short Chinese copy below.`,
+      `Card 1: ${safeTags[0] || ''}`,
+      `Card 2: ${safeTags[1] || ''}`,
+      `Card 3: ${safeTags[2] || ''}`,
+      `At the absolute bottom, add a dark rounded quote banner with elegant contrasting text reading: "${punchline || quote || ''}".`,
+      `Do not show label prefixes like 标题 / 标签 / quote. Render the actual text directly in the design.`,
+      `negative prompt: garbled text, misspelled Chinese, unreadable typography, photorealistic skin, heavy 3D render, low poly, papercraft, cyberpunk, horror, gore, NSFW, busy background, watermark, logo`,
+    ].filter(Boolean).join('\n\n');
+  }
+
+  if (artStyle === 'dark-aesthetic') {
+    return [
+      `[Overall Style & Visual Hierarchy]`,
+      `${seriesTone}`,
+      `${concept}`,
+      `CRITICAL STYLE CONSTRAINTS: The entire image must be a 2D anime illustration. Cel-shaded coloring, clean confident linework, large expressive eyes, no photorealistic skin texture, no 3D render, no realistic human proportions. Fashion-magazine quality shoujo anime art.`,
+      `[Typography Layer - Top Foreground]`,
+      `ALL TEXT HERE MUST SURMOUNT THE CHARACTER'S HEAD IF THEY OVERLAP.`,
+      `At the very top edge, small fine text reading "XPTI 情欲人格图谱".`,
+      `Below it, massive, impactful, bold typography text reading "${typeTitle || name}".`,
+      `Below the title, stylized prominent text reading "${code}".`,
+      `Underneath, a short expressive tagline text reading "${tagline}".`,
+      `Ensure high contrast so the text remains 100% readable.`,
+      `[Typography Layer - Bottom Foreground]`,
+      `Layered intimately near the bottom of the canvas, vividly superimposed over the character's lower torso or clothes:`,
+      `Three cleanly designed info-graphic boxes lined up horizontally.`,
+      `The first box: "${tags ? tags[0] : ''}".`,
+      `The second box: "${tags ? tags[1] : ''}".`,
+      `The third box: "${tags ? tags[2] : ''}".`,
+      `At the absolute bottom center edge, stylish elegant text serving as the punchline, reading: "${punchline || quote}".`
+    ].filter(Boolean).join('\n\n');
+  }
+
 
   const tagTexts = tags.map(t => t.replace(/^[\p{Emoji_Presentation}\p{Emoji}\uFE0F\u200D]+\s*/u, '').trim());
   const tagEmojis = tags.map(t => {

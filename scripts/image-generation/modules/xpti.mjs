@@ -1,249 +1,168 @@
-// ─── XPTI 恋爱XP体质 · 全卡面模式（文字烘焙进图） ───
-// 16 种恋爱XP体质角色，充气潮玩Q版盲盒风
-// 粉紫色调为主，女性向传播友好
+// ─── XPTI 情欲人格图谱 · 暗黑唯美乙女风 (Dark Aesthetic) ───
+// 12 种情欲人格，暗黑唯美乙女风 (Dark Aesthetic Otome)
+// 微醺红/紫红色调为主，性张力与荷尔蒙氛围，女性向审美
 // 使用 cardMode: 人格名、代号、标签、金句等文案烘焙在图里
 
-function type(slug, concept, card) {
-  return { slug, ref: `love-${slug}.png`, concept, card };
-}
-
-// 部分 slug 没有对应 love-* 图，用其他 ref 代替
-function typeWithRef(slug, ref, concept, card) {
-  return { slug, ref, concept, card };
+function type(slug, prompt, card) {
+  return { 
+    slug, 
+    ref: `xpti-${slug}.png`,
+    concept: prompt, 
+    card 
+  };
 }
 
 const xptiImageModule = {
-  displayName: 'XPTI 恋爱XP体质 Card Generator',
-  seriesLabel: 'XPTI 恋爱XP体质',
+  displayName: 'XPTI 情欲人格图谱 Card Generator',
+  seriesLabel: 'XPTI 情欲人格图谱',
   outputPrefix: 'xpti',
   outputSubdir: 'xpti',
-  artStyle: 'inflatable-vinyl',
+  artStyle: 'dark-aesthetic', // Custom aesthetic flag
   cardMode: true,
   aspectRatio: '3:4',
-  themeColor: '粉紫渐变暖色调',
+  themeColor: '#722F37',
   seriesTone:
-    '把角色语境切到恋爱XP世界。所有角色都是漂亮精致的年轻女生形象——纤细苗条身材、精致五官、时尚穿搭，' +
-    '让女性用户看了会觉得"好美好想当她"的审美水平。' +
-    '每张图都要像"恋爱体质 × 潮玩盲盒"的原创梗图角色：可爱Q版但不丑化、粉紫色系、浪漫道具和自嘲感同时成立。' +
-    '服装、表情、配色和道具要一眼看懂这个角色的恋爱XP是什么，适合女性用户截图分享到小红书。' +
-    '整体风格像 Popmart/Molly 盲盒收藏卡片，角色精致漂亮，不要复杂背景，不要 logo。',
+    '[Overall Style & Visual Hierarchy]\n' +
+    'A premium personality atlas card, vertical 3:4 format, DARK YUMEJOSHI FASHION-ILLUSTRATION ANIME STYLE. ' +
+    'CRITICAL: The character must be a 2D anime illustration with cel-shaded coloring, clean vector-like linework, and large expressive eyes. ABSOLUTELY NO photorealistic skin, NO 3D render, NO realistic human proportions, NO uncanny valley. ' +
+    'The art style is polished, magazine-cover worthy, and alluring — like a high-end shoujo anime promotional illustration with modern fashion sensibility. ' +
+    'Color palette is strictly deep wine red, dark violet, muted rose, and warm burgundy (#722F37). No cold blues or neon greens. ' +
+    'Background is a smooth dark gradient with subtle glassmorphism light particles and soft breathing glow. Keep it simple and dark so the character pops. ' +
+    'CRITICAL LAYER RULE (Z-INDEX): All typography (text) MUST be on the absolute top layer (foreground). The central anime character MUST be on the layer behind the text. The character is large and occupies 50% to 60% of the canvas, BUT whenever the character and text intersect, the TEXT MUST CLEARLY OVERLAY THE CHARACTER. The character must NEVER obscure, block, or hide any part of the text.',
   types: [
-    // ═══════ D (主导) + S (氛围) ═══════
-    typeWithRef(
-      'queen', 'love-emperor.png',
-      '一个精致漂亮的女生充气手办角色，纤细修长身材，瓜子脸大眼睛。深紫玫瑰金色收腰小西装裙勾勒曲线，头戴精致小皇冠，长卷发披肩。一手叉腰一手举着爱心权杖，下巴微抬表情自信迷人。脚边躺着一份写好的恋爱排期表。',
+    type(
+      'switch',
+      'Centered: A stylish anime figure with an unmistakable dominant aura. Sharp, confident eyes staring directly at the viewer. Wearing a sleek dark high-collar coat or fitted uniform in deep burgundy and black. Holding a small chess piece or silver lighter near their face. Sharp cel-shaded lighting with a crisp rim light. Close-up to half-body composition. Clean linework, large expressive eyes, 2D illustration.',
       {
-        name: '霸总体质',
-        number: '#01',
-        code: 'D.S.P.F',
-        backronym: 'Dominant · Sensory · Planned · Fantasy',
-        tagline: '恋爱版甲方，这段感情我来排期',
-        tags: ['👑 约会前做PPT', '📋 甲方式恋爱', '📊 分手写复盘'],
-        quote: '「这段感情，我来排期。」',
-      },
+        name: '开关在我手里',
+        code: 'XPTI-01',
+        tagline: '全场你最大',
+        tags: ['#掌控系', '#气场压制', '#节奏大师'],
+        quote: '你负责感受，我来安排一切。',
+      }
     ),
-    typeWithRef(
-      'love-pm', 'boss.png',
-      '一个干练美丽的女生充气手办角色，纤细高挑身材，精致五官。珊瑚粉色修身小西装配白色真丝衬衫，露出纤细锁骨，微卷中长发。手持爱心打勾的清单板，另一手指向进度表。表情认真又略带得意的俏皮笑。',
+    type(
+      'mind-theater',
+      'Centered: A mysterious anime character with wistful, slightly obsessive eyes, surrounded by floating glowing film strips and translucent cinema tickets. Soft curls or messy elegant hair. Deep purple and crimson cel-shaded lighting. Half-body shot. Dreamy, introspective expression. Clean anime linework, no photorealism.',
       {
-        name: '恋爱项目经理',
-        number: '#02',
-        code: 'D.S.P.R',
-        backronym: 'Dominant · Sensory · Planned · Reality',
-        tagline: '有条件的浪漫，心动要过风控',
-        tags: ['📊 心里默默打分', '💰 浪漫但先算账', '🏠 看房比表白管用'],
-        quote: '「爱你，但要看KPI。」',
-      },
+        name: '颅内放映厅',
+        code: 'XPTI-02',
+        tagline: '脑子里已经拍完八集',
+        tags: ['#脑内剧场', '#深夜文学系', '#余震体质'],
+        quote: '你还没开口，我脑子里的大结局已经写好了。',
+      }
     ),
-    typeWithRef(
-      'pre-green', 'love-fish.png',
-      '一个妩媚迷人的女生充气手办角色，纤细身材蜂腰长腿，精致猫系五官。黑色配亮粉色潮感短裙套装，性感又俏皮，波浪卷长发。一手抛起粉色爱心，另一手拿着冒出多个聊天气泡的手机。眨眼俏皮撩人表情。',
+    type(
+      'all-in',
+      'Centered: An anime character leaning forward with intense dedication, holding a single glowing red poker chip or a burning playing card between their fingers. Eyes wide and luminous with emotion. Dark background with warm gold and red accent lighting. Half-body. Cel-shaded, fashion-illustration quality, large sparkling eyes.',
       {
-        name: '渣女预备役',
-        number: '#03',
-        code: 'D.S.C.F',
-        backronym: 'Dominant · Sensory · Chaotic · Fantasy',
-        tagline: '刺激才是氧气，暧昧期的女王',
-        tags: ['💬 同时三人聊天', '🏃 确定就想跑', '🃏 暧昧巅峰期'],
-        quote: '「我没渣，只是选项太多。」',
-      },
+        name: '全押型玩家',
+        code: 'XPTI-03',
+        tagline: '要么全部，要么不开始',
+        tags: ['#极致投入', '#纯爱偏执', '#全情体质'],
+        quote: '输赢都接受，但不接受"差不多"。',
+      }
     ),
-    typeWithRef(
-      'sober-queen', 'ctrl.png',
-      '一个气质清冷的美女充气手办角色，纤细挺拔身材，鹅蛋脸高鼻梁。白色配冰蓝色优雅修身套装，精致珍珠耳饰，利落短发或低马尾。一手拿放大镜审视小爱心，另一手做出"停"的手势。表情冷静高贵不屑。',
+    type(
+      'synesthete',
+      'Centered: An ethereal anime figure with eyes gently closed, glowing fingertips brushing a flowing silk ribbon. Soft amber and deep rose cel-shaded highlights. Fragile yet dangerous vibe. Half-body. Clean vector-like anime lines, delicate facial features, serene expression. Dark simple background.',
       {
-        name: '清醒女王',
-        number: '#04',
-        code: 'D.S.C.R',
-        backronym: 'Dominant · Sensory · Chaotic · Reality',
-        tagline: '从不吃亏型，智商恋爱两不误',
-        tags: ['💅 标准绝不降', '🧮 分手前算好账', '🧊 理性是最大魅力'],
-        quote: '「这段关系我亏了吗？没有，继续。」',
-      },
+        name: '通感体质',
+        code: 'XPTI-04',
+        tagline: '碰一下手指全身都记住',
+        tags: ['#五感全开', '#身体记忆', '#细节收集癖'],
+        quote: '你的气味，我的手臂还记得。',
+      }
     ),
-
-    // ═══════ D (主导) + I (直觉) ═══════
-    typeWithRef(
-      'screenwriter', 'love-sweet.png',
-      '一个梦幻甜美的女生充气手办角色，纤细柔和身材，圆眼樱桃唇。梦幻紫粉色飘带连衣裙轻盈如仙女，长直发末端微卷。一手捂胸口做戏剧化心动状，另一手伸向远处想象中的人。眼睛含星星，嘴巴微张叹息。身边飘着电影打板器。',
+    type(
+      'charge',
+      'Centered: An energetic anime character with restless, hungry eyes, bathed in vivid neon red and deep magenta cel-shaded light. Wearing modern dark streetwear with subtle glowing tech accessories like cables or earpieces. Three-quarter body. Dynamic pose. Sharp clean anime lines, no 3D render.',
       {
-        name: '恋爱编剧',
-        number: '#05',
-        code: 'D.I.P.F',
-        backronym: 'Dominant · Intuitive · Planned · Fantasy',
-        tagline: '脑内已拍完8集，含导演评论音轨',
-        tags: ['🎬 脑内8集连续剧', '🎵 自动配BGM', '💭 想象力是最大情敌'],
-        quote: '「他朝我笑了，大结局我写好了。」',
-      },
+        name: '电量焦虑',
+        code: 'XPTI-05',
+        tagline: '永远在找下一个充电桩',
+        tags: ['#快充体质', '#微波炉恋爱', '#刺激依赖'],
+        quote: '不是不爱，是一个人根本不够充。',
+      }
     ),
-    typeWithRef(
-      'sober-brain', 'love-balance.png',
-      '一个温柔知性的女生充气手办角色，苗条身材，柔美五官戴着精致细框眼镜。暖粉色V领毛衣配米色A字裙，温柔中带一丝聪慧。微卷中长发柔顺垂落。一手举着发光的小脑袋，另一手捂着胸口的爱心。表情温柔但带着无奈的笑。',
+    type(
+      'slow-burn',
+      'Centered: An elegant anime figure holding a vintage hourglass or a slowly burning candle. Calm, patient eyes with a deeply intense underlying warmth. Warm amber and dark mahogany lighting. Half-body. Refined clothing in dark velvet tones. Clean anime illustration style, serene beautiful face.',
       {
-        name: '人间清醒恋爱脑',
-        number: '#06',
-        code: 'D.I.P.R',
-        backronym: 'Dominant · Intuitive · Planned · Reality',
-        tagline: '矛盾共同体，明知是坑还想跳',
-        tags: ['📝 恋爱前做SWOT', '🧠 理性感性同在线', '😤 嘴上说不要'],
-        quote: '「明知是坑还是想跳，但我量好了深度。」',
-      },
+        name: '慢火收藏家',
+        code: 'XPTI-06',
+        tagline: '越熟越沉越上头',
+        tags: ['#慢热致命', '#深度成瘾', '#旧物偏执'],
+        quote: '找到了就反复确认——每一次都比上一次更深。',
+      }
     ),
-    typeWithRef(
-      'adventurer', 'love-bomb.png',
-      '一个帅气飒爽的美女充气手办角色，纤细有力的身材，剑眉星目英气五官。红色配黑色修身皮夹克短裙，长靴露出笔直纤细小腿，马尾随风飘。姿态前倾充满冲劲，一手够向燃烧的心形火焰，另一手握着指南针。表情兴奋闪亮。',
+    type(
+      'night-writer',
+      'Centered: An alluring anime character illuminated by the soft glow of a screen or moonlight against pure darkness. One hand touching a crisp white collar while their shadowed expression hints at something wild. Large expressive eyes with a hidden spark. Half-body. Cel-shaded, dual-personality vibe.',
       {
-        name: '恋爱冒险家',
-        number: '#07',
-        code: 'D.I.C.F',
-        backronym: 'Dominant · Intuitive · Chaotic · Fantasy',
-        tagline: '直觉选人型，要的不是安全感是心跳',
-        tags: ['⚡ 第一面定生死', '🎲 冲动飞去见人', '🎢 平淡免疫体质'],
-        quote: '「我要的不是安全感，是心跳。」',
-      },
+        name: '深夜编剧',
+        code: 'XPTI-07',
+        tagline: '外表平静脑子里全是R18',
+        tags: ['#暗涌系', '#双重人格', '#文字型性感'],
+        quote: '白天我是正经人，晚上的脑子你不敢看。',
+      }
     ),
-    typeWithRef(
-      'ice', 'love-freeze.png',
-      '一个冰山美人的女生充气手办角色，高挑纤细身材，高冷精致脸庞。海军蓝配冰蓝色修身西装裙，精致钻石耳钉，乌黑长直发如缎面。双臂交叉审视姿态，下巴微抬挑眉。手边飘着只给3颗星的评分卡。表情礼貌但美丽中带疏远感。',
+    type(
+      'screamer',
+      'Centered: A wild, expressive anime character holding a microphone or screaming silently with an ecstatic, joyful expression. Bright contrasting neon red and violet rim lights. Rock-chic dark outfit with accessories. High energy pose. Three-quarter body. Bold clean anime linework, dynamic hair movement.',
       {
-        name: '高冷甲方',
-        number: '#08',
-        code: 'D.I.C.R',
-        backronym: 'Dominant · Intuitive · Chaotic · Reality',
-        tagline: '你行你上，能入眼的凤毛麟角',
-        tags: ['🧊 气场自动筛人', '❄️ 从不主动出击', '🔒 通过审核才认真'],
-        quote: '「不是我要求高，是你们太拉了。」',
-      },
+        name: '尖叫机器',
+        code: 'XPTI-08',
+        tagline: '平淡是最高级的酷刑',
+        tags: ['#感官过载', '#活在当下', '#刺激收集'],
+        quote: '你不给我刺激我会死。（字面意思。）',
+      }
     ),
-
-    // ═══════ A (配合) + S (氛围) ═══════
-    typeWithRef(
-      'vibes', 'love-sweet.png',
-      '一个甜美浪漫的女生充气手办角色，娇小纤细身材，娃娃脸水汪汪大眼。蜜桃色配薰衣草色波西米亚碎花裙，蕾丝花边，编发花环。双手摆弄小蜡烛和花朵布置场景。眼睛半闭甜蜜微笑，睫毛弯弯，沉浸在自己的浪漫世界里。',
+    type(
+      'sober-addict',
+      'Centered: A flawless anime figure with cool, calculating eyes, but their hand is gripping a deep red rose too tightly. Contrast between absolute control and hidden passion. Medical or pure white clothing accents against a bleeding crimson background. Close-up to half-body. Clean sharp anime features.',
       {
-        name: '恋爱氛围组',
-        number: '#09',
-        code: 'A.S.P.F',
-        backronym: 'Accepting · Sensory · Planned · Fantasy',
-        tagline: '被撩就倒型，氛围感是我的氧气',
-        tags: ['☂️ 递伞就心动', '🫧 氛围感启动器', '🎵 一首歌引爆回忆'],
-        quote: '「他给我塞了一颗糖，我想了三天。」',
-      },
+        name: '清醒上瘾',
+        code: 'XPTI-09',
+        tagline: '知道在干什么但就是停不下来',
+        tags: ['#理智沦陷', '#知行分裂', '#高功能上瘾'],
+        quote: '我完全清楚这不理性，然后继续。',
+      }
     ),
-    typeWithRef(
-      'contract', 'love-spy.png',
-      '一个优雅端庄的女生充气手办角色，纤细匀称身材，温婉知性五官。米色配薄荷绿修身商务连衣裙，精致腰带勾勒纤腰，珍珠项链点缀。中分低马尾干净清爽。一手递出合同文件，另一手拿笔。表情认真端正又漂亮，像在提议"先签协议再恋爱"。',
+    type(
+      'whatever',
+      'Centered: A detached, effortlessly cool anime character lying back or leaning casually against a dark wall. Half-lidded large eyes, completely relaxed expression. Soft muted mauve and slate gray lighting. Simple dark cozy outfit. Half-body. Minimalist anime illustration, clean soft linework.',
       {
-        name: '合约恋人',
-        number: '#10',
-        code: 'A.S.P.R',
-        backronym: 'Accepting · Sensory · Planned · Reality',
-        tagline: '浪漫要有边界，安全锁恋爱',
-        tags: ['📜 浪漫有安全锁', '🔐 边界感拉满', '⚖️ 纯爱配风控'],
-        quote: '「我可以被宠，但别失控。」',
-      },
+        name: '也行体质',
+        code: 'XPTI-10',
+        tagline: '你来我不拒你走我不追',
+        tags: ['#佛系情欲', '#走留随意', '#无压感'],
+        quote: '有你很好，没你也行。（真心的。）',
+      }
     ),
-    typeWithRef(
-      'mood', 'love-bomb.png',
-      '一个灵动俏丽的女生充气手办角色，纤瘦苗条身材，精致鬼马精灵五官。衣服一半粉色一半蓝灰色的撞色设计短裙，过膝袜，双色渐变长发。一手举小太阳，另一手举小乌云。左脸笑右脸撅嘴，戏剧性拉满。整体可爱又灵气。',
+    type(
+      'masked',
+      'Centered: A seductive anime character partially adjusting an elegant masquerade mask or holding a delicate fan. A sly, knowing smile with hypnotic large eyes. Sharp shadows emphasizing hidden vs revealed. Luxurious dark outfit with lace or ribbon details. Half-body. Clean anime illustration, no realism.',
       {
-        name: '情绪过山车',
-        number: '#11',
-        code: 'A.S.C.F',
-        backronym: 'Accepting · Sensory · Chaotic · Fantasy',
-        tagline: '坐享其成型，不波折不算爱情',
-        tags: ['🎢 吵完和好更上头', '💥 平淡过敏体质', '📈 感情线像心电图'],
-        quote: '「我什么都不用做，自有人为我疯。」',
-      },
+        name: '面具系玩家',
+        code: 'XPTI-11',
+        tagline: '你看到的是我的第三层',
+        tags: ['#反差萌', '#表演型人格', '#层层解锁'],
+        quote: '我有很多面——你能解锁几面取决于你的权限。',
+      }
     ),
-    typeWithRef(
-      'partner', 'love-buddy.png',
-      '一个清新自然的女生充气手办角色，苗条舒展身材，素颜感清秀五官。橄榄绿oversize卫衣配牛仔短裤露出纤细长腿，白球鞋，慵懒丸子头。悠闲坐在小沙发上，一手拿游戏手柄，另一手端着奶茶。翘着腿表情轻松自在，笑容干净。',
+    type(
+      'elastic',
+      'Centered: A playful, flexible anime character tangling a piece of bright red yarn or elastic cord between elegant fingers. An inviting, open, slightly teasing expression with sparkling eyes. Dark background with subtle warm highlights. Half-body. Fashion-illustration anime quality, clean lines.',
       {
-        name: '搭子人格',
-        number: '#12',
-        code: 'A.S.C.R',
-        backronym: 'Accepting · Sensory · Chaotic · Reality',
-        tagline: '低糖恋爱，我自己就是花',
-        tags: ['🧋 低糖陪伴刚好', '🎮 约会跟朋友差不多', '🌊 来去不焦虑'],
-        quote: '「恋爱是锦上添花，我自己就是花。」',
-      },
-    ),
-
-    // ═══════ A (配合) + I (直觉) ═══════
-    typeWithRef(
-      'pure', 'love-lick.png',
-      '一个纯真美丽的女生充气手办角色，纤细柔软身材，圆圆鹿眼无辜清纯五官。白色配粉色爱心图案天使风格蓬蓬裙，头顶精致光环，蝴蝶结长发。双手紧紧捧着一颗巨大发光的心贴在胸口，眼里星星闪闪，嘴巴坚定。身边飘着爱心盾牌和可爱小翅膀。',
-      {
-        name: '纯爱战士',
-        number: '#13',
-        code: 'A.I.P.F',
-        backronym: 'Accepting · Intuitive · Planned · Fantasy',
-        tagline: '赌上一切型，只认一个人',
-        tags: ['💗 喜欢以年为单位', '🛡️ 绝不将就', '💎 每段刻骨铭心'],
-        quote: '「你是我的，我也只要你。」',
-      },
-    ),
-    typeWithRef(
-      'wait-n-see', 'love-sleepy.png',
-      '一个文艺清冷的女生充气手办角色，苗条纤细身材，冷白皮淡妆精致侧颜。灰色配鼠尾草绿的文艺针织裙，长筒袜，细银耳环。单手托腮思考姿态坐在小板凳上，另一手拿放大镜。表情微眯审视冷淡美，嘴巴微撅。身边有沙漏和加载圈。',
-      {
-        name: '等等党恋人',
-        number: '#14',
-        code: 'A.I.P.R',
-        backronym: 'Accepting · Intuitive · Planned · Reality',
-        tagline: '爱可以但你先证明，超长验证期',
-        tags: ['⏳ 超长验证期', '🔍 只看做了什么', '💯 确定就all in'],
-        quote: '「感动不是心动，别偷换概念。」',
-      },
-    ),
-    typeWithRef(
-      'cat', 'love-chill.png',
-      '一个慵懒妩媚的猫系女生充气手办角色，纤细柔软身材，上挑猫眼精致小脸。黑色配粉色猫耳帽衫连衣裙，露出纤细手腕脚踝，尾巴发箍可爱。蜷缩成猫的撩人姿势，一只手慵懒地拨弄毛线心形球。半眯的眼睛魅惑，若即若离。身边飘着猫爪和小鱼干。',
-      {
-        name: '恋爱猫猫',
-        number: '#15',
-        code: 'A.I.C.F',
-        backronym: 'Accepting · Intuitive · Chaotic · Fantasy',
-        tagline: '被吸引就凑近，无聊就走开',
-        tags: ['🐱 凑近又走开', '🌙 若即若离大师', '🦋 好奇心驱动'],
-        quote: '「我不是花心，我是好奇心。」',
-      },
-    ),
-    typeWithRef(
-      'buddha', 'love-monk.png',
-      '一个仙气飘飘的女生充气手办角色，苗条纤细身材，淡颜系清冷仙女五官。薰衣草色配云白色宽松禅风薄纱长裙，若隐若现纤细身形，头发半扎飘逸。盘腿打坐双手结印。闭眼嘴角带一丝微笑，如仙子般超然。旁边躺着一颗没人理的小爱心。身边飘着莲花和祥云。',
-      {
-        name: '佛系恋爱',
-        number: '#16',
-        code: 'A.I.C.R',
-        backronym: 'Accepting · Intuitive · Chaotic · Reality',
-        tagline: '来去自由型，恋爱排第七',
-        tags: ['☁️ 云淡风轻本人', '🧘 安全感自给自足', '🐢 优先级排第七'],
-        quote: '「有你很好，没你也行。」',
-      },
-    ),
-  ],
+        name: '弹力边界',
+        code: 'XPTI-12',
+        tagline: '别问行不行，先试试再说',
+        tags: ['#开放系', '#体验至上', '#什么都可聊'],
+        quote: '没有什么是不能聊的，也没有什么是不能试的。',
+      }
+    )
+  ]
 };
 
 export default xptiImageModule;

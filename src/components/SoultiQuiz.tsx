@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SOULTI_QUESTIONS, SOULTI_ACT_NAMES, shuffleSoultiQuestions } from '@/lib/soulti/questions';
 import type { SoultiAnswerOption } from '@/lib/soulti/questions';
 import { calculateSoultiResult } from '@/lib/soulti/scoring';
+import { calculateSoultiLayeredResult } from '@/lib/soulti/scoring';
 import type { Answer } from '@/lib/soulti/scoring';
 import { SOULTI_MODEL_NAMES, SOULTI_MODEL_COLORS } from '@/lib/soulti/dimensions';
 import { basePath } from '@/lib/site';
@@ -58,6 +59,12 @@ export function SoultiQuiz() {
     setIsFinishing(true);
 
     const result = calculateSoultiResult(finalAnswers, questions);
+
+    // Calculate and persist layered (three-mirror) result
+    try {
+      const layered = calculateSoultiLayeredResult(finalAnswers, questions);
+      localStorage.setItem('soulti-layered', JSON.stringify(layered));
+    } catch { /* localStorage unavailable — non-critical */ }
 
     // Record to WTF Card
     recordUniverseResult('soulti', result.personality.slug);

@@ -14,11 +14,21 @@ export interface UniverseResult {
   testedAt: string;   // ISO date string
 }
 
+export interface RelationshipRecord {
+  slug: string;           // relationship slug (e.g. 'soul', 'plastic')
+  partnerNickname: string;
+  mySlug: string;         // my CPTI personality slug
+  partnerSlug: string;    // partner's CPTI personality slug
+  compatibility: number;  // 0-100
+  testedAt: string;       // ISO date
+}
+
 export interface WtfCardData {
   id: string;                                    // random 6-char hex
   nickname: string;                              // user-chosen display name
   createdAt: string;                             // ISO date
   results: Record<string, UniverseResult | null>; // keyed by universe id
+  relationships?: RelationshipRecord[];          // CPTI relationship collection
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -226,4 +236,49 @@ export function getComparisonRoast(similarity: number): string {
 
 export function getUniverseForCard(uid: string): Universe | undefined {
   return UNIVERSES.find(u => u.id === uid);
+}
+
+// ─── Relationship collection ─────────────────────────────────────────────────
+
+const MAX_RELATIONSHIPS = 50;
+
+/**
+ * Record a CPTI relationship result onto the card.
+ * Keeps up to MAX_RELATIONSHIPS entries, newest first.
+ * If a relationship with same partner + same slug already exists, update it.
+ */
+export function recordRelationship(record: Omit<RelationshipRecord, 'testedAt'>): void {
+  const card = getOrCreateCard();
+  const list = card.relationships ?? [];
+
+  // Deduplicate: same relationship slug + same partner nickname → replace
+  const existingIdx = list.findIndex(
+    r => r.slug === record.slug && r.partnerNickname === record.partnerNickname
+  );
+
+  const entry: RelationshipRecord = {
+    ...record,
+    testedAt: new Date().toISOString().slice(0, 10),
+  };
+
+  if (existingIdx >= 0) {
+    list[existingIdx] = entry;
+  } else {
+    list.unshift(entry);
+    if (list.length > MAX_RELATIONSHIPS) list.length = MAX_RELATIONSHIPS;
+  }
+
+  card.relationships = list;
+  saveCard(card);
+}
+
+export function getRelationships(): RelationshipRecord[] {
+  const card = loadCard();
+  return card?.relationships ?? [];
+}
+
+/** Get unique relationship slugs the user has collected. */
+export function getCollectedRelationshipSlugs(): string[] {
+  const rels = getRelationships();
+  return [...new Set(rels.map(r => r.slug))];
 }

@@ -8,43 +8,43 @@ const homepageFaqSchema = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'SBTI 人格测试是什么？',
+      name: 'WTFTI 是什么？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'SBTI 人格测试是一套偏中文互联网语境的人格测试，会从自我、情感、态度、行动和社交五组切面切入，再落到十五个维度和二十七种人格结果上。',
+        text: 'WTFTI 是一个多宇宙人格测试平台。同一个你，在不同主题宇宙里有不同的人格翻译，经典版、毒舌版、社畜版、鸟类版、花朵版各有独立的视觉风格和测试体验。',
       },
     },
     {
       '@type': 'Question',
-      name: 'SBTI 和 MBTI 有什么区别？',
+      name: '和 MBTI 有什么区别？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'MBTI 更接近经典人格分类框架，SBTI 则更强调日常表达、行为习惯和中文互联网语境里的抽象人格标签，结果会更轻松、更贴近日常体验。',
+        text: 'MBTI 更像经典人格框架，WTFTI 更贴近中文互联网语境。在这里你看到的是生活反应、关系状态和行为习惯，不是四个字母和理论模型。',
       },
     },
     {
       '@type': 'Question',
-      name: 'SBTI 人格测试测完能看到什么？',
+      name: '这么多宇宙，我该从哪个开始？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: '测完之后可以看到你的专属人格名称、十五维落点、结果解读，以及其他人格类型的详情页，方便继续对照和分享。',
+        text: '推荐先测经典版 SBTI，拿到你的基线人格后再去其他宇宙看看你会被翻译成什么样。每个宇宙都有自己的风格和乐趣。',
       },
     },
     {
       '@type': 'Question',
-      name: 'SBTI 会上传测试答案吗？',
+      name: '结果能拿来做严肃诊断吗？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: '本站的核心测试流程以浏览器端计算为主，不需要注册账号即可完成测试。分享图片也主要在本地生成，不会把你的答案自动公开。',
+        text: '不能。WTFTI 的核心是娱乐和自我观察，适合截图发给朋友一起笑，不适合替代专业心理评估。',
       },
     },
   ],
 };
 
 export const metadata: Metadata = {
-  title: 'SBTI 人格测试在线测试 — 测测你是哪种抽象人格',
+  title: 'WTFTI 多宇宙人格测试平台 — 测测你是哪种抽象人格',
   description:
-    'SBTI 人格测试在线测试：从自我、情感、态度、行动和社交 5 组切面切入，结合 15 个维度和 27 种结果，帮你快速看清自己的抽象人格。',
+    'WTFTI 多宇宙人格测试平台：先从经典 SBTI 人格测试开始，再去毒舌版、修仙版、鸟类版、花朵版等宇宙看看同一个你会被翻译成什么样。',
   alternates: { canonical: '/' },
 };
 

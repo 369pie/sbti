@@ -34,7 +34,7 @@ export default function Page() {
           breadcrumb: {
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'SBTI', item: getSiteUrl('/') },
+              { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
               { '@type': 'ListItem', position: 2, name: 'WPTI', item: getSiteUrl('/work/') },
             ],
           },

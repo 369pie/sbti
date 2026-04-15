@@ -524,10 +524,10 @@ export default function SoultiLandingContent() {
          ═══════════════════════════════════════════════ */}
       <section className="px-6 py-16">
         <div className="max-w-2xl mx-auto">
-          <div className="rounded-2xl p-8 sm:p-10" style={{ background: '#1C1B19' }}>
+          <div className="rounded-2xl p-8 sm:p-10" style={{ background: 'linear-gradient(145deg, #2A2520 0%, #1A1715 100%)', boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 8px 32px rgba(36, 33, 29, 0.1)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
             <p
               className="text-[10px] tracking-[0.35em] uppercase mb-8"
-              style={{ fontFamily: monoFont, color: 'rgba(255,255,255,0.30)' }}
+              style={{ fontFamily: monoFont, color: 'rgba(255,255,255,0.7)' }}
             >
               SBTI → SoulTI
             </p>
@@ -542,7 +542,7 @@ export default function SoultiLandingContent() {
                 <div key={row.sbti} className="flex items-center gap-4">
                   <span
                     className="text-sm flex-1 text-right"
-                    style={{ color: 'rgba(255,255,255,0.35)' }}
+                    style={{ color: 'rgba(255,255,255,0.75)' }}
                   >
                     {row.sbti}
                   </span>
@@ -618,7 +618,7 @@ export default function SoultiLandingContent() {
 
           <div className="mt-10 flex items-center justify-center gap-4 text-xs" style={{ color: '#b0a89e' }}>
             <Link href="/test/" className="hover:text-[#8b7355] transition-colors" style={{ fontFamily: serifFont }}>
-              SBTI 标准版
+              经典人格版
             </Link>
             <span>·</span>
             <Link href="/xpti/" className="hover:text-[#8b7355] transition-colors" style={{ fontFamily: serifFont }}>

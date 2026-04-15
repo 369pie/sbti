@@ -1,6 +1,5 @@
 import type { DimensionLevel } from './dimensions';
-import { XPTI_DIMENSIONS } from './dimensions';
-import { XPTI_PERSONALITY_TYPES, getXptiPersonalityByCode } from './personalities';
+import { XPTI_PERSONALITY_TYPES } from './personalities';
 import type { XptiPersonalityType } from './personalities';
 import type { XptiQuestion } from './questions';
 
@@ -29,11 +28,12 @@ function toLevel(score: number): DimensionLevel {
   return 'L';
 }
 
+const XPTI_DIM_ORDER = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9'] as const;
+
 /**
- * XPTI uses a 4-axis binary system:
- * - Each axis average >= 2.0 → pole A letter, else → pole B letter
- * - Concatenate the 4 letters → personality code (e.g. DSPF)
- * - Look up the personality by code
+ * 9-dimension scoring + distance-based personality matching.
+ * No more 4-letter binary codes; we compute the average per dimension
+ * then find the personality prototype with minimum Euclidean distance.
  */
 export function calculateXptiResult(
   answers: Map<number, Answer>,
@@ -49,23 +49,15 @@ export function calculateXptiResult(
     dimScores.set(q.dimension, arr);
   }
 
-  const dimensions: XptiDimensionScore[] = XPTI_DIMENSIONS.map(d => {
-    const scores = dimScores.get(d.id) ?? [];
+  const dimensions: XptiDimensionScore[] = XPTI_DIM_ORDER.map(dimId => {
+    const scores = dimScores.get(dimId) ?? [];
     const avg = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 2;
-    return { id: d.id, score: avg, level: toLevel(avg) };
+    return { id: dimId, score: avg, level: toLevel(avg) };
   });
 
-  // Build 4-letter code from axis scores
-  const code = XPTI_DIMENSIONS.map(dim => {
-    const ds = dimensions.find(d => d.id === dim.id);
-    const avg = ds?.score ?? 2;
-    return avg >= 2.0 ? dim.poleA : dim.poleB;
-  }).join('');
+  const personality = matchXptiPersonality(dimensions);
 
-  // Look up personality by code, fallback to distance matching
-  const personality = getXptiPersonalityByCode(code) ?? matchXptiPersonality(dimensions);
-
-  return { personality, dimensions, code };
+  return { personality, dimensions, code: personality.code };
 }
 
 function levelToNum(l: DimensionLevel): number {

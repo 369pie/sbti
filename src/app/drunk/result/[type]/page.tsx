@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!p) return {};
   return {
     title: `${p.code}（${p.name}）— 酒后人设`,
-    description: `${p.tagline} — SBTI 酒后人设测试结果：${p.name}。`,
+    description: `${p.tagline} — WTFTI 酒后人设测试结果：${p.name}。`,
     alternates: { canonical: `/drunk/result/${type}/` },
     openGraph: {
       title: `我的酒后人设是 ${p.code}（${p.name}）`,
@@ -55,7 +55,7 @@ export default async function DrunkResultPage({ params }: PageProps) {
             {
               '@type': 'BreadcrumbList',
               itemListElement: [
-                { '@type': 'ListItem', position: 1, name: 'SBTI 人格测试', item: getSiteUrl('/') },
+                { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
                 { '@type': 'ListItem', position: 2, name: '酒后人设', item: getSiteUrl('/drunk/') },
                 { '@type': 'ListItem', position: 3, name: persona.name, item: getSiteUrl(`/drunk/result/${persona.slug}/`) },
               ],
@@ -66,7 +66,7 @@ export default async function DrunkResultPage({ params }: PageProps) {
                 {
                   '@type': 'Question',
                   name: `酒后人设 ${persona.code}（${persona.name}）是什么？`,
-                  acceptedAnswer: { '@type': 'Answer', text: `${persona.name}是 SBTI 酒后人设测试的 12 种类型之一。${persona.tagline}` },
+                  acceptedAnswer: { '@type': 'Answer', text: `${persona.name}是 WTFTI 酒后人设测试的 12 种类型之一。${persona.tagline}` },
                 },
               ],
             },

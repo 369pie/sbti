@@ -17,6 +17,18 @@ export interface SoultiTestResult {
   dimensions: SoultiDimensionScore[];
 }
 
+/** Per-act (layered) personality result for the "three mirrors" feature */
+export interface SoultiLayeredResult {
+  /** Overall result (same as SoultiTestResult) */
+  overall: { slug: string; code: string; dimensions: SoultiDimensionScore[] };
+  /** Act 1 — 白天的你 */
+  daySelf: { slug: string; code: string; dimensions: SoultiDimensionScore[] };
+  /** Act 2 — 深夜的你 */
+  nightSelf: { slug: string; code: string; dimensions: SoultiDimensionScore[] };
+  /** Act 3 — 梦里的你 (fewer questions, used as tendency signal) */
+  dreamTendency: { slug: string; code: string; dimensions: SoultiDimensionScore[] };
+}
+
 function getScore(answer: Answer, reversed: boolean): number {
   if (reversed) return 4 - answer;
   return answer;
@@ -105,4 +117,80 @@ export function calculateSoultiResult(
 
 export function normalizeSoultiScore(score: number): number {
   return Math.round(((score - 1) / 2) * 100);
+}
+
+// ── Helpers shared by layered scoring ──────────────────────────────────
+
+function computeDimensions(
+  dimScores: Map<string, number[]>,
+): { dimensions: SoultiDimensionScore[]; dimAvg: Map<string, number> } {
+  const dimAvg = new Map<string, number>();
+  const dimensions: SoultiDimensionScore[] = SOULTI_DIMENSIONS.map(d => {
+    const scores = dimScores.get(d.id) ?? [];
+    const avg = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 2;
+    dimAvg.set(d.id, avg);
+    return { id: d.id, score: avg, level: toLevel(avg) };
+  });
+  return { dimensions, dimAvg };
+}
+
+function resolveSlug(dimAvg: Map<string, number>): string {
+  const code = buildCode(dimAvg);
+  let personality = SOULTI_PERSONALITY_TYPES.find(p => p.code === code);
+  if (!personality) {
+    let bestDist = Infinity;
+    for (const p of SOULTI_PERSONALITY_TYPES) {
+      const dist = codeDistance(code, p.code);
+      if (dist < bestDist) {
+        bestDist = dist;
+        personality = p;
+      }
+    }
+  }
+  return (personality ?? SOULTI_PERSONALITY_TYPES[0]).slug;
+}
+
+/**
+ * Calculate per-act (layered) results alongside the overall result.
+ * This powers the "three mirrors" feature: 白天 / 深夜 / 梦里.
+ */
+export function calculateSoultiLayeredResult(
+  answers: Map<number, Answer>,
+  questions: SoultiQuestion[],
+): SoultiLayeredResult {
+  // Bucket scores by act AND dimension
+  const actDimScores = new Map<number, Map<string, number[]>>(); // act → dim → scores
+  const allDimScores = new Map<string, number[]>();
+
+  for (const q of questions) {
+    const a = answers.get(q.id);
+    if (a === undefined) continue;
+    const s = getScore(a, q.reversed);
+
+    // Per-act bucket
+    if (!actDimScores.has(q.act)) actDimScores.set(q.act, new Map());
+    const actBucket = actDimScores.get(q.act)!;
+    const arr = actBucket.get(q.dimension) ?? [];
+    arr.push(s);
+    actBucket.set(q.dimension, arr);
+
+    // Overall bucket
+    const allArr = allDimScores.get(q.dimension) ?? [];
+    allArr.push(s);
+    allDimScores.set(q.dimension, allArr);
+  }
+
+  function buildLayer(bucket: Map<string, number[]>) {
+    const { dimensions, dimAvg } = computeDimensions(bucket);
+    const code = buildCode(dimAvg);
+    const slug = resolveSlug(dimAvg);
+    return { slug, code, dimensions };
+  }
+
+  const overall = buildLayer(allDimScores);
+  const daySelf = buildLayer(actDimScores.get(1) ?? new Map());
+  const nightSelf = buildLayer(actDimScores.get(2) ?? new Map());
+  const dreamTendency = buildLayer(actDimScores.get(3) ?? new Map());
+
+  return { overall, daySelf, nightSelf, dreamTendency };
 }

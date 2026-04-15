@@ -18,7 +18,7 @@ const UNIVERSE_CARDS: Record<string, { tagline: string; stats: string }> = {
   flower: { tagline: '花格鉴定 · 测测你像哪朵花', stats: '16 种 · 20 题' },
   delta: { tagline: '三角洲行动 × 人格联名', stats: '29 种 · ~32 题' },
   soulti: { tagline: '觉察深层自我 · 文艺内省版', stats: '16 种 · 20 题' },
-  xpti: { tagline: '恋爱XP体质 · 你爱上什么人', stats: '16 种 · 随机20题' },
+  xpti: { tagline: '亲密偏好图谱 · 你想要的是谁', stats: '12 种 · 随机27题' },
 };
 
 const FUN_ITEMS = [

@@ -167,6 +167,19 @@ export const UNIVERSES: Universe[] = [
     galleryTabId: undefined,
     activeClass: 'bg-purple-50 text-purple-600 shadow-sm font-medium',
   },
+  {
+    id: 'cpti',
+    name: 'CPTI',
+    shortName: 'CPTI',
+    emoji: '💕',
+    status: 'live',
+    accent: '#e11d48',
+    testPath: '/cpti/test/',
+    landingPath: '/cpti/',
+    resultPrefix: '/cpti',
+    galleryTabId: 'cpti',
+    activeClass: 'bg-rose-50 text-rose-600 shadow-sm font-medium',
+  },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

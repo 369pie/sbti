@@ -1,0 +1,114 @@
+import type { DimensionLevel } from './dimensions';
+// XPTI_DIMENSIONS not used in scoring; questions use X1-X4 dimension IDs directly
+import { XPTI_PERSONALITY_TYPES, getXptiPersonalityByCode } from './personalities';
+import type { XptiPersonalityType } from './personalities';
+import type { XptiQuestion } from './questions';
+
+export type Answer = 1 | 2 | 3;
+
+export interface XptiDimensionScore {
+  id: string;
+  score: number;
+  level: DimensionLevel;
+}
+
+export interface XptiTestResult {
+  personality: XptiPersonalityType;
+  dimensions: XptiDimensionScore[];
+  code: string;
+}
+
+function getScore(answer: Answer, reversed: boolean): number {
+  if (reversed) return 4 - answer;
+  return answer;
+}
+
+function toLevel(score: number): DimensionLevel {
+  if (score >= 2.34) return 'H';
+  if (score >= 1.67) return 'M';
+  return 'L';
+}
+
+// 4-letter code poles: dimension → [highLetter, lowLetter]
+const XPTI_CODE_POLES: Record<string, [string, string]> = {
+  X1: ['D', 'A'], // dominance
+  X2: ['S', 'I'], // sensory
+  X3: ['P', 'C'], // boundary
+  X4: ['F', 'R'], // fantasy
+};
+
+const XPTI_DIM_ORDER = ['X1', 'X2', 'X3', 'X4'] as const;
+
+/**
+ * XPTI uses a 4-axis binary system:
+ * - Each axis average >= 2.0 → pole A letter, else → pole B letter
+ * - Concatenate the 4 letters → personality code (e.g. DSPF)
+ * - Look up the personality by code
+ */
+export function calculateXptiResult(
+  answers: Map<number, Answer>,
+  questions: XptiQuestion[]
+): XptiTestResult {
+  const dimScores = new Map<string, number[]>();
+  for (const q of questions) {
+    const a = answers.get(q.id);
+    if (a === undefined) continue;
+    const s = getScore(a, q.reversed);
+    const arr = dimScores.get(q.dimension) ?? [];
+    arr.push(s);
+    dimScores.set(q.dimension, arr);
+  }
+
+  const dimensions: XptiDimensionScore[] = XPTI_DIM_ORDER.map(dimId => {
+    const scores = dimScores.get(dimId) ?? [];
+    const avg = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 2;
+    return { id: dimId, score: avg, level: toLevel(avg) };
+  });
+
+  // Build 4-letter code from axis scores
+  const code = XPTI_DIM_ORDER.map(dimId => {
+    const ds = dimensions.find(d => d.id === dimId);
+    const avg = ds?.score ?? 2;
+    const poles = XPTI_CODE_POLES[dimId];
+    return avg >= 2.0 ? poles[0] : poles[1];
+  }).join('');
+
+  // Look up personality by code, fallback to distance matching
+  const personality = getXptiPersonalityByCode(code) ?? matchXptiPersonality(dimensions);
+
+  return { personality, dimensions, code };
+}
+
+function levelToNum(l: DimensionLevel): number {
+  if (l === 'H') return 3;
+  if (l === 'M') return 2;
+  return 1;
+}
+
+function matchXptiPersonality(
+  dimensions: XptiDimensionScore[]
+): XptiPersonalityType {
+  let bestMatch = XPTI_PERSONALITY_TYPES[0];
+  let bestDist = Infinity;
+
+  for (const p of XPTI_PERSONALITY_TYPES) {
+    let dist = 0;
+    for (const d of dimensions) {
+      const targetLevel = p.profile[d.id];
+      if (!targetLevel) continue;
+      const targetNum = levelToNum(targetLevel);
+      const diff = d.score - targetNum;
+      dist += diff * diff;
+    }
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestMatch = p;
+    }
+  }
+
+  return bestMatch;
+}
+
+export function normalizeXptiScore(score: number): number {
+  return Math.round(((score - 1) / 2) * 100);
+}

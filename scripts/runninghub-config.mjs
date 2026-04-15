@@ -63,6 +63,10 @@ export function loadLocalEnv() {
 export function getRunningHubConfig() {
   loadLocalEnv();
 
+  // Default policy:
+  // - Official stable text2img is the repo default
+  // - If the user explicitly asks for "低价渠道版本", switch by overriding
+  //   RUNNINGHUB_TEXT2IMG_ENDPOINT to /rhart-image-n-g31-flash/text-to-image
   return {
     apiKey: process.env.RUNNINGHUB_API_KEY,
     apiBase: process.env.RUNNINGHUB_API_BASE || 'https://www.runninghub.cn/openapi/v2',

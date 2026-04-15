@@ -7,6 +7,8 @@ import type { XptiPersonalityType } from '@/lib/xpti/personalities';
 import { XPTI_DIMENSIONS, XPTI_MODEL_COLORS } from '@/lib/xpti/dimensions';
 import { SHARE_SITE_URL } from '@/lib/site';
 import type { XptiDimensionScore } from '@/lib/xpti/scoring';
+import { resolveXptiShareCardPreset } from '@/lib/xpti/share-card-presets';
+import type { XptiShareCardPresetId } from '@/lib/xpti/share-card-presets';
 
 export interface XptiShareImageGeneratorHandle {
   generate: () => void;
@@ -15,6 +17,8 @@ export interface XptiShareImageGeneratorHandle {
 interface Props {
   personality: XptiPersonalityType;
   dimensionScores: XptiDimensionScore[];
+  presetId?: XptiShareCardPresetId;
+  subTheme?: string;
 }
 
 const CARD_WIDTH = 540;
@@ -115,11 +119,11 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines;
 }
 
-/** Extract the 翻译你的恋爱DNA section from xpti description */
+/** Extract the 翻译你的情欲图谱 section from xpti description */
 function extractShortDesc(description: string): string {
   const sections = description.split(/【(.*?)】/).filter(Boolean);
   for (let i = 0; i < sections.length; i++) {
-    if (sections[i].includes('翻译你的恋爱DNA') && sections[i + 1]) {
+    if ((sections[i].includes('翻译你的情欲图谱') || sections[i].includes('翻译你的恋爱DNA')) && sections[i + 1]) {
       return sections[i + 1].trim();
     }
   }
@@ -128,29 +132,22 @@ function extractShortDesc(description: string): string {
   return paragraphs.slice(0, 4).join('\n');
 }
 
-/** Draw a centered decorative divider */
-function drawDivider(ctx: CanvasRenderingContext2D, y: number, color: string) {
-  const cx = CARD_WIDTH / 2;
-  ctx.lineWidth = 0.8;
-  const grad = ctx.createLinearGradient(cx - 90, 0, cx + 90, 0);
-  grad.addColorStop(0, 'rgba(0,0,0,0)');
-  grad.addColorStop(0.3, color);
-  grad.addColorStop(0.5, color);
-  grad.addColorStop(0.7, color);
-  grad.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.strokeStyle = grad;
+/** Draw a subtle left accent bar inside a panel */
+function drawLeftAccent(ctx: CanvasRenderingContext2D, x: number, y: number, h: number, color: string) {
   ctx.beginPath();
-  ctx.moveTo(cx - 90, y);
-  ctx.lineTo(cx + 90, y);
+  ctx.moveTo(x, y + 6);
+  ctx.lineTo(x, y + h - 6);
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = color;
   ctx.stroke();
-  ctx.fillStyle = color;
-  ctx.font = `8px ${FONT_SANS}`;
-  ctx.textAlign = 'center';
-  ctx.fillText('·', cx, y - 4);
-  ctx.textAlign = 'left';
 }
 
-async function renderXptiShareImage(personality: XptiPersonalityType, dimensionScores: XptiDimensionScore[]) {
+async function renderXptiShareImage(
+  personality: XptiPersonalityType,
+  dimensionScores: XptiDimensionScore[],
+  options?: { presetId?: XptiShareCardPresetId; subTheme?: string },
+) {
   const [personalityImage, qrImage] = await Promise.all([
     getCachedImage(getXptiTypeImage(personality.slug)).catch(() => null),
     toQrDataUrl(XPTI_SHARE_URL, {
@@ -168,210 +165,320 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
   ctx.textBaseline = 'top';
 
   // ========== Color system ==========
-  const BG = '#FFF5F7';
-  const DARK = '#2D2236';
-  const MED = '#6B5F72';
-  const LIGHT = '#A89DB0';
-  const DIV = '#e8dce6';
+  const preset = resolveXptiShareCardPreset(options);
+  const BG = preset.background;
+  const DEEP = preset.backgroundDeep;
+  const DARK = preset.textStrong;
+  const MED = preset.textBody;
+  const LIGHT = preset.textMuted;
+  const DIV = preset.divider;
 
   ctx.fillStyle = BG;
   ctx.fillRect(0, 0, CARD_WIDTH, MAX_H);
 
-  // Subtle gradient wash
-  const wash = ctx.createRadialGradient(270, 200, 0, 270, 200, 300);
-  wash.addColorStop(0, hexToRgba(personality.color, 0.1));
-  wash.addColorStop(1, hexToRgba(personality.color, 0));
-  ctx.fillStyle = wash;
-  ctx.fillRect(0, 0, CARD_WIDTH, 400);
+  // ========== Sophisticated ambient wash (multiple gradients) ==========
+  // Top-centered theme glow
+  const washTop = ctx.createRadialGradient(CARD_WIDTH / 2, 220, 0, CARD_WIDTH / 2, 220, 480);
+  washTop.addColorStop(0, hexToRgba(personality.color, 0.14));
+  washTop.addColorStop(0.5, hexToRgba(personality.color, 0.05));
+  washTop.addColorStop(1, hexToRgba(personality.color, 0));
+  ctx.fillStyle = washTop;
+  ctx.fillRect(0, 0, CARD_WIDTH, 720);
 
-  // ========== y tracks the current vertical position ==========
-  let y = 46;
+  // Bottom warm ambient glow
+  const washBottom = ctx.createRadialGradient(CARD_WIDTH / 2, MAX_H, 0, CARD_WIDTH / 2, MAX_H, 500);
+  washBottom.addColorStop(0, hexToRgba(preset.warmGlow, 0.04));
+  washBottom.addColorStop(1, hexToRgba(preset.warmGlow, 0));
+  ctx.fillStyle = washBottom;
+  ctx.fillRect(0, MAX_H - 500, CARD_WIDTH, 500);
 
-  // ── Header ──
-  ctx.fillStyle = personality.color;
-  ctx.font = `600 12px ${FONT_MONO}`;
+  // ========== Decorative top line (warm gold fade) ==========
+  const lineY = 36;
+  const lineGrad = ctx.createLinearGradient(60, 0, CARD_WIDTH - 60, 0);
+  lineGrad.addColorStop(0, 'rgba(255,255,255,0)');
+  lineGrad.addColorStop(0.2, hexToRgba(preset.warmGlow, 0.25));
+  lineGrad.addColorStop(0.5, hexToRgba(preset.warmGlow, 0.4));
+  lineGrad.addColorStop(0.8, hexToRgba(preset.warmGlow, 0.25));
+  lineGrad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.strokeStyle = lineGrad;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(60, lineY);
+  ctx.lineTo(CARD_WIDTH - 60, lineY);
+  ctx.stroke();
+
+  let y = 54;
+
+  // ── Magazine Header ──
+  ctx.fillStyle = preset.headerTone;
+  ctx.font = `500 11px ${FONT_MONO}`;
   ctx.textAlign = 'center';
-  ctx.fillText('XPTI 恋爱XP体质报告', CARD_WIDTH / 2, y);
+  ctx.letterSpacing = '3px';
+  ctx.fillText('XPTI · DESIRE ARCHETYPE', CARD_WIDTH / 2, y);
+  ctx.letterSpacing = '0px';
   y += 22;
 
-  ctx.fillStyle = MED;
-  ctx.font = `13px ${FONT_SANS}`;
-  ctx.fillText('MBTI测你是什么人，XPTI测你爱上什么人', CARD_WIDTH / 2, y);
-  y += 24;
-  ctx.textAlign = 'left';
+  // ============ HERO CHARACTER IMAGE (macOS-native layered depth) ============
+  const avatarX = 44;
+  const avatarW = CARD_WIDTH - 88;
+  const avatarH = 460;
 
-  // ============ HERO CHARACTER IMAGE ============
-  const avatarX = 60;
-  const avatarW = CARD_WIDTH - 120;
-  const avatarH = 400;
-  fillRoundedRect(ctx, avatarX, y, avatarW, avatarH, 24, '#ffffff');
-  strokeRoundedRect(ctx, avatarX, y, avatarW, avatarH, 24, hexToRgba(personality.color, 0.25));
+  // Outer ring shadow (Raycast-style double-ring containment)
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.45)';
+  ctx.shadowBlur = 1;
+  ctx.shadowOffsetY = 0;
+  fillRoundedRect(ctx, avatarX, y, avatarW, avatarH, 24, '#0F080C');
+  ctx.restore();
+
+  // Inner surface with inset top highlight (glass/metal effect)
+  fillRoundedRect(ctx, avatarX + 1, y + 1, avatarW - 2, avatarH - 2, 23, preset.panelSurface);
+
+  // Inset top highlight
+  ctx.save();
+  roundRectPath(ctx, avatarX + 1, y + 1, avatarW - 2, avatarH - 2, 23);
+  ctx.clip();
+  const insetGrad = ctx.createLinearGradient(0, y, 0, y + 60);
+  insetGrad.addColorStop(0, 'rgba(255,255,255,0.06)');
+  insetGrad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = insetGrad;
+  ctx.fillRect(avatarX + 1, y + 1, avatarW - 2, 80);
+  ctx.restore();
+
+  // Subtle theme glow behind the image
+  ctx.save();
+  ctx.shadowColor = hexToRgba(personality.color, 0.28);
+  ctx.shadowBlur = 40;
+  ctx.shadowOffsetY = 12;
+  roundRectPath(ctx, avatarX + 4, y + 4, avatarW - 8, avatarH - 8, 20);
+  ctx.fillStyle = 'rgba(0,0,0,0)';
+  ctx.fill();
+  ctx.restore();
+
+  // Frame stroke
+  strokeRoundedRect(ctx, avatarX + 4, y + 4, avatarW - 8, avatarH - 8, 20, hexToRgba(personality.color, 0.35), 1.5);
+
+  // Image clip
   if (personalityImage) {
     ctx.save();
-    roundRectPath(ctx, avatarX + 4, y + 4, avatarW - 8, avatarH - 8, 20);
+    roundRectPath(ctx, avatarX + 6, y + 6, avatarW - 12, avatarH - 12, 18);
     ctx.clip();
-    drawImageContain(ctx, personalityImage, avatarX + 12, y + 8, avatarW - 24, avatarH - 16);
+    drawImageContain(ctx, personalityImage, avatarX + 6, y + 6, avatarW - 12, avatarH - 12);
     ctx.restore();
   } else {
     ctx.fillStyle = DARK;
-    ctx.font = `120px ${FONT_SANS}`;
+    ctx.font = `140px ${FONT_SANS}`;
     ctx.textAlign = 'center';
-    ctx.fillText(personality.emoji, CARD_WIDTH / 2, y + 60);
+    ctx.fillText(personality.emoji, CARD_WIDTH / 2, y + 100);
     ctx.textAlign = 'left';
   }
-  y += avatarH + 16;
+  y += avatarH + 30;
 
-  // ── Number + Code ──
+  // ── Number ──
   ctx.textAlign = 'center';
-  ctx.fillStyle = MED;
-  ctx.font = `13px ${FONT_MONO}`;
+  ctx.fillStyle = LIGHT;
+  ctx.font = `12px ${FONT_MONO}`;
+  ctx.letterSpacing = '1px';
   ctx.fillText(personality.number, CARD_WIDTH / 2, y);
-  y += 18;
+  ctx.letterSpacing = '0px';
+  y += 20;
 
+  // ── Code (luxury serial style) ──
   ctx.fillStyle = personality.color;
-  ctx.font = `700 28px ${FONT_MONO}`;
+  ctx.font = `700 34px ${FONT_MONO}`;
+  ctx.letterSpacing = '5px';
   ctx.fillText(personality.code, CARD_WIDTH / 2, y);
-  y += 36;
+  ctx.letterSpacing = '0px';
+  y += 46;
 
-  // Name
+  // ── Name ──
   ctx.fillStyle = DARK;
-  ctx.font = `700 42px ${FONT_SANS}`;
+  ctx.font = `800 46px ${FONT_SANS}`;
   ctx.fillText(personality.name, CARD_WIDTH / 2, y);
-  y += 50;
+  y += 56;
 
-  // Rarity pill
+  // ── Tagline (primary quote, elegant italic) ──
+  ctx.fillStyle = MED;
+  ctx.font = `italic 16px ${FONT_SANS}`;
+  ctx.letterSpacing = '0.3px';
+  ctx.fillText(personality.tagline, CARD_WIDTH / 2, y);
+  ctx.letterSpacing = '0px';
+  y += 34;
+
+  // ── Rarity badge (with glow) ──
   const rarity = getXptiRarity(personality.slug);
-  const rarityText = `${rarity.tier === 'legendary' ? '✦ ' : rarity.tier === 'epic' ? '◆ ' : ''}${rarity.label} · 仅 ${rarity.populationPct}% 的人`;
-  ctx.font = `600 13px ${FONT_SANS}`;
-  const rarityW = ctx.measureText(rarityText).width + 28;
+  const rarityText = `${rarity.tier === 'legendary' ? '✦ ' : rarity.tier === 'epic' ? '◆ ' : ''}${rarity.label} · 仅 ${rarity.populationPct}%`;
+  ctx.font = `600 12px ${FONT_SANS}`;
+  const rarityW = ctx.measureText(rarityText).width + 34;
   const rarityX = (CARD_WIDTH - rarityW) / 2;
-  fillRoundedRect(ctx, rarityX, y, rarityW, 28, 14, hexToRgba(rarity.color, 0.12));
-  strokeRoundedRect(ctx, rarityX, y, rarityW, 28, 14, hexToRgba(rarity.color, 0.3));
-  ctx.fillStyle = rarity.color;
-  ctx.fillText(rarityText, CARD_WIDTH / 2, y + 7);
-  y += 40;
 
-  // ============ ★ QUOTE CARD (tagline — the social sharing core) ============
+  // Glow behind badge
+  ctx.save();
+  ctx.shadowColor = hexToRgba(rarity.color, 0.45);
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetY = 0;
+  fillRoundedRect(ctx, rarityX, y, rarityW, 30, 15, hexToRgba(rarity.color, 0.10));
+  ctx.restore();
+
+  strokeRoundedRect(ctx, rarityX, y, rarityW, 30, 15, hexToRgba(rarity.color, 0.50), 1.2);
+  ctx.fillStyle = rarity.color;
+  ctx.fillText(rarityText, CARD_WIDTH / 2, y + 8);
+  y += 48;
+
+  // ============ ★ QUOTE CARD (curated narrative with glass depth) ============
+  const shortDesc = extractShortDesc(personality.description);
+  const descSnippet = shortDesc.split(/\n|\r/).filter(l => l.trim().length > 10).slice(0, 2).join('\n');
+
+  const quoteCardW = CARD_WIDTH - 72;
+  ctx.font = `500 14px ${FONT_SANS}`;
+  ctx.letterSpacing = '0.2px';
+  const quoteLines = wrapText(ctx, descSnippet, quoteCardW - 48);
+  ctx.letterSpacing = '0px';
+  const quoteH = Math.max(68, quoteLines.length * 25 + 30);
+
+  // Glass panel with subtle depth
+  fillRoundedRect(ctx, 36, y, quoteCardW, quoteH, 16, hexToRgba(personality.color, 0.06));
+  strokeRoundedRect(ctx, 36, y, quoteCardW, quoteH, 16, hexToRgba(personality.color, 0.20), 1);
+
+  // Inset top highlight on quote card
+  ctx.save();
+  roundRectPath(ctx, 36, y, quoteCardW, quoteH, 16);
+  ctx.clip();
+  const cardInset = ctx.createLinearGradient(0, y, 0, y + 40);
+  cardInset.addColorStop(0, 'rgba(255,255,255,0.04)');
+  cardInset.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = cardInset;
+  ctx.fillRect(36, y, quoteCardW, 50);
+  ctx.restore();
+
+  drawLeftAccent(ctx, 44, y + 10, quoteH - 20, hexToRgba(personality.color, 0.55));
+
+  // Decorative opening quote
+  ctx.fillStyle = hexToRgba(personality.color, 0.22);
+  ctx.font = `600 24px ${FONT_SANS}`;
   ctx.textAlign = 'left';
-  const quoteText = `"${personality.tagline}"`;
-  ctx.font = `600 17px ${FONT_SANS}`;
-  const quoteW = CARD_WIDTH - 72;
-  const quoteLines = wrapText(ctx, quoteText, quoteW - 32);
-  const quoteH = Math.max(52, quoteLines.length * 26 + 20);
-  fillRoundedRect(ctx, 36, y, quoteW, quoteH, 16, hexToRgba(personality.color, 0.06));
-  strokeRoundedRect(ctx, 36, y, quoteW, quoteH, 16, hexToRgba(personality.color, 0.15));
-  ctx.fillStyle = personality.color;
-  ctx.font = `600 17px ${FONT_SANS}`;
+  ctx.fillText('“', 56, y + 10);
+
+  ctx.fillStyle = DARK;
+  ctx.font = `500 14px ${FONT_SANS}`;
+  ctx.letterSpacing = '0.2px';
   ctx.textAlign = 'center';
   quoteLines.forEach((line, i) => {
-    ctx.fillText(line, CARD_WIDTH / 2, y + 12 + i * 26);
+    ctx.fillText(line, CARD_WIDTH / 2, y + 24 + i * 25);
   });
+  ctx.letterSpacing = '0px';
   ctx.textAlign = 'left';
-  y += quoteH + 20;
+  y += quoteH + 30;
 
-  // ============ ★ DESCRIPTION (warm narrative, not data) ============
-  drawDivider(ctx, y, hexToRgba(personality.color, 0.3));
-  y += 16;
+  // ============ ★ PERSONALITY TAG CLOUD (pill badges) ============
+  const highDims = dimensionScores
+    .filter(s => s.level === 'H' || s.score >= 2.3)
+    .slice(0, 4)
+    .map(s => {
+      const dim = XPTI_DIMENSIONS.find(d => d.id === s.id);
+      return dim ? { label: dim.poleHighLabel, color: XPTI_MODEL_COLORS[dim.model].base } : null;
+    })
+    .filter(Boolean) as { label: string; color: string }[];
 
-  ctx.fillStyle = LIGHT;
-  ctx.font = `11px ${FONT_MONO}`;
-  ctx.textAlign = 'center';
-  ctx.fillText('ABOUT YOU', CARD_WIDTH / 2, y);
-  y += 20;
-  ctx.textAlign = 'left';
-
-  const shortDesc = extractShortDesc(personality.description);
-  ctx.fillStyle = DARK;
-  ctx.font = `13.5px ${FONT_SANS}`;
-  const descLines = wrapText(ctx, shortDesc, CARD_WIDTH - 80);
-  const maxDescLines = Math.min(descLines.length, 8);
-  for (let i = 0; i < maxDescLines; i++) {
-    ctx.fillText(descLines[i], 40, y);
-    y += 21;
+  if (highDims.length === 0) {
+    const topDims = [...dimensionScores].sort((a, b) => b.score - a.score).slice(0, 3).map(s => {
+      const dim = XPTI_DIMENSIONS.find(d => d.id === s.id);
+      return dim ? { label: dim.poleHighLabel, color: XPTI_MODEL_COLORS[dim.model].base } : null;
+    }).filter(Boolean) as { label: string; color: string }[];
+    highDims.push(...topDims);
   }
-  y += 10;
 
-  // ============ ★ COMPACT SPECTRUM (dot-matrix replacing bars) ============
-  drawDivider(ctx, y, hexToRgba(personality.color, 0.3));
-  y += 16;
+  const tagHeight = 30;
+  const tagGap = 10;
+  const tagMaxW = CARD_WIDTH - 80;
 
-  ctx.fillStyle = LIGHT;
-  ctx.font = `11px ${FONT_MONO}`;
+  ctx.font = `600 12px ${FONT_SANS}`;
+  const tagMetrics = highDims.map(d => {
+    const w = ctx.measureText(d.label).width + 28;
+    return { ...d, w };
+  });
+
+  const tagRows: { w: number; label: string; color: string }[][] = [[]];
+  let currentRow = 0;
+  let currentRowW = 0;
+  for (const t of tagMetrics) {
+    if (currentRowW > 0 && currentRowW + tagGap + t.w > tagMaxW) {
+      currentRow++;
+      tagRows[currentRow] = [];
+      currentRowW = 0;
+    }
+    tagRows[currentRow].push(t);
+    currentRowW += (currentRowW > 0 ? tagGap : 0) + t.w;
+  }
+
+  // Small label above tags
   ctx.textAlign = 'center';
-  ctx.fillText('XP光谱', CARD_WIDTH / 2, y);
+  ctx.fillStyle = LIGHT;
+  ctx.font = `10px ${FONT_MONO}`;
+  ctx.letterSpacing = '1px';
+  ctx.fillText('XP KEYWORDS', CARD_WIDTH / 2, y);
+  ctx.letterSpacing = '0px';
   y += 20;
 
-  dimensionScores.forEach((score) => {
-    const dim = XPTI_DIMENSIONS.find(d => d.id === score.id);
-    if (!dim) return;
-    const color = XPTI_MODEL_COLORS[dim.model].base;
-
-    // Pole labels on left & right
-    ctx.font = `11px ${FONT_SANS}`;
-    ctx.fillStyle = MED;
-    ctx.textAlign = 'left';
-    ctx.fillText(dim.poleALabel, 40, y);
-    ctx.textAlign = 'right';
-    ctx.fillText(dim.poleBLabel, CARD_WIDTH - 40, y);
-
-    // Dot matrix: 5 dots
-    const dotsX = 155;
-    const dotsW = CARD_WIDTH - 310;
-    const dotSpacing = dotsW / 4;
-    const pct = (score.score - 1) / 2;
-    const filledDots = pct >= 0.75 ? 5 : pct >= 0.55 ? 4 : pct >= 0.4 ? 3 : pct >= 0.2 ? 2 : 1;
-
-    for (let d = 0; d < 5; d++) {
-      const dx = dotsX + d * dotSpacing;
-      const dy = y + 5;
-      ctx.beginPath();
-      ctx.arc(dx, dy, 4, 0, Math.PI * 2);
-      ctx.fillStyle = d < filledDots ? color : DIV;
-      ctx.fill();
+  let tagRowY = 0;
+  for (let r = 0; r < tagRows.length; r++) {
+    const row = tagRows[r];
+    const rowW = row.reduce((sum, t, i) => sum + t.w + (i > 0 ? tagGap : 0), 0);
+    const rowStartX = (CARD_WIDTH - rowW) / 2;
+    let cx = rowStartX;
+    for (const t of row) {
+      // Pill badge with subtle surface
+      fillRoundedRect(ctx, cx, y + tagRowY, t.w, tagHeight, 15, hexToRgba(t.color, 0.10));
+      strokeRoundedRect(ctx, cx, y + tagRowY, t.w, tagHeight, 15, hexToRgba(t.color, 0.45), 1);
+      ctx.fillStyle = t.color;
+      ctx.font = `600 12px ${FONT_SANS}`;
+      ctx.textAlign = 'center';
+      ctx.fillText(t.label, cx + t.w / 2, y + tagRowY + 8);
+      cx += t.w + tagGap;
     }
-
-    ctx.textAlign = 'left';
-    y += 28;
-  });
-  y += 8;
-
-  // ============ TAGLINE (warm closing) ============
-  drawDivider(ctx, y, hexToRgba(personality.color, 0.2));
-  y += 14;
-
-  ctx.fillStyle = MED;
-  ctx.font = `italic 12px ${FONT_SANS}`;
-  ctx.textAlign = 'center';
-  ctx.fillText(personality.tagline, CARD_WIDTH / 2, y);
-  y += 28;
+    tagRowY += tagHeight + 10;
+  }
   ctx.textAlign = 'left';
+  y += tagRowY + 22;
 
-  // ============ FOOTER ============
-  const CARD_HEIGHT = y + 80;
+  // ============ FOOTER (compact, elegant) ============
+  const FOOTER_H = 86;
+  const CARD_HEIGHT = y + FOOTER_H;
+  const footerY = CARD_HEIGHT - FOOTER_H;
 
-  const footerY = CARD_HEIGHT - 80;
-  ctx.strokeStyle = DIV;
+  // Gradient divider
+  const divGrad = ctx.createLinearGradient(36, 0, CARD_WIDTH - 36, 0);
+  divGrad.addColorStop(0, 'rgba(255,255,255,0)');
+  divGrad.addColorStop(0.15, DIV);
+  divGrad.addColorStop(0.85, DIV);
+  divGrad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.strokeStyle = divGrad;
   ctx.lineWidth = 0.8;
   ctx.beginPath();
-  ctx.moveTo(36, footerY);
-  ctx.lineTo(CARD_WIDTH - 36, footerY);
+  ctx.moveTo(36, footerY + 10);
+  ctx.lineTo(CARD_WIDTH - 36, footerY + 10);
   ctx.stroke();
 
+  // CTA text
   ctx.fillStyle = DARK;
-  ctx.font = `600 14px ${FONT_SANS}`;
-  ctx.textAlign = 'left';
-  ctx.fillText('测测你的恋爱XP体质？', 36, footerY + 12);
+  ctx.font = `600 13px ${FONT_SANS}`;
+  ctx.letterSpacing = '0.2px';
+  ctx.fillText('测测你的靠近方式', 36, footerY + 20);
+  ctx.letterSpacing = '0px';
 
-  ctx.fillStyle = personality.color;
-  ctx.font = `11px ${FONT_MONO}`;
-  ctx.fillText(XPTI_SHARE_URL, 36, footerY + 34);
+  ctx.fillStyle = LIGHT;
+  ctx.font = `10px ${FONT_MONO}`;
+  ctx.letterSpacing = '0.5px';
+  ctx.fillText(XPTI_SHARE_URL, 36, footerY + 36);
+  ctx.letterSpacing = '0px';
 
   // QR
-  fillRoundedRect(ctx, CARD_WIDTH - 36 - 60, footerY + 4, 60, 60, 10, '#ffffff');
+  const qrSize = 54;
+  fillRoundedRect(ctx, CARD_WIDTH - 36 - qrSize, footerY + 12, qrSize, qrSize, 10, '#ffffff');
   if (qrImage) {
-    drawImageContain(ctx, qrImage, CARD_WIDTH - 36 - 56, footerY + 8, 52, 52);
+    drawImageContain(ctx, qrImage, CARD_WIDTH - 36 - qrSize + 3, footerY + 15, qrSize - 6, qrSize - 6);
   } else {
-    fillRoundedRect(ctx, CARD_WIDTH - 36 - 52, footerY + 12, 44, 44, 6, DIV);
+    fillRoundedRect(ctx, CARD_WIDTH - 36 - qrSize + 6, footerY + 18, qrSize - 12, qrSize - 12, 6, DIV);
   }
 
   // ========== CROP to actual height & draw border ==========
@@ -383,24 +490,28 @@ async function renderXptiShareImage(personality: XptiPersonalityType, dimensionS
   cctx.drawImage(canvas, 0, 0);
 
   cctx.scale(CARD_SCALE, CARD_SCALE);
-  strokeRoundedRect(cctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 24, hexToRgba(personality.color, 0.25), 2.5);
-  strokeRoundedRect(cctx, 22, 22, CARD_WIDTH - 44, CARD_HEIGHT - 44, 18, hexToRgba(personality.color, 0.08), 1);
 
-  // Corner ornaments
-  cctx.fillStyle = hexToRgba(personality.color, 0.35);
-  cctx.font = `14px ${FONT_SANS}`;
+  // Outer frame: unified warm gold border (not personality green for some types)
+  strokeRoundedRect(cctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 24, hexToRgba(preset.warmGlow, 0.45), 2.5);
+  // Inner subtle frame
+  strokeRoundedRect(cctx, 22, 22, CARD_WIDTH - 44, CARD_HEIGHT - 44, 18, hexToRgba(preset.warmGlow, 0.16), 1);
+
+  // Corner ornaments — refined diamonds with warm glow
+  cctx.fillStyle = hexToRgba(preset.warmGlow, 0.60);
+  cctx.font = `11px ${FONT_SANS}`;
   cctx.textAlign = 'center';
   cctx.textBaseline = 'top';
-  cctx.fillText('✦', 36, 28);
-  cctx.fillText('✦', CARD_WIDTH - 36, 28);
-  cctx.fillText('✦', 36, CARD_HEIGHT - 44);
-  cctx.fillText('✦', CARD_WIDTH - 36, CARD_HEIGHT - 44);
+  cctx.fillText('◆', 32, 24);
+  cctx.fillText('◆', CARD_WIDTH - 32, 24);
+  cctx.textBaseline = 'bottom';
+  cctx.fillText('◆', 32, CARD_HEIGHT - 24);
+  cctx.fillText('◆', CARD_WIDTH - 32, CARD_HEIGHT - 24);
 
   return croppedCanvas.toDataURL('image/png');
 }
 
 export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle, Props>(
-  function XptiShareImageGenerator({ personality, dimensionScores }, ref) {
+  function XptiShareImageGenerator({ personality, dimensionScores, presetId, subTheme }, ref) {
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
@@ -410,14 +521,16 @@ export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle,
       setGenerating(true);
       setSaveHint(null);
       try {
-        const dataUrl = await renderXptiShareImage(personality, dimensionScores);
+        const dataUrl = await renderXptiShareImage(personality, dimensionScores, { presetId, subTheme });
         setPreviewUrl(dataUrl);
       } catch (e) {
         console.error('Share image generation failed:', e);
       } finally {
         setGenerating(false);
       }
-    }, [dimensionScores, generating, personality]);
+    }, [dimensionScores, generating, personality, presetId, subTheme]);
+
+    const preset = resolveXptiShareCardPreset({ presetId, subTheme });
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
@@ -452,7 +565,7 @@ export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle,
       try {
         const file = await createPreviewFile();
         if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: `我的恋爱XP体质：${personality.name}` });
+          await navigator.share({ files: [file], title: `我的 XPTI 结果：${personality.name}` });
         } else {
           await handleDownload();
         }
@@ -468,7 +581,8 @@ export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle,
         <button
           onClick={handleGenerate}
           disabled={generating}
-          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full py-3.5 rounded-xl text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          style={{ background: `linear-gradient(90deg, ${preset.ctaGradientFrom}, ${preset.ctaGradientTo})` }}
         >
           {generating ? (
             <>
@@ -487,16 +601,16 @@ export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle,
 
         {previewUrl && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain bg-black/80 backdrop-blur-sm p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:items-center"
             onClick={() => setPreviewUrl(null)}
           >
             <div
-              className="relative w-full max-w-sm animate-in fade-in zoom-in-95 duration-200"
+              className="relative w-full max-w-sm max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain animate-in fade-in zoom-in-95 duration-200"
               onClick={e => e.stopPropagation()}
             >
               <button
                 onClick={() => setPreviewUrl(null)}
-                className="absolute -top-11 -right-1 p-2 text-white/50 hover:text-white transition-colors z-10"
+                className="absolute top-3 right-3 rounded-full bg-black/55 p-2 text-white shadow-lg backdrop-blur-sm transition-colors hover:bg-black/70 z-10"
                 aria-label="关闭"
               >
                 <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -531,7 +645,8 @@ export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle,
                 </button>
                 <button
                   onClick={handleShare}
-                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium hover:brightness-110 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-xl text-white text-sm font-medium hover:brightness-110 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  style={{ background: `linear-gradient(90deg, ${preset.ctaGradientFrom}, ${preset.ctaGradientTo})` }}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />

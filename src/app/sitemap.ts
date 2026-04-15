@@ -16,6 +16,7 @@ import { getAllSoultiSlugs } from '@/lib/soulti/personalities';
 import { getBirdSlugs } from '@/lib/bird/personalities';
 import { getAllFlowerSlugs } from '@/lib/flower/personalities';
 import { getAllIdentifySlugs } from '@/lib/identify/personas';
+import { getAllCptiSlugs } from '@/lib/cpti/personalities';
 
 export const dynamic = 'force-static';
 
@@ -46,6 +47,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: getSiteUrl('/bird/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/flower/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/identify/'), lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    { url: getSiteUrl('/cpti/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/wtfti/symptoms/'), lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
   ];
 
@@ -154,6 +156,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
+  const cptiResultPages: MetadataRoute.Sitemap = getAllCptiSlugs().map((slug) => ({
+    url: getSiteUrl(`/cpti/result/${slug}/`),
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
   const symptomsPages: MetadataRoute.Sitemap = getWtftiSlugs().map((slug) => ({
     url: getSiteUrl(`/wtfti/symptoms/${slug}/`),
     lastModified: now,
@@ -161,5 +170,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }));
 
-  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages, ...kingsResultPages, ...deltaResultPages, ...xptiResultPages, ...soultiResultPages, ...birdResultPages, ...flowerResultPages, ...identifyResultPages, ...symptomsPages];
+  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...cptiResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages, ...kingsResultPages, ...deltaResultPages, ...xptiResultPages, ...soultiResultPages, ...birdResultPages, ...flowerResultPages, ...identifyResultPages, ...symptomsPages];
 }

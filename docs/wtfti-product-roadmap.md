@@ -431,6 +431,14 @@ RunningHub 批量生产（img2img / txt2img）
 | `src/app/layout.tsx` | 站点标题、meta描述 |
 | `README.md` | 项目说明更新 |
 
+#### 2026-04-14 迁移状态补记
+
+- 平台主品牌已统一为 **WTFTI**，主域名为 `wtfti.com`。
+- `SBTI` 现在仅作为 WTFTI 平台内的经典基线宇宙 / 核心测试名保留，不再作为整站总品牌。
+- `sbtinb.com` 与 `www.sbtinb.com` 只保留跳转职责，不再用于用户可见文案、分享图和运营文档链接。
+- 本轮同步范围：站级 metadata / OG / Twitter / breadcrumb / social image，以及 about、guide、types、contact、privacy、terms 等品牌页。
+- 详细记录见 `docs/wtfti-brand-migration-log.md`。
+
 ### 5.2 宇宙系统核心模块
 
 新增文件结构：
@@ -504,14 +512,14 @@ src/components/
 
 > 目标：完成从 SBTI 到 WTFTI 的品牌迁移，不改功能
 
-- [ ] 注册并配置 wtfti.com 域名
+- [x] 注册并配置 wtfti.com 域名
 - [ ] 注册 666ti.com 域名（微信备用）
-- [ ] 修改 site.ts / social-image.tsx / layout.tsx 中的品牌引用
-- [ ] 更新分享图模板：SBTI → WTFTI
-- [ ] 更新页面标题/meta/OG tags
-- [ ] 部署到 wtfti.com
+- [x] 修改 site.ts / social-image.tsx / layout.tsx 中的品牌引用
+- [ ] 更新分享图模板：SBTI → WTFTI（首页/站级分享图已完成；各宇宙结果分享卡待继续统一）
+- [x] 更新页面标题/meta/OG tags
+- [x] 部署到 wtfti.com
 - [ ] 666ti.com 配置跳转到 wtfti.com
-- [ ] 原域名 sbtinb.com 保留跳转（不丢老用户）
+- [x] 原域名 sbtinb.com 保留跳转（不丢老用户）
 
 ### Phase 1 — 多宇宙 MVP（2-3 周）
 

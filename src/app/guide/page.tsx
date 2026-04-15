@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { GUIDE_ARTICLES } from '@/lib/guides';
 
 export const metadata: Metadata = {
-  title: 'SBTI 测试说明与结果解读',
-  description: '查看 SBTI 测试说明、结果怎么看、SBTI 和 MBTI 的区别，以及 27 张抽象人设卡的阅读入口。',
+  title: 'WTFTI 指南：SBTI 经典测试说明与结果解读',
+  description: '查看 WTFTI 经典 SBTI 测试说明、结果怎么看、SBTI 和 MBTI 的区别，以及图鉴阅读入口。',
   alternates: { canonical: '/guide/' },
 };
 
@@ -12,9 +12,9 @@ export default function GuidePage() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-12 sm:py-16">
       <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Guide</span>
-      <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-4">SBTI 测试说明与结果解读</h1>
+      <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-4">WTFTI 指南：SBTI 经典测试说明与结果解读</h1>
       <p className="max-w-3xl text-text-secondary leading-8 text-base mb-10">
-        这里集中整理 SBTI 的测试说明、结果阅读方法和常见问题。如果你已经搜到了 “SBTI 人格测试” 并准备开测，这个栏目会帮你先理解它在测什么；如果你已经拿到结果，也可以从这里继续读懂十五维、稀有度和相近人格之间的差别。
+        这里集中整理 WTFTI 经典 SBTI 测试的说明、结果阅读方法和常见问题。如果你已经搜到了 “SBTI 人格测试” 并准备开测，这个栏目会帮你先理解它在测什么；如果你已经拿到结果，也可以从这里继续读懂十五维、稀有度和相近人格之间的差别。
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">

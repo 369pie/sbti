@@ -19,18 +19,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const p = getXptiPersonalityBySlug(type);
   if (!p) return {};
   return {
-    title: `${p.code}（${p.name}）— 恋爱XP体质测试结果 | XPTI`,
-    description: `${p.tagline} — XPTI 恋爱XP体质测试结果：${p.name}，四轴恋爱DNA画像。`,
+    title: `${p.code}（${p.name}）— XPTI 亲密偏好结果 | XPTI`,
+    description: `${p.tagline} — XPTI 亲密偏好测试结果：${p.name}，九维亲密画像。`,
     alternates: { canonical: `/xpti/result/${type}/` },
     openGraph: {
-      title: `我的恋爱XP体质是 ${p.code}（${p.name}）`,
+      title: `我的 XPTI 结果是 ${p.code}（${p.name}）`,
       description: p.tagline,
       url: getSiteUrl(`/xpti/result/${type}/`),
       images: [{ url: getXptiTypeImage(type), width: 256, height: 256, alt: p.name }],
     },
     twitter: {
       card: 'summary',
-      title: `我的恋爱XP体质是 ${p.code}（${p.name}）`,
+      title: `我的 XPTI 结果是 ${p.code}（${p.name}）`,
       description: p.tagline,
     },
   };
@@ -57,8 +57,8 @@ export default async function XptiResultPage({ params }: PageProps) {
             {
               '@type': 'BreadcrumbList',
               itemListElement: [
-                { '@type': 'ListItem', position: 1, name: 'SBTI 人格测试', item: getSiteUrl('/') },
-                { '@type': 'ListItem', position: 2, name: 'XPTI 恋爱XP体质', item: getSiteUrl('/xpti/') },
+                { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
+                { '@type': 'ListItem', position: 2, name: 'XPTI 亲密偏好图谱', item: getSiteUrl('/xpti/') },
                 { '@type': 'ListItem', position: 3, name: personality.name, item: getSiteUrl(`/xpti/result/${personality.slug}/`) },
               ],
             },
@@ -67,8 +67,8 @@ export default async function XptiResultPage({ params }: PageProps) {
               mainEntity: [
                 {
                   '@type': 'Question',
-                  name: `恋爱XP体质 ${personality.code}（${personality.name}）是什么？`,
-                  acceptedAnswer: { '@type': 'Answer', text: `${personality.name}是 XPTI 恋爱XP体质测试的 16 种类型之一。${personality.tagline}` },
+                  name: `XPTI ${personality.code}（${personality.name}）是什么？`,
+                  acceptedAnswer: { '@type': 'Answer', text: `${personality.name}是 XPTI 亲密偏好图谱测试中的 12 种关系原型之一。${personality.tagline}` },
                 },
               ],
             },

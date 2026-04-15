@@ -91,6 +91,8 @@ function buildTypePrompt(config, type) {
   if (config.cardMode && type.card) {
     return buildUniverseCardPrompt({
       seriesLabel: config.seriesLabel,
+      artStyle: config.artStyle,
+      seriesTone: config.seriesTone,
       concept: type.concept,
       card: type.card,
       themeColor: config.themeColor,

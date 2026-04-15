@@ -55,7 +55,7 @@ export default async function WorkResultPage({ params }: PageProps) {
             {
               '@type': 'BreadcrumbList',
               itemListElement: [
-                { '@type': 'ListItem', position: 1, name: 'SBTI 人格测试', item: getSiteUrl('/') },
+                { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
                 { '@type': 'ListItem', position: 2, name: '打工人格', item: getSiteUrl('/work/') },
                 { '@type': 'ListItem', position: 3, name: personality.name, item: getSiteUrl(`/work/result/${personality.slug}/`) },
               ],

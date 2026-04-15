@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!s) return {};
   return {
     title: `${s.code}（${s.name}）— 今日模式`,
-    description: `${s.tagline} — SBTI 今日模式测试结果：${s.name}。`,
+    description: `${s.tagline} — WTFTI 今日模式测试结果：${s.name}。`,
     alternates: { canonical: `/daily/result/${type}/` },
     openGraph: {
       title: `我今天开的模式是 ${s.code}（${s.name}）`,
@@ -55,7 +55,7 @@ export default async function DailyResultPage({ params }: PageProps) {
             {
               '@type': 'BreadcrumbList',
               itemListElement: [
-                { '@type': 'ListItem', position: 1, name: 'SBTI 人格测试', item: getSiteUrl('/') },
+                { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
                 { '@type': 'ListItem', position: 2, name: '今日模式', item: getSiteUrl('/daily/') },
                 { '@type': 'ListItem', position: 3, name: status.name, item: getSiteUrl(`/daily/result/${status.slug}/`) },
               ],
@@ -66,7 +66,7 @@ export default async function DailyResultPage({ params }: PageProps) {
                 {
                   '@type': 'Question',
                   name: `今日模式 ${status.code}（${status.name}）是什么？`,
-                  acceptedAnswer: { '@type': 'Answer', text: `${status.name}是 SBTI 今日模式测试的 12 种状态之一。${status.tagline}` },
+                  acceptedAnswer: { '@type': 'Answer', text: `${status.name}是 WTFTI 今日模式测试的 12 种状态之一。${status.tagline}` },
                 },
               ],
             },

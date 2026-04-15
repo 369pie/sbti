@@ -462,7 +462,7 @@ export default function JuetiLandingContent() {
 
           <div className="mt-8 flex items-center justify-center gap-4 text-xs text-text-muted/40">
             <Link href="/test/" className="hover:text-text-muted transition-colors" style={{ fontFamily: serifFont }}>
-              SBTI 标准版
+              经典人格版
             </Link>
             <span>·</span>
             <Link href="/xpti/" className="hover:text-text-muted transition-colors" style={{ fontFamily: serifFont }}>

@@ -7,6 +7,8 @@ import { FLOWER_PERSONALITY_TYPES, getFlowerRarity, getFlowerTypeThumbnailImage 
 import { SOULTI_PERSONALITY_TYPES, getSoultiRarity, getSoultiTypeThumbnailImage } from '@/lib/soulti/personalities';
 import { KINGS_PERSONALITIES, getKingsTypeThumbnailImage } from '@/lib/kings/personalities';
 import { LOVE_PERSONALITY_TYPES, getLoveRarity, getLoveTypeImage } from '@/lib/love/personalities';
+import { CPTI_PERSONALITY_TYPES, getCptiRarity, getCptiTypeThumbnailImage } from '@/lib/cpti/personalities';
+import { CPTI_RELATIONSHIP_TYPES, RELATIONSHIP_TIER_INFO, getCptiRelationshipTypeThumbnailImage } from '@/lib/cpti/relationships';
 import { getRarity, getTypeImage, getXiuxianTypeImage, PERSONALITY_TYPES } from '@/lib/personalities';
 import { WTFTI_PERSONALITIES, getWtftiTypeThumbnailImage } from '@/lib/wtfti-personalities';
 import { getWorkRarity, getWorkTypeImage, WORK_PERSONALITY_TYPES } from '@/lib/work/personalities';
@@ -258,6 +260,38 @@ function buildThemeTabs(): GalleryTab[] {
     };
   });
 
+  const cptiItems: GalleryItem[] = CPTI_PERSONALITY_TYPES.map((personality) => {
+    const rarity = getCptiRarity(personality.slug);
+
+    return {
+      slug: personality.slug,
+      code: personality.code,
+      name: personality.name,
+      tagline: personality.tagline,
+      color: personality.color,
+      emoji: personality.emoji,
+      image: getCptiTypeThumbnailImage(personality.slug),
+      href: `/cpti/result/${personality.slug}`,
+      rarity: { label: rarity.label, color: rarity.color, bgColor: rarity.bgColor },
+    };
+  });
+
+  const cptiRelationshipItems: GalleryItem[] = CPTI_RELATIONSHIP_TYPES.map((relationship) => {
+    const tierInfo = RELATIONSHIP_TIER_INFO[relationship.tier];
+
+    return {
+      slug: relationship.slug,
+      code: relationship.code,
+      name: relationship.name,
+      tagline: relationship.tagline,
+      color: relationship.color,
+      emoji: relationship.emoji,
+      image: getCptiRelationshipTypeThumbnailImage(relationship.slug),
+      href: `/cpti/relationship/?type=${relationship.slug}`,
+      rarity: { label: tierInfo.label, color: tierInfo.color, bgColor: tierInfo.bgColor },
+    };
+  });
+
   const flowerItems: GalleryItem[] = FLOWER_PERSONALITY_TYPES.map((personality) => {
     const rarity = getFlowerRarity(personality.slug);
 
@@ -339,6 +373,24 @@ function buildThemeTabs(): GalleryTab[] {
       testHref: '/xpti',
       description: `她视角的人格解剖——${xptiItems.length} 种女性专属人格画像。`,
       items: xptiItems,
+    },
+    {
+      id: 'cpti',
+      label: 'CPTI',
+      emoji: '💗',
+      accent: '#f43f5e',
+      testHref: '/cpti',
+      description: `CPTI 角色图鉴：${cptiItems.length} 种关系角色，测完直接看你在关系里的站位。`,
+      items: cptiItems,
+    },
+    {
+      id: 'cpti-relationship',
+      label: 'CPTI关系',
+      emoji: '💕',
+      accent: '#db2777',
+      testHref: '/cpti/relationship/',
+      description: `CPTI 关系图鉴：${cptiRelationshipItems.length} 种关系类型，覆盖梗王级到稀有级。`,
+      items: cptiRelationshipItems,
     },
     {
       id: 'flower',

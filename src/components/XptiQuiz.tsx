@@ -31,7 +31,7 @@ export function XptiQuiz() {
   const total = questions.length;
   const progress = ((currentIndex) / total) * 100;
 
-  const modelColor = currentQ ? XPTI_MODEL_COLORS[currentQ.model] : XPTI_MODEL_COLORS.power;
+  const modelColor = currentQ ? XPTI_MODEL_COLORS[currentQ.model] : XPTI_MODEL_COLORS.dominance;
 
   useLayoutEffect(() => {
     activeQuestionIdRef.current = currentQuestionId;
@@ -250,8 +250,8 @@ export function XptiQuiz() {
               transition={{ delay: 0.1, duration: 0.4 }}
               className="text-center"
             >
-              <div className="text-4xl mb-4">💜</div>
-              <p className="text-text-secondary text-lg">正在解码你的恋爱XP体质…</p>
+              <div className="text-4xl mb-4">�</div>
+              <p className="text-text-secondary text-lg">正在解码你的亲密偏好图谱…</p>
             </motion.div>
           </motion.div>
         )}

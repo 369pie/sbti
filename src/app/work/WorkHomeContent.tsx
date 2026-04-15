@@ -53,7 +53,7 @@ export default function WorkHomeContent() {
                 prefetch={false}
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:border-border hover:bg-bg-secondary/50 transition-all duration-200 text-base"
               >
-                ← SBTI 抽象人格测试
+                ← 返回 WTFTI
               </Link>
             </div>
           </div>

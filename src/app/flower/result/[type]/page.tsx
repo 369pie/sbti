@@ -57,7 +57,7 @@ export default async function FlowerResultPage({ params }: PageProps) {
             {
               '@type': 'BreadcrumbList',
               itemListElement: [
-                { '@type': 'ListItem', position: 1, name: 'SBTI 人格测试', item: getSiteUrl('/') },
+                { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
                 { '@type': 'ListItem', position: 2, name: '花TI 花格鉴定', item: getSiteUrl('/flower/') },
                 { '@type': 'ListItem', position: 3, name: personality.name, item: getSiteUrl(`/flower/result/${personality.slug}/`) },
               ],

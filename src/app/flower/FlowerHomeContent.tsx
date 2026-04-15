@@ -249,7 +249,7 @@ export default function FlowerHomeContent() {
       {/* Footer links */}
       <section className="pb-24 px-6 text-center">
         <div className="flex items-center justify-center gap-6 text-sm text-text-muted">
-          <Link href="/" className="hover:text-text-secondary transition-colors">SBTI</Link>
+          <Link href="/" className="hover:text-text-secondary transition-colors">WTFTI</Link>
           <Link href="/xpti/" className="hover:text-text-secondary transition-colors">XPTI</Link>
           <Link href="/soulti/" className="hover:text-text-secondary transition-colors">SoulTI</Link>
           <Link href="/wtfti/" className="hover:text-text-secondary transition-colors">WTF毒舌版</Link>

@@ -3,17 +3,17 @@ import { getSiteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: '隐私说明',
-  description: '查看 SBTI 人格测试关于测试答案、分享图片、本地计算与基础访问日志的隐私说明。',
+  description: '查看 WTFTI 关于测试答案、分享图片、本地计算与基础访问日志的隐私说明。',
   alternates: { canonical: '/privacy/' },
   openGraph: {
-    title: '隐私说明 — SBTI',
-    description: 'SBTI 人格测试的数据处理与隐私保护说明。',
+    title: '隐私说明 — WTFTI',
+    description: 'WTFTI 的数据处理与隐私保护说明。',
     url: getSiteUrl('/privacy/'),
   },
   twitter: {
     card: 'summary',
-    title: '隐私说明 — SBTI',
-    description: 'SBTI 人格测试的数据处理与隐私保护说明。',
+    title: '隐私说明 — WTFTI',
+    description: 'WTFTI 的数据处理与隐私保护说明。',
   },
 };
 
@@ -47,7 +47,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-xl font-medium text-text-primary mb-3">隐私声明的边界</h2>
           <p>
-            SBTI 不是医疗、金融或实名认证服务，站点也不建议你在公开分享时附带敏感身份信息。如果未来站点引入登录、提交、排行榜或分析能力，本页会同步更新。
+            WTFTI 不是医疗、金融或实名认证服务，站点也不建议你在公开分享时附带敏感身份信息。如果未来站点引入登录、提交、排行榜或分析能力，本页会同步更新。
           </p>
         </section>
       </div>

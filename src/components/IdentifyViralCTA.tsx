@@ -6,13 +6,15 @@ import { motion } from 'framer-motion';
 interface Props {
   /** Name of the user's personality result, for personalized text */
   personalityName: string;
+  variant?: 'default' | 'xpti';
 }
 
 /**
  * Lightweight viral CTA that appears on result pages.
  * Drives the A→B→A invitation loop via the identify feature.
  */
-export function IdentifyViralCTA({ personalityName }: Props) {
+export function IdentifyViralCTA({ personalityName, variant = 'default' }: Props) {
+  const isXpti = variant === 'xpti';
   return (
     <section className="max-w-2xl mx-auto px-6 pb-12">
       <motion.div
@@ -20,10 +22,14 @@ export function IdentifyViralCTA({ personalityName }: Props) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.55, duration: 0.4 }}
       >
-        <div className="rounded-2xl border border-pink-500/15 bg-gradient-to-r from-pink-500/5 to-rose-500/5 p-5 sm:p-6 flex items-center gap-4">
+        <div className={`rounded-2xl border p-5 sm:p-6 flex items-center gap-4 ${
+          isXpti
+            ? 'border-[#A3526E]/20 bg-gradient-to-r from-[#A3526E]/12 to-[#6A2A3E]/12'
+            : 'border-pink-500/15 bg-gradient-to-r from-pink-500/5 to-rose-500/5'
+        }`}>
           <div className="text-3xl flex-shrink-0">🔍</div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-semibold text-text-primary mb-0.5">
+            <h3 className={`text-sm font-semibold mb-0.5 ${isXpti ? 'text-[#F3E8EB]' : 'text-text-primary'}`}>
               你是{personalityName}，你朋友呢？
             </h3>
             <p className="text-xs text-text-muted">
@@ -32,7 +38,9 @@ export function IdentifyViralCTA({ personalityName }: Props) {
           </div>
           <Link
             href="/identify/"
-            className="flex-shrink-0 px-4 py-2 rounded-full bg-pink-500 text-white text-xs font-medium hover:bg-pink-600 transition-colors"
+            className={`flex-shrink-0 px-4 py-2 rounded-full text-white text-xs font-medium transition-colors ${
+              isXpti ? 'bg-[#C2485E] hover:bg-[#A53E58]' : 'bg-pink-500 hover:bg-pink-600'
+            }`}
           >
             帮 ta 鉴定
           </Link>

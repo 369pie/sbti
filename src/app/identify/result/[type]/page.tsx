@@ -56,7 +56,7 @@ export default async function IdentifyResultPage({ params }: PageProps) {
             {
               '@type': 'BreadcrumbList',
               itemListElement: [
-                { '@type': 'ListItem', position: 1, name: 'SBTI 人格测试', item: getSiteUrl('/') },
+                { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
                 { '@type': 'ListItem', position: 2, name: '好友鉴定器', item: getSiteUrl('/identify/') },
                 { '@type': 'ListItem', position: 3, name: persona.name, item: getSiteUrl(`/identify/result/${persona.slug}/`) },
               ],

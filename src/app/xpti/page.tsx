@@ -3,20 +3,20 @@ import { getSiteUrl } from '@/lib/site';
 import XptiHomeContent from './XptiHomeContent';
 
 export const metadata: Metadata = {
-  title: 'XPTI 恋爱XP体质测试 — 测测你在爱情里是什么体质',
+  title: 'XPTI 亲密偏好图谱测试 — 测测你在关系里你想要的是谁',
   description:
-    'XPTI 恋爱XP体质测试：4 大恋爱轴、大题池随机 20 题、16 种XP体质，三分钟测出你的恋爱DNA。MBTI 测你是什么人，XPTI 测你爱上什么人。',
-  keywords: ['XPTI', '恋爱XP体质', '恋爱人格', 'XP体质测试', '恋爱测试', '性格测试'],
+    'XPTI 亲密偏好图谱测试：9 大维度、54 题随机抽 27 题、12 种关系原型，三分钟照见你的靠近方式。MBTI 测你是什么人，XPTI 测你想要的是谁。',
+  keywords: ['XPTI', '亲密偏好图谱', '关系原型', '亲密关系测试', '性格测试', '恋爱测试'],
   alternates: { canonical: '/xpti/' },
   openGraph: {
-    title: 'XPTI 恋爱XP体质测试 — 测测你在爱情里是什么体质',
-    description: '4 大恋爱轴、大题池随机 20 题、16 种XP体质，三分钟测出你的恋爱DNA。',
+    title: 'XPTI 亲密偏好图谱测试 — 测测你在关系里你想要的是谁',
+    description: '9 大维度、54 题随机抽 27 题、12 种关系原型，三分钟照见你的靠近方式。',
     url: getSiteUrl('/xpti/'),
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'XPTI 恋爱XP体质测试 — 测测你在爱情里是什么体质',
-    description: '4 大恋爱轴、大题池随机 20 题、16 种XP体质，三分钟测出你的恋爱DNA。',
+    title: 'XPTI 亲密偏好图谱测试 — 测测你在关系里你想要的是谁',
+    description: '9 大维度、54 题随机抽 27 题、12 种关系原型，三分钟照见你的靠近方式。',
   },
 };
 
@@ -28,8 +28,8 @@ export default function XptiPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'WebPage',
-          name: 'XPTI 恋爱XP体质测试',
-          description: '4 大恋爱轴、大题池随机 20 题、16 种XP体质，三分钟测出你的恋爱DNA。',
+          name: 'XPTI 亲密偏好图谱测试',
+          description: '9 大维度、54 题随机抽 27 题、12 种关系原型，三分钟照见你的靠近方式。',
           url: getSiteUrl('/xpti/'),
           breadcrumb: {
             '@type': 'BreadcrumbList',

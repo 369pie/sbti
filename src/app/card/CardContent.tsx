@@ -10,12 +10,18 @@ import {
   calculateSimilarity, getComparisonRoast,
   CARD_UNIVERSE_IDS,
   type WtfCardData,
+  type RelationshipRecord,
 } from '@/lib/wtf-card';
 import { getUniverse } from '@/lib/universes';
 import { resolvePersonality } from '@/lib/personality-resolver';
 import { SHARE_SITE_URL } from '@/lib/site';
 import { WtfCardShareImageGenerator } from '@/components/WtfCardShareImageGenerator';
 import type { WtfCardShareImageGeneratorHandle } from '@/components/WtfCardShareImageGenerator';
+import {
+  CPTI_RELATIONSHIP_TYPES,
+  RELATIONSHIP_TIER_INFO,
+  type CptiRelationshipType,
+} from '@/lib/cpti/relationships';
 
 // ─── Badge component ─────────────────────────────────────
 
@@ -109,6 +115,132 @@ function ProgressRing({ lit, total }: { lit: number; total: number }) {
         <span className="text-[10px] text-text-muted">/ {total}</span>
       </div>
     </div>
+  );
+}
+
+// ─── Comparison view ─────────────────────────────────────
+
+function RelationshipCollection({
+  relationships,
+}: {
+  relationships: RelationshipRecord[];
+}) {
+  const collectedSlugs = new Set(relationships.map(r => r.slug));
+  const total = CPTI_RELATIONSHIP_TYPES.length;
+  const collected = collectedSlugs.size;
+
+  // Group all 25 types by tier
+  const tiers: { key: 'viral' | 'deep' | 'rare'; types: CptiRelationshipType[] }[] = [
+    { key: 'viral', types: CPTI_RELATIONSHIP_TYPES.filter(t => t.tier === 'viral') },
+    { key: 'deep', types: CPTI_RELATIONSHIP_TYPES.filter(t => t.tier === 'deep') },
+    { key: 'rare', types: CPTI_RELATIONSHIP_TYPES.filter(t => t.tier === 'rare') },
+  ];
+
+  // Find latest record for a given slug (for tooltip details)
+  const latestFor = (slug: string) =>
+    relationships.find(r => r.slug === slug);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.6 }}
+      className="mb-8"
+    >
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-text-primary flex items-center gap-1.5">
+          💕 CP关系图鉴
+        </h3>
+        <span className="text-xs font-mono text-text-muted">
+          {collected} / {total}
+        </span>
+      </div>
+
+      {collected === 0 ? (
+        <div className="rounded-2xl border border-dashed border-border bg-bg-secondary/30 p-6 text-center">
+          <div className="text-3xl mb-2 opacity-40">💕</div>
+          <p className="text-sm text-text-muted mb-3">
+            还没有收集到任何CP关系类型
+          </p>
+          <Link
+            href="/cpti/"
+            className="inline-flex items-center gap-1.5 text-sm text-rose-400 hover:text-rose-300 transition-colors"
+          >
+            去做CPTI测试 →
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {tiers.map(({ key, types }) => {
+            const tierInfo = RELATIONSHIP_TIER_INFO[key];
+            const tierCollected = types.filter(t => collectedSlugs.has(t.slug));
+            return (
+              <div key={key}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span
+                    className="inline-block w-1.5 h-1.5 rounded-full"
+                    style={{ background: tierInfo.color }}
+                  />
+                  <span className="text-xs font-medium" style={{ color: tierInfo.color }}>
+                    {tierInfo.label}
+                  </span>
+                  <span className="text-[10px] text-text-muted font-mono">
+                    {tierCollected.length}/{types.length}
+                  </span>
+                </div>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {types.map(relType => {
+                    const isCollected = collectedSlugs.has(relType.slug);
+                    const record = isCollected ? latestFor(relType.slug) : null;
+                    return (
+                      <div
+                        key={relType.slug}
+                        className={`relative group rounded-lg p-2 text-center transition-all ${
+                          isCollected
+                            ? 'bg-bg-elevated border border-border-subtle'
+                            : 'bg-bg-secondary/40 border border-dashed border-border/50 opacity-40'
+                        }`}
+                        title={
+                          isCollected && record
+                            ? `${relType.name} · ${record.partnerNickname} · ${record.compatibility}%`
+                            : relType.name
+                        }
+                      >
+                        <div className="text-lg leading-none">
+                          {isCollected ? relType.emoji : '?'}
+                        </div>
+                        <div className={`text-[9px] mt-1 leading-tight truncate ${
+                          isCollected ? 'text-text-secondary' : 'text-text-muted'
+                        }`}>
+                          {isCollected ? relType.name : '???'}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {collected > 0 && collected < total && (
+        <div className="mt-3 text-center">
+          <Link
+            href="/cpti/"
+            className="text-xs text-text-muted hover:text-rose-400 transition-colors"
+          >
+            邀请更多人测试，收集更多关系类型 →
+          </Link>
+        </div>
+      )}
+
+      {collected === total && (
+        <div className="mt-3 text-center">
+          <p className="text-xs text-rose-400">🎉 恭喜！集齐全部 {total} 种CP关系类型！</p>
+        </div>
+      )}
+    </motion.div>
   );
 }
 
@@ -411,6 +543,9 @@ export function CardContent() {
           />
         ))}
       </div>
+
+      {/* Relationship collection wall */}
+      <RelationshipCollection relationships={card.relationships ?? []} />
 
       {/* Share */}
       <motion.div

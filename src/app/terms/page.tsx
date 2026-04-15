@@ -3,17 +3,17 @@ import { getSiteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: '使用条款',
-  description: '查看 SBTI 人格测试的使用范围、结果性质、分享规范和免责声明。',
+  description: '查看 WTFTI 的使用范围、结果性质、分享规范和免责声明。',
   alternates: { canonical: '/terms/' },
   openGraph: {
-    title: '使用条款 — SBTI',
-    description: 'SBTI 人格测试的使用范围与免责声明。',
+    title: '使用条款 — WTFTI',
+    description: 'WTFTI 的使用范围与免责声明。',
     url: getSiteUrl('/terms/'),
   },
   twitter: {
     card: 'summary',
-    title: '使用条款 — SBTI',
-    description: 'SBTI 人格测试的使用范围与免责声明。',
+    title: '使用条款 — WTFTI',
+    description: 'WTFTI 的使用范围与免责声明。',
   },
 };
 
@@ -26,7 +26,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-xl font-medium text-text-primary mb-3">内容定位</h2>
           <p>
-            SBTI 旨在提供轻松的人格测试体验，适合娱乐、自我观察、朋友之间的比较和内容分享。站内结果不构成专业心理诊断、医疗建议或法律意见。
+            WTFTI 旨在提供轻松的人格测试与图鉴体验，包含经典 SBTI、主题宇宙和相关衍生玩法。站内结果适合娱乐、自我观察、朋友之间的比较和内容分享，不构成专业心理诊断、医疗建议或法律意见。
           </p>
         </section>
 

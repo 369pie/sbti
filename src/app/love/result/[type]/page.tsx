@@ -55,7 +55,7 @@ export default async function LoveResultPage({ params }: PageProps) {
             {
               '@type': 'BreadcrumbList',
               itemListElement: [
-                { '@type': 'ListItem', position: 1, name: 'SBTI 人格测试', item: getSiteUrl('/') },
+                { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
                 { '@type': 'ListItem', position: 2, name: '恋爱人格', item: getSiteUrl('/love/') },
                 { '@type': 'ListItem', position: 3, name: personality.name, item: getSiteUrl(`/love/result/${personality.slug}/`) },
               ],

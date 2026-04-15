@@ -2,8 +2,8 @@ import { XptiQuiz } from '@/components/XptiQuiz';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '开始测试 — XPTI 恋爱XP体质测试',
-  description: '从大题池随机抽 20 题，测出你的恋爱XP体质。4 大恋爱轴、16 种XP体质。',
+  title: '开始测试 — XPTI 亲密偏好图谱',
+  description: '从 54 题随机抽 27 题，测出你的关系原型。9 大维度、12 种关系原型。',
   robots: { index: false, follow: true },
 };
 

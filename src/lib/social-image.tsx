@@ -30,7 +30,7 @@ const featuredTypes = [
   { code: 'CHILL', label: '无所谓', background: 'linear-gradient(135deg, #22c55e 0%, #06b6d4 100%)' },
 ] as const;
 
-export const socialImageAlt = 'SBTI 人格测试预览图，使用中英双语展示测试信息';
+export const socialImageAlt = 'WTFTI 多宇宙人格测试预览图，展示平台品牌与测试亮点';
 
 export const socialImageSize = {
   width: 1200,
@@ -101,7 +101,7 @@ export async function createSocialImageResponse() {
               fontWeight: 600,
             }}
           >
-            SBTI
+            WTFTI
           </div>
 
           <div
@@ -121,7 +121,7 @@ export async function createSocialImageResponse() {
                 letterSpacing: '-0.04em',
               }}
             >
-              Find your type.
+              What&apos;s your type?
             </div>
             <div
               style={{
@@ -134,7 +134,7 @@ export async function createSocialImageResponse() {
                 fontWeight: 700,
               }}
             >
-              测测你是哪种抽象人格
+              WTFTI 多宇宙人格测试
             </div>
             <div
               style={{
@@ -145,7 +145,7 @@ export async function createSocialImageResponse() {
                 color: '#6B6560',
               }}
             >
-              5 models, 15 dimensions, 27 results.
+              10+ universes, 100+ types, endless versions of you.
             </div>
             <div
               style={{
@@ -157,7 +157,7 @@ export async function createSocialImageResponse() {
                 fontFamily: 'Noto Sans SC',
               }}
             >
-              五大模型 · 十五维度 · 二十七张人设卡
+              同一个你，在不同宇宙里会被翻译成完全不同的人设
             </div>
           </div>
         </div>
@@ -183,8 +183,8 @@ export async function createSocialImageResponse() {
                   color: '#e06088',
                 }}
               >
-                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>27 results</div>
-                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>27 张人设卡</div>
+                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>10+ universes</div>
+                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>多个主题宇宙</div>
               </div>
               <div
                 style={{
@@ -198,8 +198,8 @@ export async function createSocialImageResponse() {
                   color: '#0ea5c4',
                 }}
               >
-                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>15 dimensions</div>
-                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>15 个维度</div>
+                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>100+ types</div>
+                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>100+ 张人设卡</div>
               </div>
               <div
                 style={{
@@ -213,8 +213,8 @@ export async function createSocialImageResponse() {
                   color: '#0ea572',
                 }}
               >
-                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>Abstract quiz</div>
-                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>中文抽象人格测试</div>
+                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>WTF energy</div>
+                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>荒诞又上头</div>
               </div>
             </div>
             <div

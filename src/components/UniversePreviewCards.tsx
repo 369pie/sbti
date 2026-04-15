@@ -20,7 +20,7 @@ const UNIVERSE_TEASERS: Record<string, string> = {
   flower: '你像哪朵花？',
   delta: '你在战场是什么人设？',
   soulti: '向内看见你是什么？',
-  xpti: '你的恋爱XP是什么体质？',
+  xpti: '你的靠近方式是什么？',
 };
 
 interface Props {
@@ -28,6 +28,8 @@ interface Props {
   currentUniverse: string;
   /** Max number of preview cards to show */
   max?: number;
+  /** Optional visual variant for universe-specific pages */
+  variant?: 'default' | 'xpti';
 }
 
 /**
@@ -36,8 +38,9 @@ interface Props {
  * then shows the most enticing ones with themed styling.
  * Falls back to random universes if all are tested.
  */
-export function UniversePreviewCards({ currentUniverse, max = 3 }: Props) {
+export function UniversePreviewCards({ currentUniverse, max = 3, variant = 'default' }: Props) {
   const [cards, setCards] = useState<string[]>([]);
+  const isXpti = variant === 'xpti';
 
   useEffect(() => {
     const card = loadCard();
@@ -76,7 +79,7 @@ export function UniversePreviewCards({ currentUniverse, max = 3 }: Props) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.5 }}
       >
-        <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-4">
+        <h2 className={`text-sm font-mono tracking-wider uppercase text-center mb-4 ${isXpti ? 'text-[#A38A90]' : 'text-text-muted'}`}>
           解锁更多宇宙
         </h2>
         <div className="grid gap-3">
@@ -96,8 +99,8 @@ export function UniversePreviewCards({ currentUniverse, max = 3 }: Props) {
                   href={u.testPath}
                   className="group flex items-center gap-4 rounded-2xl border p-4 transition-all hover:shadow-md"
                   style={{
-                    borderColor: `${u.accent}25`,
-                    background: `${u.accent}06`,
+                    borderColor: isXpti ? `${u.accent}35` : `${u.accent}25`,
+                    background: isXpti ? `linear-gradient(140deg, ${u.accent}10 0%, rgba(26,12,17,0.92) 65%)` : `${u.accent}06`,
                   }}
                 >
                   <div

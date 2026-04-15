@@ -45,7 +45,7 @@ export function getSiteLabel(): string {
   const origin = getSiteOrigin();
 
   if (!origin) {
-    return siteBasePath ? siteBasePath.slice(1) : 'sbti';
+    return siteBasePath ? siteBasePath.slice(1) : 'wtfti';
   }
 
   const host = origin.replace(/^https?:\/\//, '');

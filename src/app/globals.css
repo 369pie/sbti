@@ -201,3 +201,18 @@ html {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* XPTI 专属夜间暧昧微醺暗黑主题 */
+.xpti-dark-theme {
+  --color-bg-primary: #0D0608 !important;
+  --color-bg-secondary: #20181A !important;
+  --color-bg-tertiary: #3D1A25 !important;
+  --color-bg-elevated: rgba(26,12,17,0.7) !important;
+  
+  --color-text-primary: #F3E8EB !important;
+  --color-text-secondary: #D4C5C9 !important;
+  --color-text-muted: #A38A90 !important;
+  
+  --color-border: rgba(163,82,110,0.3) !important;
+  --color-border-subtle: rgba(163,82,110,0.15) !important;
+}

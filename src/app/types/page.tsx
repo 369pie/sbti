@@ -8,19 +8,19 @@ import { getTypesGalleryData } from './gallery-data';
 const TYPES_GALLERY_DATA = getTypesGalleryData();
 
 export const metadata: Metadata = {
-  title: `SBTI 全人格图鉴馆 — ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡`,
+  title: `WTFTI 全人格图鉴馆 — ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡`,
   description:
-    `浏览 SBTI 全部 ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡：核心人格、修仙版、WTFTI、班TI、王者TI、三角TI、恋爱、职场、XPTI、花TI、今日状态、酒后人设，${TYPES_GALLERY_DATA.seriesCount} 个系列一次刷完。`,
-  keywords: ['SBTI人格图鉴', '人格类型大全', '人格图鉴馆', '抽象人设卡', 'SBTI全部类型', '人格测试类型'],
+    `浏览 WTFTI 全部 ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡：经典 SBTI、修仙版、WTFTI、班TI、王者TI、三角TI、恋爱、职场、XPTI、花TI、今日状态、酒后人设，${TYPES_GALLERY_DATA.seriesCount} 个系列一次刷完。`,
+  keywords: ['WTFTI人格图鉴', 'SBTI人格图鉴', '人格类型大全', '人格图鉴馆', '抽象人设卡', '人格测试类型'],
   alternates: { canonical: '/types/' },
   openGraph: {
-    title: `SBTI 全人格图鉴馆 — ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡`,
+    title: `WTFTI 全人格图鉴馆 — ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡`,
     description: `${TYPES_GALLERY_DATA.seriesCount} 个系列、${TYPES_GALLERY_DATA.totalCount} 张人设卡，一次刷完全部人格类型。`,
     url: getSiteUrl('/types/'),
   },
   twitter: {
     card: 'summary_large_image',
-    title: `SBTI 全人格图鉴馆 — ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡`,
+    title: `WTFTI 全人格图鉴馆 — ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡`,
     description: `${TYPES_GALLERY_DATA.seriesCount} 个系列、${TYPES_GALLERY_DATA.totalCount} 张人设卡，一次刷完。`,
   },
 };
@@ -33,13 +33,13 @@ export default function Page() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
-          name: `SBTI 全人格图鉴馆`,
+          name: `WTFTI 全人格图鉴馆`,
           description: `${TYPES_GALLERY_DATA.seriesCount} 个系列、${TYPES_GALLERY_DATA.totalCount} 张人设卡，一次刷完全部人格类型。`,
           url: getSiteUrl('/types/'),
           breadcrumb: {
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'SBTI', item: getSiteUrl('/') },
+              { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
               { '@type': 'ListItem', position: 2, name: '全人格图鉴馆', item: getSiteUrl('/types/') },
             ],
           },
@@ -72,7 +72,7 @@ export default function Page() {
           </h2>
           <div className="space-y-4 text-text-secondary leading-8 text-sm sm:text-base">
             <p>
-              SBTI 的人设卡不是随便起梗的标签列表，基础人格是五组切面、十五个维度的交叉组合；WTFTI 用同一套核心维度切进更毒舌的命名宇宙；班TI 再把这套人格翻译进办公室场景；恋爱、职场、今日状态、酒后人设各有独立维度模型。两个人看起来相似，最后也可能落到完全不同的卡上。
+              WTFTI 的人设卡不是随便起梗的标签列表。经典 SBTI 宇宙负责提供五组切面、十五个维度的基础人格底图；WTFTI 毒舌版用同一套核心维度切进更狠的命名宇宙；班TI 再把这套人格翻译进办公室场景；恋爱、职场、今日状态、酒后人设各有独立维度模型。两个人看起来相似，最后也可能落到完全不同的卡上。
             </p>
             <p>
               最顺手的打开方式：先刷一遍感兴趣的系列图鉴，再去做对应测试，然后回到结果页对照详细解读。比只看一个结果名更容易理解自己为什么会落到那个类型。

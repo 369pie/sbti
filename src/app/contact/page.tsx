@@ -5,18 +5,18 @@ import { withBasePath } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: '联系与社群',
-  description: '查看 SBTI 人格测试的社群入口、微信群与 QQ 群信息，获取反馈和交流渠道。',
-  keywords: ['SBTI社群', 'SBTI微信群', 'SBTI QQ群', '人格测试社群'],
+  description: '查看 WTFTI 的社群入口、微信群与 QQ 群信息，获取反馈和交流渠道。',
+  keywords: ['WTFTI社群', 'WTFTI微信群', 'WTFTI QQ群', '人格测试社群'],
   alternates: { canonical: '/contact/' },
   openGraph: {
-    title: '联系与社群 — SBTI',
-    description: '加入 SBTI 社群，和同类一起讨论人格测试结果。',
+    title: '联系与社群 — WTFTI',
+    description: '加入 WTFTI 社群，和同类一起讨论人格测试结果。',
     url: getSiteUrl('/contact/'),
   },
   twitter: {
     card: 'summary',
-    title: '联系与社群 — SBTI',
-    description: '加入 SBTI 社群，和同类一起讨论人格测试结果。',
+    title: '联系与社群 — WTFTI',
+    description: '加入 WTFTI 社群，和同类一起讨论人格测试结果。',
   },
 };
 
@@ -26,7 +26,7 @@ export default function ContactPage() {
       <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Contact</span>
       <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-4">联系与社群</h1>
       <p className="text-text-secondary leading-8 text-base mb-10">
-        如果你想反馈问题、一起讨论结果，或者单纯想找同类交流，可以直接加入 SBTI 社群。当前站点主要通过微信群和 QQ 群承接讨论。
+        如果你想反馈问题、一起讨论结果，或者单纯想找同类交流，可以直接加入 WTFTI 社群。当前站点主要通过微信群和 QQ 群承接讨论。
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -35,7 +35,7 @@ export default function ContactPage() {
           <div className="rounded-xl overflow-hidden bg-white p-2 inline-block">
             <NextImage
               src={withBasePath('/images/qr-wechat.png')}
-              alt="SBTI 微信交流群二维码"
+              alt="WTFTI 微信交流群二维码"
               width={220}
               height={220}
               unoptimized
@@ -51,7 +51,7 @@ export default function ContactPage() {
           <div className="rounded-xl overflow-hidden bg-bg-secondary p-2 inline-block">
             <NextImage
               src={withBasePath('/images/qr-qq.png')}
-              alt="SBTI QQ 群二维码"
+              alt="WTFTI QQ 群二维码"
               width={220}
               height={220}
               unoptimized

@@ -356,16 +356,16 @@ export const WtfCardShareImageGenerator = forwardRef<WtfCardShareImageGeneratorH
 
     return (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain bg-black/80 backdrop-blur-sm p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:items-center"
         onClick={() => setPreviewUrl(null)}
       >
         <div
-          className="relative w-full max-w-sm animate-in fade-in zoom-in-95 duration-200"
+          className="relative w-full max-w-sm max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain animate-in fade-in zoom-in-95 duration-200"
           onClick={e => e.stopPropagation()}
         >
           <button
             onClick={() => setPreviewUrl(null)}
-            className="absolute -top-11 -right-1 p-2 text-white/50 hover:text-white transition-colors z-10"
+            className="absolute top-3 right-3 rounded-full bg-black/55 p-2 text-white shadow-lg backdrop-blur-sm transition-colors hover:bg-black/70 z-10"
             aria-label="关闭"
           >
             <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

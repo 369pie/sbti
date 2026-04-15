@@ -21,10 +21,11 @@ const ALL_TESTS: TestRecommendation[] = [
   { id: 'cp', emoji: '🔮', title: 'CP 配对', hook: '拉好友来看你们配不配', href: '/cp', accent: '#a78bfa' },
   { id: 'squad', emoji: '🎪', title: '组局测试', hook: '看看你们这群人有多抽象', href: '/squad', accent: '#fb923c' },
   { id: 'combo', emoji: '🧩', title: '人格拼盘', hook: 'SBTI × MBTI × 星座三合一', href: '/combo', accent: '#a78bfa' },
-  { id: 'xpti', emoji: '💜', title: 'XPTI 恋爱XP', hook: '你的恋爱DNA是什么体质？', href: '/xpti', accent: '#c084fc' },
+  { id: 'xpti', emoji: '💜', title: 'XPTI 亲密偏好', hook: '你想要的是谁？', href: '/xpti', accent: '#c084fc' },
   { id: 'soulti', emoji: '🌙', title: 'SoulTI 自然人格', hook: '向内看见你是哪种自然力', href: '/soulti', accent: '#8b7355' },
   { id: 'flower', emoji: '🌸', title: '花TI 花格鉴定', hook: '测测你像自然界的哪朵花', href: '/flower', accent: '#e11d48' },
   { id: 'identify', emoji: '🔍', title: '好友鉴定器', hook: '帮你朋友鉴定ta是什么人格', href: '/identify', accent: '#ec4899' },
+  { id: 'cpti', emoji: '💗', title: 'CPTI 关系角色', hook: 'CPTI：你在关系里扮演什么角色？', href: '/cpti', accent: '#f43f5e' },
 ];
 
 interface Props {
@@ -34,10 +35,13 @@ interface Props {
   personalityName?: string;
   /** Max recommendations to show */
   max?: number;
+  /** Optional visual variant for universe-specific pages */
+  variant?: 'default' | 'xpti';
 }
 
-export function CrossTestRecommendations({ currentTest, personalityName, max = 4 }: Props) {
+export function CrossTestRecommendations({ currentTest, personalityName, max = 4, variant = 'default' }: Props) {
   const recommendations = ALL_TESTS.filter(t => t.id !== currentTest).slice(0, max);
+  const isXpti = variant === 'xpti';
 
   return (
     <section className="max-w-2xl mx-auto px-6 pb-10">
@@ -46,7 +50,7 @@ export function CrossTestRecommendations({ currentTest, personalityName, max = 4
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.5 }}
       >
-        <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
+        <h2 className={`text-sm font-mono tracking-wider uppercase mb-4 ${isXpti ? 'text-[#A38A90]' : 'text-text-muted'}`}>
           {personalityName ? `${personalityName}，再来一个？` : '不过瘾？再来一个'}
         </h2>
         <div className="grid grid-cols-2 gap-3">
@@ -55,13 +59,17 @@ export function CrossTestRecommendations({ currentTest, personalityName, max = 4
               key={test.id}
               href={test.href}
               prefetch={false}
-              className="group rounded-2xl border border-border-subtle hover:border-border bg-bg-elevated hover:shadow-md transition-all p-4 sm:p-5"
+              className={`group rounded-2xl border transition-all p-4 sm:p-5 ${
+                isXpti
+                  ? 'border-[#A3526E]/20 hover:border-[#A3526E]/40 bg-[#1A0C11] hover:shadow-md'
+                  : 'border-border-subtle hover:border-border bg-bg-elevated hover:shadow-md'
+              }`}
             >
               <div className="text-2xl mb-2">{test.emoji}</div>
-              <h3 className="text-sm font-semibold text-text-primary mb-1 group-hover:text-accent transition-colors">
+              <h3 className={`text-sm font-semibold mb-1 transition-colors ${isXpti ? 'text-[#F3E8EB]' : 'text-text-primary group-hover:text-accent'}`}>
                 {test.title}
               </h3>
-              <p className="text-xs text-text-muted leading-relaxed">{test.hook}</p>
+              <p className="text-xs leading-relaxed text-text-muted">{test.hook}</p>
             </Link>
           ))}
         </div>
