@@ -357,7 +357,7 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
         <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
           还有这些状态卡
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {others.map(s => (
             <Link
               key={s.slug}
@@ -367,11 +367,11 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
               <DailyStatusAvatar
                 status={s}
                 alt=""
-                sizes="64px"
-                className="relative w-16 h-16 rounded-lg overflow-hidden mb-2"
+                sizes="96px"
+                className="relative w-24 h-24 rounded-lg overflow-hidden mb-3"
                 style={{ background: `${s.color}15` }}
                 imageClassName="object-contain p-1"
-                fallbackClassName="w-full h-full flex items-center justify-center text-2xl"
+                fallbackClassName="w-full h-full flex items-center justify-center text-3xl"
               />
               <span className="text-xs font-mono tracking-wider block mb-1" style={{ color: s.color }}>
                 {s.code}

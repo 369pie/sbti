@@ -6,13 +6,28 @@ import { getLiveUniverses } from '@/lib/universes';
 
 // ─── Static data ─────────────────────────────────────────────────────────────
 
-const UNIVERSE_ITEMS = getLiveUniverses().map(u => ({
-  href: u.landingPath,
-  label: u.name,
-  emoji: u.emoji,
-  accent: u.accent,
-  desc: getUniverseDesc(u.id),
-}));
+const PRIORITY_UNIVERSE_IDS = ['cpti', 'xpti', 'soulti'] as const;
+
+const UNIVERSE_ITEMS = getLiveUniverses()
+  .map(u => ({
+    id: u.id,
+    href: u.landingPath,
+    label: u.name,
+    emoji: u.emoji,
+    accent: u.accent,
+    desc: getUniverseDesc(u.id),
+    featured: PRIORITY_UNIVERSE_IDS.includes(u.id as typeof PRIORITY_UNIVERSE_IDS[number]),
+  }))
+  .sort((a, b) => {
+    const aIndex = PRIORITY_UNIVERSE_IDS.indexOf(a.id as typeof PRIORITY_UNIVERSE_IDS[number]);
+    const bIndex = PRIORITY_UNIVERSE_IDS.indexOf(b.id as typeof PRIORITY_UNIVERSE_IDS[number]);
+    if (aIndex !== -1 || bIndex !== -1) {
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    }
+    return a.label.localeCompare(b.label, 'zh-Hans', { sensitivity: 'base' });
+  });
 
 function getUniverseDesc(id: string): string {
   const map: Record<string, string> = {
@@ -26,6 +41,8 @@ function getUniverseDesc(id: string): string {
     delta: '三角洲行动 × 人格联名',
     soulti: '镜像觉察 · 深度人格',
     xpti: '恋爱 XP 人格鉴定',
+    cpti: '恋爱情感与人格深度测评',
+    mysti: '用塔罗重新翻译你的人格',
   };
   return map[id] ?? '';
 }
@@ -134,7 +151,30 @@ export function Navigation() {
             </button>
             {universeDD.open && (
               <div className="nav-dropdown w-72 left-0">
-                {UNIVERSE_ITEMS.map(item => (
+                {UNIVERSE_ITEMS.filter(item => item.featured).map(item => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    prefetch={false}
+                    onClick={universeDD.close}
+                    className="nav-dropdown-item featured-nav-item"
+                  >
+                    <span className="text-2xl leading-none shrink-0">{item.emoji}</span>
+                    <span className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-text-primary">{item.label}</span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white bg-gradient-to-r from-pink-500 to-fuchsia-500">
+                          热推
+                        </span>
+                      </div>
+                      {item.desc && (
+                        <span className="block text-xs text-text-muted mt-0.5">{item.desc}</span>
+                      )}
+                    </span>
+                  </Link>
+                ))}
+                <div className="h-px bg-border-subtle my-2" />
+                {UNIVERSE_ITEMS.filter(item => !item.featured).map(item => (
                   <Link
                     key={item.href}
                     href={item.href}
@@ -243,10 +283,27 @@ export function Navigation() {
               </svg>
             </Link>
 
+            <MobileSection title="小姐姐热推" subtitle="CPTI / XPTI / SoulTI 最适合发小红书">
+              <div className="grid grid-cols-2 gap-2">
+                {UNIVERSE_ITEMS.filter(item => item.featured).map(item => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    prefetch={false}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-gradient-to-r from-pink-50 via-white to-fuchsia-50 text-text-primary shadow-sm"
+                  >
+                    <span className="text-lg leading-none">{item.emoji}</span>
+                    <span className="text-sm font-medium truncate">{item.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </MobileSection>
+
             {/* 测试宇宙 */}
             <MobileSection title="测试宇宙" subtitle="选择一个主题宇宙开始测试">
               <div className="grid grid-cols-2 gap-2">
-                {UNIVERSE_ITEMS.map(item => (
+                {UNIVERSE_ITEMS.filter(item => !item.featured).map(item => (
                   <Link
                     key={item.href}
                     href={item.href}

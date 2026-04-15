@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import { SOULTI_DIMENSIONS, SOULTI_MODEL_NAMES, SOULTI_MODEL_COLORS } from '@/lib/soulti/dimensions';
-import { SOULTI_PERSONALITY_TYPES, getSoultiRarity, getSoultiResonance, getSoultiPersonalityBySlug } from '@/lib/soulti/personalities';
+import { SOULTI_PERSONALITY_TYPES, getSoultiRarity, getSoultiResonance, getSoultiPersonalityBySlug, getSoultiTypeThumbnailImage } from '@/lib/soulti/personalities';
 import type { SoultiPersonalityType } from '@/lib/soulti/personalities';
 import type { SoultiDimensionScore } from '@/lib/soulti/scoring';
 import type { SoultiLayeredResult } from '@/lib/soulti/scoring';
@@ -160,6 +161,24 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
           <p className="text-xs tracking-[0.2em] text-[#7A6A5A] font-medium mb-8">
             你的自然人格是
           </p>
+
+          {/* Hero character image */}
+          <div
+            className="w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 mx-auto mb-8 rounded-3xl overflow-hidden flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, ${personality.color}08 0%, ${personality.color}12 100%)`,
+              border: `1px solid ${personality.color}20`,
+            }}
+          >
+            <NextImage
+              src={getSoultiTypeThumbnailImage(personality.slug)}
+              alt={personality.name}
+              fill
+              sizes="(max-width: 768px) 224px, 288px"
+              className="object-contain drop-shadow-lg"
+              priority
+            />
+          </div>
 
           {/* Type code — large serif, single line */}
           <h1

@@ -1,4 +1,5 @@
-import { CptiQuiz } from '@/components/CptiQuiz';
+import { Suspense } from 'react';
+import { CptiQuizWrapper } from '@/components/CptiQuizWrapper';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,5 +9,15 @@ export const metadata: Metadata = {
 };
 
 export default function CptiTestPage() {
-  return <CptiQuiz />;
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center">
+          <div className="w-5 h-5 rounded-full border-2 border-accent border-t-transparent animate-spin" />
+        </div>
+      }
+    >
+      <CptiQuizWrapper />
+    </Suspense>
+  );
 }

@@ -9,13 +9,14 @@ import { CPTI_PEER_QUESTIONS, shuffleCptiPeerQuestions } from '@/lib/cpti/peer-q
 import type { CptiPeerQuestion } from '@/lib/cpti/peer-questions';
 import { CPTI_STEALTH_QUESTIONS, shuffleCptiStealthQuestions } from '@/lib/cpti/stealth-questions';
 import { calculateCptiResult } from '@/lib/cpti/scoring';
-import type { Answer, CptiDimensionScore } from '@/lib/cpti/scoring';
+import type { Answer } from '@/lib/cpti/scoring';
 import { matchRelationship } from '@/lib/cpti/relationship-matching';
-import { encodeCptiInvite, type CptiInviteData } from '@/lib/cpti/cpti-invite';
+import type { CptiInviteData } from '@/lib/cpti/cpti-invite';
 import { saveCptiProfile, loadCptiProfile } from '@/lib/cpti/cpti-profile';
 import { CPTI_MODEL_NAMES, CPTI_MODEL_COLORS } from '@/lib/cpti/dimensions';
-import { basePath, getSiteUrl } from '@/lib/site';
+import { basePath } from '@/lib/site';
 import { recordUniverseResult, recordRelationship } from '@/lib/wtf-card';
+import { cptiApi } from '@/lib/cpti/cpti-api';
 
 const emptySubscribe = () => () => {};
 
@@ -34,12 +35,12 @@ interface CptiQuizProps {
   inviteData?: CptiInviteData | null;
   /** Nickname of the target person (only for 'stealth' mode) */
   targetNickname?: string;
+  /** Pair code ID for server-side paired flow (from /cpti/join) */
+  pairCodeId?: string;
 }
 
-export function CptiQuiz({ mode: initialMode = 'solo', inviteData, targetNickname }: CptiQuizProps = {}) {
+export function CptiQuiz({ mode: initialMode = 'solo', inviteData, targetNickname, pairCodeId }: CptiQuizProps = {}) {
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
-
-  const [phase, setPhase] = useState<'quiz'>('quiz');
 
   const isPeerMode = initialMode === 'peer' && inviteData;
   const isStealthMode = initialMode === 'stealth';
@@ -91,6 +92,14 @@ export function CptiQuiz({ mode: initialMode = 'solo', inviteData, targetNicknam
     };
   }, []);
 
+  const storeRelationshipResult = useCallback((data: Record<string, unknown>) => {
+    try {
+      sessionStorage.setItem('cpti-relationship', JSON.stringify(data));
+    } catch {
+      // ignore storage failures
+    }
+  }, []);
+
   // ── Finish: self-assessment done ──
   const finishSelfTest = useCallback((finalAnswers: Map<number, Answer>) => {
     if (isFinishingRef.current) return;
@@ -103,6 +112,27 @@ export function CptiQuiz({ mode: initialMode = 'solo', inviteData, targetNicknam
     // Save profile to localStorage for future invite/stealth use
     saveCptiProfile(result.personality.slug, result.dimensions);
 
+    // Also persist to backend DB (fire-and-forget, don't block navigation)
+    const source = pairCodeId ? 'pair_flow' : 'self_test';
+    cptiApi
+      .bootstrap()
+      .then(() =>
+        cptiApi.saveProfile({
+          personalitySlug: result.personality.slug,
+          dimensionScores: result.dimensions,
+          source,
+        }),
+      )
+      .then(() => {
+        // If paired flow, start a match linked to the pair code
+        if (pairCodeId) {
+          return cptiApi.startMatch({ pairCodeId });
+        }
+      })
+      .catch((err) => {
+        console.warn('[CPTI] Failed to save profile to backend:', err);
+      });
+
     // Write CPTI personality to WTF Card
     recordUniverseResult('cpti', result.personality.slug);
 
@@ -114,7 +144,7 @@ export function CptiQuiz({ mode: initialMode = 'solo', inviteData, targetNicknam
     finishTimeoutRef.current = window.setTimeout(() => {
       window.location.href = `${basePath}/cpti/result/${encodeURIComponent(result.personality.slug)}/`;
     }, 800);
-  }, []);
+  }, [pairCodeId]);
 
   // ── Finish: peer-assessment done ──
   const finishPeerTest = useCallback((finalAnswers: Map<number, Answer>) => {
@@ -168,7 +198,7 @@ export function CptiQuiz({ mode: initialMode = 'solo', inviteData, targetNicknam
     finishTimeoutRef.current = window.setTimeout(() => {
       window.location.href = `${basePath}/cpti/relationship/`;
     }, 800);
-  }, [inviteData]);
+  }, [inviteData, storeRelationshipResult]);
 
   // ── Finish: stealth assessment done ──
   const finishStealthTest = useCallback((finalAnswers: Map<number, Answer>) => {
@@ -220,13 +250,7 @@ export function CptiQuiz({ mode: initialMode = 'solo', inviteData, targetNicknam
     finishTimeoutRef.current = window.setTimeout(() => {
       window.location.href = `${basePath}/cpti/relationship/`;
     }, 800);
-  }, [targetNickname]);
-
-  function storeRelationshipResult(data: Record<string, unknown>) {
-    try {
-      sessionStorage.setItem('cpti-relationship', JSON.stringify(data));
-    } catch { /* ignore */ }
-  }
+  }, [storeRelationshipResult, targetNickname]);
 
   const handleAnswer = useCallback((questionId: number, value: Answer) => {
     if (!currentQ) return;

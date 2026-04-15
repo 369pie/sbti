@@ -16,9 +16,13 @@ import type { CptiPersonalityType } from '@/lib/cpti/personalities';
 import type { CptiDimensionScore } from '@/lib/cpti/scoring';
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
+import { trackCptiEvent } from '@/lib/cpti/analytics';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { loadCptiProfile } from '@/lib/cpti/cpti-profile';
 import { encodeCptiInvite } from '@/lib/cpti/cpti-invite';
+import { cptiApi } from '@/lib/cpti/cpti-api';
+import { ClaimAssetCard } from '@/components/ClaimAssetCard';
+import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 
 interface Props {
   personality: CptiPersonalityType;
@@ -47,8 +51,9 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
   const copyLink = useCallback(() => {
     navigator.clipboard.writeText(shareUrl);
     setCopied(true);
+    trackCptiEvent('cpti_pair_code_copied', { personality: personality.slug, method: 'link' });
     setTimeout(() => setCopied(false), 2000);
-  }, [shareUrl]);
+  }, [shareUrl, personality.slug]);
 
   const quickShare = useCallback(async () => {
     if (navigator.share) {
@@ -127,22 +132,28 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
             {/* Hero image */}
             {heroImageMode === 'emoji' ? (
               <div
-                className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-6 rounded-2xl flex items-center justify-center text-7xl sm:text-8xl"
-                style={{ background: `${personality.color}15` }}
+                className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mx-auto mb-8 rounded-[2rem] flex items-center justify-center text-9xl"
+                style={{
+                  background: `linear-gradient(135deg, ${personality.color}08 0%, ${personality.color}1a 100%)`,
+                  boxShadow: `0 24px 80px -24px ${personality.color}45, inset 0 0 0 1px ${personality.color}20`,
+                }}
               >
                 {personality.emoji}
               </div>
             ) : (
               <div
-                className="relative w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-6 rounded-2xl overflow-hidden"
-                style={{ background: `${personality.color}10` }}
+                className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mx-auto mb-8 rounded-[2rem] overflow-hidden flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${personality.color}08 0%, ${personality.color}1a 100%)`,
+                  boxShadow: `0 24px 80px -24px ${personality.color}45, inset 0 0 0 1px ${personality.color}20`,
+                }}
               >
                 <NextImage
                   src={heroImageSrc}
                   alt={personality.name}
                   fill
-                  sizes="(max-width: 640px) 160px, 192px"
-                  className="object-contain p-2"
+                  sizes="(max-width: 768px) 256px, 384px"
+                  className="object-contain drop-shadow-2xl w-[88%] h-[88%]"
                   priority
                   onError={handleHeroImageError}
                 />
@@ -246,6 +257,31 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
 
       <CrossTestRecommendations currentTest="cpti" personalityName={personality.name} />
 
+      {/* Claim Asset Card */}
+      <section className="max-w-2xl mx-auto px-6 pb-16">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+        >
+          <ClaimAssetCard
+            variant="result"
+            payload={{
+              personalitySlug: personality.slug,
+              dimensionScores,
+              source: 'self_test',
+            }}
+            onClaim={() => {
+              trackCptiEvent('cpti_profile_saved', {
+                personality: personality.slug,
+                claimedVia: 'result_page',
+              });
+            }}
+            onIdleSecondaryAction={quickShare}
+          />
+        </motion.div>
+      </section>
+
       {/* Share section */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
         <motion.div
@@ -305,12 +341,22 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
         </motion.div>
       </section>
 
+      {/* Leaderboard link */}
+      <div className="max-w-2xl mx-auto px-6 pb-10 text-center">
+        <Link
+          href="/cpti/leaderboard"
+          className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-accent transition-colors"
+        >
+          🏆 查看关系图鉴排行榜 →
+        </Link>
+      </div>
+
       {/* Other types */}
       <section className="max-w-3xl mx-auto px-6 pb-24">
         <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
           还可以看看其他CP角色
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {others.map(p => (
             <Link
               key={p.slug}
@@ -319,21 +365,21 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
             >
               {(otherImageModes[p.slug] ?? 'thumb') === 'emoji' ? (
                 <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center text-xl mb-2"
+                  className="w-24 h-24 rounded-lg flex items-center justify-center text-4xl mb-3"
                   style={{ background: `${p.color}15` }}
                 >
                   {p.emoji}
                 </div>
               ) : (
                 <div
-                  className="relative w-10 h-10 rounded-lg overflow-hidden mb-2"
+                  className="relative w-24 h-24 rounded-lg overflow-hidden mb-3"
                   style={{ background: `${p.color}10` }}
                 >
                   <NextImage
                     src={getOtherTypeImageSrc(p.slug)}
                     alt={p.name}
                     fill
-                    sizes="40px"
+                    sizes="96px"
                     className="object-contain p-1"
                     onError={() => handleOtherTypeImageError(p.slug)}
                   />
@@ -347,6 +393,8 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
           ))}
         </div>
       </section>
+
+      <UniversePreviewCards currentUniverse="cpti" />
     </div>
   );
 }
@@ -357,6 +405,10 @@ function InviteAndStealthCTA({ personality }: { personality: CptiPersonalityType
   const [inviteLink, setInviteLink] = useState('');
   const [inviteCopied, setInviteCopied] = useState(false);
   const [showInvitePanel, setShowInvitePanel] = useState(false);
+  const [pairCode, setPairCode] = useState('');
+  const [pairCodeCopied, setPairCodeCopied] = useState(false);
+  const [pairCodeLinkCopied, setPairCodeLinkCopied] = useState(false);
+  const [isGeneratingPairCode, setIsGeneratingPairCode] = useState(false);
 
   const generateInviteLink = useCallback(() => {
     const profile = loadCptiProfile();
@@ -388,6 +440,40 @@ function InviteAndStealthCTA({ personality }: { personality: CptiPersonalityType
     }
     copyInviteLink();
   }, [inviteLink, copyInviteLink, personality.code, personality.name]);
+
+  const generatePairCode = useCallback(async () => {
+    if (isGeneratingPairCode) return;
+    setIsGeneratingPairCode(true);
+    try {
+      const profile = loadCptiProfile();
+      await cptiApi.bootstrap();
+      const result = await cptiApi.createPairCode({
+        mode: 'direct',
+        personalitySlug: profile?.slug,
+        dimensionScores: profile?.dimensions,
+        source: 'self_test',
+      });
+      setPairCode(result.code);
+    } catch (err) {
+      console.warn('[CPTI] Failed to generate pair code:', err);
+    } finally {
+      setIsGeneratingPairCode(false);
+    }
+  }, [isGeneratingPairCode]);
+
+  const copyPairCode = useCallback(() => {
+    navigator.clipboard.writeText(pairCode);
+    setPairCodeCopied(true);
+    setTimeout(() => setPairCodeCopied(false), 2000);
+  }, [pairCode]);
+
+  const pairCodeLink = pairCode ? getSiteUrl(`/cpti/invite/?pairCode=${pairCode}`) : '';
+
+  const copyPairCodeLink = useCallback(() => {
+    navigator.clipboard.writeText(pairCodeLink);
+    setPairCodeLinkCopied(true);
+    setTimeout(() => setPairCodeLinkCopied(false), 2000);
+  }, [pairCodeLink]);
 
   return (
     <div className="space-y-3">
@@ -450,6 +536,66 @@ function InviteAndStealthCTA({ personality }: { personality: CptiPersonalityType
                 分享给ta
               </button>
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Pair Code CTA */}
+      <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 sm:p-8 text-center">
+        <div className="text-3xl mb-3">🔗</div>
+        <h3 className="text-lg font-semibold mb-2">快速配对码</h3>
+        <p className="text-sm text-text-muted mb-4">
+          生成一个6位配对码，让对方直接输入配对
+          <br />
+          无需发送链接，更方便快捷
+        </p>
+
+        {!pairCode ? (
+          <button
+            onClick={generatePairCode}
+            disabled={isGeneratingPairCode}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-500 text-white font-medium text-sm hover:bg-amber-600 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isGeneratingPairCode ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                生成中...
+              </>
+            ) : (
+              <>
+                生成配对码
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </>
+            )}
+          </button>
+        ) : (
+          <div className="space-y-3">
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-4xl font-mono font-bold tracking-[0.3em] text-amber-500">
+                {pairCode}
+              </span>
+            </div>
+            <p className="text-xs text-text-muted">把这个配对码发给对方</p>
+            <button
+              onClick={copyPairCode}
+              className="w-full py-3 rounded-xl border border-amber-500/30 text-sm text-amber-400 hover:bg-amber-500/10 transition-all cursor-pointer"
+            >
+              {pairCodeCopied ? '已复制 ✓' : '📋 复制配对码'}
+            </button>
+            <div className="rounded-xl border border-border-subtle bg-bg-elevated p-3">
+              <div className="text-xs text-text-muted text-left mb-1">配对链接</div>
+              <div className="text-xs text-text-secondary break-all text-left font-mono leading-relaxed">
+                {pairCodeLink}
+              </div>
+            </div>
+            <button
+              onClick={copyPairCodeLink}
+              className="w-full py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all cursor-pointer"
+            >
+              {pairCodeLinkCopied ? '已复制 ✓' : '📋 复制配对链接'}
+            </button>
           </div>
         )}
       </div>

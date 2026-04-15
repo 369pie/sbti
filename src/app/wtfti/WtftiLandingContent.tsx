@@ -139,6 +139,32 @@ export default function WtftiLandingContent() {
         </div>
       </section>
 
+      {/* Mysti Switch */}
+      <section className="px-6 pb-4 pt-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="rounded-2xl border border-violet-500/20 bg-violet-500/5 p-6 sm:p-8 animate-fade-up">
+            <span className="text-xs font-mono tracking-[0.2em] text-violet-500 uppercase block mb-3">Mysti</span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">
+              🔮 灵鉴 — 用塔罗重新翻译你的人格
+            </h2>
+            <p className="text-text-secondary leading-relaxed max-w-2xl">
+              同一套 WTFTI 人格内核，换一种神秘视角再看一次。29 种 WTF 人格各自对应一张灵魂塔罗。
+            </p>
+            <div className="flex flex-col sm:flex-row items-center gap-3 mt-6">
+              <Link
+                href="/mysti/"
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-violet-500 text-white font-medium text-sm hover:bg-violet-600 transition-all"
+              >
+                进入灵鉴
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Gallery Preview */}
       <section className="py-16 px-6">
         <div className="max-w-3xl mx-auto">

@@ -27,7 +27,10 @@ export function KingsTypeArt({
   return (
     <div
       className={containerClassName}
-      style={{ background: `${personality.color}10` }}
+      style={{
+        background: `linear-gradient(135deg, ${personality.color}08 0%, ${personality.color}1a 100%)`,
+        boxShadow: `0 24px 80px -24px ${personality.color}45, inset 0 0 0 1px ${personality.color}20`,
+      }}
     >
       {failed ? (
         <span className={emojiClassName}>{personality.emoji}</span>
@@ -35,8 +38,8 @@ export function KingsTypeArt({
         <NextImage
           src={getKingsTypeImage(personality.slug)}
           alt={alt ?? personality.heroName}
-          width={320}
-          height={320}
+          width={400}
+          height={400}
           className={imageClassName}
           priority={priority}
           onError={() => setFailed(true)}

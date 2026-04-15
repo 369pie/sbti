@@ -13,6 +13,8 @@ import { BIRD_PERSONALITIES } from './bird/personalities';
 import { getFlowerPersonalityBySlug } from './flower/personalities';
 import { getSoultiPersonalityBySlug } from './soulti/personalities';
 import { getXptiPersonalityBySlug } from './xpti/personalities';
+import { getFengPersonality } from './feng/personalities';
+import { getCptiPersonalityBySlug } from './cpti/personalities';
 
 export interface ResolvedPersonality {
   name: string;
@@ -39,6 +41,10 @@ export function resolvePersonality(universeId: string, slug: string): ResolvedPe
       const p = getBantiPersonality(slug);
       return p ? { name: p.workName, emoji: p.emoji } : null;
     }
+    case 'feng': {
+      const p = getFengPersonality(slug);
+      return p ? { name: p.fengName, emoji: p.emoji } : null;
+    }
     case 'kings': {
       const p = getKingsPersonality(slug);
       return p ? { name: p.heroName, emoji: p.emoji } : null;
@@ -61,6 +67,10 @@ export function resolvePersonality(universeId: string, slug: string): ResolvedPe
     }
     case 'xpti': {
       const p = getXptiPersonalityBySlug(slug);
+      return p ? { name: p.name, emoji: p.emoji } : null;
+    }
+    case 'cpti': {
+      const p = getCptiPersonalityBySlug(slug);
       return p ? { name: p.name, emoji: p.emoji } : null;
     }
     default:

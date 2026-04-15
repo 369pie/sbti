@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node scripts/generate-gallery-thumbnails.mjs && next dev --webpack",
     "dev:turbo": "node scripts/generate-gallery-thumbnails.mjs && next dev",
-    "build": "node scripts/generate-gallery-thumbnails.mjs && next build",
+    "build": "node scripts/generate-gallery-thumbnails.mjs && node scripts/build-export.mjs",
     "images:thumbs": "node scripts/generate-gallery-thumbnails.mjs",
     "images:banti-launch": "node scripts/generate-banti-launch.mjs",
     "start": "next start",
@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "@fontsource/noto-sans-sc": "^5.2.9",
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.103.2",
     "@vercel/analytics": "^2.0.1",
     "framer-motion": "^12.38.0",
     "html-to-image": "^1.11.13",

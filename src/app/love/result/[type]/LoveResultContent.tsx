@@ -12,6 +12,7 @@ import type { LoveDimensionScore } from '@/lib/love/scoring';
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 
 interface Props {
   personality: LovePersonalityType;
@@ -92,11 +93,14 @@ export function LoveResultContent({ personality, dimensionScores }: Props) {
               personality={personality}
               alt={`${personality.name}形象`}
               priority
-              sizes="192px"
-              className="relative w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-6 rounded-2xl overflow-hidden"
-              style={{ background: `${personality.color}15` }}
-              imageClassName="object-contain p-2"
-              fallbackClassName="w-full h-full flex items-center justify-center text-7xl"
+              sizes="384px"
+              className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mx-auto mb-8 rounded-[2rem] overflow-hidden flex items-center justify-center"
+              style={{
+                background: `linear-gradient(135deg, ${personality.color}08 0%, ${personality.color}1a 100%)`,
+                boxShadow: `0 24px 80px -24px ${personality.color}45, inset 0 0 0 1px ${personality.color}20`,
+              }}
+              imageClassName="object-contain drop-shadow-2xl w-[88%] h-[88%]"
+              fallbackClassName="w-full h-full flex items-center justify-center text-8xl"
             />
 
             {/* Code */}
@@ -249,7 +253,7 @@ export function LoveResultContent({ personality, dimensionScores }: Props) {
         <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
           还可以看看其他恋爱人设
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {others.map(p => (
             <Link
               key={p.slug}
@@ -259,8 +263,8 @@ export function LoveResultContent({ personality, dimensionScores }: Props) {
               <LovePersonalityAvatar
                 personality={p}
                 alt=""
-                sizes="40px"
-                className="relative w-10 h-10 rounded-lg overflow-hidden mb-2"
+                sizes="72px"
+                className="relative w-18 h-18 rounded-lg overflow-hidden mb-2"
                 style={{ background: `${p.color}15` }}
                 imageClassName="object-contain p-1"
                 fallbackClassName="w-full h-full flex items-center justify-center text-xl"
@@ -273,6 +277,8 @@ export function LoveResultContent({ personality, dimensionScores }: Props) {
           ))}
         </div>
       </section>
+
+      <UniversePreviewCards currentUniverse="love" />
     </div>
   );
 }

@@ -95,8 +95,8 @@ export function BirdResultContent({ birdPersonality: p, dimensionScores }: Props
             <BirdTypeArt
               personality={p}
               alt={`${p.birdName}·${p.birdTitle}`}
-              containerClassName="w-48 h-48 sm:w-56 sm:h-56 mx-auto mb-6 rounded-2xl overflow-hidden flex items-center justify-center"
-              imageClassName="w-[85%] h-[85%] object-contain drop-shadow-lg"
+              containerClassName="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mx-auto mb-8 rounded-[2rem] overflow-hidden flex items-center justify-center"
+              imageClassName="w-[88%] h-[88%] object-contain drop-shadow-2xl"
               emojiClassName="text-7xl sm:text-8xl"
               priority
             />
@@ -297,9 +297,9 @@ export function BirdResultContent({ birdPersonality: p, dimensionScores }: Props
                 <BirdTypeArt
                   personality={o}
                   alt={o.birdTitle}
-                  containerClassName="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden"
-                  imageClassName="w-[82%] h-[82%] object-contain"
-                  emojiClassName="text-xl"
+                  containerClassName="w-20 h-20 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden"
+                  imageClassName="w-[87%] h-[87%] object-contain"
+                  emojiClassName="text-lg"
                 />
                 <div className="min-w-0">
                   <div className="font-medium text-sm text-text-primary truncate">{o.birdName}·{o.birdTitle}</div>

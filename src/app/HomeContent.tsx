@@ -8,6 +8,8 @@ import { WtfCardBanner } from '@/components/WtfCardBanner';
 
 // ─── Universe descriptions for the hub cards ─────────────────────────────────
 
+const PRIORITY_UNIVERSE_IDS = ['cpti', 'xpti', 'soulti'] as const;
+
 const UNIVERSE_CARDS: Record<string, { tagline: string; stats: string }> = {
   standard: { tagline: '经典 15 维 × 27 种人格基线', stats: '27 种 · ~32 题' },
   xiuxian: { tagline: '修仙体质 × 人格维度', stats: '27 种 · ~32 题' },
@@ -19,6 +21,8 @@ const UNIVERSE_CARDS: Record<string, { tagline: string; stats: string }> = {
   delta: { tagline: '三角洲行动 × 人格联名', stats: '29 种 · ~32 题' },
   soulti: { tagline: '觉察深层自我 · 文艺内省版', stats: '16 种 · 20 题' },
   xpti: { tagline: '亲密偏好图谱 · 你想要的是谁', stats: '12 种 · 随机27题' },
+  cpti: { tagline: '恋爱情感 & 人格深度测评', stats: '12 种 · 24 题' },
+  mysti: { tagline: '用塔罗重新翻译你的人格', stats: '29 种 · ~32 题' },
 };
 
 const FUN_ITEMS = [
@@ -34,6 +38,9 @@ const FUN_ITEMS = [
   { href: '/puzzle/', emoji: '🧩', label: '闺蜜拼图', desc: '四人人格拼图' },
   { href: '/share-templates/', emoji: '📕', label: '分享文案', desc: '一键复制发小红书' },
 ];
+
+const PRIORITY_FUN_ITEMS = FUN_ITEMS.slice(0, 3);
+const OTHER_FUN_ITEMS = FUN_ITEMS.slice(3);
 
 const FAQS = [
   {
@@ -62,6 +69,8 @@ const FEATURED = PERSONALITY_TYPES.slice(0, 6);
 
 export default function HomeContent() {
   const universes = getLiveUniverses();
+  const priorityUniverses = universes.filter(u => PRIORITY_UNIVERSE_IDS.includes(u.id as typeof PRIORITY_UNIVERSE_IDS[number]));
+  const otherUniverses = universes.filter(u => !PRIORITY_UNIVERSE_IDS.includes(u.id as typeof PRIORITY_UNIVERSE_IDS[number]));
 
   return (
     <div className="min-h-screen">
@@ -117,6 +126,34 @@ export default function HomeContent() {
                 先刷 27 张人设卡
               </Link>
             </div>
+          </div>
+
+          {/* Priority universes preview */}
+          <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-3 animate-fade-up-delay-2">
+            {priorityUniverses.map((u, i) => {
+              const meta = UNIVERSE_CARDS[u.id];
+              return (
+                <Link
+                  key={u.id}
+                  href={u.landingPath}
+                  prefetch={false}
+                  className="group block rounded-3xl border border-pink-100 bg-gradient-to-br from-pink-50 via-white to-fuchsia-50 p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                  style={{ animationDelay: `${i * 80}ms` }}
+                >
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <div>
+                      <div className="text-xs uppercase tracking-[0.3em] text-pink-600 font-semibold mb-2">热推</div>
+                      <h3 className="text-lg font-semibold text-text-primary">{u.name}</h3>
+                    </div>
+                    <span className="text-3xl">{u.emoji}</span>
+                  </div>
+                  <p className="text-sm text-text-secondary leading-relaxed mb-4">{meta?.tagline}</p>
+                  <div className="inline-flex items-center gap-2 text-xs text-white font-semibold px-3 py-1 rounded-full" style={{ background: u.accent }}>
+                    {meta?.stats}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
 
           {/* Stats */}
@@ -206,20 +243,47 @@ export default function HomeContent() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {FUN_ITEMS.map((item, i) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                prefetch={false}
-                className="animate-fade-up group block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-md transition-all p-5 text-center"
-                style={{ animationDelay: `${i * 50}ms` }}
-              >
-                <div className="text-3xl mb-3">{item.emoji}</div>
-                <h3 className="font-medium text-text-primary text-sm">{item.label}</h3>
-                <p className="text-xs text-text-muted mt-1">{item.desc}</p>
-              </Link>
-            ))}
+          {/* Priority fun items */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+              <span className="text-pink-500">💖</span>
+              恋爱 & 分享必玩
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {PRIORITY_FUN_ITEMS.map((item, i) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  prefetch={false}
+                  className="animate-fade-up group block rounded-3xl border border-pink-100 bg-gradient-to-br from-pink-50 via-white to-fuchsia-50 p-6 text-center shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
+                  style={{ animationDelay: `${i * 80}ms` }}
+                >
+                  <div className="text-4xl mb-4">{item.emoji}</div>
+                  <h3 className="font-semibold text-text-primary text-base mb-2">{item.label}</h3>
+                  <p className="text-sm text-text-muted">{item.desc}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Other fun items */}
+          <div>
+            <h3 className="text-lg font-semibold text-text-primary mb-4">其他玩法</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+              {OTHER_FUN_ITEMS.map((item, i) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  prefetch={false}
+                  className="animate-fade-up group block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-md transition-all p-5 text-center"
+                  style={{ animationDelay: `${i * 50}ms` }}
+                >
+                  <div className="text-3xl mb-3">{item.emoji}</div>
+                  <h3 className="font-medium text-text-primary text-sm">{item.label}</h3>
+                  <p className="text-xs text-text-muted mt-1">{item.desc}</p>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>

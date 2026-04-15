@@ -604,7 +604,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
           还可以看看其他人格
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {others.map(p => {
             const r = getRarity(p.slug);
             return (
@@ -613,12 +613,12 @@ export function ResultContent({ personality, dimensionScores }: Props) {
               href={`/result/${p.slug}${skinQuery}`}
               className="group rounded-2xl border border-border-subtle hover:border-border bg-bg-elevated hover:shadow-md transition-all p-4"
             >
-              <div className="w-16 h-16 rounded-lg overflow-hidden mb-2" style={{ background: `${p.color}15` }}>
+              <div className="w-28 h-28 rounded-lg overflow-hidden mb-3" style={{ background: `${p.color}15` }}>
                 <NextImage
                   src={getOtherTypeImageSrc(p.slug)}
                   alt={p.name}
-                  width={64}
-                  height={64}
+                  width={112}
+                  height={112}
                   className="w-full h-full object-contain p-1"
                   onError={() => handleOtherTypeImageError(p.slug)}
                 />

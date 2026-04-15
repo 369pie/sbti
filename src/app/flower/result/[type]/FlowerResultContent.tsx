@@ -104,15 +104,18 @@ export function FlowerResultContent({ personality, dimensionScores }: Props) {
 
             {/* Type image */}
             <div
-              className="w-36 h-36 sm:w-44 sm:h-44 mx-auto mb-6 rounded-3xl overflow-hidden"
-              style={{ background: `${personality.color}12` }}
+              className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mx-auto mb-8 rounded-[2rem] overflow-hidden flex items-center justify-center"
+              style={{
+                background: `linear-gradient(135deg, ${personality.color}08 0%, ${personality.color}1a 100%)`,
+                boxShadow: `0 24px 80px -24px ${personality.color}45, inset 0 0 0 1px ${personality.color}20`,
+              }}
             >
               <NextImage
                 src={getFlowerTypeImage(personality.slug)}
                 alt={personality.flower}
-                width={176}
-                height={176}
-                className="w-full h-full object-contain p-2"
+                width={384}
+                height={384}
+                className="w-[88%] h-[88%] object-contain drop-shadow-2xl"
                 priority
               />
             </div>
@@ -284,19 +287,19 @@ export function FlowerResultContent({ personality, dimensionScores }: Props) {
         <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
           还可以看看其他花格
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {others.map(p => (
             <Link
               key={p.slug}
               href={`/flower/result/${p.slug}`}
               className="group rounded-xl border border-border-subtle hover:border-border bg-bg-secondary/30 hover:bg-bg-secondary/60 transition-all p-4 text-center"
             >
-              <div className="w-14 h-14 mx-auto mb-2 rounded-lg overflow-hidden" style={{ background: `${p.color}12` }}>
+              <div className="w-20 h-20 mx-auto mb-3 rounded-lg overflow-hidden" style={{ background: `${p.color}12` }}>
                 <NextImage
                   src={getFlowerTypeThumbnailImage(p.slug)}
                   alt={p.flower}
-                  width={56}
-                  height={56}
+                  width={80}
+                  height={80}
                   className="w-full h-full object-contain p-1"
                 />
               </div>

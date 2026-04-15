@@ -1,6 +1,6 @@
 'use client';
 
-import { useSyncExternalStore, useState, useCallback, useEffect, useRef } from 'react';
+import { useSyncExternalStore, useState, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import NextImage from 'next/image';
@@ -20,6 +20,7 @@ import { getSiteUrl } from '@/lib/site';
 import { encodeRelationshipLink, decodeRelationshipLink } from '@/lib/cpti/cpti-relationship-link';
 import { CptiRelationshipShareImageGenerator } from '@/components/CptiRelationshipShareImageGenerator';
 import type { CptiRelationshipShareImageGeneratorHandle } from '@/components/CptiRelationshipShareImageGenerator';
+import { ClaimAssetCard } from '@/components/ClaimAssetCard';
 
 const emptySubscribe = () => () => {};
 
@@ -34,6 +35,25 @@ interface StoredRelationshipData {
   dimsB: CptiDimensionScore[];
 }
 
+interface BackendRelationshipData {
+  relationship: {
+    id: string;
+    slug: string;
+    tier: string;
+    compatibility: number;
+  };
+  participantProfile?: {
+    personality: {
+      slug: string;
+    };
+    dimensions: CptiDimensionScore[];
+  };
+  collectionProgress?: {
+    collected: number;
+    total: number;
+  };
+}
+
 function levelNum(l: string): number {
   return l === 'H' ? 3 : l === 'M' ? 2 : 1;
 }
@@ -46,8 +66,6 @@ function getCptiPersonalityImageSrc(slug: string, mode: 'full' | 'thumb' | 'emoj
 export function CptiRelationshipResult() {
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const searchParams = useSearchParams();
-  const [data, setData] = useState<StoredRelationshipData | null>(null);
-  const [fromLink, setFromLink] = useState(false);
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const [returnLinkCopied, setReturnLinkCopied] = useState(false);
@@ -56,59 +74,90 @@ export function CptiRelationshipResult() {
   const [bImageMode, setBImageMode] = useState<'full' | 'thumb' | 'emoji'>('thumb');
   const shareRef = useRef<CptiRelationshipShareImageGeneratorHandle>(null);
 
-  useEffect(() => {
-    if (!mounted) return;
+  const { data, backendData, fromLink } = useMemo(() => {
+    if (!mounted) {
+      return {
+        data: null as StoredRelationshipData | null,
+        backendData: null as BackendRelationshipData | null,
+        fromLink: false,
+      };
+    }
 
-    // Priority 1: decode from ?r= URL param ("回传链接")
     const rParam = searchParams.get('r');
     if (rParam) {
       const decoded = decodeRelationshipLink(rParam);
       if (decoded) {
         const rel = CPTI_RELATIONSHIP_TYPES.find(r => r.slug === decoded.relationshipSlug);
         if (rel) {
-          setData({
-            relationship: rel,
-            pairs: [],
-            compatibility: decoded.compatibility,
-            nicknameA: decoded.nicknameA,
-            personalitySlugA: decoded.personalitySlugA,
-            personalitySlugB: decoded.personalitySlugB,
-            dimsA: [],
-            dimsB: [],
-          });
-          setFromLink(true);
-          return;
+          return {
+            data: {
+              relationship: rel,
+              pairs: [],
+              compatibility: decoded.compatibility,
+              nicknameA: decoded.nicknameA,
+              personalitySlugA: decoded.personalitySlugA,
+              personalitySlugB: decoded.personalitySlugB,
+              dimsA: [],
+              dimsB: [],
+            },
+            backendData: null,
+            fromLink: true,
+          };
         }
       }
     }
 
-    // Priority 2: from sessionStorage (normal flow)
     try {
       const raw = sessionStorage.getItem('cpti-relationship');
       if (raw) {
-        setData(JSON.parse(raw) as StoredRelationshipData);
-        return;
-      }
-    } catch { /* ignore */ }
+        const nextData = JSON.parse(raw) as StoredRelationshipData;
+        let nextBackendData: BackendRelationshipData | null = null;
 
-    // Priority 3: static preview by relationship type (from gallery)
+        try {
+          const backendRaw = sessionStorage.getItem('cpti-relationship-backend');
+          if (backendRaw) {
+            nextBackendData = JSON.parse(backendRaw) as BackendRelationshipData;
+          }
+        } catch {
+          nextBackendData = null;
+        }
+
+        return {
+          data: nextData,
+          backendData: nextBackendData,
+          fromLink: false,
+        };
+      }
+    } catch {
+      // ignore storage failures
+    }
+
     const typeParam = searchParams.get('type');
     if (typeParam) {
       const rel = CPTI_RELATIONSHIP_TYPES.find(r => r.slug === typeParam);
       if (rel) {
-        setData({
-          relationship: rel,
-          pairs: [],
-          compatibility: 0,
-          nicknameA: '',
-          personalitySlugA: '',
-          personalitySlugB: '',
-          dimsA: [],
-          dimsB: [],
-        });
-        setFromLink(true);
+        return {
+          data: {
+            relationship: rel,
+            pairs: [],
+            compatibility: 0,
+            nicknameA: '',
+            personalitySlugA: '',
+            personalitySlugB: '',
+            dimsA: [],
+            dimsB: [],
+          },
+          backendData: null,
+          fromLink: true,
+        };
       }
     }
+
+    return {
+      data: null,
+      backendData: null,
+      fromLink: false,
+    };
   }, [mounted, searchParams]);
 
   const shareUrl = getSiteUrl('/cpti/');
@@ -173,7 +222,7 @@ export function CptiRelationshipResult() {
     );
   }
 
-  const { relationship, pairs, compatibility, nicknameA, personalitySlugA, personalitySlugB, dimsA, dimsB } = data;
+  const { relationship, pairs, compatibility, nicknameA, personalitySlugA, personalitySlugB } = data;
   const personalityA = getCptiPersonalityBySlug(personalitySlugA);
   const personalityB = getCptiPersonalityBySlug(personalitySlugB);
   const tierInfo = RELATIONSHIP_TIER_INFO[relationship.tier];
@@ -360,6 +409,20 @@ export function CptiRelationshipResult() {
             <p className="text-lg text-text-secondary max-w-md mx-auto">
               {relationship.tagline}
             </p>
+
+            {/* Backend sync badge + collection progress */}
+            {backendData && !fromLink && (
+              <div className="mt-4 flex flex-col items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border border-emerald-500/20 bg-emerald-500/5 text-emerald-500">
+                  ✓ 已同步到双方图鉴
+                </span>
+                {backendData.collectionProgress != null && (
+                  <span className="text-xs text-text-muted">
+                    已收集 {backendData.collectionProgress.collected}/{backendData.collectionProgress.total} 种关系
+                  </span>
+                )}
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
@@ -380,6 +443,26 @@ export function CptiRelationshipResult() {
           </p>
         </motion.div>
       </section>
+
+      {backendData && !fromLink && (
+        <section className="max-w-2xl mx-auto px-6 pb-14">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.25, duration: 0.5 }}
+          >
+            <ClaimAssetCard
+              variant="relationship"
+              payload={{
+                relationshipId: backendData.relationship.id,
+                currentPersonalitySlug: backendData.participantProfile?.personality.slug,
+                currentDimensionScores: backendData.participantProfile?.dimensions,
+                currentSource: 'pair_flow',
+              }}
+            />
+          </motion.div>
+        </section>
+      )}
 
       {/* Dimension comparison (only available from session, not from link) */}
       {!fromLink && pairs.length > 0 && (

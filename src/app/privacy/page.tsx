@@ -45,6 +45,39 @@ export default function PrivacyPage() {
         </section>
 
         <section>
+          <h2 className="text-xl font-medium text-text-primary mb-3">CPTI 关系测试数据</h2>
+
+          <h3 className="text-base font-medium text-text-primary mb-2 mt-4">收集哪些数据</h3>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>你的 CP 角色测试结果与五维画像分数</li>
+            <li>配对码记录（用于匹配双方测试结果）</li>
+            <li>匹配后的 CP 关系类型与兼容度</li>
+            <li>排行榜所需的匿名统计数据（灵魂伴侣数、稀有关系数等）</li>
+          </ul>
+
+          <h3 className="text-base font-medium text-text-primary mb-2 mt-4">数据如何存储</h3>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>数据存储在 Supabase 数据库中，传输过程使用 HTTPS 加密</li>
+            <li>配对码在 24 小时后自动过期失效</li>
+            <li>不收集真实姓名、邮箱或手机号等实名信息</li>
+          </ul>
+
+          <h3 className="text-base font-medium text-text-primary mb-2 mt-4">谁能看见你的数据</h3>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>只有你自己可以看到完整的关系记录和匹配历史</li>
+            <li>配对的双方可以看到彼此的 CP 角色类型（不含原始测试答案）</li>
+            <li>排行榜仅显示昵称和匿名统计数据，不展示个人画像细节</li>
+          </ul>
+
+          <h3 className="text-base font-medium text-text-primary mb-2 mt-4">排行榜与数据删除</h3>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>你可以选择不在排行榜中展示你的数据（联系站点管理员）</li>
+            <li>你有权要求删除所有与你相关的 CPTI 数据（通过站点管理员处理）</li>
+            <li>删除后，已匹配的关系记录将不再可访问</li>
+          </ul>
+        </section>
+
+        <section>
           <h2 className="text-xl font-medium text-text-primary mb-3">隐私声明的边界</h2>
           <p>
             WTFTI 不是医疗、金融或实名认证服务，站点也不建议你在公开分享时附带敏感身份信息。如果未来站点引入登录、提交、排行榜或分析能力，本页会同步更新。

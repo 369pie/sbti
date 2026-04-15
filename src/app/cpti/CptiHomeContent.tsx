@@ -144,6 +144,54 @@ export default function CptiHomeContent() {
         </div>
       </section>
 
+      {/* More features */}
+      <section className="py-12 px-6">
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-8 animate-fade-up">
+            <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Explore</span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">探索更多</h2>
+          </div>
+
+          <div className="grid gap-3">
+            {[
+              {
+                emoji: '📖', title: '我的关系图鉴', desc: '查看已收集的所有CP关系类型，点亮你的关系宇宙。',
+                href: '/card', color: '#ec4899', bgColor: 'rgba(236,72,153,0.06)',
+              },
+              {
+                emoji: '🏆', title: '排行榜', desc: '看看谁的关系类型收集最多，谁是最活跃的CP猎人。',
+                href: '/cpti/leaderboard', color: '#f59e0b', bgColor: 'rgba(245,158,11,0.06)',
+              },
+              {
+                emoji: '🔗', title: '输入配对码', desc: '收到邀请码？输入即可配对，解锁新的关系类型。',
+                href: '/cpti/join', color: '#a855f7', bgColor: 'rgba(168,85,247,0.06)',
+              },
+            ].map((item, i) => (
+              <Link
+                key={item.title}
+                href={item.href}
+                className="animate-fade-up flex items-center gap-4 p-4 rounded-xl border border-border-subtle bg-bg-elevated shadow-sm hover:shadow-md hover:border-border transition-all"
+                style={{ animationDelay: `${i * 80}ms` }}
+              >
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                  style={{ background: item.bgColor }}
+                >
+                  {item.emoji}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-text-primary">{item.title}</div>
+                  <div className="text-xs text-text-muted mt-0.5">{item.desc}</div>
+                </div>
+                <svg className="w-4 h-4 text-text-muted flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 5 Dimensions */}
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto">

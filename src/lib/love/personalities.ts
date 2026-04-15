@@ -61,11 +61,11 @@ export interface LovePersonalityType {
 }
 
 export function getLoveTypeImage(slug: string): string {
-  return withBasePath(`/images/types/love-${slug}.png`);
+  return withBasePath(`/images/types/love/love-${slug}.png`);
 }
 
 export function getLoveTypeThumbnailImage(slug: string): string {
-  return withBasePath(`/images/types/thumbs/love-${slug}.webp`);
+  return withBasePath(`/images/types/love/thumbs/love-${slug}.webp`);
 }
 
 export const LOVE_PERSONALITY_TYPES: LovePersonalityType[] = [

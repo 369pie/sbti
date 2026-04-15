@@ -143,15 +143,18 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
 
             {/* Hero character image */}
             <div
-              className="relative w-36 h-36 sm:w-44 sm:h-44 mx-auto mb-6 rounded-3xl overflow-hidden"
-              style={{ background: `${personality.color}15` }}
+              className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mx-auto mb-8 rounded-[2rem] overflow-hidden flex items-center justify-center"
+              style={{
+                background: `linear-gradient(135deg, ${personality.color}08 0%, ${personality.color}1a 100%)`,
+                boxShadow: `0 24px 80px -24px ${personality.color}45, inset 0 0 0 1px ${personality.color}20`,
+              }}
             >
               <NextImage
                 src={getXptiTypeThumbnailImage(personality.slug)}
                 alt={personality.name}
                 fill
-                sizes="(max-width: 640px) 144px, 176px"
-                className="object-contain p-2"
+                sizes="(max-width: 768px) 256px, 384px"
+                className="object-contain drop-shadow-2xl w-[88%] h-[88%]"
                 priority
               />
             </div>

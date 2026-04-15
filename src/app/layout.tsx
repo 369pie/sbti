@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import Link from "next/link";
+import Script from "next/script";
 import { Geist, Geist_Mono, Playfair_Display, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
@@ -115,11 +116,12 @@ export default function RootLayout({
                   description: 'WTFTI 多宇宙人格测试平台，提供经典、修仙、毒舌、社畜等多种主题人格测试。',
                 },
               ],
-            }),
+            }).replace(/</g, "\\u003c"),
           }}
         />
-        <script
+        <Script
           id="legacy-github-pages-redirect"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: getLegacyRedirectScript() }}
         />
         {isLegacyPagesBuild && (

@@ -11,6 +11,7 @@ import type { WorkDimensionScore } from '@/lib/work/scoring';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 
 type WorkShareImageGeneratorComponentType = typeof import('@/components/WorkShareImageGenerator')['WorkShareImageGenerator'];
 
@@ -319,7 +320,7 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
         <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
           还可以看看其他打工人设
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {others.map(p => (
             <Link
               key={p.slug}
@@ -329,8 +330,8 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
               <WorkPersonalityAvatar
                 personality={p}
                 alt=""
-                sizes="40px"
-                className="relative w-10 h-10 rounded-lg overflow-hidden mb-2"
+                sizes="72px"
+                className="relative w-18 h-18 rounded-lg overflow-hidden mb-2"
                 style={{ background: `${p.color}15` }}
                 imageClassName="object-contain p-1"
                 fallbackClassName="w-full h-full flex items-center justify-center text-xl"
@@ -343,6 +344,8 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
           ))}
         </div>
       </section>
+
+      <UniversePreviewCards currentUniverse="work" />
     </div>
   );
 }

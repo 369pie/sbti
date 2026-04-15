@@ -16,6 +16,7 @@ import { UniversePicker } from '@/components/UniversePicker';
 import type { Universe } from '@/lib/universes';
 import { saveStoredQuizResult } from '@/lib/quiz-result-session';
 import { recordUniverseResult } from '@/lib/wtf-card';
+import { trackMystiEvent } from '@/lib/mysti/analytics';
 
 const MODEL_CLASS: Record<ModelType, string> = {
   self: 'model-self',
@@ -43,6 +44,15 @@ interface QuizProps {
 export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'standard', universeId, finishingOverlay }: QuizProps = {}) {
   const searchParams = useSearchParams();
   const cpPartner = searchParams.get('cp');
+  const mode = searchParams.get('mode');
+  const isMysti = mode === 'mysti';
+
+  // Track mysti test start
+  useEffect(() => {
+    if (isMysti) {
+      trackMystiEvent('mysti_test_start');
+    }
+  }, [isMysti]);
   const [skinMode, setSkinMode] = useState<'standard' | 'xiuxian'>(() =>
     (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('skin') : null) === 'xiuxian' ? 'xiuxian' : 'standard'
   );
@@ -104,7 +114,12 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
     setIsFinishing(true);
 
     const result = calculateResult(finalAnswers, QUESTIONS);
-    const resultNamespace = resultPrefix === '/wtfti' ? 'wtfti' : 'sbti';
+    const resultNamespace = isMysti ? 'mysti' : (resultPrefix === '/wtfti' ? 'wtfti' : 'sbti');
+
+    // Track mysti test completion
+    if (isMysti) {
+      trackMystiEvent('mysti_test_complete', { slug: result.personality.slug });
+    }
 
     saveStoredQuizResult(resultNamespace, {
       slug: result.personality.slug,
@@ -115,6 +130,7 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
 
     // Record to WTF Card
     const cardUniverseId =
+      isMysti ? 'mysti' :
       resultPrefix === '/wtfti/kings' ? 'kings' :
       resultPrefix === '/wtfti/delta' ? 'delta' :
       resultPrefix === '/wtfti' ? 'wtfti' :
@@ -130,11 +146,13 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
       if (cpPartner) {
         const sep = skinParam ? '&skin=xiuxian' : '';
         window.location.href = `${basePath}/cp/result?a=${encodeURIComponent(cpPartner)}&b=${encodeURIComponent(result.personality.slug)}${sep}`;
+      } else if (isMysti) {
+        window.location.href = `${basePath}/mysti/result/${encodeURIComponent(result.personality.slug)}${skinParam}`;
       } else {
         window.location.href = `${basePath}${resultPrefix}/result/${encodeURIComponent(result.personality.slug)}${skinParam}`;
       }
     }, 800);
-  }, [cpPartner, isXiuxian, resultPrefix]);
+  }, [cpPartner, isMysti, isXiuxian, resultPrefix]);
 
   const handleAnswer = useCallback((questionId: number, value: Answer) => {
     if (!currentQ) return;
@@ -208,10 +226,28 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
 
   const canGoBack = currentIndex > 0 || (showDrinkBranch && drinkBranchIndex >= 0);
 
+  // Mysti theme colors (same as MYSTI_THEMES.celestial)
+  const mystiTheme = {
+    bg: '#0B0D17',
+    bgGradient: 'linear-gradient(180deg, #0B0D17 0%, #12152B 100%)',
+    text: '#F3EFE6',
+    textMuted: '#A7B0C8',
+    accent: '#C9A86C',
+    accentSoft: 'rgba(201,168,108,0.22)',
+    divider: 'rgba(201,168,108,0.35)',
+    cardSurface: '#12152B',
+    cardBorder: 'rgba(201,168,108,0.45)',
+    cardGlow: 'rgba(123,97,255,0.18)',
+  };
+
   if (!mounted || !currentQ) {
     return (
-      <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center">
-        <div className="w-5 h-5 rounded-full border-2 border-accent border-t-transparent animate-spin" />
+      <div className={`min-h-[calc(100vh-3.5rem)] flex items-center justify-center ${isMysti ? '' : ''}`}
+        style={isMysti ? { background: mystiTheme.bgGradient } : undefined}>
+        <div
+          className={`w-5 h-5 rounded-full border-2 ${isMysti ? '' : 'border-accent'} border-t-transparent animate-spin`}
+          style={isMysti ? { borderColor: mystiTheme.accent, borderTopColor: 'transparent' } : undefined}
+        />
       </div>
     );
   }
@@ -223,7 +259,39 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
   const qOptions = xiuxianSkin?.options ?? currentQ.options ?? defaultOpts;
 
   return (
-    <div className={`min-h-[calc(100vh-3.5rem)] flex flex-col ${MODEL_CLASS[currentQ.model]} model-glow`}>
+    <div
+      className={`min-h-[calc(100vh-3.5rem)] flex flex-col ${MODEL_CLASS[currentQ.model]} model-glow`}
+      style={isMysti ? {
+        background: mystiTheme.bgGradient,
+        color: mystiTheme.text,
+      } : undefined}
+    >
+      {/* Star particles background for mysti mode */}
+      {isMysti && (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
+          <div className="absolute inset-0" style={{
+            background: `radial-gradient(circle at 50% 30%, rgba(123,97,255,0.08) 0%, transparent 60%)`,
+          }} />
+          {/* Star particles */}
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width: `${Math.random() * 2 + 1}px`,
+                height: `${Math.random() * 2 + 1}px`,
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                background: mystiTheme.accent,
+                opacity: Math.random() * 0.5 + 0.2,
+                animation: `twinkle ${Math.random() * 3 + 2}s ease-in-out infinite`,
+                animationDelay: `${Math.random() * 2}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Universe picker */}
       {showSkinToggle && (
       <div className="px-6 pt-4 max-w-2xl mx-auto w-full flex justify-center">
@@ -247,27 +315,56 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
       )}
 
       {/* Progress */}
-      <div className="px-6 pt-6 pb-2 max-w-2xl mx-auto w-full">
-        <div className="flex items-center justify-between text-xs text-text-muted mb-3">
+      <div className="px-6 pt-6 pb-2 max-w-2xl mx-auto w-full relative z-10">
+        <div className="flex items-center justify-between text-xs mb-3"
+          style={{ color: isMysti ? mystiTheme.textMuted : undefined }}>
           <span className="font-mono tracking-wider">
             {currentIndex + 1} / {totalMain}
-            {showDrinkBranch && <span className="text-accent ml-1">+{drinkBranchIndex + 1}</span>}
+            {showDrinkBranch && <span className="text-accent ml-1" style={isMysti ? { color: mystiTheme.accent } : undefined}>+{drinkBranchIndex + 1}</span>}
           </span>
-          <span style={{ color: modelColor.base }}>
+          <span style={{ color: isMysti ? mystiTheme.accent : modelColor.base }}>
             {modelNames[currentQ.model]}
           </span>
         </div>
 
-        {/* Progress bar */}
-        <div className="h-[3px] bg-border-subtle rounded-full overflow-hidden">
-          <motion.div
-            className="h-full rounded-full"
-            style={{ background: `linear-gradient(90deg, ${modelColor.base}, ${modelColor.light})` }}
-            initial={false}
-            animate={{ width: `${Math.min(progress, 100)}%` }}
-            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-          />
-        </div>
+        {/* Progress indicator */}
+        {isMysti ? (
+          /* Mystical ✦ progress indicators */
+          <div className="flex items-center justify-center gap-2 mb-3">
+            {[...Array(totalMain)].map((_, i) => {
+              const isCompleted = i < currentIndex;
+              const isCurrent = i === currentIndex;
+              const isUpcoming = i > currentIndex;
+              return (
+                <span
+                  key={i}
+                  className="text-lg transition-all duration-300"
+                  style={{
+                    color: isCompleted ? mystiTheme.accent :
+                           isCurrent ? mystiTheme.accent :
+                           mystiTheme.textMuted,
+                    opacity: isUpcoming ? 0.4 : 1,
+                    textShadow: isCurrent ? `0 0 10px ${mystiTheme.accent}` : 'none',
+                    transform: isCurrent ? 'scale(1.2)' : 'scale(1)',
+                  }}
+                >
+                  ✦
+                </span>
+              );
+            })}
+          </div>
+        ) : (
+          /* Standard progress bar */
+          <div className="h-[3px] bg-border-subtle rounded-full overflow-hidden">
+            <motion.div
+              className="h-full rounded-full"
+              style={{ background: `linear-gradient(90deg, ${modelColor.base}, ${modelColor.light})` }}
+              initial={false}
+              animate={{ width: `${Math.min(progress, 100)}%` }}
+              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            />
+          </div>
+        )}
       {/* Question area */}
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
@@ -277,13 +374,34 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
             animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, x: direction * -60, filter: 'blur(4px)' }}
             transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-            className="w-full max-w-2xl min-h-[31rem] sm:min-h-[29rem]"
+            className={`w-full max-w-2xl min-h-[31rem] sm:min-h-[29rem] relative z-10 ${isMysti ? 'px-2' : ''}`}
+            style={isMysti ? {
+              background: `linear-gradient(135deg, ${mystiTheme.cardSurface}90 0%, ${mystiTheme.cardSurface}60 100%)`,
+              borderRadius: '1.5rem',
+              border: `1px solid ${mystiTheme.cardBorder}`,
+              padding: '2rem',
+              boxShadow: `0 0 40px ${mystiTheme.cardGlow}`,
+            } : undefined}
           >
+            {/* Decorative ✦ corners for mysti mode */}
+            {isMysti && (
+              <>
+                <span className="absolute top-3 left-4 text-sm" style={{ color: mystiTheme.accent, opacity: 0.5 }}>✦</span>
+                <span className="absolute top-3 right-4 text-sm" style={{ color: mystiTheme.accent, opacity: 0.5 }}>✦</span>
+                <span className="absolute bottom-3 left-4 text-sm" style={{ color: mystiTheme.accent, opacity: 0.5 }}>✦</span>
+                <span className="absolute bottom-3 right-4 text-sm" style={{ color: mystiTheme.accent, opacity: 0.5 }}>✦</span>
+              </>
+            )}
+
             {/* Dimension badge */}
             <div className="flex justify-center mb-8">
               <span
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono tracking-wider"
-                style={{
+                style={isMysti ? {
+                  background: mystiTheme.accentSoft,
+                  color: mystiTheme.accent,
+                  border: `1px solid ${mystiTheme.divider}`,
+                } : {
                   background: modelColor.bg,
                   color: modelColor.base,
                   border: `1px solid ${modelColor.bg}`,
@@ -294,7 +412,10 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
             </div>
 
             {/* Question text */}
-            <h2 className="text-2xl sm:text-3xl font-medium text-center leading-relaxed tracking-tight mb-12">
+            <h2
+              className="text-2xl sm:text-3xl font-medium text-center leading-relaxed tracking-tight mb-12"
+              style={isMysti ? { color: mystiTheme.text } : undefined}
+            >
               {qText}
             </h2>
 
@@ -313,20 +434,31 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
                         ? 'bg-bg-elevated border-2 shadow-sm'
                         : 'bg-bg-elevated border border-border-subtle hover:border-border hover:shadow-sm'
                     } disabled:cursor-not-allowed disabled:opacity-80`}
-                    style={selected ? { borderColor: modelColor.base } : undefined}
+                    style={isMysti ? {
+                      background: selected ? mystiTheme.accentSoft : `${mystiTheme.cardSurface}80`,
+                      borderColor: selected ? mystiTheme.accent : mystiTheme.divider,
+                      boxShadow: selected ? `0 0 12px ${mystiTheme.cardGlow}` : 'none',
+                    } : selected ? { borderColor: modelColor.base } : undefined}
                   >
                     <div className="flex items-center gap-4">
                       <span
                         className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-mono transition-colors"
-                        style={
-                          selected
-                            ? { background: modelColor.base, color: '#FFFFFF' }
-                            : { background: '#EDE8E2', color: '#9C9590' }
+                        style={isMysti ? {
+                          background: selected ? mystiTheme.accent : `${mystiTheme.cardSurface}`,
+                          color: selected ? '#FFFFFF' : mystiTheme.textMuted,
+                        } : selected
+                          ? { background: modelColor.base, color: '#FFFFFF' }
+                          : { background: '#EDE8E2', color: '#9C9590' }
                         }
                       >
                         {opt.key}
                       </span>
-                      <span className={`text-base ${selected ? 'text-text-primary' : 'text-text-secondary group-hover:text-text-primary'} transition-colors`}>
+                      <span
+                        className={`text-base ${selected ? 'text-text-primary' : 'text-text-secondary group-hover:text-text-primary'} transition-colors`}
+                        style={isMysti ? {
+                          color: selected ? mystiTheme.text : mystiTheme.textMuted,
+                        } : undefined}
+                      >
                         {opt.label}
                       </span>
                     </div>
@@ -334,7 +466,11 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
                       <motion.div
                         layoutId="selected-ring"
                         className="absolute inset-0 rounded-2xl"
-                        style={{ boxShadow: `0 0 12px ${modelColor.bg}` }}
+                        style={isMysti ? {
+                          boxShadow: `0 0 16px ${mystiTheme.accentSoft}`,
+                        } : {
+                          boxShadow: `0 0 12px ${modelColor.bg}`,
+                        }}
                         transition={{ duration: 0.2 }}
                       />
                     )}
@@ -345,7 +481,10 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
 
             {/* Drink trigger hint */}
             {currentQ.isDrinkTrigger && (
-              <p className="text-center text-text-muted text-xs mt-6 opacity-60">
+              <p
+                className="text-center text-xs mt-6 opacity-60"
+                style={isMysti ? { color: mystiTheme.textMuted } : undefined}
+              >
                 {isXiuxian ? '此题可能触发隐藏灵酒支线 🍺' : '这道题可能会触发隐藏分支 🍺'}
               </p>
             )}
@@ -353,11 +492,12 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
         </AnimatePresence>
 
         {/* Navigation */}
-        <div className="mt-8 flex items-center gap-4">
+        <div className="mt-8 flex items-center gap-4 relative z-10">
           {canGoBack && (
             <button
               onClick={handleBack}
-              className="text-sm text-text-muted hover:text-text-secondary transition-colors px-4 py-2 cursor-pointer"
+              className="text-sm hover:text-text-secondary transition-colors px-4 py-2 cursor-pointer"
+              style={isMysti ? { color: mystiTheme.textMuted } : { color: 'var(--text-muted)' }}
             >
               ← 上一题
             </button>
@@ -371,7 +511,8 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 z-50 bg-bg-primary flex items-center justify-center"
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={isMysti ? { background: `linear-gradient(180deg, ${mystiTheme.bg} 0%, ${mystiTheme.cardSurface} 100%)` } : undefined}
           >
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
@@ -379,10 +520,32 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
               transition={{ delay: 0.1, duration: 0.4 }}
               className="text-center"
             >
-              <div className="text-4xl mb-4">{finishingOverlay?.emoji ?? (isXiuxian ? '🔮' : '🎯')}</div>
-              <p className="text-text-secondary text-lg">
-                {finishingOverlay?.text ?? (isXiuxian ? '灵镜推演中，请稳住道心…' : '正在分析你的人格…')}
-              </p>
+              {/* Pulsing glow effect for mysti mode */}
+              {isMysti && (
+                <motion.div
+                  className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                  animate={{ opacity: [0.3, 0.6, 0.3] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <div
+                    className="w-32 h-32 rounded-full"
+                    style={{
+                      background: `radial-gradient(circle, ${mystiTheme.accent}40 0%, transparent 70%)`,
+                    }}
+                  />
+                </motion.div>
+              )}
+              <div className="relative z-10">
+                <div className="text-4xl mb-4">
+                  {finishingOverlay?.emoji ?? (isMysti ? '✦' : (isXiuxian ? '🔮' : '🎯'))}
+                </div>
+                <p
+                  className="text-lg"
+                  style={isMysti ? { color: mystiTheme.text } : undefined}
+                >
+                  {finishingOverlay?.text ?? (isMysti ? '你的灵魂牌正在揭晓...' : (isXiuxian ? '灵镜推演中，请稳住道心…' : '正在分析你的人格…'))}
+                </p>
+              </div>
             </motion.div>
           </motion.div>
         )}

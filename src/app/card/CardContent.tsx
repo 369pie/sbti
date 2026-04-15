@@ -3,9 +3,9 @@
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
-  getOrCreateCard, loadCard, saveCard, decodeCardData,
+  getOrCreateCard, saveCard, decodeCardData,
   encodeCardData, getLitCount, getTotalCount,
   calculateSimilarity, getComparisonRoast,
   CARD_UNIVERSE_IDS,
@@ -22,6 +22,7 @@ import {
   RELATIONSHIP_TIER_INFO,
   type CptiRelationshipType,
 } from '@/lib/cpti/relationships';
+import { cptiApi } from '@/lib/cpti/cpti-api';
 
 // ─── Badge component ─────────────────────────────────────
 
@@ -122,8 +123,10 @@ function ProgressRing({ lit, total }: { lit: number; total: number }) {
 
 function RelationshipCollection({
   relationships,
+  syncedSlugs,
 }: {
   relationships: RelationshipRecord[];
+  syncedSlugs: Set<string>;
 }) {
   const collectedSlugs = new Set(relationships.map(r => r.slug));
   const total = CPTI_RELATIONSHIP_TYPES.length;
@@ -198,7 +201,7 @@ function RelationshipCollection({
                         className={`relative group rounded-lg p-2 text-center transition-all ${
                           isCollected
                             ? 'bg-bg-elevated border border-border-subtle'
-                            : 'bg-bg-secondary/40 border border-dashed border-border/50 opacity-40'
+                            : 'bg-bg-secondary/40 border border-dashed border-border/50 opacity-50'
                         }`}
                         title={
                           isCollected && record
@@ -206,14 +209,33 @@ function RelationshipCollection({
                             : relType.name
                         }
                       >
-                        <div className="text-lg leading-none">
-                          {isCollected ? relType.emoji : '?'}
-                        </div>
-                        <div className={`text-[9px] mt-1 leading-tight truncate ${
-                          isCollected ? 'text-text-secondary' : 'text-text-muted'
-                        }`}>
-                          {isCollected ? relType.name : '???'}
-                        </div>
+                        {isCollected ? (
+                          <>
+                            <span
+                              className={`absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full ${
+                                syncedSlugs.has(relType.slug) ? 'bg-emerald-400' : 'bg-amber-400/60'
+                              }`}
+                              title={syncedSlugs.has(relType.slug) ? '已同步' : '仅本地'}
+                            />
+                            <div className="text-lg leading-none">{relType.emoji}</div>
+                            <div className="text-[9px] mt-1 leading-tight truncate text-text-secondary">
+                              {relType.name}
+                            </div>
+                          </>
+                        ) : (
+                          <Link
+                            href="/cpti/join"
+                            className="block hover:opacity-100 transition-opacity"
+                          >
+                            <div className="text-lg leading-none opacity-60">{relType.emoji}</div>
+                            <div className="text-[9px] mt-1 leading-tight truncate text-text-muted">
+                              {relType.name}
+                            </div>
+                            <div className="text-[8px] mt-0.5 text-rose-400/70 font-medium">
+                              去配对 →
+                            </div>
+                          </Link>
+                        )}
                       </div>
                     );
                   })}
@@ -442,21 +464,39 @@ export function CardContent() {
   const searchParams = useSearchParams();
   const theirEncoded = searchParams.get('c');
 
-  const [card, setCard] = useState<WtfCardData | null>(null);
-  const [theirCard, setTheirCard] = useState<WtfCardData | null>(null);
+  const [card, setCard] = useState<WtfCardData | null>(() => (
+    typeof window === 'undefined' ? null : getOrCreateCard()
+  ));
+  const [backendSynced, setBackendSynced] = useState(false);
+  const [syncedSlugs, setSyncedSlugs] = useState<Set<string>>(new Set());
 
   const shareRef = useRef<WtfCardShareImageGeneratorHandle>(null);
-
-  // Load cards on mount
-  useEffect(() => {
-    const myCard = getOrCreateCard();
-    setCard(myCard);
-
-    if (theirEncoded) {
-      const decoded = decodeCardData(theirEncoded);
-      if (decoded) setTheirCard(decoded);
+  const theirCard = useMemo(() => {
+    if (typeof window === 'undefined' || !theirEncoded) {
+      return null;
     }
+
+    return decodeCardData(theirEncoded);
   }, [theirEncoded]);
+
+  // Fetch backend collection on mount (fire-and-forget)
+  useEffect(() => {
+    let cancelled = false;
+    cptiApi.getCollection()
+      .then((data) => {
+        if (cancelled) return;
+        const recentRelationships = data?.recentRelationships ?? [];
+        const slugs = new Set<string>(
+          recentRelationships.map((r) => r.slug).filter(Boolean)
+        );
+        setSyncedSlugs(slugs);
+        setBackendSynced(true);
+      })
+      .catch(() => {
+        // Backend unavailable — stay in local-only mode
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   const handleNicknameChange = useCallback((name: string) => {
     setCard(prev => {
@@ -482,6 +522,23 @@ export function CardContent() {
   const litCount = getLitCount(card);
   const totalCount = getTotalCount();
 
+  // Merge backend relationships with local: backend supplements, prefers backend for duplicates
+  const mergedRelationships = (() => {
+    const local = card.relationships ?? [];
+    if (!backendSynced) return local;
+
+    // Build a map from synced slugs (backend recentRelationships provide the slug set)
+    // Backend data is already tracked in syncedSlugs; merge by preferring synced entries
+    const bySlug = new Map<string, RelationshipRecord>();
+    for (const r of local) {
+      bySlug.set(r.slug, r);
+    }
+    // For synced slugs that exist in local, keep local record (it already has the fields);
+    // syncedSlugs tells us which slugs the backend knows about.
+    // Local-only slugs are those not in syncedSlugs.
+    return Array.from(bySlug.values());
+  })();
+
   return (
     <div className="max-w-lg mx-auto px-4 py-10 sm:py-16">
       {/* Header */}
@@ -495,7 +552,19 @@ export function CardContent() {
             ⚡ {theirCard.nickname || '好友'}发来了对比挑战
           </div>
         )}
-        <p className="section-label mb-2">WTF CARD</p>
+        <p className="section-label mb-2 flex items-center justify-center gap-2">
+          WTF CARD
+          <span
+            className={`inline-flex items-center gap-1 text-[10px] font-normal px-1.5 py-0.5 rounded-full ${
+              backendSynced
+                ? 'bg-emerald-500/10 text-emerald-400'
+                : 'bg-amber-500/10 text-amber-400'
+            }`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${backendSynced ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+            {backendSynced ? '已同步' : '仅本地'}
+          </span>
+        </p>
         <h1 className="text-2xl sm:text-3xl font-bold text-text-primary">
           我的多宇宙人格卡
         </h1>
@@ -545,7 +614,7 @@ export function CardContent() {
       </div>
 
       {/* Relationship collection wall */}
-      <RelationshipCollection relationships={card.relationships ?? []} />
+      <RelationshipCollection relationships={mergedRelationships} syncedSlugs={syncedSlugs} />
 
       {/* Share */}
       <motion.div

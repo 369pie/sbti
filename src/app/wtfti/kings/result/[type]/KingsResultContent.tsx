@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import { useCallback, useRef, useState } from 'react';
 import type { KingsPersonality } from '@/lib/kings/personalities';
@@ -94,8 +95,8 @@ export function KingsResultContent({ kingsPersonality: p, dimensionScores }: Pro
             <KingsTypeArt
               personality={p}
               alt={p.heroName}
-              containerClassName="w-48 h-48 sm:w-56 sm:h-56 mx-auto mb-6 rounded-2xl overflow-hidden flex items-center justify-center"
-              imageClassName="w-[85%] h-[85%] object-contain drop-shadow-lg"
+              containerClassName="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mx-auto mb-8 rounded-[2rem] overflow-hidden flex items-center justify-center"
+              imageClassName="w-[88%] h-[88%] object-contain drop-shadow-2xl"
               emojiClassName="text-7xl sm:text-8xl"
               priority
             />
@@ -265,25 +266,28 @@ export function KingsResultContent({ kingsPersonality: p, dimensionScores }: Pro
         <h3 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
           其他峡谷人格
         </h3>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           {others.map(o => (
             <Link
               key={o.slug}
               href={`/wtfti/kings/result/${o.slug}/`}
-              className="group rounded-xl border border-border-subtle bg-bg-elevated p-4 shadow-sm hover:shadow-md hover:border-border transition-all"
+              className="group rounded-2xl border border-border-subtle bg-bg-elevated p-4 shadow-sm hover:shadow-md hover:border-border transition-all flex flex-col items-center text-center"
             >
-              <div className="flex items-center gap-3">
-                <KingsTypeArt
-                  personality={o}
+              <div
+                className="w-full aspect-square rounded-xl overflow-hidden flex items-center justify-center mb-3"
+                style={{ background: `linear-gradient(135deg, ${o.color}08, ${o.color}16)` }}
+              >
+                <NextImage
+                  src={getKingsTypeImage(o.slug)}
                   alt={o.heroName}
-                  containerClassName="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden"
-                  imageClassName="w-[82%] h-[82%] object-contain"
-                  emojiClassName="text-xl"
+                  width={160}
+                  height={160}
+                  className="w-[82%] h-[82%] object-contain transition-transform duration-300 group-hover:scale-105"
                 />
-                <div className="min-w-0">
-                  <div className="font-medium text-sm text-text-primary truncate">{o.heroName}</div>
-                  <div className="text-xs text-text-muted font-mono">{o.number} · {o.code}</div>
-                </div>
+              </div>
+              <div className="w-full">
+                <div className="font-medium text-sm text-text-primary truncate">{o.heroName}</div>
+                <div className="text-xs text-text-muted font-mono mt-0.5">{o.number} · {o.code}</div>
               </div>
             </Link>
           ))}

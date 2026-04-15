@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { DRUNK_DIMENSIONS, DRUNK_MODEL_NAMES, DRUNK_MODEL_COLORS } from '@/lib/drunk/dimensions';
 import { DRUNK_PERSONA_TYPES } from '@/lib/drunk/personas';
 import type { DrunkPersonaType } from '@/lib/drunk/personas';
@@ -14,6 +14,7 @@ import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
 import { ResultDiagnosticsPanel } from '@/components/ResultDiagnosticsPanel';
+import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 
 const emptySubscribe = () => () => {};
 
@@ -53,7 +54,7 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
     setTimeout(() => setTextCopied(false), 2000);
   }, [persona.code, persona.name, persona.tagline, shareUrl]);
 
-  const others = DRUNK_PERSONA_TYPES.filter(p => p.slug !== persona.slug).slice(0, 3);
+
 
   return (
     <div className="min-h-screen">
@@ -76,11 +77,14 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
               酒后人设鉴定
             </div>
 
-            <DrunkPersonaAvatar persona={persona} alt={`${persona.name}形象`} priority sizes="(min-width: 640px) 192px, 160px"
-              className="relative w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-6 rounded-2xl overflow-hidden"
-              style={{ background: `${persona.color}15` }}
-              imageClassName="object-contain p-2"
-              fallbackClassName="w-full h-full flex items-center justify-center text-7xl sm:text-8xl" />
+            <DrunkPersonaAvatar persona={persona} alt={`${persona.name}形象`} priority sizes="(min-width: 768px) 384px, (min-width: 640px) 320px, 256px"
+              className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mx-auto mb-8 rounded-[2rem] overflow-hidden flex items-center justify-center"
+              style={{
+                background: `linear-gradient(135deg, ${persona.color}08 0%, ${persona.color}1a 100%)`,
+                boxShadow: `0 24px 80px -24px ${persona.color}45, inset 0 0 0 1px ${persona.color}20`,
+              }}
+              imageClassName="object-contain drop-shadow-2xl w-[88%] h-[88%]"
+              fallbackClassName="w-full h-full flex items-center justify-center text-8xl sm:text-9xl" />
 
             <div className="text-sm font-mono tracking-[0.3em] uppercase mb-2" style={{ color: persona.color }}>
               {persona.code}
@@ -167,24 +171,7 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
         </motion.div>
       </section>
 
-      {/* Other personas */}
-      <section className="max-w-3xl mx-auto px-6 pb-24">
-        <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">还有这些酒后人设</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {others.map(p => (
-            <Link key={p.slug} href={`/drunk/result/${p.slug}`}
-              className="group rounded-xl border border-border-subtle hover:border-border bg-bg-secondary/30 hover:bg-bg-secondary/60 transition-all p-4">
-              <DrunkPersonaAvatar persona={p} alt="" sizes="64px"
-                className="relative w-16 h-16 rounded-lg overflow-hidden mb-2"
-                style={{ background: `${p.color}15` }}
-                imageClassName="object-contain p-1"
-                fallbackClassName="w-full h-full flex items-center justify-center text-2xl" />
-              <span className="text-xs font-mono tracking-wider block mb-1" style={{ color: p.color }}>{p.code}</span>
-              <span className="text-sm font-medium text-text-primary">{p.name}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <UniversePreviewCards currentUniverse="drunk" />
     </div>
   );
 }

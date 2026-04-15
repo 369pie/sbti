@@ -11,6 +11,7 @@ import { getSiteUrl } from '@/lib/site';
 import { WtftiShareImageGenerator } from '@/components/WtftiShareImageGenerator';
 import type { WtftiShareImageHandle } from '@/components/WtftiShareImageGenerator';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
+import { UniverseSwitcher } from '@/components/UniverseSwitcher';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
 import { UgcShareCTA } from '@/components/UgcShareCTA';
 import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
@@ -56,7 +57,7 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
     copyLink();
   }, [copyLink, p.wtftiName, p.tagline, shareUrl]);
 
-  const typeImageUrl = getWtftiTypeImage(p.slug);
+  const typeImageUrl = getWtftiTypeThumbnailImage(p.slug);
   const others = WTFTI_PERSONALITIES.filter(o => o.slug !== p.slug).slice(0, 4);
 
   return (
@@ -94,15 +95,18 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
 
             {/* Character collectible figure */}
             <div
-              className="w-48 h-48 sm:w-56 sm:h-56 mx-auto mb-6 rounded-2xl overflow-hidden flex items-center justify-center"
-              style={{ background: `${p.color}10` }}
+              className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mx-auto mb-8 rounded-[2rem] overflow-hidden flex items-center justify-center"
+              style={{
+                background: `linear-gradient(135deg, ${p.color}08 0%, ${p.color}1a 100%)`,
+                boxShadow: `0 24px 80px -24px ${p.color}45, inset 0 0 0 1px ${p.color}20`,
+              }}
             >
               <NextImage
                 src={typeImageUrl}
                 alt={p.wtftiName}
-                width={280}
-                height={280}
-                className="w-[85%] h-[85%] object-contain drop-shadow-lg"
+                width={400}
+                height={400}
+                className="w-[88%] h-[88%] object-contain drop-shadow-2xl"
                 priority
               />
             </div>
@@ -124,6 +128,9 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
           </motion.div>
         </div>
       </section>
+
+      {/* Visual Universe Switcher */}
+      <UniverseSwitcher slug={p.slug} currentUniverseId="wtfti" />
 
       {/* WTF 一击 */}
       <section className="max-w-2xl mx-auto px-6 pb-8">
@@ -268,27 +275,28 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
         <h3 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
           其他 WTF 人格
         </h3>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           {others.map(o => (
             <Link
               key={o.slug}
               href={`/wtfti/result/${o.slug}/`}
-              className="group rounded-xl border border-border-subtle bg-bg-elevated p-4 shadow-sm hover:shadow-md hover:border-border transition-all"
+              className="group rounded-2xl border border-border-subtle bg-bg-elevated p-4 shadow-sm hover:shadow-md hover:border-border transition-all flex flex-col items-center text-center"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0" style={{ background: `${o.color}10` }}>
-                  <NextImage
-                    src={getWtftiTypeThumbnailImage(o.slug)}
-                    alt={o.wtftiName}
-                    width={80}
-                    height={80}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div className="min-w-0">
-                  <div className="font-medium text-sm text-text-primary truncate">{o.wtftiName}</div>
-                  <div className="text-xs text-text-muted font-mono">{o.number} · {o.code}</div>
-                </div>
+              <div
+                className="w-full aspect-square rounded-xl overflow-hidden flex items-center justify-center mb-3"
+                style={{ background: `linear-gradient(135deg, ${o.color}08, ${o.color}16)` }}
+              >
+                <NextImage
+                  src={getWtftiTypeThumbnailImage(o.slug)}
+                  alt={o.wtftiName}
+                  width={160}
+                  height={160}
+                  className="w-[82%] h-[82%] object-contain transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
+              <div className="w-full">
+                <div className="font-medium text-sm text-text-primary truncate">{o.wtftiName}</div>
+                <div className="text-xs text-text-muted font-mono mt-0.5">{o.number} · {o.code}</div>
               </div>
             </Link>
           ))}

@@ -49,6 +49,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: getSiteUrl('/identify/'), lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: getSiteUrl('/cpti/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/wtfti/symptoms/'), lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
+    { url: getSiteUrl('/mysti/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: getSiteUrl('/mysti/daily/'), lastModified: now, changeFrequency: 'daily', priority: 0.8 },
   ];
 
   const guidePages: MetadataRoute.Sitemap = GUIDE_ARTICLES.map((article) => ({
@@ -170,5 +172,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }));
 
-  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...cptiResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages, ...kingsResultPages, ...deltaResultPages, ...xptiResultPages, ...soultiResultPages, ...birdResultPages, ...flowerResultPages, ...identifyResultPages, ...symptomsPages];
+  const mystiResultPages: MetadataRoute.Sitemap = getWtftiSlugs().map((slug) => ({
+    url: getSiteUrl(`/mysti/result/${slug}/`),
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...cptiResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages, ...kingsResultPages, ...deltaResultPages, ...xptiResultPages, ...soultiResultPages, ...birdResultPages, ...flowerResultPages, ...identifyResultPages, ...symptomsPages, ...mystiResultPages];
 }

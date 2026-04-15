@@ -13,6 +13,7 @@ import { useCallback, useMemo, useRef, useState, useEffect, useSyncExternalStore
 import { getSiteUrl, SHARE_SITE_URL } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
+import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 
 const emptySubscribe = () => () => {};
 
@@ -346,6 +347,8 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
           </div>
         </motion.div>
       </section>
+
+      <UniversePreviewCards currentUniverse="identify" />
     </div>
   );
 }
