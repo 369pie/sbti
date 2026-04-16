@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background gradient -->
+    <radialGradient id="bgGlow" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#1A1B2E"/>
+      <stop offset="100%" stop-color="#0A0B14"/>
+    </radialGradient>
+    
+    <!-- Gold gradient for lines -->
+    <linearGradient id="goldLine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C9A86C"/>
+      <stop offset="50%" stop-color="#D4B87A"/>
+      <stop offset="100%" stop-color="#B8868C"/>
+    </linearGradient>
+    
+    <!-- Rose glow -->
+    <radialGradient id="roseGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#B8868C" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#B8868C" stop-opacity="0"/>
+    </radialGradient>
+    
+    <!-- Center gem gradient -->
+    <radialGradient id="gemGlow" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#D4B87A"/>
+      <stop offset="40%" stop-color="#C9A86C"/>
+      <stop offset="100%" stop-color="#B8868C"/>
+    </radialGradient>
+    
+    <!-- Star glow -->
+    <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F3EFE6" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#C9A86C" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#C9A86C" stop-opacity="0"/>
+    </radialGradient>
+    
+    <!-- Lavender accent -->
+    <linearGradient id="lavenderLine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9B8EC4" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#B8868C" stop-opacity="0.4"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" fill="url(#bgGlow)"/>
+  
+  <!-- Subtle outer ring -->
+  <circle cx="256" cy="240" r="195" fill="none" stroke="#C9A86C" stroke-opacity="0.08" stroke-width="1"/>
+  <circle cx="256" cy="240" r="180" fill="none" stroke="#C9A86C" stroke-opacity="0.05" stroke-width="0.5"/>
+  
+  <!-- Rose glow behind the constellation -->
+  <ellipse cx="256" cy="235" rx="140" ry="120" fill="url(#roseGlow)"/>
+  
+  <!-- Constellation lines - the "eye" shape -->
+  <!-- Top arc -->
+  <line x1="148" y1="200" x2="210" y2="148" stroke="url(#goldLine)" stroke-width="1.2" stroke-opacity="0.7"/>
+  <line x1="210" y1="148" x2="256" y2="130" stroke="url(#goldLine)" stroke-width="1.2" stroke-opacity="0.7"/>
+  <line x1="256" y1="130" x2="302" y2="148" stroke="url(#goldLine)" stroke-width="1.2" stroke-opacity="0.7"/>
+  <line x1="302" y1="148" x2="364" y2="200" stroke="url(#goldLine)" stroke-width="1.2" stroke-opacity="0.7"/>
+  
+  <!-- Bottom arc -->
+  <line x1="148" y1="200" x2="200" y2="290" stroke="url(#goldLine)" stroke-width="1.2" stroke-opacity="0.7"/>
+  <line x1="200" y1="290" x2="256" y2="320" stroke="url(#goldLine)" stroke-width="1.2" stroke-opacity="0.7"/>
+  <line x1="256" y1="320" x2="312" y2="290" stroke="url(#goldLine)" stroke-width="1.2" stroke-opacity="0.7"/>
+  <line x1="312" y1="290" x2="364" y2="200" stroke="url(#goldLine)" stroke-width="1.2" stroke-opacity="0.7"/>
+  
+  <!-- Cross lines through center -->
+  <line x1="148" y1="200" x2="364" y2="200" stroke="url(#lavenderLine)" stroke-width="0.8" stroke-opacity="0.4"/>
+  <line x1="200" y1="290" x2="312" y2="290" stroke="url(#lavenderLine)" stroke-width="0.8" stroke-opacity="0.4"/>
+  
+  <!-- Diagonal inner connections -->
+  <line x1="210" y1="148" x2="200" y2="290" stroke="url(#lavenderLine)" stroke-width="0.6" stroke-opacity="0.3"/>
+  <line x1="302" y1="148" x2="312" y2="290" stroke="url(#lavenderLine)" stroke-width="0.6" stroke-opacity="0.3"/>
+  <line x1="210" y1="148" x2="312" y2="290" stroke="url(#lavenderLine)" stroke-width="0.4" stroke-opacity="0.2"/>
+  <line x1="302" y1="148" x2="200" y2="290" stroke="url(#lavenderLine)" stroke-width="0.4" stroke-opacity="0.2"/>
+  
+  <!-- Center cross -->
+  <line x1="256" y1="130" x2="256" y2="320" stroke="url(#lavenderLine)" stroke-width="0.6" stroke-opacity="0.25"/>
+  
+  <!-- Constellation nodes (7 universe points) -->
+  <!-- Top center (灵鉴/WTFTI) -->
+  <circle cx="256" cy="130" r="4" fill="#C9A86C"/>
+  <circle cx="256" cy="130" r="8" fill="url(#starGlow)"/>
+  
+  <!-- Upper left (班TI) -->
+  <circle cx="210" cy="148" r="3.5" fill="#C9A86C" opacity="0.9"/>
+  <circle cx="210" cy="148" r="6" fill="url(#starGlow)"/>
+  
+  <!-- Upper right (鸟TI) -->
+  <circle cx="302" cy="148" r="3.5" fill="#C9A86C" opacity="0.9"/>
+  <circle cx="302" cy="148" r="6" fill="url(#starGlow)"/>
+  
+  <!-- Left (三角TI) -->
+  <circle cx="148" cy="200" r="3.5" fill="#B8868C" opacity="0.9"/>
+  <circle cx="148" cy="200" r="6" fill="url(#starGlow)"/>
+  
+  <!-- Right (王者TI) -->
+  <circle cx="364" cy="200" r="3.5" fill="#B8868C" opacity="0.9"/>
+  <circle cx="364" cy="200" r="6" fill="url(#starGlow)"/>
+  
+  <!-- Lower left (疯TI) -->
+  <circle cx="200" cy="290" r="3" fill="#9B8EC4" opacity="0.8"/>
+  <circle cx="200" cy="290" r="5" fill="url(#starGlow)"/>
+  
+  <!-- Lower right (Mysti) -->
+  <circle cx="312" cy="290" r="3" fill="#9B8EC4" opacity="0.8"/>
+  <circle cx="312" cy="290" r="5" fill="url(#starGlow)"/>
+  
+  <!-- Bottom center node -->
+  <circle cx="256" cy="320" r="3" fill="#C9A86C" opacity="0.7"/>
+  <circle cx="256" cy="320" r="5" fill="url(#starGlow)"/>
+  
+  <!-- Center gem / eye -->
+  <ellipse cx="256" cy="220" rx="28" ry="35" fill="none" stroke="url(#goldLine)" stroke-width="1.5" opacity="0.9"/>
+  <ellipse cx="256" cy="220" rx="18" ry="24" fill="none" stroke="#C9A86C" stroke-width="0.8" opacity="0.5"/>
+  
+  <!-- Inner gem facets -->
+  <line x1="256" y1="196" x2="240" y2="220" stroke="#C9A86C" stroke-width="0.5" opacity="0.4"/>
+  <line x1="256" y1="196" x2="272" y2="220" stroke="#C9A86C" stroke-width="0.5" opacity="0.4"/>
+  <line x1="240" y1="220" x2="256" y2="244" stroke="#C9A86C" stroke-width="0.5" opacity="0.4"/>
+  <line x1="272" y1="220" x2="256" y2="244" stroke="#C9A86C" stroke-width="0.5" opacity="0.4"/>
+  <line x1="238" y1="210" x2="274" y2="210" stroke="#C9A86C" stroke-width="0.4" opacity="0.3"/>
+  <line x1="238" y1="230" x2="274" y2="230" stroke="#C9A86C" stroke-width="0.4" opacity="0.3"/>
+  
+  <!-- Center dot -->
+  <circle cx="256" cy="220" r="4" fill="url(#gemGlow)"/>
+  <circle cx="256" cy="220" r="2" fill="#F3EFE6" opacity="0.9"/>
+  
+  <!-- Decorative micro-stars scattered -->
+  <circle cx="180" cy="120" r="1" fill="#F3EFE6" opacity="0.3"/>
+  <circle cx="340" cy="110" r="1.2" fill="#F3EFE6" opacity="0.25"/>
+  <circle cx="130" cy="260" r="0.8" fill="#C9A86C" opacity="0.3"/>
+  <circle cx="380" cy="270" r="1" fill="#B8868C" opacity="0.25"/>
+  <circle cx="220" cy="350" r="0.8" fill="#9B8EC4" opacity="0.3"/>
+  <circle cx="300" cy="340" r="1" fill="#C9A86C" opacity="0.2"/>
+  <circle cx="170" cy="160" r="0.6" fill="#F3EFE6" opacity="0.2"/>
+  <circle cx="350" cy="170" r="0.6" fill="#F3EFE6" opacity="0.2"/>
+  
+  <!-- Brand name: 万相图鉴 -->
+  <text x="256" y="390" text-anchor="middle" font-family="'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif" font-size="36" font-weight="600" fill="#F3EFE6" letter-spacing="12">
+    万相图鉴
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="256" y="420" text-anchor="middle" font-family="'PingFang SC', 'Noto Sans SC', sans-serif" font-size="11" fill="#C9A86C" letter-spacing="6" opacity="0.7">
+    WTFTI · SOUL ATLAS
+  </text>
+  
+  <!-- Thin decorative line under text -->
+  <line x1="190" y1="435" x2="322" y2="435" stroke="#C9A86C" stroke-width="0.5" opacity="0.3"/>
+  <circle cx="190" cy="435" r="1.5" fill="#C9A86C" opacity="0.4"/>
+  <circle cx="322" cy="435" r="1.5" fill="#C9A86C" opacity="0.4"/>
+  <circle cx="256" cy="435" r="1" fill="#B8868C" opacity="0.5"/>
+</svg>
