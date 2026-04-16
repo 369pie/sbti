@@ -8,10 +8,24 @@ const backupRoot = mkdtempSync(join(tmpdir(), 'sbti-app-api-'));
 const backupApi = join(backupRoot, 'api');
 let movedApi = false;
 
+function movePathSync(source, destination) {
+  try {
+    renameSync(source, destination);
+  } catch (error) {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'EXDEV') {
+      cpSync(source, destination, { recursive: true, force: true });
+      rmSync(source, { recursive: true, force: true });
+      return;
+    }
+
+    throw error;
+  }
+}
+
 try {
   // Move API routes out of the app directory for static export
   if (existsSync(appApi)) {
-    renameSync(appApi, backupApi);
+    movePathSync(appApi, backupApi);
     movedApi = true;
     console.log('Moved', appApi, '->', backupApi);
   }
@@ -26,7 +40,7 @@ try {
       rmSync(backupApi, { recursive: true, force: true });
       console.log('Merged', backupApi, '->', appApi);
     } else {
-      renameSync(backupApi, appApi);
+      movePathSync(backupApi, appApi);
       console.log('Restored', backupApi, '->', appApi);
     }
   }
