@@ -1,0 +1,202 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 620" width="512" height="620">
+  <defs>
+    <radialGradient id="nightBg" cx="50%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#161728"/>
+      <stop offset="50%" stop-color="#0D0E1B"/>
+      <stop offset="100%" stop-color="#080912"/>
+    </radialGradient>
+    
+    <linearGradient id="wStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4B57A"/>
+      <stop offset="35%" stop-color="#C9A86C"/>
+      <stop offset="65%" stop-color="#C4939A"/>
+      <stop offset="100%" stop-color="#D4B57A"/>
+    </linearGradient>
+    
+    <radialGradient id="roseMist" cx="50%" cy="40%" r="40%">
+      <stop offset="0%" stop-color="#C4939A" stop-opacity="0.12"/>
+      <stop offset="60%" stop-color="#9B8EC4" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    
+    <radialGradient id="eyeCenter" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#E8D5A8"/>
+      <stop offset="40%" stop-color="#D4B57A"/>
+      <stop offset="80%" stop-color="#C4939A"/>
+      <stop offset="100%" stop-color="#9B8EC4"/>
+    </radialGradient>
+    
+    <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F0EBE3" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#D4B57A" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    
+    <linearGradient id="lavenderAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9B8EC4" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#9B8EC4" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#9B8EC4" stop-opacity="0"/>
+    </linearGradient>
+    
+    <!-- W stroke glow -->
+    <filter id="wGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="620" fill="url(#nightBg)"/>
+  
+  <!-- Rose mist aura -->
+  <ellipse cx="256" cy="230" rx="130" ry="120" fill="url(#roseMist)"/>
+  
+  <!-- ====== THE W ====== -->
+  <!-- Organic, calligraphic W — like a single brushstroke -->
+  <!-- Three peaks, two valleys. Eye sits in center valley. -->
+  
+  <!-- W main stroke — left half -->
+  <!-- Starting from bottom-left, rising to left peak, dipping to center valley -->
+  <path d="M135,310 
+           Q140,280 160,250 
+           Q175,225 190,155 
+           Q195,135 200,140 
+           Q208,150 210,190 
+           Q212,220 220,250 
+           Q228,275 240,295
+           Q248,308 256,315"
+        fill="none" stroke="url(#wStroke)" stroke-width="2.8" stroke-linecap="round" opacity="0.85"/>
+  
+  <!-- W main stroke — right half (mirror) -->
+  <path d="M256,315 
+           Q264,308 272,295 
+           Q284,275 292,250 
+           Q300,220 302,190 
+           Q304,150 312,140 
+           Q317,135 322,155 
+           Q337,225 352,250 
+           Q372,280 377,310"
+        fill="none" stroke="url(#wStroke)" stroke-width="2.8" stroke-linecap="round" opacity="0.85"/>
+  
+  <!-- W thick accent strokes (calligraphic weight variation) -->
+  <!-- Left downstroke thickener -->
+  <path d="M138,305 Q145,270 165,240 Q180,215 193,155"
+        fill="none" stroke="url(#wStroke)" stroke-width="4.5" stroke-linecap="round" opacity="0.2"/>
+  <!-- Right downstroke thickener -->
+  <path d="M374,305 Q367,270 347,240 Q332,215 319,155"
+        fill="none" stroke="url(#wStroke)" stroke-width="4.5" stroke-linecap="round" opacity="0.2"/>
+  
+  <!-- Center valley thickener -->
+  <path d="M230,285 Q243,305 256,318 Q269,305 282,285"
+        fill="none" stroke="url(#wStroke)" stroke-width="4" stroke-linecap="round" opacity="0.15"/>
+  
+  <!-- Soft glow behind the W -->
+  <ellipse cx="256" cy="240" rx="100" ry="80" fill="#D4B57A" opacity="0.03"/>
+  
+  <!-- ====== STAR NODES on W peaks ====== -->
+  <!-- Left peak -->
+  <circle cx="195" cy="148" r="3.5" fill="#D4B57A" opacity="0.9"/>
+  <circle cx="195" cy="148" r="7" fill="url(#starGlow)"/>
+  
+  <!-- Center valley (where eye sits) -->
+  <circle cx="256" cy="318" r="2.5" fill="#C4939A" opacity="0.7"/>
+  <circle cx="256" cy="318" r="5" fill="url(#starGlow)"/>
+  
+  <!-- Right peak -->
+  <circle cx="317" cy="148" r="3.5" fill="#D4B57A" opacity="0.9"/>
+  <circle cx="317" cy="148" r="7" fill="url(#starGlow)"/>
+  
+  <!-- ====== THE EYE in center valley ====== -->
+  <!-- Sitting within the W's embrace, slightly below center -->
+  
+  <!-- Eye outer contour — soft almond -->
+  <path d="M218,268 Q237,242 256,238 Q275,242 294,268 Q275,292 256,296 Q237,292 218,268Z"
+        fill="none" stroke="url(#wStroke)" stroke-width="1.2" opacity="0.7"/>
+  
+  <!-- Eye inner contour -->
+  <path d="M230,268 Q243,250 256,247 Q269,250 282,268 Q269,285 256,288 Q243,285 230,268Z"
+        fill="none" stroke="#D4B57A" stroke-width="0.6" opacity="0.35"/>
+  
+  <!-- Iris ring -->
+  <circle cx="256" cy="268" r="16" fill="none" stroke="#C4939A" stroke-width="0.5" opacity="0.3"/>
+  
+  <!-- Gem facets -->
+  <path d="M256,255 L246,265 L250,280 L262,280 L266,265Z"
+        fill="none" stroke="#D4B57A" stroke-width="0.35" opacity="0.2"/>
+  
+  <!-- Center gem -->
+  <circle cx="256" cy="268" r="7" fill="url(#eyeCenter)" opacity="0.85"/>
+  <circle cx="256" cy="268" r="3.5" fill="#F0EBE3" opacity="0.8"/>
+  <circle cx="256" cy="268" r="1.5" fill="#FFFFFF" opacity="0.9"/>
+  
+  <!-- Eye highlight -->
+  <ellipse cx="250" cy="262" rx="2.5" ry="1.5" fill="#FFFFFF" opacity="0.2" transform="rotate(-10 250 262)"/>
+  
+  <!-- ====== ORGANIC ACCENTS ====== -->
+  <!-- Small leaf/petal shapes at W's outer edges -->
+  
+  <!-- Left leaf -->
+  <path d="M150,280 Q140,260 145,240 Q152,255 158,265 Q155,275 150,280Z"
+        fill="#C4939A" opacity="0.08" stroke="#C4939A" stroke-width="0.3" stroke-opacity="0.15"/>
+  
+  <!-- Right leaf -->
+  <path d="M362,280 Q372,260 367,240 Q360,255 354,265 Q357,275 362,280Z"
+        fill="#C4939A" opacity="0.08" stroke="#C4939A" stroke-width="0.3" stroke-opacity="0.15"/>
+  
+  <!-- Top center tiny leaf -->
+  <path d="M252,175 Q256,162 260,175 Q257,170 252,175Z"
+        fill="#9B8EC4" opacity="0.1"/>
+  
+  <!-- ====== SCATTERED STAR DUST ====== -->
+  <circle cx="165" cy="130" r="1" fill="#F0EBE3" opacity="0.25"/>
+  <circle cx="350" cy="125" r="1.2" fill="#F0EBE3" opacity="0.2"/>
+  <circle cx="130" cy="220" r="0.8" fill="#D4B57A" opacity="0.2"/>
+  <circle cx="385" cy="230" r="0.9" fill="#C4939A" opacity="0.18"/>
+  <circle cx="175" cy="360" r="0.7" fill="#9B8EC4" opacity="0.15"/>
+  <circle cx="340" cy="355" r="0.8" fill="#D4B57A" opacity="0.15"/>
+  <circle cx="220" cy="120" r="0.6" fill="#F0EBE3" opacity="0.15"/>
+  <circle cx="295" cy="115" r="0.7" fill="#F0EBE3" opacity="0.12"/>
+  
+  <!-- Tiny sparkle crosses -->
+  <g transform="translate(170,170)" opacity="0.15">
+    <line x1="-3" y1="0" x2="3" y2="0" stroke="#F0EBE3" stroke-width="0.5"/>
+    <line x1="0" y1="-3" x2="0" y2="3" stroke="#F0EBE3" stroke-width="0.5"/>
+  </g>
+  <g transform="translate(345,165)" opacity="0.12">
+    <line x1="-2.5" y1="0" x2="2.5" y2="0" stroke="#D4B57A" stroke-width="0.5"/>
+    <line x1="0" y1="-2.5" x2="0" y2="2.5" stroke="#D4B57A" stroke-width="0.5"/>
+  </g>
+  <g transform="translate(256,100)" opacity="0.1">
+    <line x1="-2" y1="0" x2="2" y2="0" stroke="#9B8EC4" stroke-width="0.4"/>
+    <line x1="0" y1="-2" x2="0" y2="2" stroke="#9B8EC4" stroke-width="0.4"/>
+  </g>
+  
+  <!-- ====== DECORATIVE LINE below W ====== -->
+  <line x1="170" y1="375" x2="342" y2="375" stroke="url(#lavenderAccent)" stroke-width="0.5"/>
+  
+  <!-- ====== BRAND TEXT ====== -->
+  
+  <!-- Chinese brand name -->
+  <text x="256" y="440" text-anchor="middle" 
+        font-family="'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'SimSun', serif" 
+        font-size="36" font-weight="600" fill="#F0EBE3" letter-spacing="14" opacity="0.95">
+    万相图鉴
+  </text>
+  
+  <!-- Thin accent line -->
+  <line x1="180" y1="455" x2="332" y2="455" stroke="#D4B57A" stroke-width="0.35" opacity="0.2"/>
+  <circle cx="180" cy="455" r="1" fill="#C4939A" opacity="0.25"/>
+  <circle cx="332" cy="455" r="1" fill="#C4939A" opacity="0.25"/>
+  <circle cx="256" cy="455" r="0.7" fill="#9B8EC4" opacity="0.3"/>
+  
+  <!-- English subtitle -->
+  <text x="256" y="482" text-anchor="middle" 
+        font-family="'Cormorant Garamond', 'Playfair Display', 'Georgia', serif" 
+        font-size="11.5" fill="#D4B57A" letter-spacing="8" opacity="0.5">
+    SOUL ATLAS
+  </text>
+  
+  <!-- Flanking dots -->
+  <circle cx="195" cy="479" r="1" fill="#C4939A" opacity="0.25"/>
+  <circle cx="317" cy="479" r="1" fill="#C4939A" opacity="0.25"/>
+</svg>
