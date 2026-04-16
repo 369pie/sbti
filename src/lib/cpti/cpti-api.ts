@@ -3,6 +3,37 @@ import type { CptiClaimSource } from './claim';
 // Base fetch wrapper that includes credentials (cookies for Supabase auth)
 const API_BASE = '/api/cpti';
 
+let _signInPromise: Promise<void> | null = null;
+
+/**
+ * Ensure we have a Supabase session. Signs in anonymously if needed.
+ * Deduplicates concurrent calls.
+ */
+async function ensureSession(): Promise<void> {
+  if (_signInPromise) return _signInPromise;
+
+  _signInPromise = (async () => {
+    try {
+      const { createBrowserSupabaseClient } = await import('@/lib/supabase/client');
+      const supabase = createBrowserSupabaseClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        const { error } = await supabase.auth.signInAnonymously();
+        if (error) {
+          console.error('[cpti-api] signInAnonymously failed:', error.message);
+        }
+      }
+    } catch (err) {
+      console.error('[cpti-api] ensureSession failed:', err);
+    } finally {
+      // Allow retry on next call
+      setTimeout(() => { _signInPromise = null; }, 1000);
+    }
+  })();
+
+  return _signInPromise;
+}
+
 interface PairCodeResponse {
   code: string;
   shareToken: string;
@@ -96,12 +127,23 @@ interface CollectionResponse {
   };
 }
 
-async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+async function apiFetch<T>(path: string, options?: RequestInit, retry = true): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     credentials: 'include',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
   });
+
+  if (res.status === 401 && retry) {
+    const body = await res.json().catch(() => ({}));
+    if (body.needsAnonymousSignIn) {
+      // Auto-authenticate and retry once
+      await ensureSession();
+      return apiFetch<T>(path, options, false);
+    }
+    throw new Error(body.error ?? 'Authentication required');
+  }
+
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error ?? `API error ${res.status}`);
