@@ -4,8 +4,8 @@ import { DAILY_STATUS_TYPES, getDailyTypeImage } from '@/lib/daily/statuses';
 import { DRUNK_PERSONA_TYPES, getDrunkTypeImage } from '@/lib/drunk/personas';
 import { DELTA_PERSONALITIES, getDeltaTypeThumbnailImage } from '@/lib/delta/personalities';
 import { FLOWER_PERSONALITY_TYPES, getFlowerRarity, getFlowerTypeThumbnailImage } from '@/lib/flower/personalities';
-import { SOULTI_PERSONALITY_TYPES, getSoultiRarity, getSoultiTypeThumbnailImage } from '@/lib/soulti/personalities';
-import { KINGS_PERSONALITIES, getKingsTypeThumbnailImage } from '@/lib/kings/personalities';
+import { SOULTI_PERSONALITY_TYPES, getSoultiRarity, getSoultiTypeEmojiFallbackImage } from '@/lib/soulti/personalities';
+import { KINGS_PERSONALITIES, getKingsTypeThumbnailImage, getKingsTypeCardImage } from '@/lib/kings/personalities';
 import { LOVE_PERSONALITY_TYPES, getLoveRarity, getLoveTypeImage } from '@/lib/love/personalities';
 import { CPTI_PERSONALITY_TYPES, getCptiRarity, getCptiTypeThumbnailImage } from '@/lib/cpti/personalities';
 import { CPTI_RELATIONSHIP_TYPES, RELATIONSHIP_TIER_INFO, getCptiRelationshipTypeThumbnailImage } from '@/lib/cpti/relationships';
@@ -140,6 +140,8 @@ function buildIpTabs(): GalleryTab[] {
     href: `/wtfti/work/result/${personality.slug}/`,
   }));
 
+  const KINGS_CARD_SLUGS = new Set(['boss', 'simp', 'thin-k', 'rebel', 'joker', 'drunk', 'dior-s', 'food-ie']);
+
   const kingsItems: GalleryItem[] = KINGS_PERSONALITIES.map((personality) => ({
     slug: personality.slug,
     code: personality.number,
@@ -147,7 +149,9 @@ function buildIpTabs(): GalleryTab[] {
     tagline: personality.tagline,
     color: personality.color,
     emoji: personality.emoji,
-    image: getKingsTypeThumbnailImage(personality.slug),
+    image: KINGS_CARD_SLUGS.has(personality.slug)
+      ? getKingsTypeCardImage(personality.slug)
+      : getKingsTypeThumbnailImage(personality.slug),
     href: `/wtfti/kings/result/${personality.slug}/`,
   }));
 
@@ -340,7 +344,7 @@ function buildThemeTabs(): GalleryTab[] {
       tagline: personality.tagline,
       color: personality.color,
       emoji: personality.emoji,
-      image: getSoultiTypeThumbnailImage(personality.slug),
+      image: getSoultiTypeEmojiFallbackImage(personality.slug, 240),
       href: `/soulti/result/${personality.slug}`,
       rarity: { label: rarity.label, color: rarity.color, bgColor: rarity.bgColor },
     };

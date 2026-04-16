@@ -3,7 +3,7 @@
 import NextImage from 'next/image';
 import { useState } from 'react';
 import type { KingsPersonality } from '@/lib/kings/personalities';
-import { getKingsTypeImage } from '@/lib/kings/personalities';
+import { getKingsTypeImage, getKingsTypeMediumImage, getKingsTypeCardImage } from '@/lib/kings/personalities';
 
 interface KingsTypeArtProps {
   personality: KingsPersonality;
@@ -24,6 +24,11 @@ export function KingsTypeArt({
 }: KingsTypeArtProps) {
   const [failed, setFailed] = useState(false);
 
+  const KINGS_CARD_SLUGS = new Set(['boss', 'simp', 'thin-k', 'rebel', 'joker', 'drunk', 'dior-s', 'food-ie']);
+  const imageSrc = KINGS_CARD_SLUGS.has(personality.slug)
+    ? getKingsTypeCardImage(personality.slug)
+    : getKingsTypeMediumImage(personality.slug);
+
   return (
     <div
       className={containerClassName}
@@ -36,12 +41,14 @@ export function KingsTypeArt({
         <span className={emojiClassName}>{personality.emoji}</span>
       ) : (
         <NextImage
-          src={getKingsTypeImage(personality.slug)}
+          src={imageSrc}
           alt={alt ?? personality.heroName}
           width={400}
           height={400}
           className={imageClassName}
           priority={priority}
+          placeholder="blur"
+          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
           onError={() => setFailed(true)}
         />
       )}
