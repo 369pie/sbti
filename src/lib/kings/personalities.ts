@@ -1037,3 +1037,11 @@ export function getKingsTypeImage(slug: string): string {
 export function getKingsTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/kings/thumbs/${slug}.webp`);
 }
+
+export function getKingsTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/kings/medium/${slug}.webp`);
+}
+
+export function getKingsTypeCardImage(slug: string): string {
+  return withBasePath(`/images/types/kings-cards/${slug}.png`);
+}

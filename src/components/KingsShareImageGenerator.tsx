@@ -1,9 +1,9 @@
 'use client';
 
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
 import type { KingsPersonality } from '@/lib/kings/personalities';
-import type { DimensionScore } from '@/lib/scoring';
+import { getKingsTypeMediumImage, getKingsTypeCardImage } from '@/lib/kings/personalities';
 import { SHARE_SITE_URL } from '@/lib/site';
 
 export interface KingsShareImageHandle {
@@ -13,18 +13,16 @@ export interface KingsShareImageHandle {
 interface Props {
   personality: KingsPersonality;
   imageUrl?: string;
-  dimensionScores?: DimensionScore[];
+  dimensionScores?: unknown[]; // accepted but unused — kept for prop compatibility
 }
 
-const CARD_W = 540;
-const CARD_H = 960;
-const SCALE = 2;
+const CARD_WIDTH = 540;
+const MAX_H = 4000;
+const CARD_SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
 
-const DARK = '#221d1a';
-const MED = '#6d645d';
-const imageCache = new Map<string, Promise<HTMLImageElement>>();
+const KINGS_SHARE_URL = SHARE_SITE_URL + 'wtfti/kings/';
 
 function isMobile() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -35,158 +33,92 @@ function isWeChatBrowser() {
 }
 
 function hexToRgba(hex: string, alpha: number) {
-  const normalized = hex.replace('#', '');
-  const value = normalized.length === 3
-    ? normalized.split('').map(char => char + char).join('')
-    : normalized;
-  const r = Number.parseInt(value.slice(0, 2), 16);
-  const g = Number.parseInt(value.slice(2, 4), 16);
-  const b = Number.parseInt(value.slice(4, 6), 16);
+  const n = hex.replace('#', '');
+  const v = n.length === 3 ? n.split('').map(c => c + c).join('') : n;
+  const r = Number.parseInt(v.slice(0, 2), 16);
+  const g = Number.parseInt(v.slice(2, 4), 16);
+  const b = Number.parseInt(v.slice(4, 6), 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 function roundRectPath(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
-  const rr = Math.min(r, w / 2, h / 2);
+  const radius = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
-  ctx.moveTo(x + rr, y);
-  ctx.lineTo(x + w - rr, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
-  ctx.lineTo(x + w, y + h - rr);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
-  ctx.lineTo(x + rr, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
-  ctx.lineTo(x, y + rr);
-  ctx.quadraticCurveTo(x, y, x + rr, y);
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + w - radius, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+  ctx.lineTo(x + w, y + h - radius);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+  ctx.lineTo(x + radius, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
   ctx.closePath();
 }
 
-function fillRoundedRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number,
-  fill: string | CanvasGradient,
-) {
+function fillRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number, fill: string | CanvasGradient) {
   roundRectPath(ctx, x, y, w, h, r);
   ctx.fillStyle = fill;
   ctx.fill();
 }
 
-function strokeRoundedRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number,
-  stroke: string,
-  lineWidth = 1,
-) {
+function strokeRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number, stroke: string, lw = 1) {
   roundRectPath(ctx, x, y, w, h, r);
-  ctx.lineWidth = lineWidth;
+  ctx.lineWidth = lw;
   ctx.strokeStyle = stroke;
   ctx.stroke();
 }
 
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number) {
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines?: number) {
   const lines: string[] = [];
-  let index = 0;
-
-  while (index < text.length && lines.length < maxLines) {
+  let idx = 0;
+  while (idx < text.length && (!maxLines || lines.length < maxLines)) {
     let line = '';
-    while (index < text.length) {
-      const char = text[index];
-      if (char === '\n') {
-        index += 1;
-        break;
-      }
+    while (idx < text.length) {
+      const char = text[idx];
+      if (char === '\n') { idx++; break; }
       const candidate = line + char;
       if (line && ctx.measureText(candidate).width > maxWidth) break;
       line = candidate;
-      index += 1;
+      idx++;
     }
-    lines.push(line.trimStart());
+    if (line) lines.push(line.trimStart());
   }
-
-  if (index < text.length && lines.length > 0) {
+  if (maxLines && idx < text.length && lines.length > 0) {
     let last = lines[lines.length - 1];
-    while (last && ctx.measureText(`${last}…`).width > maxWidth) {
-      last = last.slice(0, -1);
-    }
+    while (last && ctx.measureText(`${last}…`).width > maxWidth) last = last.slice(0, -1);
     lines[lines.length - 1] = `${last}…`;
   }
-
   return lines;
 }
+
+const imageCache = new Map<string, Promise<HTMLImageElement>>();
 
 async function loadImage(src: string): Promise<HTMLImageElement> {
   const img = new window.Image();
   img.crossOrigin = 'anonymous';
-
   await new Promise<void>((resolve, reject) => {
-    const onLoad = () => {
-      cleanup();
-      resolve();
-    };
-    const onError = () => {
-      cleanup();
-      reject(new Error(`Image load failed: ${src}`));
-    };
-    const cleanup = () => {
-      img.removeEventListener('load', onLoad);
-      img.removeEventListener('error', onError);
-    };
-
+    const onLoad = () => { cleanup(); resolve(); };
+    const onError = () => { cleanup(); reject(new Error(`Load failed: ${src}`)); };
+    const cleanup = () => { img.removeEventListener('load', onLoad); img.removeEventListener('error', onError); };
     img.addEventListener('load', onLoad);
     img.addEventListener('error', onError);
     img.src = src;
-
-    if (img.complete && img.naturalWidth > 0) {
-      cleanup();
-      resolve();
-    }
+    if (img.complete && img.naturalWidth > 0) { cleanup(); resolve(); }
   });
-
-  try {
-    await img.decode();
-  } catch {
-    // Best-effort decode.
-  }
-
+  try { await img.decode(); } catch { /* ok */ }
   return img;
 }
 
 function getCachedImage(src: string) {
   const cached = imageCache.get(src);
   if (cached) return cached;
-  const pending = loadImage(src).catch(error => {
-    imageCache.delete(src);
-    throw error;
-  });
-  imageCache.set(src, pending);
-  return pending;
+  const p = loadImage(src).catch(e => { imageCache.delete(src); throw e; });
+  imageCache.set(src, p);
+  return p;
 }
 
-async function createQrImage() {
-  const qrDataUrl = await toQrDataUrl(SHARE_SITE_URL, {
-    width: 200,
-    margin: 1,
-    color: { dark: '#281f1b', light: '#fff7ee' },
-    errorCorrectionLevel: 'M',
-  });
-  return getCachedImage(qrDataUrl);
-}
-
-function drawImageContain(
-  ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-) {
+function drawImageContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number) {
   const sw = img.naturalWidth || img.width;
   const sh = img.naturalHeight || img.height;
   const scale = Math.min(w / sw, h / sh);
@@ -195,14 +127,7 @@ function drawImageContain(
   ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
 }
 
-function drawImageCover(
-  ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-) {
+function drawImageCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number) {
   const sw = img.naturalWidth || img.width;
   const sh = img.naturalHeight || img.height;
   const scale = Math.max(w / sw, h / sh);
@@ -211,144 +136,243 @@ function drawImageCover(
   ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
 }
 
+function drawDivider(ctx: CanvasRenderingContext2D, y: number, color: string) {
+  const cx = CARD_WIDTH / 2;
+  const grad = ctx.createLinearGradient(cx - 90, 0, cx + 90, 0);
+  grad.addColorStop(0, 'rgba(0,0,0,0)');
+  grad.addColorStop(0.3, color);
+  grad.addColorStop(0.7, color);
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(cx - 90, y);
+  ctx.lineTo(cx + 90, y);
+  ctx.stroke();
+}
+
 async function renderKingsShareImage(personality: KingsPersonality, imageUrl?: string) {
-  const [typeImage, qrImage] = await Promise.all([
-    imageUrl ? getCachedImage(imageUrl).catch(() => null) : Promise.resolve(null),
-    createQrImage().catch(() => null),
+  // Try new card image first, fall back to medium, then to prop
+  const cardImageUrl = getKingsTypeCardImage(personality.slug);
+  const mediumUrl = getKingsTypeMediumImage(personality.slug);
+  const [cardImage, qrImage] = await Promise.all([
+    getCachedImage(cardImageUrl)
+      .catch(() => getCachedImage(mediumUrl))
+      .catch(() => imageUrl ? getCachedImage(imageUrl) : null)
+      .catch(() => null),
+    toQrDataUrl(KINGS_SHARE_URL, {
+      width: 200, margin: 1,
+      color: { dark: '#1a1510', light: '#ffffff' },
+      errorCorrectionLevel: 'M',
+    }).then(url => getCachedImage(url)).catch(() => null),
   ]);
 
   const canvas = document.createElement('canvas');
-  canvas.width = CARD_W * SCALE;
-  canvas.height = CARD_H * SCALE;
+  canvas.width = CARD_WIDTH * CARD_SCALE;
+  canvas.height = MAX_H * CARD_SCALE;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas context unavailable');
 
-  ctx.scale(SCALE, SCALE);
+  ctx.scale(CARD_SCALE, CARD_SCALE);
   ctx.textBaseline = 'top';
+
+  const BG = '#FFF8F0';
+  const DARK = '#1a1510';
+  const MED = '#6d5f52';
+  const LIGHT = '#a89888';
   const accent = personality.color;
 
-  if (typeImage) {
-    drawImageCover(ctx, typeImage, 0, 0, CARD_W, CARD_H);
-  } else {
-    const background = ctx.createLinearGradient(0, 0, 0, CARD_H);
-    background.addColorStop(0, '#fff9f0');
-    background.addColorStop(1, '#f4eadc');
-    ctx.fillStyle = background;
-    ctx.fillRect(0, 0, CARD_W, CARD_H);
-    ctx.fillStyle = hexToRgba(accent, 0.14);
-    ctx.fillRect(0, 0, CARD_W, CARD_H);
-    ctx.textAlign = 'center';
-    ctx.font = `160px ${FONT_SANS}`;
-    ctx.fillText(personality.emoji, CARD_W / 2, CARD_H * 0.28);
-  }
+  // Background
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, CARD_WIDTH, MAX_H);
 
-  // ========== 2. Top gradient overlay for text legibility ==========
-  const topGrad = ctx.createLinearGradient(0, 0, 0, CARD_H * 0.40);
-  topGrad.addColorStop(0, 'rgba(255, 247, 238, 0.92)');
-  topGrad.addColorStop(0.55, 'rgba(255, 247, 238, 0.72)');
-  topGrad.addColorStop(1, 'rgba(255, 247, 238, 0)');
-  ctx.fillStyle = topGrad;
-  ctx.fillRect(0, 0, CARD_W, CARD_H * 0.40);
+  // Subtle radial wash
+  const wash = ctx.createRadialGradient(270, 300, 0, 270, 300, 320);
+  wash.addColorStop(0, hexToRgba(accent, 0.08));
+  wash.addColorStop(1, hexToRgba(accent, 0));
+  ctx.fillStyle = wash;
+  ctx.fillRect(0, 0, CARD_WIDTH, 600);
 
-  // ========== 3. Bottom gradient overlay for cards/quote ==========
-  const bottomGrad = ctx.createLinearGradient(0, CARD_H * 0.58, 0, CARD_H);
-  bottomGrad.addColorStop(0, 'rgba(24, 17, 14, 0)');
-  bottomGrad.addColorStop(0.35, 'rgba(24, 17, 14, 0.40)');
-  bottomGrad.addColorStop(1, 'rgba(24, 17, 14, 0.75)');
-  ctx.fillStyle = bottomGrad;
-  ctx.fillRect(0, CARD_H * 0.58, CARD_W, CARD_H * 0.42);
+  let y = 40;
 
-  // ========== 4. Top text: badge → title → code → tagline ==========
-  const badgeText = `王者TI · 峡谷宇宙 · ${personality.number}`;
-  ctx.font = `700 11px ${FONT_MONO}`;
-  const badgeWidth = ctx.measureText(badgeText).width + 24;
-  fillRoundedRect(ctx, 28, 28, badgeWidth, 24, 12, hexToRgba(accent, 0.18));
-  ctx.fillStyle = accent;
+  // ── Header ──
   ctx.textAlign = 'center';
-  ctx.fillText(badgeText, 28 + badgeWidth / 2, 34);
+  ctx.fillStyle = accent;
+  ctx.font = `700 12px ${FONT_MONO}`;
+  ctx.fillText('王者TI · 峡谷人格图鉴', CARD_WIDTH / 2, y);
+  y += 24;
 
+  ctx.fillStyle = MED;
+  ctx.font = `13px ${FONT_SANS}`;
+  ctx.fillText('我在峡谷居然是这种人？', CARD_WIDTH / 2, y);
+  y += 28;
+
+  // ── Card Image ──
+  const imgW = CARD_WIDTH - 60;
+  const imgH = Math.round(imgW * 4 / 3); // 3:4 aspect
+  const imgX = 30;
+
+  if (cardImage) {
+    // Rounded clip for card image
+    ctx.save();
+    roundRectPath(ctx, imgX, y, imgW, imgH, 20);
+    ctx.clip();
+    drawImageCover(ctx, cardImage, imgX, y, imgW, imgH);
+    ctx.restore();
+    // Border
+    strokeRoundedRect(ctx, imgX, y, imgW, imgH, 20, hexToRgba(accent, 0.25), 2);
+  } else {
+    // Fallback: emoji placeholder
+    fillRoundedRect(ctx, imgX, y, imgW, imgH, 20, hexToRgba(accent, 0.08));
+    strokeRoundedRect(ctx, imgX, y, imgW, imgH, 20, hexToRgba(accent, 0.2));
+    ctx.fillStyle = DARK;
+    ctx.font = `100px ${FONT_SANS}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(personality.emoji, CARD_WIDTH / 2, y + imgH / 2 - 50);
+    ctx.textAlign = 'left';
+  }
+  y += imgH + 20;
+
+  // ── Name + Code ──
+  ctx.textAlign = 'center';
+  ctx.fillStyle = DARK;
+  ctx.font = `900 36px ${FONT_SANS}`;
+  ctx.fillText(personality.heroName, CARD_WIDTH / 2, y);
+  y += 44;
+
+  ctx.fillStyle = accent;
+  ctx.font = `700 16px ${FONT_MONO}`;
+  const codeText = `${personality.code}  (${personality.heroRef})`;
+  ctx.fillText(codeText, CARD_WIDTH / 2, y);
+  y += 28;
+
+  // Tagline pill
+  const tagText = `你总是……${personality.tagline}`;
+  ctx.font = `600 14px ${FONT_SANS}`;
+  const tagW = ctx.measureText(tagText).width + 32;
+  const tagX = (CARD_WIDTH - tagW) / 2;
+  fillRoundedRect(ctx, tagX, y, tagW, 30, 15, hexToRgba(accent, 0.1));
+  strokeRoundedRect(ctx, tagX, y, tagW, 30, 15, hexToRgba(accent, 0.25));
+  ctx.fillStyle = accent;
+  ctx.fillText(tagText, CARD_WIDTH / 2, y + 7);
+  y += 44;
+
+  // ── Description divider ──
+  drawDivider(ctx, y, hexToRgba(accent, 0.3));
+  y += 16;
+  ctx.fillStyle = LIGHT;
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('CANYON TRANSLATION', CARD_WIDTH / 2, y);
+  y += 20;
+
+  // ── Description text (wtfHit) ──
   ctx.textAlign = 'left';
   ctx.fillStyle = DARK;
-  ctx.font = `900 38px ${FONT_SANS}`;
-  const titleLines = wrapText(ctx, personality.heroName, CARD_W - 64, 2);
-  titleLines.forEach((line, index) => {
-    ctx.fillText(line, 32, 68 + index * 44);
-  });
+  ctx.font = `14px ${FONT_SANS}`;
+  const descLines = wrapText(ctx, personality.copy.wtfHit, CARD_WIDTH - 80, 6);
+  for (let i = 0; i < descLines.length; i++) {
+    ctx.fillText(descLines[i], 40, y);
+    y += 22;
+  }
+  y += 12;
 
-  const codeY = 68 + titleLines.length * 44 + 8;
-  ctx.fillStyle = accent;
-  ctx.font = `700 18px ${FONT_MONO}`;
-  ctx.fillText(personality.code, 32, codeY);
-
-  const refX = 32 + ctx.measureText(personality.code).width + 10;
-  ctx.fillStyle = MED;
-  ctx.font = `600 11px ${FONT_MONO}`;
-  const refLines = wrapText(ctx, `(${personality.heroRef})`, CARD_W - refX - 32, 2);
-  refLines.forEach((line, index) => {
-    ctx.fillText(line, refX, codeY + 5 + index * 14);
-  });
-
-  const taglineY = codeY + Math.max(28, refLines.length * 14 + 8) + 8;
-  ctx.fillStyle = hexToRgba(DARK, 0.88);
-  ctx.font = `600 15px ${FONT_SANS}`;
-  const taglineLines = wrapText(ctx, `你总是…${personality.tagline}`, CARD_W - 64, 2);
-  taglineLines.forEach((line, index) => {
-    ctx.fillText(line, 32, taglineY + index * 22);
-  });
-
-  // ========== 5. Bottom: 3 feature cards (frosted glass) ==========
-  const cardsY = CARD_H - 206;
-  const cardGap = 10;
-  const cardW = (CARD_W - 64 - cardGap * 2) / 3;
-  const cardH = 82;
-  const symptomCards = personality.copy.symptoms.slice(0, 3);
-
-  symptomCards.forEach((symptom, index) => {
-    const cardX = 32 + index * (cardW + cardGap);
-    fillRoundedRect(ctx, cardX, cardsY, cardW, cardH, 14, 'rgba(255, 255, 255, 0.16)');
-    strokeRoundedRect(ctx, cardX, cardsY, cardW, cardH, 14, 'rgba(255, 255, 255, 0.28)', 1);
-
-    ctx.textAlign = 'center';
-    ctx.fillStyle = hexToRgba(accent, 0.96);
-    ctx.font = `700 10px ${FONT_MONO}`;
-    ctx.fillText(`SYMPTOM 0${index + 1}`, cardX + cardW / 2, cardsY + 8);
-
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `600 11px ${FONT_SANS}`;
-    const symptomLines = wrapText(ctx, symptom, cardW - 14, 3);
-    symptomLines.forEach((line, lineIndex) => {
-      ctx.fillText(line, cardX + cardW / 2, cardsY + 26 + lineIndex * 15);
-    });
-  });
-
-  // ========== 6. Quote bar (accent colored) ==========
-  const quoteY = cardsY + cardH + 14;
-  fillRoundedRect(ctx, 24, quoteY, CARD_W - 48, 54, 14, hexToRgba(accent, 0.88));
-  ctx.fillStyle = '#ffffff';
-  ctx.font = `600 14px ${FONT_SANS}`;
+  // ── Symptom tags ──
+  drawDivider(ctx, y, hexToRgba(accent, 0.3));
+  y += 16;
+  ctx.fillStyle = LIGHT;
+  ctx.font = `11px ${FONT_MONO}`;
   ctx.textAlign = 'center';
-  const quoteLines = wrapText(ctx, personality.quote, CARD_W - 96, 2);
-  const quoteOffset = quoteLines.length === 1 ? 17 : 9;
-  quoteLines.forEach((line, index) => {
-    ctx.fillText(line, CARD_W / 2, quoteY + quoteOffset + index * 20);
-  });
+  ctx.fillText('峡谷症状', CARD_WIDTH / 2, y);
+  y += 22;
 
-  // ========== 7. Footer: CTA + QR ==========
-  const footerY = CARD_H - 46;
-  ctx.textAlign = 'left';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+  const symptoms = personality.copy.symptoms.slice(0, 3);
+  const tagGap = 8;
   ctx.font = `600 12px ${FONT_SANS}`;
-  ctx.fillText('测测你的王者TI →', 32, footerY);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.50)';
-  ctx.font = `10px ${FONT_MONO}`;
-  ctx.fillText(SHARE_SITE_URL, 32, footerY + 18);
+  // Calculate widths
+  const tagWidths = symptoms.map(s => ctx.measureText(s).width + 24);
+  const totalTagW = tagWidths.reduce((a, b) => a + b, 0) + tagGap * (symptoms.length - 1);
+  let tagStartX = (CARD_WIDTH - totalTagW) / 2;
 
+  symptoms.forEach((symptom, i) => {
+    const tw = tagWidths[i];
+    fillRoundedRect(ctx, tagStartX, y, tw, 28, 14, hexToRgba(accent, 0.1));
+    strokeRoundedRect(ctx, tagStartX, y, tw, 28, 14, hexToRgba(accent, 0.25));
+    ctx.fillStyle = accent;
+    ctx.textAlign = 'center';
+    ctx.fillText(symptom, tagStartX + tw / 2, y + 7);
+    tagStartX += tw + tagGap;
+  });
+  ctx.textAlign = 'left';
+  y += 44;
+
+  // ── Quote ──
+  const quoteText = personality.quote;
+  ctx.font = `600 14px ${FONT_SANS}`;
+  const quoteLines = wrapText(ctx, quoteText, CARD_WIDTH - 80, 3);
+  const quoteH = Math.max(50, quoteLines.length * 22 + 20);
+  fillRoundedRect(ctx, 36, y, CARD_WIDTH - 72, quoteH, 14, hexToRgba(accent, 0.85));
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+  quoteLines.forEach((line, i) => {
+    ctx.fillText(line, CARD_WIDTH / 2, y + 10 + i * 22);
+  });
+  ctx.textAlign = 'left';
+  y += quoteH + 20;
+
+  // ── Closing divider ──
+  drawDivider(ctx, y, hexToRgba(accent, 0.2));
+  y += 28;
+
+  // ── Footer ──
+  const CARD_HEIGHT = y + 80;
+  const footerY = CARD_HEIGHT - 80;
+
+  ctx.strokeStyle = hexToRgba(accent, 0.15);
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(36, footerY);
+  ctx.lineTo(CARD_WIDTH - 36, footerY);
+  ctx.stroke();
+
+  ctx.fillStyle = DARK;
+  ctx.font = `600 14px ${FONT_SANS}`;
+  ctx.fillText('测测你的王者TI →', 36, footerY + 12);
+  ctx.fillStyle = accent;
+  ctx.font = `11px ${FONT_MONO}`;
+  ctx.fillText(KINGS_SHARE_URL, 36, footerY + 34);
+
+  fillRoundedRect(ctx, CARD_WIDTH - 96, footerY + 4, 60, 60, 10, '#ffffff');
   if (qrImage) {
-    fillRoundedRect(ctx, CARD_W - 74, footerY - 6, 46, 46, 8, 'rgba(255, 255, 255, 0.92)');
-    drawImageContain(ctx, qrImage, CARD_W - 71, footerY - 3, 40, 40);
+    drawImageContain(ctx, qrImage, CARD_WIDTH - 92, footerY + 8, 52, 52);
+  } else {
+    fillRoundedRect(ctx, CARD_WIDTH - 92, footerY + 12, 44, 44, 6, hexToRgba(accent, 0.1));
   }
 
-  return canvas.toDataURL('image/png');
+  // ── Crop & decorative border ──
+  const croppedCanvas = document.createElement('canvas');
+  croppedCanvas.width = CARD_WIDTH * CARD_SCALE;
+  croppedCanvas.height = CARD_HEIGHT * CARD_SCALE;
+  const cctx = croppedCanvas.getContext('2d');
+  if (!cctx) throw new Error('Canvas context unavailable');
+  cctx.drawImage(canvas, 0, 0);
+  cctx.scale(CARD_SCALE, CARD_SCALE);
+
+  // Decorative outer border
+  strokeRoundedRect(cctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 20, hexToRgba(accent, 0.2), 2);
+  strokeRoundedRect(cctx, 20, 20, CARD_WIDTH - 40, CARD_HEIGHT - 40, 16, hexToRgba(accent, 0.06), 1);
+
+  // Corner accents
+  cctx.fillStyle = hexToRgba(accent, 0.3);
+  cctx.font = `12px ${FONT_SANS}`;
+  cctx.textAlign = 'center';
+  cctx.textBaseline = 'top';
+  cctx.fillText('⚔', 34, 26);
+  cctx.fillText('⚔', CARD_WIDTH - 34, 26);
+  cctx.fillText('⚔', 34, CARD_HEIGHT - 40);
+  cctx.fillText('⚔', CARD_WIDTH - 34, CARD_HEIGHT - 40);
+
+  return croppedCanvas.toDataURL('image/png');
 }
 
 export const KingsShareImageGenerator = forwardRef<KingsShareImageHandle, Props>(
@@ -357,53 +381,50 @@ export const KingsShareImageGenerator = forwardRef<KingsShareImageHandle, Props>
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
 
-    const prepareAssets = useCallback(async () => {
-      await Promise.all([
-        imageUrl ? getCachedImage(imageUrl).catch(() => null) : Promise.resolve(null),
-        createQrImage().catch(() => null),
-      ]);
-    }, [imageUrl]);
-
-    useEffect(() => {
-      void prepareAssets();
-    }, [prepareAssets]);
-
     const handleGenerate = useCallback(async () => {
       if (generating) return;
       setGenerating(true);
       setSaveHint(null);
-
       try {
         const dataUrl = await renderKingsShareImage(personality, imageUrl);
         setPreviewUrl(dataUrl);
-      } catch (error) {
-        console.error('Failed to generate Kings share image:', error);
+      } catch (err) {
+        console.error('Failed to generate Kings share image:', err);
       } finally {
         setGenerating(false);
       }
     }, [generating, imageUrl, personality]);
 
+    const handleQuickDownload = useCallback(async () => {
+      if (!previewUrl) {
+        await handleGenerate();
+        return;
+      }
+      const link = document.createElement('a');
+      link.download = `王者TI-${personality.code}.png`;
+      link.href = previewUrl;
+      link.click();
+    }, [handleGenerate, personality.code, previewUrl]);
+
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `KingsTI-${personality.code}.png`, { type: 'image/png' });
+      return new File([blob], `王者TI-${personality.code}.png`, { type: 'image/png' });
     }, [personality.code, previewUrl]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
-
       if (isMobile()) {
         try {
           const file = await createPreviewFile();
           if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
-            setSaveHint('请在系统菜单里选择“保存到照片”或“存储到文件”。');
-            await navigator.share({ files: [file], title: `KingsTI-${personality.code}.png` });
+            setSaveHint('请在系统菜单里选择"保存到照片"或"存储到文件"。');
+            await navigator.share({ files: [file], title: `王者TI-${personality.code}.png` });
             return;
           }
         } catch (error) {
           if (error instanceof DOMException && error.name === 'AbortError') return;
         }
-
         setSaveHint(
           isWeChatBrowser()
             ? '微信内置浏览器不支持直接弹出保存面板，请长按上方图片保存，或右上角用系统浏览器打开后再保存。'
@@ -411,16 +432,14 @@ export const KingsShareImageGenerator = forwardRef<KingsShareImageHandle, Props>
         );
         return;
       }
-
       const link = document.createElement('a');
-      link.download = `KingsTI-${personality.code}.png`;
+      link.download = `王者TI-${personality.code}.png`;
       link.href = previewUrl;
       link.click();
     }, [createPreviewFile, personality.code, previewUrl]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
-
       try {
         const file = await createPreviewFile();
         if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
@@ -436,16 +455,23 @@ export const KingsShareImageGenerator = forwardRef<KingsShareImageHandle, Props>
     useImperativeHandle(ref, () => ({ generate: handleGenerate }), [handleGenerate]);
 
     return (
-      <div>
+      <div className="space-y-2.5">
         <button
-          onClick={handleGenerate}
+          onClick={handleQuickDownload}
           disabled={generating}
-          className="w-full py-3.5 rounded-xl bg-accent text-white font-medium text-sm hover:bg-accent/90 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full py-3.5 rounded-xl bg-accent text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {generating ? (
             <>
               <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               生成中…
+            </>
+          ) : previewUrl ? (
+            <>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              直接下载
             </>
           ) : (
             <>
@@ -456,6 +482,15 @@ export const KingsShareImageGenerator = forwardRef<KingsShareImageHandle, Props>
             </>
           )}
         </button>
+
+        {previewUrl && (
+          <button
+            onClick={() => setPreviewUrl(null)}
+            className="w-full py-3 rounded-xl border border-accent/20 bg-accent/5 text-sm text-accent/70 hover:bg-accent/10 transition-all cursor-pointer"
+          >
+            隐藏预览
+          </button>
+        )}
 
         {previewUrl && (
           <div
@@ -499,11 +534,11 @@ export const KingsShareImageGenerator = forwardRef<KingsShareImageHandle, Props>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  保存图片
+                  下载图片
                 </button>
                 <button
                   onClick={handleShare}
-                  className="flex-1 py-3 rounded-xl bg-accent text-bg-primary text-sm font-medium hover:brightness-110 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-xl bg-accent text-white text-sm font-medium hover:brightness-110 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -511,10 +546,6 @@ export const KingsShareImageGenerator = forwardRef<KingsShareImageHandle, Props>
                   分享
                 </button>
               </div>
-
-              <p className="text-center text-xs text-white/60 mt-4">
-                点击空白处关闭
-              </p>
             </div>
           </div>
         )}
