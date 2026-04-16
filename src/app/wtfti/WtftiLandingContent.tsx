@@ -1,6 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import NextImage from 'next/image';
+import { motion } from 'framer-motion';
 import { WTFTI_PERSONALITIES, getWtftiTypeThumbnailImage } from '@/lib/wtfti-personalities';
+import { UNIVERSES as UNIVERSES_DATA } from '@/lib/universes';
 
 const FEATURED = WTFTI_PERSONALITIES.slice(0, 8);
 
@@ -157,6 +161,76 @@ export default function WtftiLandingContent() {
               >
                 进入灵鉴
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* All Universes Grid */}
+      <section className="px-6 pb-8 pt-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="animate-fade-up">
+            <div className="mb-8">
+              <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Universes</span>
+              <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+                探索全部宇宙
+              </h2>
+              <p className="text-text-secondary mt-3 leading-relaxed">
+                同一个灵魂，不同的宇宙里有不同的翻译。选择你感兴趣的宇宙开始测试。
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {UNIVERSES_DATA.filter(u => u.status === 'live' && u.id !== 'standard' && u.id !== 'xiuxian').map((universe, index) => (
+                <motion.div
+                  key={universe.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                >
+                  <Link
+                    href={universe.testPath}
+                    className="group block rounded-xl border border-border-subtle bg-bg-elevated p-5 shadow-sm hover:shadow-md hover:border-border transition-all h-full"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div 
+                        className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                        style={{ 
+                          background: `${universe.accent}15`,
+                          border: `1px solid ${universe.accent}30`
+                        }}
+                      >
+                        {universe.emoji}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-text-primary mb-1">{universe.name}</div>
+                        <div className="text-sm text-text-muted mb-3 truncate">{universe.shortName}</div>
+                        <div 
+                          className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+                          style={{ color: universe.accent }}
+                        >
+                          开始测试
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="text-center mt-8">
+              <Link
+                href="/types/"
+                className="inline-flex items-center gap-2 text-accent text-sm font-medium hover:underline"
+              >
+                查看所有宇宙详情
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </Link>

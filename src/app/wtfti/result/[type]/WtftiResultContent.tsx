@@ -3,14 +3,16 @@
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { WtftiPersonality } from '@/lib/wtfti-personalities';
+import { markCollected } from '@/lib/mysti/collection';
 import { WTFTI_PERSONALITIES, getWtftiTypeImage, getWtftiTypeThumbnailImage } from '@/lib/wtfti-personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
 import { WtftiShareImageGenerator } from '@/components/WtftiShareImageGenerator';
 import type { WtftiShareImageHandle } from '@/components/WtftiShareImageGenerator';
 import { UniverseSwitcher } from '@/components/UniverseSwitcher';
+import { CrossUniverseCTA } from '@/components/CrossUniverseCTA';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
 import { UgcShareCTA } from '@/components/UgcShareCTA';
 import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
@@ -26,6 +28,11 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<WtftiShareImageHandle>(null);
+
+  // Mark as collected on mount
+  useEffect(() => {
+    markCollected('wtfti', p.slug);
+  }, [p.slug]);
 
   const shareUrl = getSiteUrl(`/wtfti/result/${p.slug}/`);
 
@@ -267,6 +274,11 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
       {/* Cross-universe exploration */}
       <section className="max-w-2xl mx-auto px-6 pb-8">
         <UniverseSwitcher slug={p.slug} currentUniverseId="wtfti" />
+      </section>
+
+      {/* Cross-universe CTA */}
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <CrossUniverseCTA slug={p.slug} currentUniverseId="wtfti" />
       </section>
 
       {/* Other types */}

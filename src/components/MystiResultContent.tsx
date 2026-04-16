@@ -12,7 +12,9 @@ import { getMystiTarotData } from '@/lib/mysti/tarot-mapping';
 import { getDualInterpretation } from '@/lib/mysti/dual-interpretation';
 import { MystiShareImageGenerator } from '@/components/MystiShareImageGenerator';
 import { UniverseSwitcher } from '@/components/UniverseSwitcher';
+import { CrossUniverseCTA } from '@/components/CrossUniverseCTA';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
+import { markCollected } from '@/lib/mysti/collection';
 
 interface Props {
   wtftiPersonality: WtftiPersonality;
@@ -24,6 +26,11 @@ export function MystiResultContent({ wtftiPersonality }: Props) {
   const searchParams = useSearchParams();
   const partnerSlug = searchParams.get('partner');
   const partnerPersonality = partnerSlug ? getWtftiPersonality(partnerSlug) : undefined;
+
+  // Mark as collected on mount
+  useEffect(() => {
+    markCollected('mysti', wtftiPersonality.slug);
+  }, [wtftiPersonality.slug]);
 
   // Track dual view
   useEffect(() => {
@@ -280,6 +287,27 @@ function SingleModeContent({
             accent: theme.accent,
             text: theme.text,
             textMuted: theme.textMuted,
+          }}
+        />
+      </motion.div>
+
+      {/* Cross-universe CTA */}
+      <motion.div
+        initial={mounted ? { opacity: 0, y: 16 } : false}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.39 }}
+        className="mb-10"
+      >
+        <CrossUniverseCTA
+          slug={personality.slug}
+          currentUniverseId="mysti"
+          theme={{
+            cardSurface: theme.cardSurface,
+            divider: theme.divider,
+            accent: theme.accent,
+            text: theme.text,
+            textMuted: theme.textMuted,
+            bgGradient: `linear-gradient(135deg, ${theme.gradientBg[0]} 0%, ${theme.gradientBg[1]} 100%)`,
           }}
         />
       </motion.div>
