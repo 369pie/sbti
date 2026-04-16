@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { getIdentifyPersonaBySlug, getAllIdentifySlugs, getIdentifyTypeImage } from '@/lib/identify/personas';
 import { IDENTIFY_DIMENSIONS } from '@/lib/identify/dimensions';
@@ -35,6 +36,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+function IdentifyResultFallback({ name }: { name: string }) {
+  return (
+    <div className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
+      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-border-subtle bg-bg-secondary/60 text-xs text-text-muted mb-6">
+        正在加载 {name} 的鉴定书…
+      </div>
+    </div>
+  );
+}
+
 export default async function IdentifyResultPage({ params }: PageProps) {
   const { type } = await params;
   const persona = getIdentifyPersonaBySlug(type);
@@ -64,7 +75,9 @@ export default async function IdentifyResultPage({ params }: PageProps) {
           ],
         }) }}
       />
-      <IdentifyResultContent persona={persona} dimensionScores={dimensionScores} />
+      <Suspense fallback={<IdentifyResultFallback name={persona.name} />}>
+        <IdentifyResultContent persona={persona} dimensionScores={dimensionScores} />
+      </Suspense>
     </>
   );
 }
