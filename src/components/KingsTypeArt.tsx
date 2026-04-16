@@ -24,10 +24,7 @@ export function KingsTypeArt({
 }: KingsTypeArtProps) {
   const [failed, setFailed] = useState(false);
 
-  const KINGS_CARD_SLUGS = new Set(['boss', 'simp', 'thin-k', 'rebel', 'joker', 'drunk', 'dior-s', 'food-ie']);
-  const imageSrc = KINGS_CARD_SLUGS.has(personality.slug)
-    ? getKingsTypeCardImage(personality.slug)
-    : getKingsTypeMediumImage(personality.slug);
+  const imageSrc = getKingsTypeCardImage(personality.slug);
 
   return (
     <div

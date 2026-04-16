@@ -247,8 +247,15 @@ async function renderKingsShareImage(personality: KingsPersonality, imageUrl?: s
   y += 28;
 
   // Tagline pill
-  const tagText = `你总是……${personality.tagline}`;
   ctx.font = `600 14px ${FONT_SANS}`;
+  const tagPillMaxW = CARD_WIDTH - 80;
+  let tagText = `你总是……${personality.tagline}`;
+  if (ctx.measureText(tagText).width + 32 > tagPillMaxW) {
+    while (tagText.length > 0 && ctx.measureText(tagText + '…').width + 32 > tagPillMaxW) {
+      tagText = tagText.slice(0, -1);
+    }
+    tagText = tagText + '…';
+  }
   const tagW = ctx.measureText(tagText).width + 32;
   const tagX = (CARD_WIDTH - tagW) / 2;
   fillRoundedRect(ctx, tagX, y, tagW, 30, 15, hexToRgba(accent, 0.1));
@@ -288,19 +295,32 @@ async function renderKingsShareImage(personality: KingsPersonality, imageUrl?: s
 
   const symptoms = personality.copy.symptoms.slice(0, 3);
   const tagGap = 8;
+  const tagPadding = 24;
+  const tagMaxW = (CARD_WIDTH - 80 - tagGap * 2) / 3; // max per tag to fit 3 in a row
+
+  // Truncate tag text to fit within max width
+  function truncateTag(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
+    if (ctx.measureText(text).width + tagPadding <= maxWidth) return text;
+    let truncated = text;
+    while (truncated.length > 0 && ctx.measureText(truncated + '…').width + tagPadding > maxWidth) {
+      truncated = truncated.slice(0, -1);
+    }
+    return truncated ? truncated + '…' : text.slice(0, 2) + '…';
+  }
+
   ctx.font = `600 12px ${FONT_SANS}`;
-  // Calculate widths
-  const tagWidths = symptoms.map(s => ctx.measureText(s).width + 24);
-  const totalTagW = tagWidths.reduce((a, b) => a + b, 0) + tagGap * (symptoms.length - 1);
+  const tagTexts = symptoms.map(s => truncateTag(ctx, s, tagMaxW));
+  const tagWidths = tagTexts.map(t => Math.min(ctx.measureText(t).width + tagPadding, tagMaxW));
+  const totalTagW = tagWidths.reduce((a, b) => a + b, 0) + tagGap * (tagTexts.length - 1);
   let tagStartX = (CARD_WIDTH - totalTagW) / 2;
 
-  symptoms.forEach((symptom, i) => {
+  tagTexts.forEach((text, i) => {
     const tw = tagWidths[i];
     fillRoundedRect(ctx, tagStartX, y, tw, 28, 14, hexToRgba(accent, 0.1));
     strokeRoundedRect(ctx, tagStartX, y, tw, 28, 14, hexToRgba(accent, 0.25));
     ctx.fillStyle = accent;
     ctx.textAlign = 'center';
-    ctx.fillText(symptom, tagStartX + tw / 2, y + 7);
+    ctx.fillText(text, tagStartX + tw / 2, y + 7);
     tagStartX += tw + tagGap;
   });
   ctx.textAlign = 'left';

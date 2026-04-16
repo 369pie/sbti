@@ -140,8 +140,6 @@ function buildIpTabs(): GalleryTab[] {
     href: `/wtfti/work/result/${personality.slug}/`,
   }));
 
-  const KINGS_CARD_SLUGS = new Set(['boss', 'simp', 'thin-k', 'rebel', 'joker', 'drunk', 'dior-s', 'food-ie']);
-
   const kingsItems: GalleryItem[] = KINGS_PERSONALITIES.map((personality) => ({
     slug: personality.slug,
     code: personality.number,
@@ -149,9 +147,7 @@ function buildIpTabs(): GalleryTab[] {
     tagline: personality.tagline,
     color: personality.color,
     emoji: personality.emoji,
-    image: KINGS_CARD_SLUGS.has(personality.slug)
-      ? getKingsTypeCardImage(personality.slug)
-      : getKingsTypeThumbnailImage(personality.slug),
+    image: getKingsTypeCardImage(personality.slug),
     href: `/wtfti/kings/result/${personality.slug}/`,
   }));
 
