@@ -16,6 +16,7 @@ import { UgcShareCTA } from '@/components/UgcShareCTA';
 import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
+import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 
 interface Props {
   fengPersonality: FengPersonality;
@@ -436,7 +437,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
           <CardFrame color={p.color} className="p-6 sm:p-8" style={{ background: 'rgba(255,255,255,0.015)' }} tilt>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-xl">💥</span>
-              <h2 className="text-xs font-mono tracking-[0.2em] text-white/40 uppercase">{'// Wtf_Hit.exe'}</h2>
+              <h2 className="text-xs font-mono tracking-[0.2em] text-white/40 uppercase">{'// Wtf_Hit'}</h2>
             </div>
             <p className="text-xl sm:text-2xl font-bold leading-relaxed" style={{ color: p.color, textShadow: `0 0 14px ${p.color}30` }}>
               &ldquo;{p.copy.wtfHit}&rdquo;
@@ -541,7 +542,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
               </span>
             </div>
             <h3 className="text-lg font-bold mb-2 text-white">分享你的疯TI人格</h3>
-            <p className="text-sm text-white/55 mb-5 max-w-sm mx-auto">截图发给朋友，看看谁是隐藏症状最重的那个</p>
+            <p className="text-sm text-white/55 mb-5 max-w-sm mx-auto">截图发给朋友，看看谁才是最疯的那个。</p>
 
             {/* Share image generator */}
             <div className="max-w-sm mx-auto mb-5">
@@ -646,11 +647,13 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
         </div>
       </section>
 
+      <ResultClosureEngine
+        currentUniverse="feng"
+        personalitySlug={p.slug}
+        personalityName={p.fengName}
+        accent={p.color}
+      />
       <DailyCheckInCTA />
-      <UniversePreviewCards currentUniverse="feng" />
-      <IdentifyViralCTA personalityName={p.fengName} />
-      <WtfCardCTA />
-      <UgcShareCTA />
     </div>
   );
 }

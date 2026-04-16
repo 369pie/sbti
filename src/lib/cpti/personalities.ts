@@ -68,6 +68,10 @@ export function getCptiTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/thumbs/cpti-${slug}.webp`);
 }
 
+export function getCptiTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/medium/cpti-${slug}.webp`);
+}
+
 export const CPTI_PERSONALITY_TYPES: CptiPersonalityType[] = [
   {
     slug: 'ceo', code: 'CEO', name: '恋爱CEO', tagline: '这段关系，我来做主。',

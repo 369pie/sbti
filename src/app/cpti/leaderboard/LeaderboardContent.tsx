@@ -38,12 +38,19 @@ export default function LeaderboardContent() {
   const [data, setData] = useState<LeaderboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [apiMissing, setApiMissing] = useState(false);
 
   const fetchLeaderboard = useCallback(async (type: TabKey) => {
     setLoading(true);
     setError(null);
+    setApiMissing(false);
     try {
       const res = await fetch(`/api/cpti/leaderboards?type=${type}&limit=50`);
+      if (res.status === 404) {
+        setApiMissing(true);
+        setData(null);
+        return;
+      }
       if (!res.ok) throw new Error('Failed to fetch');
       const json = await res.json();
       setData(json);
@@ -129,6 +136,12 @@ export default function LeaderboardContent() {
             >
               重试
             </button>
+          </div>
+        ) : apiMissing ? (
+          <div className="text-center py-20">
+            <div className="text-4xl mb-3">🚧</div>
+            <p className="text-sm text-text-muted">排行榜功能正在准备中</p>
+            <p className="text-xs text-text-muted mt-1">服务端数据同步完成后即可查看</p>
           </div>
         ) : !data || data.entries.length === 0 ? (
           <div className="text-center py-20">

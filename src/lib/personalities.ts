@@ -89,6 +89,10 @@ export function getTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/thumbs/${slug}.webp`);
 }
 
+export function getTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/medium/${slug}.webp`);
+}
+
 export function getXiuxianTypeImage(slug: string): string {
   const imagePath = hasXiuxianV2Image(slug)
     ? getXiuxianV2ImagePath(slug)
@@ -99,6 +103,10 @@ export function getXiuxianTypeImage(slug: string): string {
 
 export function getXiuxianTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/thumbs/xiuxian-${slug}.webp`);
+}
+
+export function getXiuxianTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/medium/xiuxian-${slug}.webp`);
 }
 
 export const PERSONALITY_TYPES: PersonalityType[] = [

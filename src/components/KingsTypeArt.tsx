@@ -3,7 +3,7 @@
 import NextImage from 'next/image';
 import { useState } from 'react';
 import type { KingsPersonality } from '@/lib/kings/personalities';
-import { getKingsTypeImage, getKingsTypeMediumImage, getKingsTypeCardImage } from '@/lib/kings/personalities';
+import { getKingsTypeMediumImage, getKingsTypeThumbnailImage } from '@/lib/kings/personalities';
 
 interface KingsTypeArtProps {
   personality: KingsPersonality;
@@ -22,9 +22,12 @@ export function KingsTypeArt({
   emojiClassName,
   priority = false,
 }: KingsTypeArtProps) {
-  const [failed, setFailed] = useState(false);
-
-  const imageSrc = getKingsTypeCardImage(personality.slug);
+  const [imageMode, setImageMode] = useState<'medium' | 'thumb' | 'emoji'>('medium');
+  const imageSrc = imageMode === 'medium'
+    ? getKingsTypeMediumImage(personality.slug)
+    : imageMode === 'thumb'
+      ? getKingsTypeThumbnailImage(personality.slug)
+      : '';
 
   return (
     <div
@@ -34,7 +37,7 @@ export function KingsTypeArt({
         boxShadow: `0 24px 80px -24px ${personality.color}45, inset 0 0 0 1px ${personality.color}20`,
       }}
     >
-      {failed ? (
+      {imageMode === 'emoji' ? (
         <span className={emojiClassName}>{personality.emoji}</span>
       ) : (
         <NextImage
@@ -46,7 +49,13 @@ export function KingsTypeArt({
           priority={priority}
           placeholder="blur"
           blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
-          onError={() => setFailed(true)}
+          onError={() => {
+            setImageMode((current) => {
+              if (current === 'medium') return 'thumb';
+              if (current === 'thumb') return 'emoji';
+              return 'emoji';
+            });
+          }}
         />
       )}
     </div>

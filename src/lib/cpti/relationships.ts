@@ -179,6 +179,10 @@ export function getCptiRelationshipTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/cpti/relationships/thumbs/${slug}.webp`);
 }
 
+export function getCptiRelationshipTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/cpti/relationships/medium/${slug}.webp`);
+}
+
 export function getAllRelationshipSlugs(): string[] {
   return CPTI_RELATIONSHIP_TYPES.map(r => r.slug);
 }

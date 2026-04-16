@@ -1,7 +1,7 @@
 import { WTFTI_CLASSIC_TYPES, WTFTI_TONE, buildWtftiClassicPrompt } from '../../wtfti-classic-prompts.mjs';
 
 // 种子图（先生成一张基准图后放到 public/images/types/ 目录下）
-// 生成种子图的 prompt 见 docs/wtfti-classic-visual-spec.md § 5.2
+// 生成种子图的 prompt 见 docs/04-design-growth/design/wtfti-classic-visual-spec.md § 5.2
 const REF = 'wtfti-classic-seed.png';
 
 const wtftiClassicImageModule = {

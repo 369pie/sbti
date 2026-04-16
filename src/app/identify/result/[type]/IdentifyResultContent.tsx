@@ -2,14 +2,16 @@
 
 import Link from 'next/link';
 import NextImage from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { IDENTIFY_DIMENSIONS, IDENTIFY_MODEL_NAMES, IDENTIFY_MODEL_COLORS } from '@/lib/identify/dimensions';
 import type { IdentifyPersonaType } from '@/lib/identify/personas';
-import { getIdentifyTypeImage, getIdentifyTypeThumbnailImage } from '@/lib/identify/personas';
+import { getIdentifyTypeImage, getIdentifyTypeThumbnailImage, getIdentifyTypeMediumImage } from '@/lib/identify/personas';
 import type { IdentifyDimensionScore } from '@/lib/identify/scoring';
 import { IdentifyShareImageGenerator } from '@/components/IdentifyShareImageGenerator';
 import type { IdentifyShareImageGeneratorHandle } from '@/components/IdentifyShareImageGenerator';
 import { useCallback, useMemo, useRef, useState, useEffect, useSyncExternalStore } from 'react';
+import { identifyApi, type IdentifyPreviewResponse } from '@/lib/identify/api';
 import { getSiteUrl, SHARE_SITE_URL } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
@@ -34,7 +36,7 @@ function PersonaAvatar({ persona, className, style, priority = false, sizes = '1
 
   useEffect(() => { setImageFailed(false); setUseOriginal(false); }, [persona.slug]);
 
-  const src = useOriginal ? getIdentifyTypeImage(persona.slug) : getIdentifyTypeThumbnailImage(persona.slug);
+  const src = useOriginal ? getIdentifyTypeImage(persona.slug) : getIdentifyTypeMediumImage(persona.slug);
 
   return (
     <div className={className} style={style}>
@@ -49,6 +51,8 @@ function PersonaAvatar({ persona, className, style, priority = false, sizes = '1
           priority={priority}
           sizes={sizes}
           className="object-contain p-2"
+          placeholder="blur"
+          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
           onError={() => {
             if (!useOriginal) { setUseOriginal(true); return; }
             setImageFailed(true);
@@ -61,19 +65,64 @@ function PersonaAvatar({ persona, className, style, priority = false, sizes = '1
 
 export function IdentifyResultContent({ persona, dimensionScores }: Props) {
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const searchParams = useSearchParams();
+  const sharedAssessmentToken = searchParams.get('r');
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
+  const [sharedPreview, setSharedPreview] = useState<IdentifyPreviewResponse | null>(null);
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>(
+    sharedAssessmentToken ? 'saved' : 'idle',
+  );
+  const [savedAssessment, setSavedAssessment] = useState<{
+    id: string;
+    shareToken: string;
+    actorDisplayName: string;
+    subjectDisplayName: string;
+    personaSlug: string;
+    createdAt: string;
+  } | null>(null);
+  const clientMutationIdRef = useRef(
+    typeof crypto !== 'undefined' ? crypto.randomUUID() : `identify-${Date.now()}`,
+  );
   const shareRef = useRef<IdentifyShareImageGeneratorHandle>(null);
 
-  const shareUrl = getSiteUrl(`/identify/result/${persona.slug}/`);
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!sharedAssessmentToken) return;
+
+    identifyApi
+      .getPreview(sharedAssessmentToken)
+      .then((preview) => {
+        if (cancelled) return;
+        setSharedPreview(preview);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setSharedPreview(null);
+      });
+
+    identifyApi.claimReceived(sharedAssessmentToken, true).catch(() => {
+      // Non-blocking: the shared result should still render if claiming fails.
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sharedAssessmentToken]);
 
   // Load friend name from session
   const friendName = useMemo(() => {
+    if (sharedPreview?.subjectDisplayName) {
+      return sharedPreview.subjectDisplayName;
+    }
     if (!mounted) return '';
     try {
       return window.sessionStorage.getItem('sbti:identify-friend-name') || '';
     } catch { return ''; }
-  }, [mounted]);
+  }, [mounted, sharedPreview?.subjectDisplayName]);
+
+  const fromName = sharedPreview?.actorDisplayName || '';
 
   const displayName = friendName || 'ta';
 
@@ -83,7 +132,44 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
     return stored?.slug === persona.slug ? stored : null;
   }, [mounted, persona.slug]);
 
-  const activeDimensionScores = sessionResult?.dimensionScores ?? dimensionScores;
+  useEffect(() => {
+    let active = true;
+
+    if (!mounted || sharedAssessmentToken || !sessionResult || savedAssessment || saveState === 'saving') {
+      return;
+    }
+
+    setSaveState('saving');
+
+    identifyApi
+      .saveAssessment({
+        personaSlug: persona.slug,
+        friendName,
+        dimensionScores: sessionResult.dimensionScores,
+        diagnostics: sessionResult.diagnostics,
+        clientMutationId: clientMutationIdRef.current,
+      })
+      .then((result) => {
+        if (!active) return;
+        setSavedAssessment(result.assessment);
+        setSaveState('saved');
+      })
+      .catch(() => {
+        if (!active) return;
+        setSaveState('error');
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [friendName, mounted, persona.slug, saveState, savedAssessment, sessionResult, sharedAssessmentToken]);
+
+  const activeDimensionScores = sharedPreview?.dimensionScores ?? sessionResult?.dimensionScores ?? dimensionScores;
+
+  const resultShareToken = sharedAssessmentToken || savedAssessment?.shareToken || '';
+  const shareUrl = resultShareToken
+    ? getSiteUrl(`/identify/result/${persona.slug}/?r=${encodeURIComponent(resultShareToken)}`)
+    : getSiteUrl(`/identify/result/${persona.slug}/`);
 
   const copyLink = useCallback(() => {
     navigator.clipboard.writeText(shareUrl);
@@ -92,18 +178,24 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
   }, [shareUrl]);
 
   const copyShareText = useCallback(() => {
-    const text = `WTF 鉴定书：${displayName}被鉴定为 ${persona.code}（${persona.name}）\n${persona.tagline}\n被冤枉了？自己来测 → ${getSiteUrl('/test')}`;
+    const prefix = fromName
+      ? `${displayName}在 ${fromName} 眼里是`
+      : `${displayName}被鉴定为`;
+    const text = `WTF 鉴定书：${prefix} ${persona.code}（${persona.name}）\n${persona.tagline}\n被冤枉了？自己来测 → ${getSiteUrl('/identify/test/')}`;
     navigator.clipboard.writeText(text);
     setTextCopied(true);
     setTimeout(() => setTextCopied(false), 2000);
-  }, [persona.code, persona.name, persona.tagline, displayName]);
+  }, [displayName, fromName, persona.code, persona.name, persona.tagline]);
 
   // Challenge link for reverse invitation
   const challengeUrl = useMemo(() => {
+    if (savedAssessment?.shareToken) {
+      return `${SHARE_SITE_URL}identify/challenge/?r=${encodeURIComponent(savedAssessment.shareToken)}`;
+    }
     const params = new URLSearchParams({ t: persona.slug });
     if (friendName) params.set('n', friendName);
     return `${SHARE_SITE_URL}identify/challenge/?${params.toString()}`;
-  }, [persona.slug, friendName]);
+  }, [friendName, persona.slug, savedAssessment?.shareToken]);
 
   const [challengeCopied, setChallengeCopied] = useState(false);
   const copyChallenge = useCallback(() => {
@@ -149,6 +241,18 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
 
             {friendName && (
               <p className="text-text-muted text-sm mb-4">被鉴定人：<span className="text-text-primary font-medium">{friendName}</span></p>
+            )}
+
+            {fromName && (
+              <p className="text-text-muted text-sm mb-4">鉴定方：<span className="text-text-primary font-medium">{fromName}</span></p>
+            )}
+
+            {saveState !== 'idle' && !sharedAssessmentToken && (
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border-subtle bg-bg-secondary/60 text-xs text-text-muted mb-5">
+                {saveState === 'saving' && '正在保存到灵鉴历史…'}
+                {saveState === 'saved' && '已保存到灵鉴历史'}
+                {saveState === 'error' && '保存失败，但不影响当前查看'}
+              </div>
             )}
 
             <PersonaAvatar
@@ -313,7 +417,7 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
               {displayName}觉得不准？让 ta 自己来测
             </p>
             <Link
-              href="/test"
+              href="/identify/test/"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-border text-text-secondary font-medium text-sm hover:text-text-primary hover:bg-bg-secondary transition-all"
             >
               让 ta 自己来测 →

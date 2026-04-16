@@ -4,10 +4,14 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useAuth } from '@/components/AuthProvider';
+import type { SoultiLayeredResult } from '@/lib/soulti/scoring';
+import { getAllCollected, getCollectionCount } from '@/lib/mysti/collection';
 import {
-  getOrCreateCard, saveCard, decodeCardData,
+  getOrCreateCard, saveCard, loadCard, decodeCardData,
   encodeCardData, getLitCount, getTotalCount,
   calculateSimilarity, getComparisonRoast,
+  togglePinnedUniverse,
   CARD_UNIVERSE_IDS,
   type WtfCardData,
   type RelationshipRecord,
@@ -17,6 +21,7 @@ import { resolvePersonality } from '@/lib/personality-resolver';
 import { SHARE_SITE_URL } from '@/lib/site';
 import { WtfCardShareImageGenerator } from '@/components/WtfCardShareImageGenerator';
 import type { WtfCardShareImageGeneratorHandle } from '@/components/WtfCardShareImageGenerator';
+import { IdentifyHistoryPanel } from '@/components/IdentifyHistoryPanel';
 import {
   CPTI_RELATIONSHIP_TYPES,
   RELATIONSHIP_TIER_INFO,
@@ -30,10 +35,14 @@ function UniverseBadge({
   universeId,
   slug,
   delay,
+  isPinned,
+  onTogglePin,
 }: {
   universeId: string;
   slug: string | null;
   delay: number;
+  isPinned?: boolean;
+  onTogglePin?: (uid: string) => void;
 }) {
   const universe = getUniverse(universeId);
   if (!universe) return null;
@@ -46,12 +55,22 @@ function UniverseBadge({
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay, duration: 0.3 }}
+      className="relative"
     >
       {isLit ? (
         <Link
           href={`${universe.resultPrefix}/result/${slug}/`}
-          className="group block rounded-2xl border border-border-subtle bg-bg-elevated p-3 text-center transition-all hover:border-border hover:shadow-sm"
+          className={`group block rounded-2xl border p-3 text-center transition-all hover:shadow-sm ${
+            isPinned
+              ? 'border-accent/40 bg-accent-dim ring-1 ring-accent/20'
+              : 'border-border-subtle bg-bg-elevated hover:border-border'
+          }`}
         >
+          {isPinned && (
+            <span className="absolute -top-1.5 -right-1.5 text-[10px] bg-accent text-white w-4 h-4 rounded-full flex items-center justify-center">
+              ★
+            </span>
+          )}
           <div
             className="text-2xl mb-1.5"
             role="img"
@@ -69,18 +88,46 @@ function UniverseBadge({
       ) : (
         <Link
           href={universe.testPath}
-          className="group block rounded-2xl border border-dashed border-border bg-bg-secondary/50 p-3 text-center transition-all hover:border-accent/40 hover:bg-accent-dim"
+          className="group block rounded-2xl border border-dashed p-3 text-center transition-all hover:scale-[1.03]"
+          style={{
+            borderColor: `${universe.accent}30`,
+            background: `linear-gradient(145deg, ${universe.accent}08, ${universe.accent}04)`,
+          }}
         >
-          <div className="text-2xl mb-1.5 opacity-30">
-            {universe.emoji || '❓'}
+          <div
+            className="text-3xl mb-1 transition-opacity"
+            style={{
+              opacity: 0.6,
+              animation: `slot-breathe 3s ease-in-out infinite`,
+              animationDelay: `${delay * 400}ms`,
+            }}
+          >
+            ?
           </div>
-          <div className="text-[10px] font-mono tracking-wider text-text-muted">
+          <div className="text-[10px] font-mono tracking-wider" style={{ color: `${universe.accent}90` }}>
             {universe.shortName}
           </div>
-          <div className="text-xs text-text-muted mt-0.5">
-            去测试
+          <div
+            className="text-[11px] mt-0.5 font-medium transition-colors"
+            style={{ color: `${universe.accent}99` }}
+          >
+            去解锁 →
           </div>
         </Link>
+      )}
+      {/* Pin button for lit badges */}
+      {isLit && onTogglePin && (
+        <button
+          onClick={(e) => { e.preventDefault(); onTogglePin(universeId); }}
+          className={`absolute -top-1 -left-1 w-5 h-5 rounded-full text-[10px] flex items-center justify-center transition-all cursor-pointer ${
+            isPinned
+              ? 'bg-accent text-white shadow-sm'
+              : 'bg-bg-secondary border border-border-subtle text-text-muted hover:border-accent/40 hover:text-accent opacity-0 group-hover:opacity-100'
+          }`}
+          title={isPinned ? '取消置顶' : '置顶到展柜'}
+        >
+          {isPinned ? '★' : '☆'}
+        </button>
       )}
     </motion.div>
   );
@@ -88,33 +135,57 @@ function UniverseBadge({
 
 // ─── Progress ring ───────────────────────────────────────
 
+function getProgressTitle(lit: number, total: number): { title: string; isMax: boolean } {
+  if (lit >= total) return { title: '全宇宙觉醒者', isMax: true };
+  if (lit >= Math.ceil(total * 0.8)) return { title: '宇宙旅行者', isMax: false };
+  if (lit >= Math.ceil(total * 0.5)) return { title: '人格收藏家', isMax: false };
+  if (lit >= Math.ceil(total * 0.25)) return { title: '多面探索者', isMax: false };
+  return { title: '初入多元宇宙', isMax: false };
+}
+
 function ProgressRing({ lit, total }: { lit: number; total: number }) {
   const pct = total > 0 ? lit / total : 0;
   const r = 36;
   const circumference = 2 * Math.PI * r;
   const offset = circumference * (1 - pct);
+  const { title, isMax } = getProgressTitle(lit, total);
 
   return (
-    <div className="relative w-24 h-24 mx-auto">
-      <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90">
-        <circle
-          cx="40" cy="40" r={r}
-          fill="none" stroke="var(--color-border-subtle)" strokeWidth="6"
-        />
-        <motion.circle
-          cx="40" cy="40" r={r}
-          fill="none" stroke="var(--color-accent)" strokeWidth="6"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-xl font-bold text-text-primary">{lit}</span>
-        <span className="text-[10px] text-text-muted">/ {total}</span>
+    <div className="flex flex-col items-center gap-2">
+      <div className="relative w-24 h-24">
+        <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90">
+          <circle
+            cx="40" cy="40" r={r}
+            fill="none" stroke="var(--color-border-subtle)" strokeWidth="6"
+          />
+          <motion.circle
+            cx="40" cy="40" r={r}
+            fill="none"
+            stroke={isMax ? '#f59e0b' : 'var(--color-accent)'}
+            strokeWidth="6"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            initial={{ strokeDashoffset: circumference }}
+            animate={{ strokeDashoffset: offset }}
+            transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
+          />
+        </svg>
+        {isMax && (
+          <motion.div
+            className="absolute inset-0 rounded-full"
+            style={{ boxShadow: '0 0 20px rgba(245,158,11,0.3)' }}
+            animate={{ opacity: [0.4, 0.8, 0.4] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className={`text-xl font-bold ${isMax ? 'text-amber-500' : 'text-text-primary'}`}>{lit}</span>
+          <span className="text-[10px] text-text-muted">/ {total}</span>
+        </div>
       </div>
+      <span className={`text-xs font-medium ${isMax ? 'text-amber-500' : 'text-text-secondary'}`}>
+        {title}
+      </span>
     </div>
   );
 }
@@ -165,12 +236,20 @@ function RelationshipCollection({
           <p className="text-sm text-text-muted mb-3">
             还没有收集到任何CP关系类型
           </p>
-          <Link
-            href="/cpti/"
-            className="inline-flex items-center gap-1.5 text-sm text-rose-400 hover:text-rose-300 transition-colors"
-          >
-            去做CPTI测试 →
-          </Link>
+          <div className="flex flex-col items-center gap-2">
+            <Link
+              href="/cpti/"
+              className="inline-flex items-center gap-1.5 text-sm text-rose-400 hover:text-rose-300 transition-colors"
+            >
+              去做CPTI测试 →
+            </Link>
+            <Link
+              href="/cpti/gallery/"
+              className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-rose-400 transition-colors"
+            >
+              查看25种关系图鉴 →
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">
@@ -249,17 +328,23 @@ function RelationshipCollection({
       {collected > 0 && collected < total && (
         <div className="mt-3 text-center">
           <Link
-            href="/cpti/"
+            href="/cpti/gallery/"
             className="text-xs text-text-muted hover:text-rose-400 transition-colors"
           >
-            邀请更多人测试，收集更多关系类型 →
+            查看完整图鉴 · 邀请更多人测试 →
           </Link>
         </div>
       )}
 
       {collected === total && (
         <div className="mt-3 text-center">
-          <p className="text-xs text-rose-400">🎉 恭喜！集齐全部 {total} 种CP关系类型！</p>
+          <p className="text-xs text-rose-400 mb-1">🎉 恭喜！集齐全部 {total} 种CP关系类型！</p>
+          <Link
+            href="/cpti/gallery/"
+            className="text-xs text-text-muted hover:text-rose-400 transition-colors"
+          >
+            查看完整图鉴 →
+          </Link>
         </div>
       )}
     </motion.div>
@@ -460,15 +545,184 @@ function ShareButton({ card, onShareImage }: { card: WtfCardData; onShareImage: 
 
 // ─── Main content ────────────────────────────────────────
 
+// ─── Appraisal section (鉴定 tab) ─────────────────────────
+
+function AppraisalSection() {
+  const [soultiData, setSoultiData] = useState<SoultiLayeredResult | null>(null);
+  const [collectionCount, setCollectionCount] = useState(0);
+  const [identifyHistoryLoaded, setIdentifyHistoryLoaded] = useState(false);
+  const [hasIdentifyHistory, setHasIdentifyHistory] = useState(false);
+
+  useEffect(() => {
+    // Load SoulTI layered result
+    try {
+      const raw = localStorage.getItem('soulti-layered');
+      if (raw) setSoultiData(JSON.parse(raw) as SoultiLayeredResult);
+    } catch { /* ignore */ }
+
+    // Load mysti collection count
+    setCollectionCount(getCollectionCount());
+  }, []);
+
+  const hasSoulti = !!soultiData;
+  const hasMysti = collectionCount > 0;
+  const showEmptyState = identifyHistoryLoaded && !hasIdentifyHistory && !hasSoulti && !hasMysti;
+
+  if (showEmptyState) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border bg-bg-secondary/30 p-8 text-center">
+        <div className="text-3xl mb-3 opacity-40">🔮</div>
+        <p className="text-sm text-text-muted mb-4">
+          还没有任何鉴定结果
+        </p>
+        <div className="flex flex-col items-center gap-2">
+          <Link
+            href="/identify/"
+            className="text-sm text-accent hover:text-accent/80 transition-colors"
+          >
+            去鉴定一个朋友 →
+          </Link>
+          <Link
+            href="/soulti/"
+            className="text-xs text-text-muted hover:text-accent transition-colors"
+          >
+            做灵魂三镜测试 →
+          </Link>
+          <Link
+            href="/mysti/"
+            className="text-xs text-text-muted hover:text-accent transition-colors"
+          >
+            去灵鉴抽卡 →
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <IdentifyHistoryPanel
+        variant="card"
+        onLoaded={(hasAny) => {
+          setIdentifyHistoryLoaded(true);
+          setHasIdentifyHistory(hasAny);
+        }}
+      />
+
+      {/* SoulTI three-layer summary */}
+      {hasSoulti && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-border bg-bg-elevated p-5"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-text-primary flex items-center gap-1.5">
+              🪞 灵魂三镜
+            </h3>
+            <Link
+              href={`/soulti/result/${soultiData!.overall.slug}/`}
+              className="text-xs text-accent hover:text-accent/80 transition-colors"
+            >
+              查看完整报告 →
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {([
+              { key: 'daySelf', label: '☀️ 白天', data: soultiData!.daySelf },
+              { key: 'nightSelf', label: '🌙 深夜', data: soultiData!.nightSelf },
+              { key: 'dreamTendency', label: '💭 梦里', data: soultiData!.dreamTendency },
+            ] as const).map(({ key, label, data }) => (
+              <div
+                key={key}
+                className="rounded-xl bg-bg-secondary/60 p-3 text-center"
+              >
+                <p className="text-xs text-text-muted mb-1">{label}</p>
+                <p className="text-sm font-mono font-semibold text-text-primary tracking-wider">
+                  {data.code}
+                </p>
+              </div>
+            ))}
+          </div>
+          {soultiData!.daySelf.slug !== soultiData!.nightSelf.slug && (
+            <p className="text-xs text-text-muted mt-3 text-center italic">
+              白天是 {soultiData!.daySelf.code}，深夜变成 {soultiData!.nightSelf.code}
+            </p>
+          )}
+        </motion.div>
+      )}
+
+      {/* Mysti collection summary */}
+      {hasMysti && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="rounded-2xl border border-border bg-bg-elevated p-5"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-text-primary flex items-center gap-1.5">
+              ✦ 灵鉴图鉴
+            </h3>
+            <Link
+              href="/mysti/collection/"
+              className="text-xs text-accent hover:text-accent/80 transition-colors"
+            >
+              查看全部 →
+            </Link>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-2 rounded-full bg-bg-secondary overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-violet-400 to-fuchsia-400 transition-all duration-500"
+                style={{ width: `${Math.min(100, (collectionCount / 70) * 100)}%` }}
+              />
+            </div>
+            <span className="text-xs font-mono text-text-muted whitespace-nowrap">
+              {collectionCount} 张
+            </span>
+          </div>
+          <Link
+            href="/mysti/"
+            className="mt-3 inline-flex items-center gap-1 text-xs text-text-muted hover:text-accent transition-colors"
+          >
+            继续抽卡 →
+          </Link>
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main component ──────────────────────────────────────
+
 export function CardContent() {
   const searchParams = useSearchParams();
   const theirEncoded = searchParams.get('c');
+  const { isAuthenticated, displayName } = useAuth();
 
   const [card, setCard] = useState<WtfCardData | null>(() => (
     typeof window === 'undefined' ? null : getOrCreateCard()
   ));
   const [backendSynced, setBackendSynced] = useState(false);
   const [syncedSlugs, setSyncedSlugs] = useState<Set<string>>(new Set());
+  const [cardTab, setCardTab] = useState<'universe' | 'relationship' | 'appraisal'>('universe');
+  const [pinnedIds, setPinnedIds] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return [];
+    const c = loadCard();
+    return c?.pinnedUniverses ?? [];
+  });
+
+  // Sync auth nickname to WTF Card when logged in and card nickname is empty
+  useEffect(() => {
+    if (!isAuthenticated || !displayName || displayName === '旅行者') return;
+    setCard(prev => {
+      if (!prev || prev.nickname?.trim()) return prev;
+      const updated = { ...prev, nickname: displayName };
+      saveCard(updated);
+      return updated;
+    });
+  }, [isAuthenticated, displayName]);
 
   const shareRef = useRef<WtfCardShareImageGeneratorHandle>(null);
   const theirCard = useMemo(() => {
@@ -509,6 +763,11 @@ export function CardContent() {
 
   const handleShareImage = useCallback(() => {
     shareRef.current?.generate();
+  }, []);
+
+  const handleTogglePin = useCallback((uid: string) => {
+    const updated = togglePinnedUniverse(uid);
+    setPinnedIds([...updated]);
   }, []);
 
   if (!card) {
@@ -594,27 +853,102 @@ export function CardContent() {
         className="mb-8"
       >
         <ProgressRing lit={litCount} total={totalCount} />
-        <p className="text-xs text-text-muted text-center mt-2">
-          {litCount === 0 && '还没测过任何宇宙，快去试试'}
-          {litCount > 0 && litCount < totalCount && `已点亮 ${litCount} / ${totalCount} 个宇宙`}
-          {litCount === totalCount && '🎉 恭喜全宇宙点亮！'}
-        </p>
+        {/* Weekly soul frequency entry */}
+        <Link
+          href="/weekly/"
+          className="mt-4 mx-auto flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-border-subtle bg-bg-secondary text-xs text-text-secondary hover:border-accent/40 hover:text-accent transition-all w-fit"
+        >
+          ✦ 查看本周灵魂频率
+        </Link>
       </motion.div>
 
-      {/* Badge grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-        {CARD_UNIVERSE_IDS.map((uid, i) => (
-          <UniverseBadge
-            key={uid}
-            universeId={uid}
-            slug={card.results[uid]?.slug ?? null}
-            delay={0.3 + i * 0.05}
-          />
+      {/* Showcase — pinned cards */}
+      {pinnedIds.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="mb-8"
+        >
+          <p className="text-[10px] font-mono tracking-widest text-text-muted mb-3 text-center uppercase">
+            ★ 我的展柜精选
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            {pinnedIds.map((uid) => {
+              const u = getUniverse(uid);
+              const r = card.results[uid];
+              const p = r?.slug ? resolvePersonality(uid, r.slug) : null;
+              if (!u || !p) return null;
+              return (
+                <Link
+                  key={uid}
+                  href={`${u.resultPrefix}/result/${r!.slug}/`}
+                  className="group relative flex flex-col items-center w-20 p-2.5 rounded-2xl border border-accent/30 bg-gradient-to-b from-accent-dim to-transparent text-center transition-all hover:shadow-md hover:border-accent/50"
+                >
+                  <span className="absolute -top-1 -right-1 text-[8px] bg-accent text-white w-3.5 h-3.5 rounded-full flex items-center justify-center">★</span>
+                  <span className="text-2xl mb-1">{p.emoji}</span>
+                  <span className="text-[10px] font-mono text-text-muted">{u.shortName}</span>
+                  <span className="text-[11px] font-medium text-text-primary mt-0.5 leading-tight">{p.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+          <p className="text-[10px] text-text-muted text-center mt-2">
+            长按卡片左上角 ☆ 可添加/移除展柜（最多 5 个）
+          </p>
+        </motion.div>
+      )}
+
+      {/* Tab bar */}
+      <div className="flex items-center justify-center gap-1 mb-6 p-1 rounded-full bg-bg-secondary/60 border border-border-subtle">
+        {([
+          { key: 'universe' as const, label: '🌌 宇宙', count: litCount },
+          { key: 'relationship' as const, label: '💕 关系', count: mergedRelationships.length },
+          { key: 'appraisal' as const, label: '🔮 鉴定', count: null },
+        ]).map(({ key, label, count }) => (
+          <button
+            key={key}
+            onClick={() => setCardTab(key)}
+            className={`flex-1 px-3 py-2 rounded-full text-xs font-medium transition-all ${
+              cardTab === key
+                ? 'bg-bg-elevated text-text-primary shadow-sm'
+                : 'text-text-muted hover:text-text-secondary'
+            }`}
+          >
+            {label}
+            {count !== null && (
+              <span className="ml-1 font-mono opacity-60">{count}</span>
+            )}
+          </button>
         ))}
       </div>
 
-      {/* Relationship collection wall */}
-      <RelationshipCollection relationships={mergedRelationships} syncedSlugs={syncedSlugs} />
+      {/* Tab content */}
+      {cardTab === 'universe' && (
+        <>
+          {/* Badge grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
+            {CARD_UNIVERSE_IDS.map((uid, i) => (
+              <UniverseBadge
+                key={uid}
+                universeId={uid}
+                slug={card.results[uid]?.slug ?? null}
+                delay={0.3 + i * 0.05}
+                isPinned={pinnedIds.includes(uid)}
+                onTogglePin={handleTogglePin}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      {cardTab === 'relationship' && (
+        <RelationshipCollection relationships={mergedRelationships} syncedSlugs={syncedSlugs} />
+      )}
+
+      {cardTab === 'appraisal' && (
+        <AppraisalSection />
+      )}
 
       {/* Share */}
       <motion.div

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { IdentifyHistoryPanel } from '@/components/IdentifyHistoryPanel';
 import { IDENTIFY_MODEL_NAMES, IDENTIFY_MODEL_COLORS } from '@/lib/identify/dimensions';
 import type { IdentifyModelType } from '@/lib/identify/dimensions';
 
@@ -79,6 +80,13 @@ export default function IdentifyHomeContent() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* History / notification loop */}
+      <section className="max-w-3xl mx-auto px-6 pb-8">
+        <div className="animate-fade-up">
+          <IdentifyHistoryPanel variant="home" />
         </div>
       </section>
 

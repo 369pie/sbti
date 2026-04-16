@@ -3,7 +3,7 @@
 import NextImage from 'next/image';
 import { useState } from 'react';
 import type { DeltaPersonality } from '@/lib/delta/personalities';
-import { getDeltaTypeImage } from '@/lib/delta/personalities';
+import { getDeltaTypeMediumImage } from '@/lib/delta/personalities';
 
 interface DeltaTypeArtProps {
   personality: DeltaPersonality;
@@ -36,12 +36,14 @@ export function DeltaTypeArt({
         <span className={emojiClassName}>{personality.emoji}</span>
       ) : (
         <NextImage
-          src={getDeltaTypeImage(personality.slug)}
+          src={getDeltaTypeMediumImage(personality.slug)}
           alt={alt ?? personality.heroName}
           width={400}
           height={400}
           className={imageClassName}
           priority={priority}
+          placeholder="blur"
+          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
           onError={() => setFailed(true)}
         />
       )}

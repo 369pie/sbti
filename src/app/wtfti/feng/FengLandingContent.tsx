@@ -161,10 +161,10 @@ export default function FengLandingContent() {
                   className="text-base sm:text-lg leading-relaxed max-w-lg mx-auto mb-6"
                   style={{ color: '#ffffffa0' }}
                 >
-                  同一个你，在互联网上的发疯翻译版。
+                  同一个你，在互联网上的发疯译本。
                   <br />
                   <span className="text-white/60">
-                    15 维度人格测试，测完直达 29 张纯文本 meme 图鉴卡。
+                    15 维度人格测试，测完直达 29 张纯文本发疯图鉴卡。
                   </span>
                 </p>
 
@@ -326,10 +326,10 @@ export default function FengLandingContent() {
 
           <div className="grid sm:grid-cols-2 gap-4">
             {[
-              { emoji: '👿', title: '互联网嘴替映射', desc: '29 种人格对应 29 种你在互联网上的样子：是 Excel 成精还是电子仓鼠症晚期？' },
-              { emoji: '💀', title: ' meme 梗全覆盖', desc: 'KPI、收藏夹、已读不回、情绪稳定……你的日常习惯就是你的人格写照' },
-              { emoji: '✨', title: '纯 CSS 霓虹图鉴', desc: '零插画成本，纯 CSS + 文本霓虹卡。每张都是朋友圈可以直接转发的梗' },
-              { emoji: '📲', title: '一键分享', desc: '"测完发现我是全场唯一活爹💀" 截图直接发小红书' },
+              { emoji: '😈', title: '互联网嘴替图鉴', desc: '29 种人格对应 29 种你在互联网上的样子：是 Excel 成精还是电子仓鼠症晚期？' },
+              { emoji: '💀', title: '发疯梗全覆盖', desc: 'KPI、收藏夹、已读不回、情绪稳定……你的日常习惯就是你的人格写照' },
+              { emoji: '✨', title: '纯 CSS 霓虹图鉴', desc: '零插画成本，纯 CSS 霓虹图鉴卡。每张都是朋友圈可以直接转发的梗' },
+              { emoji: '📲', title: '一键分享', desc: '"测完发现我竟然是全场隐形BOSS💀" 截图直接发小红书' },
             ].map((item, i) => {
               const tilts = ['feng-tilt-n2', 'feng-tilt-1', 'feng-tilt-2', 'feng-tilt-n1'];
               const margins = ['-mt-2', 'mt-1', '-mb-2', 'mt-0'];
@@ -526,7 +526,7 @@ export default function FengLandingContent() {
             <span className="text-[10px] font-mono text-white/40 border border-white/10 px-2 py-0.5 rounded">CONTAGIOUS</span>
           </div>
           <p className="text-sm mb-6" style={{ color: '#ffffff60' }}>
-            29 种发疯人格，总有一种是你 — 或者你的互联网嘴替
+            29 种发疯人格，总有一种是你。
           </p>
           <Link
             href="/wtfti/feng/test/"

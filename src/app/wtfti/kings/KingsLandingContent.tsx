@@ -119,7 +119,15 @@ export default function KingsLandingContent() {
                   className="relative w-full aspect-square flex items-center justify-center overflow-hidden"
                   style={{ background: `linear-gradient(135deg, ${p.color}08, ${p.color}15)` }}
                 >
-                  <span className="text-5xl group-hover:scale-110 transition-transform">{p.emoji}</span>
+                  <NextImage
+                    src={getKingsTypeThumbnailImage(p.slug)}
+                    alt={p.heroName}
+                    width={240}
+                    height={240}
+                    loading={i < 4 ? 'eager' : 'lazy'}
+                    fetchPriority={i < 4 ? 'high' : 'auto'}
+                    className="w-[72%] h-[72%] object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
+                  />
                 </div>
                 <div className="px-3 py-3">
                   <span

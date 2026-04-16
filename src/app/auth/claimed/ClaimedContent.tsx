@@ -70,7 +70,7 @@ export function ClaimedContent() {
 
     setIsAnonymous(false);
     setPageState('done');
-    setMessage('账号已经认领完成，之前保存的 CPTI 资产会继续跟着你走。');
+    setMessage('账号已经认领完成，之前保存的关系和鉴定资产会继续跟着你走。');
   }, [shouldMerge]);
 
   useEffect(() => {
@@ -158,7 +158,7 @@ export function ClaimedContent() {
           <div className="text-5xl mb-4">🫶</div>
           <h1 className="text-2xl font-semibold tracking-tight mb-2">认领你的 WTF CARD</h1>
           <p className="text-sm text-text-muted leading-relaxed">
-            你刚刚保存的 CPTI 结果和关系已经有了临时身份。再走一步，就能把这些资产正式认领下来。
+            你刚刚保存的关系、鉴定和图鉴资产已经有了临时身份。再走一步，就能把这些资产正式认领下来。
           </p>
         </div>
 

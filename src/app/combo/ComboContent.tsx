@@ -5,10 +5,10 @@ import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useCallback, useRef } from 'react';
-import { PERSONALITY_TYPES, getTypeImage, getTypeThumbnailImage } from '@/lib/personalities';
+import { PERSONALITY_TYPES, getTypeImage, getTypeThumbnailImage, getTypeMediumImage } from '@/lib/personalities';
 import {
   MBTI_TYPES, ZODIAC_SIGNS, ELEMENT_LABELS,
-  generateCombo, getComboPersonalityImage, getComboPersonalityThumbnailImage,
+  generateCombo, getComboPersonalityImage, getComboPersonalityThumbnailImage, getComboPersonalityMediumImage,
 } from '@/lib/combo';
 import type { ComboResult } from '@/lib/combo';
 import { ComboShareImageGenerator } from '@/components/ComboShareImageGenerator';
@@ -160,9 +160,9 @@ function ZodiacPicker({
 function ComboResultDisplay({ result }: { result: ComboResult }) {
   const shareRef = useRef<ComboShareImageGeneratorHandle>(null);
   const [copied, setCopied] = useState(false);
-  const comboImageSrc = getComboPersonalityThumbnailImage(result.comboPersonality.code);
+  const comboImageSrc = getComboPersonalityMediumImage(result.comboPersonality.code);
   const comboImageFallbackSrc = getComboPersonalityImage(result.comboPersonality.code);
-  const personalityImageSrc = getTypeThumbnailImage(result.personality.slug);
+  const personalityImageSrc = getTypeMediumImage(result.personality.slug);
   const personalityImageFallbackSrc = getTypeImage(result.personality.slug);
 
   const applyImageFallback = (target: HTMLImageElement, fallbackSrc: string) => {

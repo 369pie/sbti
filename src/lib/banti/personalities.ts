@@ -1067,3 +1067,7 @@ export function getBantiTypeImage(slug: string): string {
 export function getBantiTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/banti/thumbs/${slug}.webp`);
 }
+
+export function getBantiTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/banti/medium/${slug}.webp`);
+}

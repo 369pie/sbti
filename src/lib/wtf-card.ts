@@ -29,6 +29,7 @@ export interface WtfCardData {
   createdAt: string;                             // ISO date
   results: Record<string, UniverseResult | null>; // keyed by universe id
   relationships?: RelationshipRecord[];          // CPTI relationship collection
+  pinnedUniverses?: string[];                    // up to 5 pinned universe IDs for showcase
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -281,4 +282,31 @@ export function getRelationships(): RelationshipRecord[] {
 export function getCollectedRelationshipSlugs(): string[] {
   const rels = getRelationships();
   return [...new Set(rels.map(r => r.slug))];
+}
+
+// ─── Pinned showcase ────────────────────────────────────────────────────────
+
+const MAX_PINNED = 5;
+
+export function getPinnedUniverses(): string[] {
+  const card = loadCard();
+  return card?.pinnedUniverses ?? [];
+}
+
+export function togglePinnedUniverse(universeId: string): string[] {
+  const card = getOrCreateCard();
+  const pinned = card.pinnedUniverses ?? [];
+  const idx = pinned.indexOf(universeId);
+  if (idx >= 0) {
+    pinned.splice(idx, 1);
+  } else if (pinned.length < MAX_PINNED) {
+    pinned.push(universeId);
+  }
+  card.pinnedUniverses = pinned;
+  saveCard(card);
+  return pinned;
+}
+
+export function isPinned(universeId: string): boolean {
+  return getPinnedUniverses().includes(universeId);
 }

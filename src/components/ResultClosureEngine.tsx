@@ -1,0 +1,278 @@
+'use client';
+
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { useEffect, useState, useCallback } from 'react';
+import { loadCard, recordUniverseResult, CARD_UNIVERSE_IDS } from '@/lib/wtf-card';
+import { getUniverse } from '@/lib/universes';
+
+// ─── Universe Switcher Teasers ───────────────────────────────────────────────
+
+const UNIVERSE_TEASERS: Record<string, string> = {
+  standard: '经典版的你是什么人设？',
+  xiuxian: '你的修仙体质是什么？',
+  wtfti: '毒舌版会怎么骂你？',
+  banti: '你在办公室是什么角色？',
+  kings: '你在峡谷是什么英雄？',
+  bird: '你是什么鸟？',
+  flower: '你像哪朵花？',
+  delta: '你在战场是什么人设？',
+  soulti: '安静地看见你自己',
+  xpti: '你的靠近方式是什么？',
+  cpti: '你在关系里是什么角色？',
+  feng: '你的疯狂人设是什么？',
+};
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface Props {
+  /** Current universe ID (e.g. 'standard', 'wtfti', 'bird') */
+  currentUniverse: string;
+  /** Current personality slug */
+  personalitySlug: string;
+  /** Current personality name for display */
+  personalityName: string;
+  /** Accent color */
+  accent?: string;
+  /** Visual variant */
+  variant?: 'default' | 'xpti';
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
+/**
+ * Result page closure engine — replaces scattered CTAs with a unified,
+ * ordered set of engagement hooks:
+ * 1. Universe Switcher: "同一个你，换个宇宙会变成谁？"
+ * 2. Save to WTF Card: progress bar + save action
+ * 3. Relationship Entry: CP/friend testing nudge
+ */
+export function ResultClosureEngine({
+  currentUniverse,
+  personalitySlug,
+  personalityName,
+  accent = '#e8729c',
+  variant = 'default',
+}: Props) {
+  const isXpti = variant === 'xpti';
+  const [cardState, setCardState] = useState<{ lit: number; total: number; saved: boolean } | null>(null);
+  const [switcherCards, setSwitcherCards] = useState<{ id: string; emoji: string; name: string; teaser: string; testPath: string; accent: string; tested: boolean }[]>([]);
+
+  useEffect(() => {
+    const card = loadCard();
+    const tested = new Set<string>();
+    if (card) {
+      for (const uid of CARD_UNIVERSE_IDS) {
+        if (card.results[uid]) tested.add(uid);
+      }
+    }
+
+    // Card progress
+    const lit = tested.size;
+    const total = CARD_UNIVERSE_IDS.length;
+    const saved = tested.has(currentUniverse);
+    setCardState({ lit, total, saved });
+
+    // Universe switcher: pick 3 untested (or random if all tested), excluding current
+    let candidates = CARD_UNIVERSE_IDS.filter(uid => uid !== currentUniverse && !tested.has(uid));
+    if (candidates.length === 0) {
+      candidates = CARD_UNIVERSE_IDS.filter(uid => uid !== currentUniverse);
+    }
+    // Shuffle
+    for (let i = candidates.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+    const picks = candidates.slice(0, 3);
+    setSwitcherCards(picks.map(uid => {
+      const u = getUniverse(uid);
+      return {
+        id: uid,
+        emoji: u?.emoji || '✨',
+        name: u?.name || uid,
+        teaser: UNIVERSE_TEASERS[uid] ?? `去${u?.name ?? uid}看看`,
+        testPath: u?.testPath || '/',
+        accent: u?.accent || '#888',
+        tested: tested.has(uid),
+      };
+    }));
+  }, [currentUniverse]);
+
+  // Save current result to WTF Card
+  const handleSave = useCallback(() => {
+    recordUniverseResult(currentUniverse, personalitySlug);
+    setCardState(prev => prev ? { ...prev, lit: prev.lit + (prev.saved ? 0 : 1), saved: true } : prev);
+  }, [currentUniverse, personalitySlug]);
+
+  return (
+    <>
+      {/* ── 1. Universe Switcher ── */}
+      {switcherCards.length > 0 && (
+        <section className="max-w-2xl mx-auto px-6 pb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <h2 className={`text-sm font-mono tracking-wider uppercase text-center mb-1 ${isXpti ? 'text-[#A38A90]' : 'text-text-muted'}`}>
+              同一个你，换个宇宙会变成谁？
+            </h2>
+            <p className={`text-xs text-center mb-4 ${isXpti ? 'text-[#A38A90]/60' : 'text-text-muted/60'}`}>
+              你已经是 {personalityName}，在其他宇宙里呢？
+            </p>
+            <div className="grid gap-3">
+              {switcherCards.map((card, i) => (
+                <motion.div
+                  key={card.id}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 + i * 0.1, duration: 0.35 }}
+                >
+                  <Link
+                    href={card.testPath}
+                    className="group flex items-center gap-4 rounded-2xl border p-4 transition-all hover:shadow-md"
+                    style={{
+                      borderColor: isXpti ? `${card.accent}35` : `${card.accent}25`,
+                      background: isXpti ? `linear-gradient(140deg, ${card.accent}10 0%, rgba(26,12,17,0.92) 65%)` : `${card.accent}06`,
+                    }}
+                  >
+                    <div
+                      className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+                      style={{ background: `${card.accent}12` }}
+                    >
+                      {card.emoji || '✨'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className="text-sm font-semibold group-hover:brightness-110 transition-colors"
+                        style={{ color: card.accent }}
+                      >
+                        {card.teaser}
+                      </p>
+                      <p className="text-xs text-text-muted mt-0.5">
+                        {card.name}
+                        {card.tested && <span className="ml-2 text-green-500">✓ 已测</span>}
+                      </p>
+                    </div>
+                    <svg
+                      className="w-4 h-4 text-text-muted group-hover:translate-x-0.5 transition-transform flex-shrink-0"
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </section>
+      )}
+
+      {/* ── 2. Save to WTF Card ── */}
+      {cardState && (
+        <section className="max-w-2xl mx-auto px-6 pb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+          >
+            <div
+              className={`rounded-2xl border p-5 ${
+                isXpti
+                  ? 'border-[#A3526E]/20 bg-[#1A0C11]'
+                  : 'border-border-subtle bg-bg-secondary/40'
+              }`}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🃏</span>
+                <div className="flex-1">
+                  <p className={`text-sm font-semibold ${isXpti ? 'text-[#F3E8EB]' : 'text-text-primary'}`}>
+                    你的多宇宙人格档案
+                  </p>
+                  <p className="text-xs text-text-muted">
+                    已收集 {cardState.lit} / {cardState.total} 个宇宙
+                  </p>
+                </div>
+                {!cardState.saved ? (
+                  <button
+                    onClick={handleSave}
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-white transition-all cursor-pointer hover:brightness-110"
+                    style={{ background: accent }}
+                  >
+                    收藏此结果
+                  </button>
+                ) : (
+                  <Link
+                    href="/card/"
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-text-muted border border-border-subtle hover:text-text-primary hover:border-border transition-all"
+                  >
+                    查看档案 →
+                  </Link>
+                )}
+              </div>
+              {/* Progress bar */}
+              <div className={`h-1.5 rounded-full overflow-hidden ${isXpti ? 'bg-[#3D1A25]/60' : 'bg-bg-tertiary'}`}>
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${Math.max((cardState.lit / cardState.total) * 100, 4)}%`,
+                    background: isXpti ? 'linear-gradient(90deg, #C2485E, #A3526E)' : `linear-gradient(90deg, ${accent}, ${accent}88)`,
+                  }}
+                />
+              </div>
+              {cardState.lit < cardState.total && (
+                <p className="text-[11px] text-text-muted mt-2">
+                  再测 {cardState.total - cardState.lit} 个宇宙就能集齐完整人格档案
+                </p>
+              )}
+            </div>
+          </motion.div>
+        </section>
+      )}
+
+      {/* ── 3. Relationship Entry ── */}
+      <section className="max-w-2xl mx-auto px-6 pb-10">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.4 }}
+        >
+          <div className="grid grid-cols-2 gap-3">
+            <Link
+              href="/cpti/"
+              className={`group rounded-2xl border p-4 text-center transition-all hover:shadow-md ${
+                isXpti
+                  ? 'border-[#A3526E]/20 hover:border-[#A3526E]/40 bg-[#1A0C11]'
+                  : 'border-pink-200/40 hover:border-pink-300/60 bg-gradient-to-b from-pink-50/50 to-transparent'
+              }`}
+            >
+              <div className="text-2xl mb-2">💕</div>
+              <h3 className={`text-sm font-semibold mb-1 ${isXpti ? 'text-[#F3E8EB]' : 'text-text-primary'}`}>
+                测段关系
+              </h3>
+              <p className="text-xs text-text-muted leading-relaxed">
+                你们的化学反应是什么型？
+              </p>
+            </Link>
+            <Link
+              href="/identify/"
+              className={`group rounded-2xl border p-4 text-center transition-all hover:shadow-md ${
+                isXpti
+                  ? 'border-[#A3526E]/20 hover:border-[#A3526E]/40 bg-[#1A0C11]'
+                  : 'border-purple-200/40 hover:border-purple-300/60 bg-gradient-to-b from-purple-50/50 to-transparent'
+              }`}
+            >
+              <div className="text-2xl mb-2">🔍</div>
+              <h3 className={`text-sm font-semibold mb-1 ${isXpti ? 'text-[#F3E8EB]' : 'text-text-primary'}`}>
+                鉴定好友
+              </h3>
+              <p className="text-xs text-text-muted leading-relaxed">
+                偷偷测 ta 是什么人
+              </p>
+            </Link>
+          </div>
+        </motion.div>
+      </section>
+    </>
+  );
+}

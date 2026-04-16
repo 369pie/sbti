@@ -212,22 +212,48 @@ function drawShadowCard(
   w: number,
   shadowArcana: { name: string; keywords: string[] },
   theme: MystiTheme,
-) {
-  const h = 72;
+  shadowReading?: string,
+): number {
+  const padY = 12;
+  const kwLineH = 20;
+  // Calculate height based on content
+  let contentH = padY + 20 + kwLineH; // top pad + header + keywords line
+
+  // Shadow reading text lines
+  let readingLines: string[] = [];
+  if (shadowReading) {
+    ctx.font = `12px ${FONT_SANS}`;
+    readingLines = wrapText(ctx, shadowReading, w - 40);
+    contentH += 10 + readingLines.length * 17; // gap + lines
+  }
+  contentH += padY; // bottom pad
+
   const x = cx - w / 2;
-  fillRoundedRect(ctx, x, y, w, h, 8, hexToRgba(theme.cardSurface, 0.6));
-  strokeRoundedRect(ctx, x, y, w, h, 8, hexToRgba(theme.divider, 0.5), 1);
+  fillRoundedRect(ctx, x, y, w, contentH, 8, hexToRgba(theme.cardSurface, 0.6));
+  strokeRoundedRect(ctx, x, y, w, contentH, 8, hexToRgba(theme.divider, 0.5), 1);
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
   ctx.font = `12px ${FONT_SANS}`;
   ctx.fillStyle = theme.textMuted;
-  ctx.fillText(`Shadow · ${shadowArcana.name}`, cx, y + 10);
+  ctx.fillText(`Shadow · ${shadowArcana.name}`, cx, y + padY);
 
   ctx.font = `12px ${FONT_SANS}`;
   ctx.fillStyle = hexToRgba(theme.textMuted, 0.85);
   const kwText = shadowArcana.keywords.join(' · ');
-  ctx.fillText(kwText, cx, y + 34);
+  ctx.fillText(kwText, cx, y + padY + 20);
+
+  if (readingLines.length > 0) {
+    ctx.font = `12px ${FONT_SANS}`;
+    ctx.fillStyle = hexToRgba(theme.textMuted, 0.75);
+    let ry = y + padY + 20 + kwLineH + 6;
+    for (const line of readingLines) {
+      ctx.fillText(line, cx, ry);
+      ry += 17;
+    }
+  }
+
+  return contentH;
 }
 
 function drawQrAndFooter(
@@ -433,8 +459,8 @@ async function renderMystiShareImage(
     y += 42;
 
     // shadow card
-    drawShadowCard(ctx, cx, y, 292, data.shadowArcana, theme);
-    y += 96;
+    const shadowH = drawShadowCard(ctx, cx, y, 292, data.shadowArcana, theme, data.shadowReading);
+    y += shadowH + 24;
 
     // qr & footer
     drawQrAndFooter(ctx, cx, y, qrDataUrl, theme);
@@ -590,24 +616,57 @@ async function renderMystiShareImage(
 
   // combined shadow card
   const shadowW = 360;
-  const shadowH = 84;
+  const shadowPadY = 12;
+  let shadowContentH = shadowPadY + 20 + 20 + 20; // header + keywords + subtext
+
+  // calculate shadow reading teaser heights
+  const shadowTeaser1 = data.shadowReading ? data.shadowReading.split('。')[0] + '。' : '';
+  const shadowTeaser2 = partnerData!.shadowReading ? partnerData!.shadowReading.split('。')[0] + '。' : '';
+  let teaser1Lines: string[] = [];
+  let teaser2Lines: string[] = [];
+  if (shadowTeaser1) {
+    ctx.font = `11px ${FONT_SANS}`;
+    teaser1Lines = wrapText(ctx, shadowTeaser1, shadowW - 40);
+    shadowContentH += 8 + teaser1Lines.length * 15;
+  }
+  if (shadowTeaser2) {
+    ctx.font = `11px ${FONT_SANS}`;
+    teaser2Lines = wrapText(ctx, shadowTeaser2, shadowW - 40);
+    shadowContentH += 8 + teaser2Lines.length * 15;
+  }
+  shadowContentH += shadowPadY;
+
   const sx = cx - shadowW / 2;
-  fillRoundedRect(ctx, sx, y, shadowW, shadowH, 8, hexToRgba(theme.cardSurface, 0.6));
-  strokeRoundedRect(ctx, sx, y, shadowW, shadowH, 8, hexToRgba(theme.divider, 0.5), 1);
+  fillRoundedRect(ctx, sx, y, shadowW, shadowContentH, 8, hexToRgba(theme.cardSurface, 0.6));
+  strokeRoundedRect(ctx, sx, y, shadowW, shadowContentH, 8, hexToRgba(theme.divider, 0.5), 1);
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
   ctx.font = `12px ${FONT_SANS}`;
   ctx.fillStyle = theme.textMuted;
-  ctx.fillText(`Shadow · ${data.shadowArcana.name} × ${partnerData!.shadowArcana.name}`, cx, y + 10);
+  ctx.fillText(`Shadow · ${data.shadowArcana.name} × ${partnerData!.shadowArcana.name}`, cx, y + shadowPadY);
 
   ctx.font = `11px ${FONT_SANS}`;
   ctx.fillStyle = hexToRgba(theme.textMuted, 0.85);
   const leftKws = data.shadowArcana.keywords.slice(0, 2).join(' · ');
   const rightKws = partnerData!.shadowArcana.keywords.slice(0, 2).join(' · ');
-  ctx.fillText(`${leftKws}  —  ${rightKws}`, cx, y + 32);
-  ctx.fillText('两人的阴影，亦是共同的课题', cx, y + 50);
-  y += shadowH + 22;
+  ctx.fillText(`${leftKws}  —  ${rightKws}`, cx, y + shadowPadY + 20);
+  ctx.fillText('两人的阴影，亦是共同的课题', cx, y + shadowPadY + 40);
+
+  let sty = y + shadowPadY + 60;
+  if (teaser1Lines.length > 0) {
+    ctx.font = `11px ${FONT_SANS}`;
+    ctx.fillStyle = hexToRgba(theme.textMuted, 0.7);
+    sty += 4;
+    for (const line of teaser1Lines) { ctx.fillText(line, cx, sty); sty += 15; }
+  }
+  if (teaser2Lines.length > 0) {
+    ctx.font = `11px ${FONT_SANS}`;
+    ctx.fillStyle = hexToRgba(theme.textMuted, 0.7);
+    sty += 4;
+    for (const line of teaser2Lines) { ctx.fillText(line, cx, sty); sty += 15; }
+  }
+  y += shadowContentH + 22;
 
   // qr & footer
   drawQrAndFooter(ctx, cx, y, qrDataUrl, theme);

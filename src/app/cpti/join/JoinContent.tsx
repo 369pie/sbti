@@ -38,8 +38,8 @@ export default function JoinContent() {
 
   const handleDigitChange = useCallback(
     (index: number, value: string) => {
-      // Only allow single digit
-      const char = value.replace(/[^0-9]/g, '').slice(-1);
+      // Allow alphanumeric only, uppercase, take last char
+      const char = value.replace(/[^0-9A-Za-z]/g, '').slice(-1).toUpperCase();
       setDigits(prev => {
         const next = [...prev];
         next[index] = char;
@@ -72,7 +72,7 @@ export default function JoinContent() {
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLInputElement>) => {
       e.preventDefault();
-      const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+      const pasted = e.clipboardData.getData('text').replace(/[^0-9A-Za-z]/g, '').toUpperCase().slice(0, 6);
       if (!pasted) return;
       const newDigits = ['', '', '', '', '', ''];
       for (let i = 0; i < pasted.length; i++) {
@@ -218,7 +218,7 @@ export default function JoinContent() {
               key={i}
               ref={el => { inputRefs.current[i] = el; }}
               type="text"
-              inputMode="numeric"
+              inputMode="text"
               autoComplete="one-time-code"
               maxLength={1}
               value={digit}

@@ -1,10 +1,10 @@
 'use client';
 
-import { useSyncExternalStore, useState, useCallback, useMemo, useRef } from 'react';
+import { useSyncExternalStore, useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import NextImage from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { CptiRelationshipType } from '@/lib/cpti/relationships';
 import {
   RELATIONSHIP_TIER_INFO,
@@ -162,6 +162,50 @@ export function CptiRelationshipResult() {
 
   const shareUrl = getSiteUrl('/cpti/');
 
+  // ── Ceremony reveal state machine ──
+  // Phases: 'translating' → 'dimensions' → 'reveal' → 'done'
+  type CeremonyPhase = 'translating' | 'dimensions' | 'reveal' | 'done';
+  const [ceremonyPhase, setCeremonyPhase] = useState<CeremonyPhase | null>(null);
+  const [litDimensions, setLitDimensions] = useState(0);
+  const ceremonyStartedRef = useRef(false);
+
+  // Trigger ceremony only for fresh session results (not from link or already seen)
+  useEffect(() => {
+    if (!data || fromLink || ceremonyStartedRef.current) return;
+    // Check if we already showed ceremony for this session
+    const seenKey = 'cpti-ceremony-seen';
+    try {
+      if (sessionStorage.getItem(seenKey)) return;
+      sessionStorage.setItem(seenKey, '1');
+    } catch { /* ignore */ }
+
+    ceremonyStartedRef.current = true;
+    setCeremonyPhase('translating');
+
+    // Phase 1: translating (2s)
+    const t1 = setTimeout(() => setCeremonyPhase('dimensions'), 2000);
+    // Phase 2: dimensions light up one by one (5 × 500ms = 2.5s)
+    const dimTimers: ReturnType<typeof setTimeout>[] = [];
+    for (let i = 1; i <= 5; i++) {
+      dimTimers.push(setTimeout(() => setLitDimensions(i), 2000 + i * 500));
+    }
+    // Phase 3: reveal name (after dimensions done)
+    const t3 = setTimeout(() => setCeremonyPhase('reveal'), 4700);
+    // Phase 4: done → show full page
+    const t4 = setTimeout(() => setCeremonyPhase('done'), 6500);
+
+    return () => {
+      clearTimeout(t1);
+      dimTimers.forEach(clearTimeout);
+      clearTimeout(t3);
+      clearTimeout(t4);
+    };
+  }, [data, fromLink]);
+
+  const skipCeremony = useCallback(() => {
+    setCeremonyPhase('done');
+  }, []);
+
   const getReturnLink = useCallback(() => {
     if (!data) return '';
     return getSiteUrl(`/cpti/relationship/?r=${encodeRelationshipLink({
@@ -226,6 +270,223 @@ export function CptiRelationshipResult() {
   const personalityA = getCptiPersonalityBySlug(personalitySlugA);
   const personalityB = getCptiPersonalityBySlug(personalitySlugB);
   const tierInfo = RELATIONSHIP_TIER_INFO[relationship.tier];
+  const isSpecialTier = relationship.tier === 'rare' || relationship.slug === 'soul';
+
+  // ── Ceremony overlay ──
+  if (ceremonyPhase && ceremonyPhase !== 'done') {
+    const dimNames = ['主导力', '表达力', '冲突力', '付出力', '融合度'];
+    const dimColors = ['#e06088', '#8b5cf6', '#f59e0b', '#22c55e', '#3b82f6'];
+
+    return (
+      <div
+        className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden"
+        onClick={skipCeremony}
+      >
+        {/* Background gradient */}
+        <div
+          className="absolute inset-0 transition-colors duration-1000"
+          style={{
+            background: ceremonyPhase === 'reveal'
+              ? `radial-gradient(ellipse at center, ${relationship.color}15 0%, #FAF8F5 70%)`
+              : '#FAF8F5',
+          }}
+        />
+
+        <AnimatePresence mode="wait">
+          {/* Phase 1: Translating */}
+          {ceremonyPhase === 'translating' && (
+            <motion.div
+              key="translating"
+              className="text-center relative z-10"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <motion.div
+                className="text-4xl mb-6"
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                🔮
+              </motion.div>
+              <p className="text-lg text-text-primary font-medium">
+                正在翻译你们的关系……
+              </p>
+              <div className="flex items-center justify-center gap-1.5 mt-4">
+                {[0, 1, 2].map(i => (
+                  <motion.div
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full bg-rose-400"
+                    animate={{ opacity: [0.3, 1, 0.3] }}
+                    transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.3 }}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Phase 2: Dimensions lighting up */}
+          {ceremonyPhase === 'dimensions' && (
+            <motion.div
+              key="dimensions"
+              className="text-center relative z-10 w-full max-w-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <p className="text-sm text-text-muted mb-8 tracking-wider">六维正在连接……</p>
+              <div className="space-y-4">
+                {dimNames.map((name, i) => {
+                  const isLit = i < litDimensions;
+                  return (
+                    <motion.div
+                      key={name}
+                      className="flex items-center gap-4"
+                      initial={{ opacity: 0.3 }}
+                      animate={{
+                        opacity: isLit ? 1 : 0.3,
+                      }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <motion.div
+                        className="w-3 h-3 rounded-full"
+                        style={{ background: isLit ? dimColors[i] : '#D1D5DB' }}
+                        animate={isLit ? {
+                          scale: [1, 1.4, 1],
+                          boxShadow: [`0 0 0 ${dimColors[i]}00`, `0 0 12px ${dimColors[i]}60`, `0 0 4px ${dimColors[i]}30`],
+                        } : {}}
+                        transition={{ duration: 0.4 }}
+                      />
+                      <span className={`text-sm font-medium transition-colors ${isLit ? 'text-text-primary' : 'text-text-muted'}`}>
+                        {name}
+                      </span>
+                      {isLit && (
+                        <motion.span
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="text-xs font-mono"
+                          style={{ color: dimColors[i] }}
+                        >
+                          ✓ 已匹配
+                        </motion.span>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Phase 3: Reveal */}
+          {ceremonyPhase === 'reveal' && (
+            <motion.div
+              key="reveal"
+              className="text-center relative z-10"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: [0.2, 0, 0.2, 1] }}
+            >
+              <motion.div
+                className="text-5xl mb-4"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+              >
+                {relationship.emoji}
+              </motion.div>
+              <motion.div
+                className="text-sm font-mono tracking-[0.3em] uppercase mb-3"
+                style={{ color: relationship.color }}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+              >
+                {relationship.code}
+              </motion.div>
+              <motion.h1
+                className="text-4xl sm:text-5xl font-bold tracking-tight"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.6 }}
+              >
+                {relationship.name}
+              </motion.h1>
+              <motion.p
+                className="text-lg text-text-secondary mt-3 max-w-xs mx-auto"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.9, duration: 0.5 }}
+              >
+                {relationship.tagline}
+              </motion.p>
+
+              {/* Special tier celebration */}
+              {isSpecialTier && (
+                <motion.div
+                  className="mt-4"
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.1, type: 'spring', stiffness: 150 }}
+                >
+                  <span
+                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold border"
+                    style={{
+                      color: '#D4A017',
+                      background: 'rgba(212,160,23,0.08)',
+                      borderColor: 'rgba(212,160,23,0.25)',
+                    }}
+                  >
+                    ✦ 稀有关系
+                  </span>
+                </motion.div>
+              )}
+
+              {/* Gold particles for special tiers */}
+              {isSpecialTier && (
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                  {Array.from({ length: 20 }).map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute w-1 h-1 rounded-full"
+                      style={{
+                        background: i % 3 === 0 ? '#FFD700' : i % 3 === 1 ? '#FFA500' : '#FFEC8B',
+                        left: `${20 + Math.random() * 60}%`,
+                        top: `${30 + Math.random() * 40}%`,
+                      }}
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{
+                        opacity: [0, 1, 0],
+                        scale: [0, 1.5, 0],
+                        x: (Math.random() - 0.5) * 200,
+                        y: (Math.random() - 0.5) * 200,
+                      }}
+                      transition={{
+                        delay: 0.8 + Math.random() * 0.8,
+                        duration: 1.2 + Math.random() * 0.5,
+                        ease: 'easeOut',
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Skip hint */}
+        <motion.p
+          className="absolute bottom-12 text-xs text-text-muted"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.5 }}
+          transition={{ delay: 1.5 }}
+        >
+          点击任意处跳过
+        </motion.p>
+      </div>
+    );
+  }
 
   const relationshipImageSrc =
     relImageMode === 'emoji'

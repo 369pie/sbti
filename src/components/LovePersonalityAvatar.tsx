@@ -3,7 +3,7 @@
 import NextImage from 'next/image';
 import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
-import { getLoveTypeImage, getLoveTypeThumbnailImage } from '@/lib/love/personalities';
+import { getLoveTypeImage, getLoveTypeThumbnailImage, getLoveTypeMediumImage } from '@/lib/love/personalities';
 import type { LovePersonalityType } from '@/lib/love/personalities';
 
 interface Props {
@@ -37,7 +37,7 @@ export function LovePersonalityAvatar({
 
   const imageSrc = useOriginalImage
     ? getLoveTypeImage(personality.slug)
-    : getLoveTypeThumbnailImage(personality.slug);
+    : getLoveTypeMediumImage(personality.slug);
 
   return (
     <div className={className} style={style}>
@@ -52,6 +52,8 @@ export function LovePersonalityAvatar({
           priority={priority}
           sizes={sizes}
           className={imageClassName}
+          placeholder="blur"
+          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
           onError={() => {
             if (!useOriginalImage) {
               setUseOriginalImage(true);

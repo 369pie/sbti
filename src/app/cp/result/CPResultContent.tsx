@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
-import { getPersonalityBySlug, getTypeImage, getTypeThumbnailImage } from '@/lib/personalities';
+import { getPersonalityBySlug, getTypeImage, getTypeThumbnailImage, getTypeMediumImage } from '@/lib/personalities';
 import { MODEL_COLORS } from '@/lib/dimensions';
 import { calculateCP, getTierColor, getTierEmoji } from '@/lib/cp-matching';
 import type { CPResult, DimensionComparison } from '@/lib/cp-matching';
@@ -205,11 +205,13 @@ export function CPResultContent() {
                 style={{ background: `${typeA.color}15` }}
               >
                 <NextImage
-                  src={getTypeThumbnailImage(typeA.slug)}
+                  src={getTypeMediumImage(typeA.slug)}
                   alt={typeA.name}
                   width={96} height={96}
                   className="w-full h-full object-cover"
                   priority
+                  placeholder="blur"
+                  blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
                 />
               </div>
               <span className="text-xs font-mono tracking-wider" style={{ color: typeA.color }}>
@@ -230,11 +232,13 @@ export function CPResultContent() {
                 style={{ background: `${typeB.color}15` }}
               >
                 <NextImage
-                  src={getTypeThumbnailImage(typeB.slug)}
+                  src={getTypeMediumImage(typeB.slug)}
                   alt={typeB.name}
                   width={96} height={96}
                   className="w-full h-full object-cover"
                   priority
+                  placeholder="blur"
+                  blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
                 />
               </div>
               <span className="text-xs font-mono tracking-wider" style={{ color: typeB.color }}>

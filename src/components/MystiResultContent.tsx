@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useRef, useState, useSyncExternalStore, useEffect, useMemo } from 'react';
+import { useCallback, useRef, useState, useSyncExternalStore, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import type { WtftiPersonality } from '@/lib/wtfti-personalities';
 import { getWtftiPersonality } from '@/lib/wtfti-personalities';
 import { MYSTI_THEMES } from '@/lib/mysti/themes';
@@ -12,7 +12,6 @@ import { getMystiTarotData } from '@/lib/mysti/tarot-mapping';
 import { getDualInterpretation } from '@/lib/mysti/dual-interpretation';
 import { MystiShareImageGenerator } from '@/components/MystiShareImageGenerator';
 import { UniverseSwitcher } from '@/components/UniverseSwitcher';
-import { CrossUniverseCTA } from '@/components/CrossUniverseCTA';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 import { markCollected } from '@/lib/mysti/collection';
 
@@ -118,7 +117,7 @@ export function MystiResultContent({ wtftiPersonality }: Props) {
       </div>
 
       {/* Main content */}
-      <main className="max-w-2xl mx-auto px-6 pb-20">
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 pb-12">
         {!partnerPersonality ? (
           <SingleModeContent
             personality={wtftiPersonality}
@@ -159,7 +158,7 @@ function SingleModeContent({
   shareRef,
 }: {
   personality: WtftiPersonality;
-  data: { majorArcana: { name: string; keywords: string[] }; shadowArcana: { name: string; keywords: string[] }; tagline: string };
+  data: { majorArcana: { name: string; keywords: string[] }; shadowArcana: { name: string; keywords: string[] }; tagline: string; reading?: string; shadowReading?: string; whyThisCard?: string };
   theme: MystiTheme;
   mounted: boolean;
   shareRef: React.RefObject<MystiShareImageGeneratorHandle | null>;
@@ -171,21 +170,21 @@ function SingleModeContent({
         initial={mounted ? { opacity: 0, y: 20 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-center pt-6 pb-8"
+        className="text-center pt-4 pb-5"
       >
-        <div className="text-xs tracking-[0.2em] uppercase mb-3" style={{ color: theme.accent }}>
+        <div className="text-xs tracking-[0.2em] uppercase mb-2" style={{ color: theme.accent }}>
           大阿卡纳
         </div>
-        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-2">
+        <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight mb-2">
           {data.majorArcana.name}
         </h1>
-        <div className="w-16 h-px mx-auto" style={{ background: theme.divider }} />
+        <div className="w-12 h-px mx-auto" style={{ background: theme.divider }} />
       </motion.div>
 
       {/* Tarot card with 3D flip */}
-      <FlipCard theme={theme} mounted={mounted} delay={0.1} className="mx-auto max-w-sm mb-10">
+      <FlipCard theme={theme} mounted={mounted} delay={0.1} className="mx-auto w-[200px] sm:w-[280px] mb-6">
         <div
-          className="aspect-[2/3] rounded-2xl border flex flex-col items-center justify-center p-6 relative overflow-hidden"
+          className="aspect-[2/3] rounded-2xl border flex flex-col items-center justify-center p-4 relative overflow-hidden"
           style={{
             background: `linear-gradient(135deg, ${theme.gradientCard[0]} 0%, ${theme.gradientCard[1]} 100%)`,
             borderColor: theme.cardBorder,
@@ -193,11 +192,11 @@ function SingleModeContent({
           }}
         >
           <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)` }} />
-          <div className="text-6xl sm:text-7xl font-serif mb-4" style={{ color: theme.accent }}>
+          <div className="text-5xl sm:text-7xl font-serif mb-3" style={{ color: theme.accent }}>
             {data.majorArcana.name.slice(0, 1)}
           </div>
-          <div className="text-2xl">{personality.emoji}</div>
-          <div className="absolute bottom-4 text-[10px] tracking-widest uppercase" style={{ color: theme.textMuted }}>
+          <div className="text-xl sm:text-2xl">{personality.emoji}</div>
+          <div className="absolute bottom-3 text-[9px] sm:text-[10px] tracking-widest uppercase" style={{ color: theme.textMuted }}>
             {personality.code}
           </div>
         </div>
@@ -208,7 +207,7 @@ function SingleModeContent({
         initial={mounted ? { opacity: 0, y: 12 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="text-center mb-6"
+        className="text-center mb-4"
       >
         <div
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm"
@@ -226,19 +225,37 @@ function SingleModeContent({
         initial={mounted ? { opacity: 0, y: 12 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.25 }}
-        className="text-center mb-8"
+        className="text-center mb-5"
       >
-        <p className="text-lg sm:text-xl italic font-serif" style={{ color: theme.accent }}>
+        <p className="text-base sm:text-xl italic font-serif" style={{ color: theme.accent }}>
           “ {data.tagline} ”
         </p>
       </motion.div>
+
+      {/* Reading */}
+      {data.reading && (
+        <motion.div
+          initial={mounted ? { opacity: 0, y: 14 } : false}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.28 }}
+          className="rounded-xl border p-4 sm:p-6 mb-5"
+          style={{ borderColor: theme.divider, background: `${theme.cardSurface}80` }}
+        >
+          <div className="text-xs tracking-[0.14em] uppercase mb-2 text-center" style={{ color: theme.accent }}>
+            Soul Reading
+          </div>
+          <p className="text-sm sm:text-[15px] leading-7 sm:leading-8" style={{ color: theme.text }}>
+            {data.reading}
+          </p>
+        </motion.div>
+      )}
 
       {/* Keywords */}
       <motion.div
         initial={mounted ? { opacity: 0, y: 12 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
-        className="flex flex-wrap items-center justify-center gap-2 mb-10"
+        className="flex flex-wrap items-center justify-center gap-2 mb-6"
       >
         {data.majorArcana.keywords.map((kw, i) => (
           <span
@@ -256,27 +273,52 @@ function SingleModeContent({
         initial={mounted ? { opacity: 0, y: 16 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.35 }}
-        className="rounded-xl border p-5 mb-10"
+        className="rounded-xl border p-4 mb-5"
         style={{ borderColor: theme.divider, background: `${theme.cardSurface}80` }}
       >
         <div className="text-xs tracking-wider uppercase mb-2 text-center" style={{ color: theme.textMuted }}>
           Shadow · {data.shadowArcana.name}
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
           {data.shadowArcana.keywords.map((kw, i) => (
             <span key={i} className="text-sm" style={{ color: theme.textMuted }}>
               {kw}
             </span>
           ))}
         </div>
+        {data.shadowReading && (
+          <div className="mt-3 pt-3 border-t" style={{ borderColor: theme.divider }}>
+            <p className="text-sm leading-7 text-center" style={{ color: theme.textMuted }}>
+              {data.shadowReading}
+            </p>
+          </div>
+        )}
       </motion.div>
+
+      {/* Why this card */}
+      {data.whyThisCard && (
+        <motion.div
+          initial={mounted ? { opacity: 0, y: 14 } : false}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.37 }}
+          className="rounded-xl border p-4 sm:p-6 mb-6"
+          style={{ borderColor: theme.divider, background: `${theme.cardSurface}80` }}
+        >
+          <div className="text-xs tracking-[0.14em] uppercase mb-2 text-center" style={{ color: theme.accent }}>
+            为什么是这张牌？
+          </div>
+          <p className="text-sm sm:text-[15px] leading-7 sm:leading-8 text-center" style={{ color: theme.text }}>
+            {data.whyThisCard}
+          </p>
+        </motion.div>
+      )}
 
       {/* Cross-universe exploration */}
       <motion.div
         initial={mounted ? { opacity: 0, y: 16 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.38 }}
-        className="mb-10"
+        className="mb-6"
       >
         <UniverseSwitcher
           slug={personality.slug}
@@ -291,38 +333,17 @@ function SingleModeContent({
         />
       </motion.div>
 
-      {/* Cross-universe CTA */}
-      <motion.div
-        initial={mounted ? { opacity: 0, y: 16 } : false}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.39 }}
-        className="mb-10"
-      >
-        <CrossUniverseCTA
-          slug={personality.slug}
-          currentUniverseId="mysti"
-          theme={{
-            cardSurface: theme.cardSurface,
-            divider: theme.divider,
-            accent: theme.accent,
-            text: theme.text,
-            textMuted: theme.textMuted,
-            bgGradient: `linear-gradient(135deg, ${theme.gradientBg[0]} 0%, ${theme.gradientBg[1]} 100%)`,
-          }}
-        />
-      </motion.div>
-
       {/* Share CTA */}
       <motion.div
         initial={mounted ? { opacity: 0, y: 16 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="rounded-2xl border p-6 sm:p-8 text-center"
+        className="rounded-2xl border p-5 sm:p-8 text-center"
         style={{ borderColor: theme.cardBorder, background: `${theme.cardSurface}60` }}
       >
-        <div className="text-2xl mb-2">✦</div>
+        <div className="text-xl mb-1">✦</div>
         <h3 className="text-base font-semibold mb-1">生成你的灵鉴卡牌</h3>
-        <p className="text-xs sm:text-sm mb-5" style={{ color: theme.textMuted }}>
+        <p className="text-xs sm:text-sm mb-4" style={{ color: theme.textMuted }}>
           将结果保存为图片，分享给朋友
         </p>
         <div className="max-w-xs mx-auto">
@@ -335,15 +356,15 @@ function SingleModeContent({
         initial={mounted ? { opacity: 0, y: 16 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.45 }}
-        className="mt-6 text-center"
+        className="mt-5 text-center"
       >
-        <a
+        <Link
           href={`/mysti/?slug=${encodeURIComponent(personality.slug)}`}
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm border transition-all hover:opacity-80"
           style={{ borderColor: theme.divider, color: theme.accent }}
         >
           💌 邀请 TA 合测
-        </a>
+        </Link>
       </motion.div>
 
       {/* Back links */}
@@ -351,7 +372,7 @@ function SingleModeContent({
         initial={mounted ? { opacity: 0 } : false}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.5 }}
-        className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3"
+        className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3"
       >
         <Link
           href="/wtfti/test/"
@@ -382,9 +403,9 @@ function DualModeContent({
   shareRef,
 }: {
   personality: WtftiPersonality;
-  data: { majorArcana: { name: string; keywords: string[] }; shadowArcana: { name: string; keywords: string[] }; tagline: string };
+  data: { majorArcana: { name: string; keywords: string[] }; shadowArcana: { name: string; keywords: string[] }; tagline: string; reading?: string; shadowReading?: string; whyThisCard?: string };
   partner: WtftiPersonality;
-  partnerData: { majorArcana: { name: string; keywords: string[] }; shadowArcana: { name: string; keywords: string[] }; tagline: string };
+  partnerData: { majorArcana: { name: string; keywords: string[] }; shadowArcana: { name: string; keywords: string[] }; tagline: string; reading?: string; shadowReading?: string; whyThisCard?: string };
   theme: MystiTheme;
   mounted: boolean;
   shareRef: React.RefObject<MystiShareImageGeneratorHandle | null>;
@@ -509,7 +530,7 @@ function DualModeContent({
               initial={mounted ? { opacity: 0, y: 12 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.35 }}
-              className="text-center mb-8"
+              className="text-center mb-5"
             >
               <p className="text-sm italic font-serif mb-1" style={{ color: theme.accent }}>
                 ✦ {data.majorArcana.name} × {partnerData.majorArcana.name} ✦
@@ -524,10 +545,10 @@ function DualModeContent({
               initial={mounted ? { opacity: 0, y: 16 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="space-y-4 mb-10"
+              className="space-y-3 mb-6"
             >
               <div
-                className="rounded-xl border p-5"
+                className="rounded-xl border p-4"
                 style={{ borderColor: theme.divider, background: `${theme.cardSurface}80` }}
               >
                 <div className="text-xs tracking-wider uppercase mb-2" style={{ color: theme.accent }}>
@@ -539,7 +560,7 @@ function DualModeContent({
               </div>
 
               <div
-                className="rounded-xl border p-5"
+                className="rounded-xl border p-4"
                 style={{ borderColor: theme.divider, background: `${theme.cardSurface}80` }}
               >
                 <div className="text-xs tracking-wider uppercase mb-2" style={{ color: theme.accent }}>
@@ -551,7 +572,7 @@ function DualModeContent({
               </div>
 
               <div
-                className="rounded-xl border p-5"
+                className="rounded-xl border p-4"
                 style={{ borderColor: theme.divider, background: `${theme.cardSurface}80` }}
               >
                 <div className="text-xs tracking-wider uppercase mb-2" style={{ color: theme.accent }}>
@@ -568,7 +589,7 @@ function DualModeContent({
               initial={mounted ? { opacity: 0, y: 16 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.45 }}
-              className="rounded-xl border p-5 mb-10"
+              className="rounded-xl border p-4 mb-6"
               style={{ borderColor: theme.divider, background: `${theme.cardSurface}80` }}
             >
               <div className="text-xs tracking-wider uppercase mb-2 text-center" style={{ color: theme.textMuted }}>
@@ -577,9 +598,25 @@ function DualModeContent({
               <div className="text-center text-xs mb-2" style={{ color: theme.textMuted }}>
                 {data.shadowArcana.keywords.slice(0, 2).join(' · ')} — {partnerData.shadowArcana.keywords.slice(0, 2).join(' · ')}
               </div>
-              <div className="text-center text-[10px] opacity-70" style={{ color: theme.textMuted }}>
+              <div className="text-center text-[10px] opacity-70 mb-3" style={{ color: theme.textMuted }}>
                 两人的阴影，亦是共同的课题
               </div>
+              {(data.shadowReading || partnerData.shadowReading) && (
+                <div className="mt-3 pt-3 border-t space-y-3" style={{ borderColor: theme.divider }}>
+                  {data.shadowReading && (
+                    <div className="text-center">
+                      <div className="text-[10px] tracking-wider uppercase mb-1" style={{ color: theme.accent }}>{personality.wtftiName}</div>
+                      <p className="text-xs leading-6" style={{ color: theme.textMuted }}>{data.shadowReading}</p>
+                    </div>
+                  )}
+                  {partnerData.shadowReading && (
+                    <div className="text-center">
+                      <div className="text-[10px] tracking-wider uppercase mb-1" style={{ color: theme.accent }}>{partner.wtftiName}</div>
+                      <p className="text-xs leading-6" style={{ color: theme.textMuted }}>{partnerData.shadowReading}</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </motion.div>
           </>
         );
@@ -590,12 +627,12 @@ function DualModeContent({
         initial={mounted ? { opacity: 0, y: 16 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="rounded-2xl border p-6 sm:p-8 text-center"
+        className="rounded-2xl border p-5 sm:p-8 text-center"
         style={{ borderColor: theme.cardBorder, background: `${theme.cardSurface}60` }}
       >
-        <div className="text-2xl mb-2">✦</div>
+        <div className="text-xl mb-1">✦</div>
         <h3 className="text-base font-semibold mb-1">生成双人灵鉴卡牌</h3>
-        <p className="text-xs sm:text-sm mb-5" style={{ color: theme.textMuted }}>
+        <p className="text-xs sm:text-sm mb-4" style={{ color: theme.textMuted }}>
           将结果保存为图片，分享给你们的世界
         </p>
         <div className="max-w-xs mx-auto">
@@ -608,7 +645,7 @@ function DualModeContent({
         initial={mounted ? { opacity: 0 } : false}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.5 }}
-        className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3"
+        className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3"
       >
         <Link
           href="/wtfti/test/"

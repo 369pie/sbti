@@ -4,13 +4,16 @@
   "private": true,
   "packageManager": "pnpm@10.15.1",
   "scripts": {
-    "dev": "node scripts/generate-gallery-thumbnails.mjs && next dev --webpack",
-    "dev:turbo": "node scripts/generate-gallery-thumbnails.mjs && next dev",
-    "build": "node scripts/generate-gallery-thumbnails.mjs && node scripts/build-export.mjs",
+    "dev": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && next dev --webpack",
+    "dev:turbo": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && next dev",
+    "build": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && node scripts/build-export.mjs",
     "images:thumbs": "node scripts/generate-gallery-thumbnails.mjs",
+    "images:medium": "node scripts/generate-medium-images.mjs",
+    "images:all": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs",
     "images:banti-launch": "node scripts/generate-banti-launch.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "docs:metadata": "node scripts/check-doc-metadata.mjs"
   },
   "dependencies": {
     "@fontsource/noto-sans-sc": "^5.2.9",

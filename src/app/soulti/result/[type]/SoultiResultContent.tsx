@@ -4,21 +4,19 @@ import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import { SOULTI_DIMENSIONS, SOULTI_MODEL_NAMES, SOULTI_MODEL_COLORS } from '@/lib/soulti/dimensions';
-import { SOULTI_PERSONALITY_TYPES, getSoultiRarity, getSoultiResonance, getSoultiPersonalityBySlug, getSoultiTypeThumbnailImage } from '@/lib/soulti/personalities';
+import { SOULTI_PERSONALITY_TYPES, getSoultiRarity, getSoultiResonance, getSoultiPersonalityBySlug, getSoultiTypeMediumImage, getSoultiTypeEmojiFallbackImage } from '@/lib/soulti/personalities';
 import type { SoultiPersonalityType } from '@/lib/soulti/personalities';
 import type { SoultiDimensionScore } from '@/lib/soulti/scoring';
 import type { SoultiLayeredResult } from '@/lib/soulti/scoring';
 import { SoultiShareImageGenerator } from '@/components/SoultiShareImageGenerator';
 import type { SoultiShareImageGeneratorHandle } from '@/components/SoultiShareImageGenerator';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
-import { WtfCardCTA } from '@/components/WtfCardCTA';
-import { UgcShareCTA } from '@/components/UgcShareCTA';
-import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
-import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
+import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 import { getCurrentWeeklyPrompt } from '@/lib/soulti/deep-report';
+import { useAuth } from '@/components/AuthProvider';
 
 interface Props {
   personality: SoultiPersonalityType;
@@ -30,23 +28,25 @@ const serifFont = "Georgia, 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC',
 export function SoultiResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
+  const [heroImageFailed, setHeroImageFailed] = useState(false);
   const shareRef = useRef<SoultiShareImageGeneratorHandle>(null);
-  const [layered, setLayered] = useState<SoultiLayeredResult | null>(null);
+  const [activeMirror, setActiveMirror] = useState<'day' | 'night' | 'dream'>('day');
+  const { isAuthenticated } = useAuth();
 
-  // Load layered (three-mirror) data from localStorage if available
-  useEffect(() => {
+  const layered = useMemo<SoultiLayeredResult | null>(() => {
+    if (typeof window === 'undefined') return null;
     try {
       const raw = localStorage.getItem('soulti-layered');
-      if (!raw) return;
+      if (!raw) return null;
       const data = JSON.parse(raw) as SoultiLayeredResult;
-      // Only use if the overall result matches the current personality
-      if (data.overall?.slug === personality.slug) {
-        setLayered(data);
-      }
-    } catch { /* ignore */ }
+      return data.overall?.slug === personality.slug ? data : null;
+    } catch {
+      return null;
+    }
   }, [personality.slug]);
 
   const shareUrl = getSiteUrl(`/soulti/result/${personality.slug}/`);
+  const unlockHref = `/auth/login/?next=${encodeURIComponent(`/soulti/result/${personality.slug}/`)}`;
   const resonance = getSoultiResonance(personality.slug);
   const rarity = getSoultiRarity(personality.slug);
 
@@ -149,7 +149,7 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
           <div className="relative">
             <button
               onClick={() => shareRef.current?.generate()}
-              className="absolute -top-2 right-0 p-2 rounded-lg text-[#7A6A5A] font-medium/40 hover:text-[#7A6A5A] font-medium transition-colors cursor-pointer"
+              className="absolute -top-2 right-0 p-2 rounded-lg text-[#7A6A5A] opacity-40 hover:opacity-100 transition-opacity cursor-pointer"
               title="生成分享图片"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -164,20 +164,34 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
 
           {/* Hero character image */}
           <div
-            className="w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 mx-auto mb-8 rounded-3xl overflow-hidden flex items-center justify-center"
+            className="relative w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 mx-auto mb-8 rounded-3xl overflow-hidden flex items-center justify-center"
             style={{
               background: `linear-gradient(135deg, ${personality.color}08 0%, ${personality.color}12 100%)`,
               border: `1px solid ${personality.color}20`,
             }}
           >
-            <NextImage
-              src={getSoultiTypeThumbnailImage(personality.slug)}
-              alt={personality.name}
-              fill
-              sizes="(max-width: 768px) 224px, 288px"
-              className="object-contain drop-shadow-lg"
-              priority
-            />
+            {!heroImageFailed ? (
+              <NextImage
+                src={getSoultiTypeMediumImage(personality.slug)}
+                alt={personality.name}
+                fill
+                sizes="(max-width: 768px) 224px, 288px"
+                className="object-contain drop-shadow-lg"
+                priority
+                placeholder="blur"
+                blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
+                onError={() => setHeroImageFailed(true)}
+              />
+            ) : (
+              <NextImage
+                src={getSoultiTypeEmojiFallbackImage(personality.slug)}
+                alt={personality.name}
+                fill
+                sizes="(max-width: 768px) 224px, 288px"
+                className="object-contain drop-shadow-lg"
+                priority
+              />
+            )}
           </div>
 
           {/* Type code — large serif, single line */}
@@ -263,17 +277,23 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
         <div className="border-t border-border-subtle/60" />
       </div>
 
-      {/* ── THREE MIRRORS — 三面镜子 ── */}
-      {layered && (layered.daySelf.slug !== layered.nightSelf.slug || layered.daySelf.slug !== layered.dreamTendency.slug) && (() => {
+      {/* ── THREE MIRRORS — 三面镜子（分层展示） ── */}
+      {layered && (() => {
         const dayP = getSoultiPersonalityBySlug(layered.daySelf.slug);
         const nightP = getSoultiPersonalityBySlug(layered.nightSelf.slug);
         const dreamP = getSoultiPersonalityBySlug(layered.dreamTendency.slug);
         if (!dayP || !nightP || !dreamP) return null;
 
-        const mirrors = [
-          { label: '白天的你', sub: 'Day Self', p: dayP, emoji: '☀️' },
-          { label: '深夜的你', sub: 'Night Self', p: nightP, emoji: '🌙' },
-          { label: '梦里的你', sub: 'Dream Self', p: dreamP, emoji: '💭' },
+        const layerThemes = {
+          day: { bg: 'linear-gradient(180deg, #FFF8F0 0%, #FAF4EC 100%)', accent: '#C4883A', border: '#C4883A20', label: '白天的你', sub: 'DAY SELF', emoji: '☀️', desc: '阳光下呈现的你——社交、行动、表达。这是世界最常看到的那一面。' },
+          night: { bg: 'linear-gradient(180deg, #1A1B2E 0%, #252840 100%)', accent: '#8B9FD4', border: '#8B9FD430', label: '深夜的你', sub: 'NIGHT SELF', emoji: '🌙', desc: '夜晚独处时的你——脆弱、真实、不加修饰。这是你只给自己看的面。' },
+          dream: { bg: 'linear-gradient(180deg, #F0F5F3 0%, #E8F0EC 100%)', accent: '#6B9B85', border: '#6B9B8520', label: '梦里的你', sub: 'DREAM SELF', emoji: '💭', desc: '潜意识中的倾向——修复、蜕变、你尚未展开的可能性。' },
+        };
+
+        const layers = [
+          { key: 'day' as const, p: dayP, dims: layered.daySelf.dimensions, locked: false },
+          { key: 'night' as const, p: nightP, dims: layered.nightSelf.dimensions, locked: !isAuthenticated },
+          { key: 'dream' as const, p: dreamP, dims: layered.dreamTendency.dimensions, locked: !isAuthenticated },
         ];
 
         return (
@@ -293,49 +313,232 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
               同一个你，在不同时刻呈现的自然力
             </p>
 
-            <div className="grid grid-cols-3 gap-3">
-              {mirrors.map(({ label, sub, p, emoji }) => {
-                const isSameAsOverall = p.slug === personality.slug;
+            {/* Layer tab selector */}
+            <div className="flex gap-2 mb-8">
+              {layers.map(({ key, locked }) => {
+                const theme = layerThemes[key];
+                const isActive = activeMirror === key;
                 return (
-                  <div
-                    key={sub}
-                    className="rounded-2xl border p-4 sm:p-5 text-center transition-all"
+                  <button
+                    key={key}
+                    onClick={() => setActiveMirror(key)}
+                    className={`flex-1 py-3 px-2 rounded-xl text-center transition-all cursor-pointer border ${
+                      isActive ? 'shadow-sm scale-[1.02]' : 'opacity-70 hover:opacity-90'
+                    }`}
                     style={{
-                      borderColor: `${p.color}20`,
-                      background: isSameAsOverall ? `${p.color}08` : '#FDFCFA',
+                      borderColor: isActive ? theme.accent + '40' : 'transparent',
+                      background: isActive ? (key === 'night' ? '#252840' : `${theme.accent}08`) : '#FDFCFA',
                     }}
                   >
-                    <p className="text-[10px] tracking-[0.2em] text-[#8b7355] font-medium uppercase mb-3" style={{ fontFamily: serifFont }}>
-                      {sub}
-                    </p>
-                    <div className="text-2xl mb-2">{emoji}</div>
-                    <p
-                      className="text-sm tracking-[0.15em] mb-1"
-                      style={{ fontFamily: serifFont, color: p.color }}
+                    <span className="text-lg block mb-1">{theme.emoji}</span>
+                    <span
+                      className="text-[10px] tracking-[0.15em] block"
+                      style={{
+                        fontFamily: serifFont,
+                        color: key === 'night' && isActive ? '#B8C4E0' : theme.accent,
+                      }}
                     >
-                      {p.name}
-                    </p>
-                    <p className="text-[10px] text-[#6A6054] font-semibold tracking-wider font-mono mb-2">
-                      {p.code}
-                    </p>
-                    <p
-                      className="text-[11px] leading-relaxed text-text-primary line-clamp-2 text-[12px] font-medium"
-                      style={{ fontFamily: serifFont }}
-                    >
-                      {p.tagline}
-                    </p>
-                    <p className="text-[10px] text-[#6A6054] font-medium mt-2" style={{ fontFamily: serifFont }}>
-                      {label}
-                    </p>
-                  </div>
+                      {theme.label}
+                    </span>
+                    {locked && (
+                      <span className="text-[9px] text-[#999] block mt-0.5">🔒</span>
+                    )}
+                  </button>
                 );
               })}
             </div>
 
+            {/* Active layer content */}
+            {layers.map(({ key, p, dims, locked }) => {
+              if (activeMirror !== key) return null;
+              const theme = layerThemes[key];
+              const isNight = key === 'night';
+              const textColor = isNight ? 'rgba(255,255,255,0.9)' : '#2D2A26';
+              const subtextColor = isNight ? 'rgba(255,255,255,0.6)' : '#6A6054';
+
+              // Parse description sections for this personality
+              const layerSections = p.description.split(/【(.*?)】/).filter(Boolean);
+              const firstSection = layerSections.length >= 2 ? layerSections[1].trim() : p.tagline;
+              const firstLine = firstSection.split('\n').filter(Boolean)[0] || p.tagline;
+
+              return (
+                <motion.div
+                  key={key}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="rounded-2xl overflow-hidden border"
+                  style={{
+                    background: theme.bg,
+                    borderColor: theme.border,
+                  }}
+                >
+                  <div className="p-6 sm:p-8">
+                    {/* Layer header */}
+                    <p
+                      className="text-[10px] tracking-[0.3em] font-medium uppercase mb-1"
+                      style={{ fontFamily: serifFont, color: theme.accent }}
+                    >
+                      {theme.sub}
+                    </p>
+                    <p className="text-xs mb-6" style={{ fontFamily: serifFont, color: subtextColor }}>
+                      {theme.desc}
+                    </p>
+
+                    {/* Personality info */}
+                    <div className="text-center mb-6">
+                      <div className="text-3xl mb-2">{p.emoji}</div>
+                      <h4
+                        className="text-2xl tracking-[0.15em] mb-1"
+                        style={{ fontFamily: serifFont, fontWeight: 400, color: textColor }}
+                      >
+                        {p.name}
+                      </h4>
+                      <p className="text-xs font-mono tracking-wider mb-2" style={{ color: theme.accent }}>
+                        {p.code}
+                      </p>
+                      <p
+                        className="text-sm leading-[1.8] max-w-sm mx-auto"
+                        style={{ fontFamily: serifFont, color: subtextColor }}
+                      >
+                        {p.tagline}
+                      </p>
+                    </div>
+
+                    {locked ? (
+                      /* ── Locked layer: blurred preview ── */
+                      <div className="relative">
+                        <div className="select-none pointer-events-none" aria-hidden>
+                          {/* Show first line for night, just title for dream */}
+                          {key === 'night' && (
+                            <p
+                              className="text-sm leading-[1.8] mb-3"
+                              style={{ fontFamily: serifFont, color: subtextColor }}
+                            >
+                              {firstLine}
+                            </p>
+                          )}
+                          {key === 'dream' && (
+                            <p
+                              className="text-sm leading-[1.8] mb-3"
+                              style={{ fontFamily: serifFont, color: subtextColor }}
+                            >
+                              你的修复方式是……
+                            </p>
+                          )}
+
+                          {/* Blurred fake content */}
+                          <div style={{ filter: 'blur(8px)' }}>
+                            <div className="space-y-3">
+                              <p className="text-sm leading-[1.8]" style={{ color: subtextColor }}>
+                                {firstSection.slice(0, 120)}……这种模式的根源在于你深层的保护机制，
+                                它让你在关系中反复经历同样的循环。
+                              </p>
+                              {/* Blurred dimension bars */}
+                              <div className="space-y-2 mt-4">
+                                {dims.map(ds => {
+                                  const dim = SOULTI_DIMENSIONS.find(d => d.id === ds.id);
+                                  if (!dim) return null;
+                                  const pct = ((ds.score - 1) / 2) * 100;
+                                  return (
+                                    <div key={ds.id} className="flex items-center gap-3">
+                                      <span className="text-xs w-6" style={{ color: subtextColor }}>{ds.id}</span>
+                                      <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: isNight ? 'rgba(255,255,255,0.1)' : '#EDE8E2' }}>
+                                        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: theme.accent }} />
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Unlock CTA overlay */}
+                        <div
+                          className="absolute inset-0 flex flex-col items-center justify-center rounded-xl"
+                          style={{
+                            background: isNight
+                              ? 'linear-gradient(180deg, rgba(26,27,46,0.3) 0%, rgba(26,27,46,0.85) 60%)'
+                              : 'linear-gradient(180deg, rgba(253,252,250,0.2) 0%, rgba(253,252,250,0.85) 60%)',
+                          }}
+                        >
+                          <p
+                            className="text-sm mb-4 text-center"
+                            style={{ fontFamily: serifFont, color: textColor }}
+                          >
+                            {key === 'night' ? '深夜的你，藏着白天不敢说的话。' : '梦里的你，指向尚未展开的蜕变。'}
+                          </p>
+                          <Link
+                            href={unlockHref}
+                            className="px-6 py-2.5 rounded-full text-sm text-white transition-all hover:scale-[1.02]"
+                            style={{
+                              background: `linear-gradient(135deg, ${theme.accent}cc, ${theme.accent})`,
+                              boxShadow: `0 4px 16px ${theme.accent}30`,
+                              fontFamily: serifFont,
+                              letterSpacing: '0.08em',
+                            }}
+                          >
+                            登录解锁完整镜像
+                          </Link>
+                        </div>
+                      </div>
+                    ) : (
+                      /* ── Unlocked layer (Day): full content ── */
+                      <div>
+                        {/* Description first section */}
+                        <p
+                          className="text-sm leading-[2] mb-6"
+                          style={{ fontFamily: serifFont, color: subtextColor }}
+                        >
+                          {firstSection}
+                        </p>
+
+                        {/* Dimension bars */}
+                        <div className="space-y-4">
+                          {dims.map(ds => {
+                            const dim = SOULTI_DIMENSIONS.find(d => d.id === ds.id);
+                            if (!dim) return null;
+                            const color = SOULTI_MODEL_COLORS[dim.model];
+                            const pct = ((ds.score - 1) / 2) * 100;
+                            return (
+                              <div key={ds.id}>
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-mono" style={{ color: color.base }}>{ds.id}</span>
+                                    <span className="text-sm" style={{ color: textColor }}>{SOULTI_MODEL_NAMES[dim.model]}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5 text-xs" style={{ color: subtextColor }}>
+                                    <span>{dim.poleALabel}</span>
+                                    <span className="font-mono">{ds.level}</span>
+                                    <span>{dim.poleBLabel}</span>
+                                  </div>
+                                </div>
+                                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#EDE8E2' }}>
+                                  <motion.div
+                                    className="h-full rounded-full"
+                                    style={{ background: `linear-gradient(90deg, ${color.base}, ${color.light})` }}
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${pct}%` }}
+                                    transition={{ delay: 0.3, duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+                                  />
+                                </div>
+                                <p className="text-xs mt-1" style={{ color: subtextColor }}>{dim.levels[ds.level]}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
+
             {/* Tension hint — if day and night differ */}
             {layered.daySelf.slug !== layered.nightSelf.slug && (
               <p
-                className="text-center text-xs text-text-primary opacity-90 mt-6 leading-relaxed"
+                className="text-center text-xs text-text-primary opacity-90 mt-8 leading-relaxed"
                 style={{ fontFamily: serifFont, fontStyle: 'italic' }}
               >
                 白天你是{dayP.name}，深夜你变成{nightP.name}。<br />
@@ -347,7 +550,7 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
       })()}
 
       {/* ── Deep Mirror Report Teaser (demand tracking) ── */}
-      {layered && (layered.daySelf.slug !== layered.nightSelf.slug || layered.daySelf.slug !== layered.dreamTendency.slug) && (() => {
+      {layered && (() => {
         const dayName = getSoultiPersonalityBySlug(layered.daySelf.slug)?.name ?? '';
         const nightName = getSoultiPersonalityBySlug(layered.nightSelf.slug)?.name ?? '';
         const hasDayNightDiff = layered.daySelf.slug !== layered.nightSelf.slug;
@@ -837,11 +1040,13 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
         </div>
       </section>
 
+      <ResultClosureEngine
+        currentUniverse="soulti"
+        personalitySlug={personality.slug}
+        personalityName={personality.name}
+        accent={personality.color}
+      />
       <DailyCheckInCTA />
-      <UniversePreviewCards currentUniverse="soulti" />
-      <IdentifyViralCTA personalityName={personality.name} />
-      <WtfCardCTA />
-      <UgcShareCTA />
     </div>
   );
 }

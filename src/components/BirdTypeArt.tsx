@@ -3,7 +3,7 @@
 import NextImage from 'next/image';
 import { useState } from 'react';
 import type { BirdPersonality } from '@/lib/bird/personalities';
-import { getBirdTypeImage } from '@/lib/bird/personalities';
+import { getBirdTypeMediumImage } from '@/lib/bird/personalities';
 
 interface BirdTypeArtProps {
   personality: BirdPersonality;
@@ -33,12 +33,14 @@ export function BirdTypeArt({
         <span className={emojiClassName}>{personality.emoji}</span>
       ) : (
         <NextImage
-          src={getBirdTypeImage(personality.slug)}
+          src={getBirdTypeMediumImage(personality.slug)}
           alt={alt ?? personality.birdTitle}
           width={320}
           height={320}
           className={imageClassName}
           priority={priority}
+          placeholder="blur"
+          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
           onError={() => setFailed(true)}
         />
       )}

@@ -1,5 +1,10 @@
 import { createBrowserClient } from '@supabase/ssr';
 
+// Fallback values — these are public keys, safe to embed.
+// .env.local should override them, but if env injection fails these keep things working.
+const FALLBACK_URL = 'https://urvxotpdmhfdnoaltchp.supabase.co';
+const FALLBACK_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVydnhvdHBkbWhmZG5vYWx0Y2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNjQyODAsImV4cCI6MjA5MTg0MDI4MH0.CiHyONuvfLB_LEAYJ19GKUXF5CxeQIZDO5fSTDXDWHE';
+
 const URL_KEYS = [
   'NEXT_PUBLIC_SUPABASE_URL',
   'SUPABASE_URL',
@@ -23,21 +28,10 @@ function readClientEnv(keys: readonly string[]): string | undefined {
 }
 
 export function createBrowserSupabaseClient() {
-  const url = readClientEnv(URL_KEYS);
-  const key = readClientEnv(KEY_KEYS);
+  const url = readClientEnv(URL_KEYS) ?? FALLBACK_URL;
+  const key = readClientEnv(KEY_KEYS) ?? FALLBACK_KEY;
 
-  if (!url || !key) {
-    console.error(
-      `[supabase] Missing env vars. URL: ${url ? 'OK' : 'MISSING'}, Key: ${key ? 'OK' : 'MISSING'}. ` +
-      `Checked URL keys: ${URL_KEYS.join(', ')}. Checked Key keys: ${KEY_KEYS.join(', ')}. ` +
-      `Make sure .env.local has NEXT_PUBLIC_* vars and dev server was restarted.`
-    );
-  }
-
-  return createBrowserClient(
-    url ?? 'https://placeholder.supabase.co',
-    key ?? 'placeholder-key'
-  );
+  return createBrowserClient(url, key);
 }
 
 export const createClient = createBrowserSupabaseClient;

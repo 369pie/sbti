@@ -5,8 +5,8 @@ import { DRUNK_PERSONA_TYPES, getDrunkTypeImage } from '@/lib/drunk/personas';
 import { DELTA_PERSONALITIES, getDeltaTypeThumbnailImage } from '@/lib/delta/personalities';
 import { FLOWER_PERSONALITY_TYPES, getFlowerRarity, getFlowerTypeThumbnailImage } from '@/lib/flower/personalities';
 import { SOULTI_PERSONALITY_TYPES, getSoultiRarity, getSoultiTypeEmojiFallbackImage } from '@/lib/soulti/personalities';
-import { KINGS_PERSONALITIES, getKingsTypeThumbnailImage, getKingsTypeCardImage } from '@/lib/kings/personalities';
-import { LOVE_PERSONALITY_TYPES, getLoveRarity, getLoveTypeImage } from '@/lib/love/personalities';
+import { KINGS_PERSONALITIES, getKingsTypeThumbnailImage } from '@/lib/kings/personalities';
+import { LOVE_PERSONALITY_TYPES, getLoveRarity, getLoveTypeThumbnailImage } from '@/lib/love/personalities';
 import { CPTI_PERSONALITY_TYPES, getCptiRarity, getCptiTypeThumbnailImage } from '@/lib/cpti/personalities';
 import { CPTI_RELATIONSHIP_TYPES, RELATIONSHIP_TIER_INFO, getCptiRelationshipTypeThumbnailImage } from '@/lib/cpti/relationships';
 import { getRarity, getTypeImage, getXiuxianTypeImage, PERSONALITY_TYPES } from '@/lib/personalities';
@@ -147,7 +147,7 @@ function buildIpTabs(): GalleryTab[] {
     tagline: personality.tagline,
     color: personality.color,
     emoji: personality.emoji,
-    image: getKingsTypeCardImage(personality.slug),
+    image: getKingsTypeThumbnailImage(personality.slug),
     href: `/wtfti/kings/result/${personality.slug}/`,
   }));
 
@@ -222,7 +222,7 @@ function buildThemeTabs(): GalleryTab[] {
       tagline: personality.tagline,
       color: personality.color,
       emoji: personality.emoji,
-      image: getGalleryCardImage(getLoveTypeImage(personality.slug)),
+      image: getLoveTypeThumbnailImage(personality.slug),
       href: `/love/result/${personality.slug}`,
       rarity: { label: rarity.label, color: rarity.color, bgColor: rarity.bgColor },
     };

@@ -66,6 +66,10 @@ export function getXptiTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/xpti/thumbs/${slug}.webp`);
 }
 
+export function getXptiTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/xpti/medium/${slug}.webp`);
+}
+
 export const XPTI_PERSONALITY_TYPES: XptiPersonalityType[] = [
   // ═══════════════════════════════ #01 我说了算 ═══════════════════════════════
   {

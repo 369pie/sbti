@@ -4,6 +4,7 @@ import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import type { User } from '@supabase/supabase-js';
 import type { CptiClaimSource } from '@/lib/cpti/claim';
 import type { CptiDimensionScore } from '@/lib/cpti/scoring';
+import { generatePairCode } from '@/lib/cpti/pair-code';
 
 // TypeScript types matching Supabase schema enums
 type CptiPairCodeMode = 'direct' | 'open';
@@ -16,11 +17,6 @@ interface PairCodeBody {
   personalitySlug?: string;
   dimensionScores?: CptiDimensionScore[];
   source?: CptiClaimSource;
-}
-
-function generateSixDigitCode(): string {
-  // Generate 000001-999999, zero-padded to 6 digits
-  return String(Math.floor(1 + Math.random() * 999999)).padStart(6, '0');
 }
 
 // POST handler: create a new pair code
@@ -90,10 +86,10 @@ export const POST = withAuth(async (
       creatorSnapshotId = latestSnapshot?.id ?? null;
     }
 
-    // Generate a unique 6-digit code (retry up to 10 times on collision)
+    // Generate a unique alphanumeric code (retry up to 10 times on collision)
     let code: string | null = null;
     for (let attempt = 0; attempt < 10; attempt++) {
-      const candidate = generateSixDigitCode();
+      const candidate = generatePairCode();
       const { data: existing, error: checkError } = await adminClient
         .from('cpti_pair_codes')
         .select('id')

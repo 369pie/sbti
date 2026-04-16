@@ -27,6 +27,12 @@ interface SourceModuleRow {
   is_current: boolean;
 }
 
+interface SourceIdentifyAssessmentRow {
+  id: string;
+  actor_user_id: string;
+  subject_user_id: string | null;
+}
+
 function json(body: unknown, init?: ResponseInit) {
   return NextResponse.json(body, {
     ...init,
@@ -118,6 +124,39 @@ export async function POST(request: Request) {
       .from('cpti_pair_codes')
       .update({ creator_user_id: user.id })
       .eq('creator_user_id', sourceUserId);
+
+    const { data: sourceIdentifyAssessments } = await adminClient
+      .from('identify_assessments')
+      .select('id, actor_user_id, subject_user_id')
+      .or(`actor_user_id.eq.${sourceUserId},subject_user_id.eq.${sourceUserId}`);
+
+    for (const row of (sourceIdentifyAssessments ?? []) as SourceIdentifyAssessmentRow[]) {
+      const nextActor = row.actor_user_id === sourceUserId ? user.id : row.actor_user_id;
+      const nextSubject = row.subject_user_id === sourceUserId ? user.id : row.subject_user_id;
+
+      if (nextSubject && nextActor === nextSubject) {
+        await adminClient
+          .from('identify_assessments')
+          .update({
+            actor_user_id: user.id,
+            subject_user_id: null,
+            subject_claimed_at: null,
+            subject_viewed_at: null,
+            updated_at: nowIso,
+          })
+          .eq('id', row.id);
+        continue;
+      }
+
+      await adminClient
+        .from('identify_assessments')
+        .update({
+          actor_user_id: nextActor,
+          subject_user_id: nextSubject,
+          updated_at: nowIso,
+        })
+        .eq('id', row.id);
+    }
 
     const { data: sourceModules } = await adminClient
       .from('user_module_results')

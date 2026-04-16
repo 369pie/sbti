@@ -5,18 +5,15 @@ import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import { useCallback, useRef, useState } from 'react';
 import type { KingsPersonality } from '@/lib/kings/personalities';
-import { KINGS_PERSONALITIES, getKingsTypeImage } from '@/lib/kings/personalities';
+import { KINGS_PERSONALITIES, getKingsTypeMediumImage, getKingsTypeThumbnailImage } from '@/lib/kings/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
 import { KingsTypeArt } from '@/components/KingsTypeArt';
 import { KingsShareImageGenerator } from '@/components/KingsShareImageGenerator';
 import type { KingsShareImageHandle } from '@/components/KingsShareImageGenerator';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
-import { WtfCardCTA } from '@/components/WtfCardCTA';
-import { UgcShareCTA } from '@/components/UgcShareCTA';
-import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
-import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
+import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 
 interface Props {
   kingsPersonality: KingsPersonality;
@@ -29,7 +26,7 @@ export function KingsResultContent({ kingsPersonality: p, dimensionScores }: Pro
   const shareRef = useRef<KingsShareImageHandle>(null);
 
   const shareUrl = getSiteUrl(`/wtfti/kings/result/${p.slug}/`);
-  const typeImageUrl = getKingsTypeImage(p.slug);
+  const typeImageUrl = getKingsTypeMediumImage(p.slug);
 
   const copyShareText = useCallback(() => {
     const text = `王者TI · 我在峡谷居然是${p.heroName}？？\n"${p.tagline}"\n来测测你的峡谷人格 → ${shareUrl}`;
@@ -278,7 +275,7 @@ export function KingsResultContent({ kingsPersonality: p, dimensionScores }: Pro
                 style={{ background: `linear-gradient(135deg, ${o.color}08, ${o.color}16)` }}
               >
                 <NextImage
-                  src={getKingsTypeImage(o.slug)}
+                  src={getKingsTypeThumbnailImage(o.slug)}
                   alt={o.heroName}
                   width={160}
                   height={160}
@@ -312,11 +309,13 @@ export function KingsResultContent({ kingsPersonality: p, dimensionScores }: Pro
         </div>
       </section>
 
+      <ResultClosureEngine
+        currentUniverse="kings"
+        personalitySlug={p.slug}
+        personalityName={p.heroName}
+        accent={p.color}
+      />
       <DailyCheckInCTA />
-      <UniversePreviewCards currentUniverse="kings" />
-      <IdentifyViralCTA personalityName={p.heroName} />
-      <WtfCardCTA />
-      <UgcShareCTA />
     </div>
   );
 }

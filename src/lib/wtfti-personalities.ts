@@ -1032,3 +1032,8 @@ export function getWtftiTypeImage(slug: string): string {
 export function getWtftiTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/wtfti/thumbs/${slug}.webp`);
 }
+
+/** 获取 WTFTI 人格图鉴中等尺寸图片路径 */
+export function getWtftiTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/wtfti/medium/${slug}.webp`);
+}

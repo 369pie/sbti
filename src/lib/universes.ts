@@ -31,9 +31,34 @@ export interface Universe {
   galleryTabId?: string;
   /** Active class applied when this universe is selected in a pill bar */
   activeClass: string;
+  /** Whether this is a UGC (creator-built) universe */
+  isUgc?: boolean;
+  /** Creator display name (UGC only) */
+  creatorName?: string;
 }
 
 // ─── Registry ────────────────────────────────────────────────────────────────
+
+import { UGC_UNIVERSES } from './ugc/registry';
+
+/** Convert UGC universe configs to Universe entries automatically. */
+function buildUgcUniverseEntries(): Universe[] {
+  return UGC_UNIVERSES.map(u => ({
+    id: `ugc-${u.id}`,
+    name: u.name,
+    shortName: u.shortName,
+    emoji: u.emoji,
+    status: 'live' as const,
+    accent: u.theme.primaryColor,
+    testPath: `/ugc/${u.id}/test/`,
+    landingPath: `/ugc/${u.id}/test/`,
+    resultPrefix: `/ugc/${u.id}`,
+    galleryTabId: undefined,
+    activeClass: 'bg-bg-elevated text-text-primary shadow-sm font-medium',
+    isUgc: true,
+    creatorName: u.creatorName,
+  }));
+}
 
 export const UNIVERSES: Universe[] = [
   {
@@ -206,6 +231,8 @@ export const UNIVERSES: Universe[] = [
     galleryTabId: undefined,
     activeClass: 'bg-violet-100 text-violet-700 shadow-sm font-medium',
   },
+  // ── UGC 宇宙（自动从 ugc/registry 加载）──
+  ...buildUgcUniverseEntries(),
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

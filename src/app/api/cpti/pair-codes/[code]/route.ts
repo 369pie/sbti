@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
+import { isValidPairCodeFormat, normalizePairCode } from '@/lib/cpti/pair-code';
 
-// GET handler: resolve a pair code by its 6-digit code string
+// GET handler: resolve a pair code
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
   try {
-    const { code } = await params;
+    const rawCode = (await params).code;
+    const code = normalizePairCode(rawCode ?? '');
 
-    if (!code || code.length !== 6) {
+    if (!isValidPairCodeFormat(code)) {
       return NextResponse.json(
         { valid: false, error: 'Invalid code format' },
         { status: 400 }

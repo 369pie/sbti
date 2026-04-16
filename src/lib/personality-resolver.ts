@@ -15,6 +15,8 @@ import { getSoultiPersonalityBySlug } from './soulti/personalities';
 import { getXptiPersonalityBySlug } from './xpti/personalities';
 import { getFengPersonality } from './feng/personalities';
 import { getCptiPersonalityBySlug } from './cpti/personalities';
+import { getMystiTarotData } from './mysti/tarot-mapping';
+import { getUgcPersonality } from './ugc/registry';
 
 export interface ResolvedPersonality {
   name: string;
@@ -73,7 +75,20 @@ export function resolvePersonality(universeId: string, slug: string): ResolvedPe
       const p = getCptiPersonalityBySlug(slug);
       return p ? { name: p.name, emoji: p.emoji } : null;
     }
-    default:
+    case 'mysti': {
+      const p = getWtftiPersonality(slug);
+      const tarot = getMystiTarotData(slug);
+      if (!p || !tarot) return null;
+      return { name: `${tarot.majorArcana.name} · ${p.wtftiName}`, emoji: p.emoji };
+    }
+    default: {
+      // Handle UGC universes (id format: 'ugc-{slug}')
+      if (universeId.startsWith('ugc-')) {
+        const ugcId = universeId.slice(4);
+        const p = getUgcPersonality(ugcId, slug);
+        return p ? { name: p.name, emoji: p.emoji } : null;
+      }
       return null;
+    }
   }
 }

@@ -1037,3 +1037,7 @@ export function getDeltaTypeImage(slug: string): string {
 export function getDeltaTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/delta/thumbs/${slug}.webp`);
 }
+
+export function getDeltaTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/delta/medium/${slug}.webp`);
+}

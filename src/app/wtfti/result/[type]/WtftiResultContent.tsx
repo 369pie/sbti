@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { WtftiPersonality } from '@/lib/wtfti-personalities';
 import { markCollected } from '@/lib/mysti/collection';
-import { WTFTI_PERSONALITIES, getWtftiTypeImage, getWtftiTypeThumbnailImage } from '@/lib/wtfti-personalities';
+import { WTFTI_PERSONALITIES, getWtftiTypeImage, getWtftiTypeThumbnailImage, getWtftiTypeMediumImage } from '@/lib/wtfti-personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
 import { WtftiShareImageGenerator } from '@/components/WtftiShareImageGenerator';
@@ -18,6 +18,8 @@ import { UgcShareCTA } from '@/components/UgcShareCTA';
 import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
+import { ResultClosureEngine } from '@/components/ResultClosureEngine';
+import { UniverseProgressBar } from '@/components/UniverseProgressBar';
 
 interface Props {
   wtftiPersonality: WtftiPersonality;
@@ -63,7 +65,7 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
     copyLink();
   }, [copyLink, p.wtftiName, p.tagline, shareUrl]);
 
-  const typeImageUrl = getWtftiTypeThumbnailImage(p.slug);
+  const typeImageUrl = getWtftiTypeMediumImage(p.slug);
   const others = WTFTI_PERSONALITIES.filter(o => o.slug !== p.slug).slice(0, 4);
 
   return (
@@ -114,6 +116,8 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
                 height={400}
                 className="w-[88%] h-[88%] object-contain drop-shadow-2xl"
                 priority
+                placeholder="blur"
+                blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
               />
             </div>
 
@@ -272,6 +276,8 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
       </section>
 
       {/* Cross-universe exploration */}
+      <UniverseProgressBar currentUniverseId="wtfti" />
+
       <section className="max-w-2xl mx-auto px-6 pb-8">
         <UniverseSwitcher slug={p.slug} currentUniverseId="wtfti" />
       </section>
@@ -332,11 +338,13 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
         </div>
       </section>
 
+      <ResultClosureEngine
+        currentUniverse="wtfti"
+        personalitySlug={p.slug}
+        personalityName={p.wtftiName}
+        accent={p.color}
+      />
       <DailyCheckInCTA />
-      <UniversePreviewCards currentUniverse="wtfti" />
-      <IdentifyViralCTA personalityName={p.wtftiName} />
-      <WtfCardCTA />
-      <UgcShareCTA />
     </div>
   );
 }

@@ -13,6 +13,7 @@ import { DeltaShareImageGenerator } from '@/components/DeltaShareImageGenerator'
 import type { DeltaShareImageHandle } from '@/components/DeltaShareImageGenerator';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
+import { UniverseProgressBar } from '@/components/UniverseProgressBar';
 import { UgcShareCTA } from '@/components/UgcShareCTA';
 import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
@@ -315,6 +316,7 @@ export function DeltaResultContent({ deltaPersonality: p, dimensionScores }: Pro
       <DailyCheckInCTA />
       <UniversePreviewCards currentUniverse="delta" />
       <IdentifyViralCTA personalityName={p.heroName} />
+      <UniverseProgressBar currentUniverseId="delta" />
       <WtfCardCTA />
       <UgcShareCTA />
     </div>

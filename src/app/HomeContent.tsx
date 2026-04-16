@@ -6,57 +6,72 @@ import { withBasePath } from '@/lib/site';
 import { FollowMeCard, FollowMeFloating } from '@/components/FollowMeLinks';
 import { WtfCardBanner } from '@/components/WtfCardBanner';
 
-// ─── Universe descriptions for the hub cards ─────────────────────────────────
+// ─── Intent-based data (mirrors Navigation.tsx categories) ───────────────────
 
-const PRIORITY_UNIVERSE_IDS = ['cpti', 'xpti', 'soulti'] as const;
-
-const UNIVERSE_CARDS: Record<string, { tagline: string; stats: string }> = {
-  standard: { tagline: '经典 15 维 × 27 种人格基线', stats: '27 种 · ~32 题' },
-  xiuxian: { tagline: '修仙体质 × 人格维度', stats: '27 种 · ~32 题' },
-  wtfti: { tagline: '直接骂醒你的毒舌版', stats: '29 种 · ~32 题' },
-  banti: { tagline: '社畜宇宙 · 你在工位是什么角色', stats: '29 种 · ~32 题' },
-  kings: { tagline: '王者峡谷 × 人格联名', stats: '29 种 · ~32 题' },
-  bird: { tagline: '你是哪种禽 · 鸟类人格鉴定', stats: '29 种 · 31 题' },
-  flower: { tagline: '花格鉴定 · 测测你像哪朵花', stats: '16 种 · 20 题' },
-  delta: { tagline: '三角洲行动 × 人格联名', stats: '29 种 · ~32 题' },
-  soulti: { tagline: '觉察深层自我 · 文艺内省版', stats: '16 种 · 20 题' },
-  xpti: { tagline: '亲密偏好图谱 · 你想要的是谁', stats: '12 种 · 随机27题' },
-  cpti: { tagline: '恋爱情感 & 人格深度测评', stats: '12 种 · 24 题' },
-  mysti: { tagline: '用塔罗重新翻译你的人格', stats: '29 种 · ~32 题' },
-};
-
-const FUN_ITEMS = [
-  { href: '/cp/', emoji: '💕', label: 'CP 配对', desc: '看看谁和你最配' },
-  { href: '/work/', emoji: '💼', label: '打工人设', desc: '16 种职场角色' },
-  { href: '/love/', emoji: '💗', label: '恋爱人设', desc: '16 种恋爱角色' },
-  { href: '/daily/', emoji: '🎲', label: '今日模式', desc: '每天换一种人格' },
-  { href: '/drunk/', emoji: '🍺', label: '酒后人设', desc: '12 种醉后真面目' },
-  { href: '/identify/', emoji: '🔍', label: '好友鉴定', desc: '帮朋友鉴定人格' },
-  { href: '/squad/', emoji: '🎯', label: '组局测试', desc: '拉上朋友一起来' },
-  { href: '/combo/', emoji: '🧩', label: '人格拼盘', desc: '拼出你的多面体' },
-  { href: '/rank/', emoji: '🏆', label: '群组排行', desc: '看看谁人格最多' },
-  { href: '/puzzle/', emoji: '🧩', label: '闺蜜拼图', desc: '四人人格拼图' },
-  { href: '/share-templates/', emoji: '📕', label: '分享文案', desc: '一键复制发小红书' },
+/** Hero quick-action cards — 4 core intents */
+const HERO_INTENTS = [
+  { href: '/test/', emoji: '🎯', label: '去测自己', desc: '选一个宇宙开始', accent: '#ff4d6d' },
+  { href: '/cpti/', emoji: '💕', label: '测段关系', desc: '你们的化学反应', accent: '#e06088' },
+  { href: '/identify/', emoji: '🔍', label: '鉴定 TA', desc: '偷偷测 ta 是什么人', accent: '#a855f7' },
+  { href: '/card/', emoji: '🃏', label: '我的档案', desc: '多宇宙人格卡', accent: '#f59e0b' },
 ];
 
-const PRIORITY_FUN_ITEMS = FUN_ITEMS.slice(0, 3);
-const OTHER_FUN_ITEMS = FUN_ITEMS.slice(3);
+/** Hot-pick universes — curated selection */
+const HOT_PICKS = [
+  { href: '/wtfti/', label: 'WTF 毒舌版', emoji: '🤯', desc: '敢听真话吗？直接骂醒你', tag: '热门', accent: '#ff4d6d' },
+  { href: '/soulti/', label: 'SoulTI 灵魂镜像', emoji: '🌙', desc: '安静地看见真正的自己', tag: '深度', accent: '#8b7ec8' },
+  { href: '/xpti/', label: 'XPTI 恋爱XP', emoji: '💜', desc: '你的亲密偏好是什么？', tag: '热门', accent: '#7c3aed' },
+  { href: '/cpti/', label: 'CPTI 关系深测', emoji: '💕', desc: '你们的关系是什么型？', tag: '新', accent: '#e06088' },
+];
+
+/** Style universes (auto-generated from live universes) */
+const STYLE_UNIVERSES = getLiveUniverses()
+  .filter(u => !['cpti', 'xpti', 'soulti', 'wtfti', 'mysti'].includes(u.id) && !u.isUgc);
+
+/** UGC universes */
+const UGC_CARDS = getLiveUniverses().filter(u => u.isUgc);
+
+/** Relationship / social play */
+const RELATIONSHIP_PLAYS = [
+  { href: '/cpti/', emoji: '💕', label: 'CPTI 关系深测', desc: '24题 · 你们的关系是什么型？' },
+  { href: '/cp/', emoji: '💗', label: 'CP 配对', desc: '快速匹配默契度' },
+  { href: '/identify/', emoji: '🔍', label: '好友鉴定', desc: '帮朋友做一份人格鉴定书' },
+  { href: '/puzzle/', emoji: '🧩', label: '闺蜜拼图', desc: '4人组合人格画' },
+  { href: '/squad/', emoji: '🎯', label: '组局测试', desc: '拉群一起测' },
+  { href: '/rank/', emoji: '🏆', label: '群组排行', desc: '看看谁人格最多' },
+];
+
+/** Casual / quick tests */
+const CASUAL_TESTS = [
+  { href: '/daily/', emoji: '🎲', label: '今日模式', desc: '6题秒测今天状态' },
+  { href: '/drunk/', emoji: '🍺', label: '酒后人设', desc: '喝多了你是谁？' },
+  { href: '/work/', emoji: '💼', label: '打工人设', desc: '你的职场角色' },
+  { href: '/love/', emoji: '💗', label: '恋爱人设', desc: '你的恋爱角色' },
+];
+
+/** Explore / collect */
+const EXPLORE_ITEMS = [
+  { href: '/mysti/', emoji: '🔮', label: '灵鉴 Mysti', desc: '塔罗 × 人格牌' },
+  { href: '/combo/', emoji: '🧩', label: '人格拼盘', desc: 'SBTI × MBTI × 星座' },
+  { href: '/share-templates/', emoji: '📕', label: '小红书文案', desc: '一键复制发小红书' },
+  { href: '/types/', emoji: '📖', label: '人设图鉴', desc: '全部人格类型一览' },
+];
 
 const FAQS = [
   {
     question: 'WTFTI 是什么？',
     answer:
-      'WTFTI 是一个多宇宙人格测试平台。同一个你，在不同主题宇宙里有不同的人格翻译——毒舌版的你、社畜版的你、鸟类版的你、花朵版的你，每个宇宙都有独立的视觉风格和测试体验。',
+      'WTFTI 是一个多宇宙人格测试平台。同一个你，在不同主题宇宙里有不同的人格翻译——毒舌版的你、灵魂版的你、鸟类版的你、花朵版的你。',
   },
   {
     question: '和 MBTI 有什么区别？',
     answer:
-      'MBTI 更像经典人格框架，WTFTI 更贴近中文互联网语境。在这里你看到的是生活反应、关系状态和行为习惯，不是四个字母和理论模型。',
+      'MBTI 更像经典人格框架，WTFTI 更贴近中文互联网语境。你看到的是生活反应和关系状态，不是四个字母和理论模型。',
   },
   {
-    question: '这么多宇宙，我该从哪个开始？',
+    question: '这么多宇宙，从哪个开始？',
     answer:
-      '推荐先测经典版（27 种人格 × 15 维度），拿到你的基线人格后再去其他宇宙看看你变成了什么。每个宇宙都有自己的风格和乐趣。',
+      '想被骂醒选毒舌版，想安静认识自己选 SoulTI，想测关系选 CPTI，想随便玩玩选今日模式。',
   },
   {
     question: '结果能拿来做严肃诊断吗？',
@@ -69,15 +84,13 @@ const FEATURED = PERSONALITY_TYPES.slice(0, 6);
 
 export default function HomeContent() {
   const universes = getLiveUniverses();
-  const priorityUniverses = universes.filter(u => PRIORITY_UNIVERSE_IDS.includes(u.id as typeof PRIORITY_UNIVERSE_IDS[number]));
-  const otherUniverses = universes.filter(u => !PRIORITY_UNIVERSE_IDS.includes(u.id as typeof PRIORITY_UNIVERSE_IDS[number]));
 
   return (
     <div className="min-h-screen">
 
       {/* ── Hero ── */}
       <section className="relative overflow-hidden">
-        <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
+        <div className="max-w-3xl mx-auto px-6 pt-24 pb-16 text-center relative">
           <div className="animate-fade-up">
             <span className="section-label mb-8 block">
               What&apos;s The F* Type Inside
@@ -99,71 +112,39 @@ export default function HomeContent() {
             <p className="display-tagline text-text-secondary text-lg sm:text-xl leading-relaxed max-w-md mx-auto mb-10">
               多宇宙人格测试平台
               <span className="mx-2 text-border">·</span>
-              同一个你，不同宇宙里完全不同的人格翻译
+              同一个你，不同宇宙完全不同的人格翻译
             </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/test/"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-white font-medium text-base transition-all duration-200 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]"
-                style={{
-                  background: 'linear-gradient(135deg, #ff4d6d, #e06088)',
-                  boxShadow: '0 8px 32px rgba(255,77,109,0.25)',
-                  fontFamily: 'var(--font-heading)',
-                }}
-              >
-                开始经典测试
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
-              <Link
-                href="/types/"
-                prefetch={false}
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full border-2 border-border text-text-secondary font-medium text-base hover:border-text-muted hover:text-text-primary transition-all duration-200"
-                style={{ fontFamily: 'var(--font-heading)' }}
-              >
-                先刷 27 张人设卡
-              </Link>
-            </div>
           </div>
 
-          {/* Priority universes preview */}
-          <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-3 animate-fade-up-delay-2">
-            {priorityUniverses.map((u, i) => {
-              const meta = UNIVERSE_CARDS[u.id];
-              return (
-                <Link
-                  key={u.id}
-                  href={u.landingPath}
-                  prefetch={false}
-                  className="group block rounded-3xl border border-pink-100 bg-gradient-to-br from-pink-50 via-white to-fuchsia-50 p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
-                  style={{ animationDelay: `${i * 80}ms` }}
-                >
-                  <div className="flex items-center justify-between gap-3 mb-4">
-                    <div>
-                      <div className="text-xs uppercase tracking-[0.3em] text-pink-600 font-semibold mb-2">热推</div>
-                      <h3 className="text-lg font-semibold text-text-primary">{u.name}</h3>
-                    </div>
-                    <span className="text-3xl">{u.emoji}</span>
-                  </div>
-                  <p className="text-sm text-text-secondary leading-relaxed mb-4">{meta?.tagline}</p>
-                  <div className="inline-flex items-center gap-2 text-xs text-white font-semibold px-3 py-1 rounded-full" style={{ background: u.accent }}>
-                    {meta?.stats}
-                  </div>
-                </Link>
-              );
-            })}
+          {/* 4 intent cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-fade-up-delay-1">
+            {HERO_INTENTS.map((item, i) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                prefetch={false}
+                className="group block rounded-2xl border border-border-subtle bg-bg-elevated p-4 text-center transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                <div className="text-3xl mb-2">{item.emoji}</div>
+                <h3 className="text-sm font-semibold text-text-primary mb-1">{item.label}</h3>
+                <p className="text-[11px] text-text-muted">{item.desc}</p>
+                <div
+                  className="mt-3 h-0.5 rounded-full opacity-0 group-hover:opacity-60 transition-opacity"
+                  style={{ background: item.accent }}
+                />
+              </Link>
+            ))}
           </div>
 
           {/* Stats */}
-          <div className="mt-16 grid grid-cols-3 gap-3 animate-fade-up-delay-1">
+          <div className="mt-12 grid grid-cols-3 gap-3 animate-fade-up-delay-2">
             {[
               { value: `${universes.length}`, label: '个测试宇宙' },
               { value: '100+', label: '种人格类型' },
-              { value: '10+', label: '种玩法' },
+              { value: '10+', label: '种社交玩法' },
             ].map(stat => (
-              <div key={stat.label} className="bg-bg-elevated rounded-2xl border border-border-subtle px-4 py-6 text-center shadow-sm">
+              <div key={stat.label} className="bg-bg-elevated rounded-2xl border border-border-subtle px-4 py-5 text-center shadow-sm">
                 <div className="stat-value text-2xl text-text-primary">{stat.value}</div>
                 <div className="text-xs text-text-muted mt-1">{stat.label}</div>
               </div>
@@ -172,127 +153,249 @@ export default function HomeContent() {
         </div>
       </section>
 
-      {/* ── Universe Hub ── */}
-      <section className="py-20 px-6">
+      {/* ── Hot Picks — 推荐测试 ── */}
+      <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-12 animate-fade-up">
-            <span className="section-label block mb-3">Universes</span>
+          <div className="mb-8 animate-fade-up">
+            <span className="section-label block mb-2">Recommended</span>
             <h2 className="section-headline text-2xl sm:text-3xl">
-              选一个宇宙，开始测试
+              不知道从哪开始？先试这几个
             </h2>
-            <p className="display-tagline text-text-secondary mt-3 text-base leading-relaxed">
-              每个宇宙有独立的视觉、题目和人格翻译 <span className="text-border mx-1">—</span> 先挑一个感兴趣的
-            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {universes.map((u, i) => {
-              const meta = UNIVERSE_CARDS[u.id];
-              return (
-                <Link
-                  key={u.id}
-                  href={u.landingPath}
-                  prefetch={false}
-                  className="group animate-fade-up block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-lg transition-all duration-300 overflow-hidden"
-                  style={{ animationDelay: `${i * 60}ms` }}
-                >
-                  <div className="p-5 sm:p-6">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span
-                        className="inline-flex items-center justify-center w-10 h-10 rounded-xl text-xl"
-                        style={{ background: `${u.accent}15` }}
-                      >
-                        {u.emoji || '🧪'}
-                      </span>
-                      <div>
-                        <h3 className="font-semibold text-text-primary group-hover:text-text-primary transition-colors">
-                          {u.name}
-                        </h3>
-                        <span className="text-xs font-mono text-text-muted">{meta?.stats}</span>
+            {HOT_PICKS.map((item, i) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                prefetch={false}
+                className="animate-fade-up group block rounded-3xl border border-pink-100 bg-gradient-to-br from-pink-50/60 via-white to-fuchsia-50/40 p-5 sm:p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                style={{ animationDelay: `${i * 70}ms` }}
+              >
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">{item.emoji}</span>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-base font-semibold text-text-primary">{item.label}</h3>
+                        {item.tag && (
+                          <span
+                            className="text-[10px] font-medium px-1.5 py-0.5 rounded-full text-white"
+                            style={{ background: item.accent }}
+                          >
+                            {item.tag}
+                          </span>
+                        )}
                       </div>
+                      <p className="text-sm text-text-secondary">{item.desc}</p>
                     </div>
-                    <p className="text-sm text-text-secondary leading-relaxed">
-                      {meta?.tagline}
-                    </p>
-                    {/* Accent bar */}
-                    <div
-                      className="mt-4 h-0.5 rounded-full opacity-20 group-hover:opacity-60 transition-opacity"
-                      style={{ background: u.accent }}
-                    />
                   </div>
-                </Link>
-              );
-            })}
+                  <svg
+                    className="w-5 h-5 text-text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-1"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
+            ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Universe Hub — 按风格浏览 ── */}
+      <section className="py-16 px-6 border-t border-border-subtle">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8 animate-fade-up">
+            <span className="section-label block mb-2">Style Universes</span>
+            <h2 className="section-headline text-2xl sm:text-3xl">
+              选一个风格宇宙
+            </h2>
+            <p className="display-tagline text-text-secondary mt-2 text-base">
+              每个宇宙有独立的视觉、题目和人格翻译
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {STYLE_UNIVERSES.map((u, i) => (
+              <Link
+                key={u.id}
+                href={u.landingPath}
+                prefetch={false}
+                className="animate-fade-up group block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-md transition-all p-5 text-center"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <span
+                  className="inline-flex items-center justify-center w-12 h-12 rounded-xl text-2xl mb-3"
+                  style={{ background: `${u.accent}12` }}
+                >
+                  {u.emoji || '🧪'}
+                </span>
+                <h3 className="font-semibold text-text-primary text-sm mb-1">{u.name}</h3>
+                <div
+                  className="mt-3 h-0.5 rounded-full mx-auto w-12 opacity-20 group-hover:opacity-60 transition-opacity"
+                  style={{ background: u.accent }}
+                />
+              </Link>
+            ))}
+          </div>
+
+          {/* UGC Universes */}
+          {UGC_CARDS.length > 0 && (
+            <div className="mt-8">
+              <h3 className="text-sm font-medium text-text-muted mb-3 flex items-center gap-2">
+                <span className="text-pink-400">✨</span>
+                创作者主题
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {UGC_CARDS.map((u, i) => (
+                  <Link
+                    key={u.id}
+                    href={u.landingPath}
+                    prefetch={false}
+                    className="group block rounded-2xl border border-dashed border-border bg-bg-elevated/60 hover:shadow-md transition-all p-4 text-center"
+                    style={{ animationDelay: `${i * 50}ms` }}
+                  >
+                    <span className="text-2xl mb-2 block">{u.emoji || '🧪'}</span>
+                    <h3 className="font-medium text-text-primary text-sm">{u.name}</h3>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
       {/* ── WTF Card Banner ── */}
       <WtfCardBanner />
 
-      {/* ── Fun Plays ── */}
-      <section className="py-20 px-6 border-t border-border-subtle">
+      {/* ── Relationship Plays — 测关系 ── */}
+      <section className="py-16 px-6 border-t border-border-subtle">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-12 animate-fade-up">
-            <span className="section-label block mb-3">More Fun</span>
+          <div className="mb-8 animate-fade-up">
+            <span className="section-label block mb-2">Relationships</span>
             <h2 className="section-headline text-2xl sm:text-3xl">
-              趣味玩法
+              和朋友一起玩
             </h2>
-            <p className="display-tagline text-text-secondary mt-3 text-base">
-              基于人格结果的二次衍生，换个姿势了解自己
+            <p className="display-tagline text-text-secondary mt-2 text-base">
+              测完自己，拉上朋友看看你们的化学反应
             </p>
           </div>
 
-          {/* Priority fun items */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-              <span className="text-pink-500">💖</span>
-              恋爱 & 分享必玩
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {PRIORITY_FUN_ITEMS.map((item, i) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  prefetch={false}
-                  className="animate-fade-up group block rounded-3xl border border-pink-100 bg-gradient-to-br from-pink-50 via-white to-fuchsia-50 p-6 text-center shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
-                  style={{ animationDelay: `${i * 80}ms` }}
-                >
-                  <div className="text-4xl mb-4">{item.emoji}</div>
-                  <h3 className="font-semibold text-text-primary text-base mb-2">{item.label}</h3>
-                  <p className="text-sm text-text-muted">{item.desc}</p>
-                </Link>
-              ))}
-            </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {RELATIONSHIP_PLAYS.map((item, i) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                prefetch={false}
+                className="animate-fade-up group block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-md transition-all p-5 text-center"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className="text-3xl mb-3">{item.emoji}</div>
+                <h3 className="font-semibold text-text-primary text-sm mb-1">{item.label}</h3>
+                <p className="text-xs text-text-muted">{item.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Casual Tests — 轻松一测 ── */}
+      <section className="py-16 px-6 border-t border-border-subtle">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8 animate-fade-up">
+            <span className="section-label block mb-2">Quick Play</span>
+            <h2 className="section-headline text-2xl sm:text-3xl">
+              轻松一测
+            </h2>
           </div>
 
-          {/* Other fun items */}
-          <div>
-            <h3 className="text-lg font-semibold text-text-primary mb-4">其他玩法</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {OTHER_FUN_ITEMS.map((item, i) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  prefetch={false}
-                  className="animate-fade-up group block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-md transition-all p-5 text-center"
-                  style={{ animationDelay: `${i * 50}ms` }}
-                >
-                  <div className="text-3xl mb-3">{item.emoji}</div>
-                  <h3 className="font-medium text-text-primary text-sm">{item.label}</h3>
-                  <p className="text-xs text-text-muted mt-1">{item.desc}</p>
-                </Link>
-              ))}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {CASUAL_TESTS.map((item, i) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                prefetch={false}
+                className="animate-fade-up group block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-md transition-all p-5 text-center"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className="text-3xl mb-3">{item.emoji}</div>
+                <h3 className="font-medium text-text-primary text-sm">{item.label}</h3>
+                <p className="text-xs text-text-muted mt-1">{item.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Explore — 发现更多 ── */}
+      <section className="py-16 px-6 border-t border-border-subtle">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8 animate-fade-up">
+            <span className="section-label block mb-2">Explore</span>
+            <h2 className="section-headline text-2xl sm:text-3xl">
+              发现更多
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {EXPLORE_ITEMS.map((item, i) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                prefetch={false}
+                className="animate-fade-up group block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-md transition-all p-5 text-center"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className="text-3xl mb-3">{item.emoji}</div>
+                <h3 className="font-medium text-text-primary text-sm">{item.label}</h3>
+                <p className="text-xs text-text-muted mt-1">{item.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Creator Program ── */}
+      <section className="py-16 px-6 border-t border-border-subtle">
+        <div className="max-w-4xl mx-auto">
+          <div className="rounded-2xl border border-border-subtle bg-gradient-to-r from-pink-50/60 via-white to-amber-50/40 p-6 sm:p-8 shadow-sm">
+            <div className="flex flex-col sm:flex-row items-start gap-6">
+              <div className="flex-1">
+                <span className="section-label block mb-2">Creator Beta</span>
+                <h2 className="section-headline text-xl sm:text-2xl">
+                  做你自己的人格宇宙
+                </h2>
+                <p className="display-tagline text-text-secondary mt-2 text-sm leading-relaxed">
+                  把你的内容做成可传播的人格测试。免费主题拉新，付费主题变现。
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Link
+                    href="/creator/"
+                    prefetch={false}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"
+                  >
+                    查看创作者计划
+                  </Link>
+                  <Link
+                    href="/creator/apply/"
+                    prefetch={false}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border-subtle text-text-secondary text-sm hover:text-text-primary hover:border-border transition-colors"
+                  >
+                    申请内测
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* ── Featured Types ── */}
-      <section className="py-20 px-6 border-t border-border-subtle">
+      <section className="py-16 px-6 border-t border-border-subtle">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-12">
-            <span className="section-label block mb-3">Types</span>
+          <div className="mb-8">
+            <span className="section-label block mb-2">Types</span>
             <h2 className="section-headline text-2xl sm:text-3xl">
               先刷几张人设卡
             </h2>
@@ -335,7 +438,7 @@ export default function HomeContent() {
             ))}
           </div>
 
-          <div className="mt-8 text-center">
+          <div className="mt-6 text-center">
             <Link
               href="/types/"
               prefetch={false}
@@ -348,10 +451,10 @@ export default function HomeContent() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="py-20 px-6 border-t border-border-subtle">
+      <section className="py-16 px-6 border-t border-border-subtle">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-10">
-            <span className="section-label block mb-3">FAQ</span>
+          <div className="text-center mb-8">
+            <span className="section-label block mb-2">FAQ</span>
             <h2 className="section-headline text-2xl sm:text-3xl">
               常见问题
             </h2>
@@ -363,8 +466,8 @@ export default function HomeContent() {
                 key={item.question}
                 className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 hover:shadow-md transition-shadow"
               >
-                <h3 className="text-lg font-medium text-text-primary leading-7">{item.question}</h3>
-                <p className="text-sm sm:text-base text-text-secondary leading-7 mt-3">{item.answer}</p>
+                <h3 className="text-base font-medium text-text-primary leading-7">{item.question}</h3>
+                <p className="text-sm text-text-secondary leading-7 mt-2">{item.answer}</p>
               </article>
             ))}
           </div>
@@ -372,15 +475,15 @@ export default function HomeContent() {
       </section>
 
       {/* ── Community ── */}
-      <section className="py-20 px-6 border-t border-border-subtle">
+      <section className="py-16 px-6 border-t border-border-subtle">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-10 animate-fade-up">
-            <span className="section-label block mb-3">Community</span>
+          <div className="text-center mb-8 animate-fade-up">
+            <span className="section-label block mb-2">Community</span>
             <h2 className="section-headline text-2xl sm:text-3xl">
               加入 WTFTI 社群
             </h2>
-            <p className="display-tagline text-text-secondary mt-3 text-base">
-              测完想找同类？来群里一起交流、玩耍、对线吧
+            <p className="display-tagline text-text-secondary mt-2 text-base">
+              测完想找同类？来群里一起玩
             </p>
           </div>
 
@@ -436,7 +539,7 @@ export default function HomeContent() {
       <FollowMeCard />
 
       {/* ── Bottom CTA ── */}
-      <section className="py-24 px-6 text-center">
+      <section className="py-20 px-6 text-center">
         <div className="max-w-lg mx-auto">
           <h2 className="section-headline text-2xl sm:text-3xl mb-4">
             准备好了吗？

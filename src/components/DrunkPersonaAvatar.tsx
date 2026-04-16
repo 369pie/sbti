@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import NextImage from 'next/image';
-import { getDrunkTypeImage, getDrunkTypeThumbnailImage } from '@/lib/drunk/personas';
+import { getDrunkTypeImage, getDrunkTypeThumbnailImage, getDrunkTypeMediumImage } from '@/lib/drunk/personas';
 import type { DrunkPersonaType } from '@/lib/drunk/personas';
 
 interface Props {
@@ -36,7 +36,7 @@ export function DrunkPersonaAvatar({
 
   const imageSrc = useOriginalImage
     ? getDrunkTypeImage(persona.slug)
-    : getDrunkTypeThumbnailImage(persona.slug);
+    : getDrunkTypeMediumImage(persona.slug);
 
   return (
     <div className={className} style={style}>
@@ -51,6 +51,8 @@ export function DrunkPersonaAvatar({
           priority={priority}
           sizes={sizes}
           className={imageClassName}
+          placeholder="blur"
+          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
           onError={() => {
             if (!useOriginalImage) {
               setUseOriginalImage(true);

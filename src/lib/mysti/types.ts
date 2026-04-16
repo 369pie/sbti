@@ -8,6 +8,10 @@ export interface MystiTarotData {
   shadowArcana: MystiArcana;
   tagline: string;
   reading?: string;
+  /** 2-3 sentence Shadow archetype narrative — the part of yourself you haven't claimed yet */
+  shadowReading?: string;
+  /** Brief explanation of why this personality maps to this Major Arcana */
+  whyThisCard?: string;
 }
 
 export interface MystiTheme {

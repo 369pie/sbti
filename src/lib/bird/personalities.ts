@@ -1133,3 +1133,7 @@ export function getBirdTypeImage(slug: string): string {
 export function getBirdTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/bird/cards/thumbs/${slug}.webp`);
 }
+
+export function getBirdTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/bird/cards/medium/${slug}.webp`);
+}

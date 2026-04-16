@@ -22,6 +22,10 @@ export function getIdentifyTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/thumbs/${slug}.webp`);
 }
 
+export function getIdentifyTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/medium/${slug}.webp`);
+}
+
 export const IDENTIFY_PERSONA_TYPES: IdentifyPersonaType[] = [
   {
     slug: 'party', code: 'PARTY', name: '气氛组组长',

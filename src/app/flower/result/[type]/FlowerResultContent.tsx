@@ -4,7 +4,7 @@ import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import { FLOWER_DIMENSIONS, FLOWER_MODEL_NAMES, FLOWER_MODEL_COLORS } from '@/lib/flower/dimensions';
-import { FLOWER_PERSONALITY_TYPES, getFlowerRarity, getFlowerTypeImage, getFlowerTypeThumbnailImage } from '@/lib/flower/personalities';
+import { FLOWER_PERSONALITY_TYPES, getFlowerRarity, getFlowerTypeImage, getFlowerTypeThumbnailImage, getFlowerTypeMediumImage } from '@/lib/flower/personalities';
 import type { FlowerPersonalityType } from '@/lib/flower/personalities';
 import type { FlowerDimensionScore } from '@/lib/flower/scoring';
 import { FlowerShareImageGenerator } from '@/components/FlowerShareImageGenerator';
@@ -13,10 +13,12 @@ import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
+import { UniverseProgressBar } from '@/components/UniverseProgressBar';
 import { UgcShareCTA } from '@/components/UgcShareCTA';
 import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
+import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 
 interface Props {
   personality: FlowerPersonalityType;
@@ -111,12 +113,14 @@ export function FlowerResultContent({ personality, dimensionScores }: Props) {
               }}
             >
               <NextImage
-                src={getFlowerTypeImage(personality.slug)}
+                src={getFlowerTypeMediumImage(personality.slug)}
                 alt={personality.flower}
                 width={384}
                 height={384}
                 className="w-[88%] h-[88%] object-contain drop-shadow-2xl"
                 priority
+                placeholder="blur"
+                blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
               />
             </div>
 
@@ -313,11 +317,13 @@ export function FlowerResultContent({ personality, dimensionScores }: Props) {
         </div>
       </section>
 
+      <ResultClosureEngine
+        currentUniverse="flower"
+        personalitySlug={personality.slug}
+        personalityName={personality.name}
+        accent={personality.color}
+      />
       <DailyCheckInCTA />
-      <UniversePreviewCards currentUniverse="flower" />
-      <IdentifyViralCTA personalityName={personality.name} />
-      <WtfCardCTA />
-      <UgcShareCTA />
     </div>
   );
 }

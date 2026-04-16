@@ -3,7 +3,7 @@
 import NextImage from 'next/image';
 import { useState } from 'react';
 import type { BantiPersonality } from '@/lib/banti/personalities';
-import { getBantiTypeImage } from '@/lib/banti/personalities';
+import { getBantiTypeImage, getBantiTypeMediumImage } from '@/lib/banti/personalities';
 
 interface BantiTypeArtProps {
   personality: BantiPersonality;
@@ -36,12 +36,14 @@ export function BantiTypeArt({
         <span className={emojiClassName}>{personality.emoji}</span>
       ) : (
         <NextImage
-          src={getBantiTypeImage(personality.slug)}
+          src={getBantiTypeMediumImage(personality.slug)}
           alt={alt ?? personality.workName}
           width={400}
           height={400}
           className={imageClassName}
           priority={priority}
+          placeholder="blur"
+          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
           onError={() => setFailed(true)}
         />
       )}

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import { XPTI_DIMENSIONS, XPTI_MODEL_NAMES, XPTI_MODEL_COLORS } from '@/lib/xpti/dimensions';
-import { XPTI_PERSONALITY_TYPES, getXptiRarity, getXptiTypeThumbnailImage } from '@/lib/xpti/personalities';
+import { XPTI_PERSONALITY_TYPES, getXptiRarity, getXptiTypeThumbnailImage, getXptiTypeMediumImage } from '@/lib/xpti/personalities';
 import type { XptiPersonalityType } from '@/lib/xpti/personalities';
 import type { XptiDimensionScore } from '@/lib/xpti/scoring';
 import { XptiShareImageGenerator } from '@/components/XptiShareImageGenerator';
@@ -13,10 +13,12 @@ import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
+import { UniverseProgressBar } from '@/components/UniverseProgressBar';
 import { UgcShareCTA } from '@/components/UgcShareCTA';
 import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
+import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 
 interface Props {
   personality: XptiPersonalityType;
@@ -150,12 +152,14 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
               }}
             >
               <NextImage
-                src={getXptiTypeThumbnailImage(personality.slug)}
+                src={getXptiTypeMediumImage(personality.slug)}
                 alt={personality.name}
                 fill
                 sizes="(max-width: 768px) 256px, 384px"
                 className="object-contain drop-shadow-2xl w-[88%] h-[88%]"
                 priority
+                placeholder="blur"
+                blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
               />
             </div>
 
@@ -425,11 +429,14 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
         </div>
       </section>
 
+      <ResultClosureEngine
+        currentUniverse="xpti"
+        personalitySlug={personality.slug}
+        personalityName={personality.name}
+        accent={personality.color}
+        variant="xpti"
+      />
       <DailyCheckInCTA variant="xpti" />
-      <UniversePreviewCards currentUniverse="xpti" variant="xpti" />
-      <IdentifyViralCTA personalityName={personality.name} variant="xpti" />
-      <WtfCardCTA variant="xpti" />
-      <UgcShareCTA variant="xpti" />
     </div>
   );
 }

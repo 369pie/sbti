@@ -364,13 +364,13 @@ function CollectionCard({ universe, slug, collected, index }: CollectionCardProp
 
           <div className="relative p-3 text-center">
             {/* Emoji */}
-            <div className={`text-2xl mb-1.5 ${collected ? '' : 'grayscale'}`}>
-              {collected ? emoji : '❓'}
+            <div className={`text-2xl mb-1.5 ${collected ? '' : 'grayscale opacity-20 blur-[2px]'}`}>
+              {emoji}
             </div>
 
             {/* Name */}
-            <p className={`text-[11px] leading-tight font-medium truncate ${collected ? 'text-white/90' : 'text-white/30'}`}>
-              {collected ? name : '未解锁'}
+            <p className={`text-[11px] leading-tight font-medium truncate ${collected ? 'text-white/90' : 'text-white/20'}`}>
+              {collected ? name : '???'}
             </p>
 
             {/* Number badge for WTFTI */}
@@ -381,15 +381,9 @@ function CollectionCard({ universe, slug, collected, index }: CollectionCardProp
             )}
           </div>
 
-          {/* Lock overlay for uncollected */}
+          {/* Silhouette outline for uncollected */}
           {!collected && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center">
-                <svg className="w-3 h-3 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-            </div>
+            <div className="absolute inset-0 rounded-xl border border-dashed border-white/10 pointer-events-none" />
           )}
         </div>
       </Link>

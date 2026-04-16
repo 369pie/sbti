@@ -11,6 +11,7 @@ import {
   getCptiRarity,
   getCptiTypeImage,
   getCptiTypeThumbnailImage,
+  getCptiTypeMediumImage,
 } from '@/lib/cpti/personalities';
 import type { CptiPersonalityType } from '@/lib/cpti/personalities';
 import type { CptiDimensionScore } from '@/lib/cpti/scoring';
@@ -32,14 +33,16 @@ interface Props {
 export function CptiResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
-  const [heroImageMode, setHeroImageMode] = useState<'thumb' | 'full' | 'emoji'>('thumb');
+  const [heroImageMode, setHeroImageMode] = useState<'thumb' | 'medium' | 'full' | 'emoji'>('medium');
   const [otherImageModes, setOtherImageModes] = useState<Record<string, 'thumb' | 'full' | 'emoji'>>({});
   const shareRef = useRef<CptiShareImageGeneratorHandle>(null);
 
   const shareUrl = getSiteUrl(`/cpti/result/${personality.slug}/`);
   const heroImageSrc = heroImageMode === 'full'
     ? getCptiTypeImage(personality.slug)
-    : getCptiTypeThumbnailImage(personality.slug);
+    : heroImageMode === 'thumb'
+      ? getCptiTypeThumbnailImage(personality.slug)
+      : getCptiTypeMediumImage(personality.slug);
 
   const copyShareText = useCallback(() => {
     const text = `我在关系里的CP角色是 ${personality.code}（${personality.name}）\n${personality.tagline}\n来测测你的 → ${shareUrl}`;
@@ -74,8 +77,9 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
 
   const handleHeroImageError = useCallback(() => {
     setHeroImageMode((current) => {
-      if (current === 'thumb') return 'full';
+      if (current === 'medium') return 'full';
       if (current === 'full') return 'emoji';
+      if (current === 'emoji') return 'medium';
       return current;
     });
   }, []);
@@ -155,6 +159,8 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
                   sizes="(max-width: 768px) 256px, 384px"
                   className="object-contain drop-shadow-2xl w-[88%] h-[88%]"
                   priority
+                  placeholder="blur"
+                  blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
                   onError={handleHeroImageError}
                 />
               </div>

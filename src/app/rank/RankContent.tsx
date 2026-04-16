@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PERSONALITY_TYPES, getTypeThumbnailImage } from '@/lib/personalities';
+import { PERSONALITY_TYPES, getTypeThumbnailImage, getTypeMediumImage } from '@/lib/personalities';
 import {
   analyzeRank,
   encodeRankParams,
@@ -166,11 +166,13 @@ function RankDisplay({
           style={{ borderColor: `${result.topType.personality.color}40`, background: `${result.topType.personality.color}12` }}
         >
           <NextImage
-            src={getTypeThumbnailImage(result.topType.personality.slug)}
+            src={getTypeMediumImage(result.topType.personality.slug)}
             alt={result.topType.personality.name}
             width={80}
             height={80}
             className="w-full h-full object-contain"
+            placeholder="blur"
+            blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
           />
         </div>
         <div className="text-sm font-mono tracking-wider mb-1" style={{ color: result.topType.personality.color }}>

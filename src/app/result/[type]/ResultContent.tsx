@@ -4,7 +4,7 @@ import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import type { ShareImageGeneratorHandle } from '@/components/ShareImageGenerator';
-import { PERSONALITY_TYPES, getTypeImage, getTypeThumbnailImage, getXiuxianTypeImage, getXiuxianTypeThumbnailImage, getRarity } from '@/lib/personalities';
+import { PERSONALITY_TYPES, getTypeImage, getTypeThumbnailImage, getTypeMediumImage, getXiuxianTypeImage, getXiuxianTypeThumbnailImage, getXiuxianTypeMediumImage, getRarity } from '@/lib/personalities';
 import type { PersonalityType } from '@/lib/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
@@ -14,6 +14,7 @@ import { getXiuxianSkin } from '@/lib/xiuxian';
 import { getXiuxianLaunchOnlyTypes } from '@/lib/xiuxian-v2';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
+import { UniverseProgressBar } from '@/components/UniverseProgressBar';
 import { UgcShareCTA } from '@/components/UgcShareCTA';
 import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
@@ -21,6 +22,7 @@ import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
 import { ResultDiagnosticsPanel } from '@/components/ResultDiagnosticsPanel';
 import { FollowMeCard, FollowMeFloating } from '@/components/FollowMeLinks';
+import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 
 type DimensionRadarComponentType = typeof import('@/components/DimensionChart')['DimensionRadar'];
 type DimensionBarsComponentType = typeof import('@/components/DimensionChart')['DimensionBars'];
@@ -137,8 +139,8 @@ export function ResultContent({ personality, dimensionScores }: Props) {
   }, [ShareImageGeneratorComponent]);
 
   const heroImageSrc = showXiuxian
-    ? (heroImageFallback ? getXiuxianTypeImage(personality.slug) : getXiuxianTypeThumbnailImage(personality.slug))
-    : (heroImageFallback ? getTypeImage(personality.slug) : getTypeThumbnailImage(personality.slug));
+    ? (heroImageFallback ? getXiuxianTypeImage(personality.slug) : getXiuxianTypeMediumImage(personality.slug))
+    : (heroImageFallback ? getTypeImage(personality.slug) : getTypeMediumImage(personality.slug));
 
   const getOtherTypeImageSrc = (slug: string) => {
     const shouldUseOriginal = Boolean(otherImageFallbacks[slug]);
@@ -325,6 +327,8 @@ export function ResultContent({ personality, dimensionScores }: Props) {
                 height={192}
                 className="w-full h-full object-contain p-2"
                 priority
+                placeholder="blur"
+                blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
                 onError={() => {
                   if (!heroImageFallback) {
                     setHeroImageFallback(true);
@@ -644,11 +648,13 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         </div>
       </section>
 
+      <ResultClosureEngine
+        currentUniverse={showXiuxian ? 'xiuxian' : 'standard'}
+        personalitySlug={personality.slug}
+        personalityName={personality.name}
+        accent={displayColor}
+      />
       <DailyCheckInCTA />
-      <UniversePreviewCards currentUniverse={showXiuxian ? 'xiuxian' : 'standard'} />
-      <IdentifyViralCTA personalityName={personality.name} />
-      <WtfCardCTA />
-      <UgcShareCTA />
       <FollowMeFloating />
     </div>
   );

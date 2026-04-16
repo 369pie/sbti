@@ -5,6 +5,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono, Playfair_Display, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
+import { AuthProvider } from "@/components/AuthProvider";
 import { FollowMeInline } from '@/components/FollowMeLinks';
 import { getLegacyRedirectScript, getSiteLabel, getSiteOrigin, getSiteUrl, isLegacyPagesBuild } from "@/lib/site";
 
@@ -78,6 +79,10 @@ export const metadata: Metadata = {
     title: "WTFTI — 多宇宙人格测试平台",
     description: "同一个你，在不同主题宇宙里有完全不同的人格翻译。经典、修仙、毒舌、社畜、鸟类……来测测你到底是哪种人。",
   },
+  icons: {
+    icon: { url: '/favicon.svg', type: 'image/svg+xml' },
+    apple: { url: '/favicon.svg', type: 'image/svg+xml' },
+  },
   alternates: {
     canonical: '/',
   },
@@ -95,6 +100,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <AuthProvider>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -112,7 +118,7 @@ export default function RootLayout({
                   '@type': 'Organization',
                   name: 'WTFTI',
                   url: getSiteUrl('/'),
-                  logo: getSiteUrl('/favicon.ico'),
+                  logo: getSiteUrl('/favicon.svg'),
                   description: 'WTFTI 多宇宙人格测试平台，提供经典、修仙、毒舌、社畜等多种主题人格测试。',
                 },
               ],
@@ -149,9 +155,11 @@ export default function RootLayout({
         <footer className="border-t border-border-subtle py-8 px-6 text-center text-text-muted text-sm">
           <div className="max-w-5xl mx-auto">
             <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
+              <Link href="/card/" prefetch={false} className="hover:text-text-primary transition-colors">我的 WTF Card</Link>
+              <Link href="/types/" prefetch={false} className="hover:text-text-primary transition-colors">人设图鉴</Link>
               <Link href="/guide/" prefetch={false} className="hover:text-text-primary transition-colors">测试说明</Link>
               <Link href="/about/" prefetch={false} className="hover:text-text-primary transition-colors">关于测试</Link>
-              <Link href="/types/" prefetch={false} className="hover:text-text-primary transition-colors">人设图鉴</Link>
+              <Link href="/creator/" prefetch={false} className="hover:text-text-primary transition-colors">创作者中心</Link>
               <Link href="/contact/" prefetch={false} className="hover:text-text-primary transition-colors">联系与社群</Link>
               <Link href="/privacy/" prefetch={false} className="hover:text-text-primary transition-colors">隐私说明</Link>
               <Link href="/terms/" prefetch={false} className="hover:text-text-primary transition-colors">使用条款</Link>
@@ -159,8 +167,10 @@ export default function RootLayout({
             <FollowMeInline />
             <p>WTFTI 更适合拿来娱乐和自我观察，不适合作为严肃的心理诊断结果。</p>
             <p className="mt-2 opacity-60">What&apos;s The F* Type Inside</p>
+            <p className="mt-2 opacity-50">SBTI 主题原创作者：B站 @Q肉儿串儿、如有侵权请联系</p>
           </div>
         </footer>
+        </AuthProvider>
         <Analytics />
       </body>
     </html>

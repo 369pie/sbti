@@ -28,7 +28,7 @@ const monoFont = "'SF Mono', 'Roboto Mono', ui-monospace, monospace";
  * When payment is integrated, wrap sections 2-4 (cross-readings,
  * repair prescription, soul letter) in a payment gate component.
  * The gate should check a payment token in localStorage or via API.
- * See docs/soulti-payment-features.md for the full plan.
+ * See docs/02-modules/soulti/soulti-payment-features.md for the full plan.
  */
 export function SoultiDeepReportContent({ personality, dimensionScores }: Props) {
   const [layered, setLayered] = useState<SoultiLayeredResult | null>(null);

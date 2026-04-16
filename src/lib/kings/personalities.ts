@@ -1031,15 +1031,15 @@ export function getKingsSlugs(): string[] {
 }
 
 export function getKingsTypeImage(slug: string): string {
-  return withBasePath(`/images/types/kings/${slug}.png`);
+  return withBasePath(`/images/types/kings-cards/${slug}.png`);
 }
 
 export function getKingsTypeThumbnailImage(slug: string): string {
-  return withBasePath(`/images/types/kings/thumbs/${slug}.webp`);
+  return withBasePath(`/images/types/kings-cards/thumbs/${slug}.webp`);
 }
 
 export function getKingsTypeMediumImage(slug: string): string {
-  return withBasePath(`/images/types/kings/medium/${slug}.webp`);
+  return withBasePath(`/images/types/kings-cards/medium/${slug}.webp`);
 }
 
 export function getKingsTypeCardImage(slug: string): string {

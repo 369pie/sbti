@@ -85,6 +85,33 @@ export function getSoultiTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/soulti-card-${slug}.png`);
 }
 
+export function getSoultiTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/soulti/medium/${slug}.webp`);
+}
+
+export function getSoultiTypeEmojiFallbackImage(slug: string, size = 320): string {
+  const personality = SOULTI_PERSONALITY_TYPES.find(p => p.slug === slug);
+  const emoji = personality?.emoji ?? '✨';
+  const code = personality?.code ?? 'SOULTI';
+  const color = personality?.color ?? '#7A6A5A';
+
+  const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FAF8F5" />
+      <stop offset="100%" stop-color="#F2ECE4" />
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="${size}" height="${size}" rx="36" fill="url(#bg)" />
+  <rect x="8" y="8" width="${size - 16}" height="${size - 16}" rx="30" fill="none" stroke="${color}" stroke-opacity="0.25" stroke-width="2" />
+  <text x="50%" y="47%" text-anchor="middle" dominant-baseline="middle" font-size="${Math.round(size * 0.34)}">${emoji}</text>
+  <text x="50%" y="76%" text-anchor="middle" dominant-baseline="middle" font-size="${Math.round(size * 0.07)}" fill="#6A6054" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" letter-spacing="1">${code}</text>
+</svg>`;
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
 // ═══════════════════════════════════════════════════════════════════════
 //  32 SoulTI 人格类型 · 以万物为镜
 //

@@ -71,6 +71,10 @@ export function getFlowerTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/flower/thumbs/${slug}.webp`);
 }
 
+export function getFlowerTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/flower/medium/${slug}.webp`);
+}
+
 export const FLOWER_PERSONALITY_TYPES: FlowerPersonalityType[] = [
   // ═══════════════════════════ H (向光) + B (盛放) ═══════════════════════════
   {

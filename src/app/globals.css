@@ -185,25 +185,71 @@ html {
 
 /* ── Navigation dropdown & link styles ── */
 .nav-link {
-  @apply px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-all duration-200 shrink-0 text-text-muted hover:text-text-secondary hover:bg-bg-secondary cursor-pointer select-none;
+  @apply px-4 py-2 rounded-full text-[15px] whitespace-nowrap transition-all duration-200 shrink-0 text-text-secondary hover:text-text-primary hover:bg-white/80 cursor-pointer select-none;
+}
+
+.nav-link-active {
+  @apply bg-bg-elevated text-text-primary shadow-sm;
+  box-shadow: 0 8px 22px rgba(45, 42, 38, 0.08);
 }
 
 .nav-dropdown {
-  @apply absolute top-full mt-2 py-2 rounded-xl border border-border-subtle bg-bg-elevated shadow-lg;
+  @apply absolute top-full mt-3 rounded-[28px] border border-border-subtle bg-bg-elevated shadow-lg backdrop-blur-sm;
+  box-shadow:
+    0 24px 60px rgba(45, 42, 38, 0.12),
+    0 8px 20px rgba(45, 42, 38, 0.05);
   animation: nav-dropdown-in 150ms ease-out;
 }
 
 .nav-dropdown-item {
-  @apply flex items-start gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-bg-secondary;
+  @apply flex items-start gap-3 rounded-[18px] px-4 py-3 text-sm transition-all duration-200 hover:bg-bg-secondary;
 }
 
 .featured-nav-item {
-  @apply rounded-3xl border border-pink-100 bg-gradient-to-r from-rose-50 via-white to-fuchsia-50 text-text-primary;
+  @apply border border-pink-100 bg-gradient-to-r from-rose-50 via-white to-fuchsia-50 text-text-primary transition-all duration-200;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.featured-nav-item:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 28px rgba(224, 96, 136, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 @keyframes nav-dropdown-in {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Auth form styles ── */
+.auth-input {
+  @apply w-full px-4 py-3 rounded-xl border border-border bg-bg-elevated text-text-primary text-sm placeholder:text-text-muted/50 transition-colors;
+}
+.auth-input:focus {
+  @apply border-accent ring-2 ring-accent/10 outline-none;
+}
+.auth-input:disabled {
+  @apply opacity-60 cursor-not-allowed;
+}
+.auth-button {
+  @apply w-full py-3 rounded-xl bg-accent text-white font-medium text-sm transition-all hover:bg-accent/90 disabled:opacity-60 disabled:cursor-not-allowed;
+}
+
+/* ── User avatar button ── */
+.user-avatar {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shrink-0;
+  background: linear-gradient(135deg, var(--color-accent), #c084fc);
+  color: white;
+}
+.user-avatar:hover {
+  @apply ring-2 ring-accent/30;
+}
+
+/* ── WTF Card empty slot breathing animation ── */
+@keyframes slot-breathe {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.9; }
 }
 
 /* XPTI 专属夜间暧昧微醺暗黑主题 */
@@ -743,4 +789,54 @@ html {
 
 .feng-progress-throb {
   animation: feng-progress-throb 0.4s ease-in-out infinite;
+}
+
+/* Subtle breathing pulse for empty WTF Card slots */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; border-color: rgba(255, 255, 255, 0.08); }
+  50% { opacity: 0.85; border-color: rgba(255, 77, 109, 0.15); }
+}
+
+/* Gacha legendary shimmer — diagonal light sweep */
+@keyframes gacha-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.gacha-legendary-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 215, 0, 0.06) 45%,
+    rgba(255, 215, 0, 0.12) 50%,
+    rgba(255, 215, 0, 0.06) 55%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: gacha-shimmer 3s ease-in-out infinite;
+}
+
+/* Gacha legendary emoji pulse */
+@keyframes gacha-legend-pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.3)); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.5)); }
+}
+
+.gacha-legendary-pulse {
+  animation: gacha-legend-pulse 2.5s ease-in-out infinite;
+}
+
+/* Holographic overlay gentle movement */
+.gacha-holo-overlay {
+  animation: gacha-holo-shift 4s ease-in-out infinite alternate;
+}
+
+@keyframes gacha-holo-shift {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
 }

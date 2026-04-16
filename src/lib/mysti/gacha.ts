@@ -11,6 +11,7 @@ import type { WtftiPersonality } from '@/lib/wtfti-personalities';
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export type GachaRarity = 'common' | 'uncommon' | 'rare' | 'legendary';
+export type GachaVariant = 'normal' | 'gold' | 'holographic';
 
 export interface GachaCard {
   slug: string;
@@ -22,6 +23,7 @@ export interface GachaCard {
   personalityEmoji: string;
   personalityColor: string;
   rarity: GachaRarity;
+  variant: GachaVariant;
   /** Short mystical description for this card */
   cardDescription: string;
 }
@@ -364,6 +366,43 @@ function getLegendaryDescription(universeId: string, slug: string): string {
   return legendary?.description ?? '传说中的神秘存在';
 }
 
+// ─── Variant determination ───────────────────────────────────────────────────
+
+function determineVariant(seed: string, rarity: GachaRarity): GachaVariant {
+  const variantHash = hashString(`${seed}:variant`);
+  const roll = variantHash % 1000;
+
+  // Holographic: 0.5% for legendary, 0.3% for rare, 0.1% for others
+  // Gold: 3% for legendary, 2% for rare, 1% for others
+  if (rarity === 'legendary') {
+    if (roll < 5) return 'holographic';
+    if (roll < 35) return 'gold';
+  } else if (rarity === 'rare') {
+    if (roll < 3) return 'holographic';
+    if (roll < 23) return 'gold';
+  } else {
+    if (roll < 1) return 'holographic';
+    if (roll < 11) return 'gold';
+  }
+  return 'normal';
+}
+
+export function getVariantLabel(variant: GachaVariant): string {
+  switch (variant) {
+    case 'gold': return '✦ 金闪';
+    case 'holographic': return '◆ 全息';
+    default: return '';
+  }
+}
+
+export function getVariantGlow(variant: GachaVariant): string {
+  switch (variant) {
+    case 'gold': return '0 0 12px rgba(255,215,0,0.4), inset 0 0 8px rgba(255,215,0,0.1)';
+    case 'holographic': return '0 0 16px rgba(168,85,247,0.4), 0 0 32px rgba(59,130,246,0.2), inset 0 0 8px rgba(255,255,255,0.15)';
+    default: return '';
+  }
+}
+
 // ─── Main draw function ──────────────────────────────────────────────────────
 
 export function drawDailyCard(date?: Date): GachaResult {
@@ -427,6 +466,7 @@ export function drawDailyCard(date?: Date): GachaResult {
     personalityEmoji: personality.emoji,
     personalityColor: personality.color,
     rarity,
+    variant: determineVariant(combinedSeed, rarity),
     cardDescription,
   };
 

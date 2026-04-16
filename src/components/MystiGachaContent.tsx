@@ -21,8 +21,11 @@ import {
   getTimeUntilNextDraw,
   checkMilestone,
   getNextMilestone,
+  getVariantLabel,
+  getVariantGlow,
   type GachaResult,
   type GachaRarity,
+  type GachaVariant,
 } from '@/lib/mysti/gacha';
 import { MystiGachaShareImageGenerator } from '@/components/MystiGachaShareImageGenerator';
 
@@ -494,24 +497,30 @@ export function MystiGachaContent() {
 
           {/* Rarity distribution */}
           <div className="grid grid-cols-4 gap-2 mt-4">
-            {(['common', 'uncommon', 'rare', 'legendary'] as GachaRarity[]).map(rarity => (
-              <div
-                key={rarity}
-                className="text-center p-2 rounded-lg"
-                style={{
-                  background: getRarityGlow(rarity),
-                  border: `1px solid ${getRarityColor(rarity)}30`,
-                }}
-              >
-                <div className="text-lg">{getRarityEmoji(rarity)}</div>
-                <div className="text-xs font-medium" style={{ color: getRarityColor(rarity) }}>
-                  {rarityDist[rarity]}
+            {(['common', 'uncommon', 'rare', 'legendary'] as GachaRarity[]).map(rarity => {
+              const dropRate = rarity === 'legendary' ? '~1%' : rarity === 'rare' ? '~5%' : rarity === 'uncommon' ? '~20%' : '~60%';
+              return (
+                <div
+                  key={rarity}
+                  className="text-center p-2 rounded-lg"
+                  style={{
+                    background: getRarityGlow(rarity),
+                    border: `1px solid ${getRarityColor(rarity)}30`,
+                  }}
+                >
+                  <div className="text-lg">{getRarityEmoji(rarity)}</div>
+                  <div className="text-xs font-medium" style={{ color: getRarityColor(rarity) }}>
+                    {rarityDist[rarity]}
+                  </div>
+                  <div className="text-[10px]" style={{ color: theme.textMuted }}>
+                    {getRarityLabel(rarity)}
+                  </div>
+                  <div className="text-[9px] mt-0.5" style={{ color: theme.textMuted, opacity: 0.6 }}>
+                    {dropRate}
+                  </div>
                 </div>
-                <div className="text-[10px]" style={{ color: theme.textMuted }}>
-                  {getRarityLabel(rarity)}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </motion.div>
 
@@ -606,30 +615,103 @@ interface GachaCardFrontProps {
 function GachaCardFront({ card, theme, isNew }: GachaCardFrontProps) {
   const rarityColor = getRarityColor(card.rarity);
   const rarityGlow = getRarityGlow(card.rarity);
+  const isHighRarity = card.rarity === 'rare' || card.rarity === 'legendary';
+  const isLegendary = card.rarity === 'legendary';
+  const variant = card.variant ?? 'normal';
+  const isSpecialVariant = variant !== 'normal';
+  const variantLabel = getVariantLabel(variant);
+  const variantShadow = getVariantGlow(variant);
+
+  // Ownership percentage based on rarity tier
+  const ownershipPct = card.rarity === 'legendary' ? 0.3
+    : card.rarity === 'rare' ? 2.1
+    : card.rarity === 'uncommon' ? 8.5
+    : null; // don't show for common
 
   return (
     <div
-      className="aspect-[2/3] rounded-2xl border flex flex-col items-center justify-center p-6 relative overflow-hidden"
+      className={`aspect-[2/3] rounded-2xl border flex flex-col items-center justify-center p-6 relative overflow-hidden ${
+        isLegendary ? 'gacha-legendary-shimmer' : ''
+      } ${variant === 'holographic' ? 'gacha-holo-overlay' : ''}`}
       style={{
-        background: `linear-gradient(135deg, ${theme.gradientCard[0]} 0%, ${theme.gradientCard[1]} 100%)`,
-        borderColor: rarityColor,
-        boxShadow: `0 24px 80px -24px ${rarityGlow}`,
+        background: isLegendary
+          ? `linear-gradient(135deg, #1a1520 0%, #2d1f35 30%, #1a1520 60%, #251a2d 100%)`
+          : `linear-gradient(135deg, ${theme.gradientCard[0]} 0%, ${theme.gradientCard[1]} 100%)`,
+        borderColor: variant === 'gold' ? '#FFD700' : variant === 'holographic' ? '#a78bfa' : rarityColor,
+        borderWidth: isHighRarity || isSpecialVariant ? '2px' : '1px',
+        boxShadow: isSpecialVariant
+          ? variantShadow
+          : isHighRarity
+            ? `0 0 30px 4px ${rarityGlow}, 0 24px 80px -24px ${rarityGlow}`
+            : `0 24px 80px -24px ${rarityGlow}`,
       }}
     >
+      {/* Variant badge */}
+      {isSpecialVariant && (
+        <div
+          className="absolute top-4 left-4 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider z-10"
+          style={{
+            background: variant === 'gold'
+              ? 'linear-gradient(135deg, #FFD700, #FFA500)'
+              : 'linear-gradient(135deg, #8b5cf6, #3b82f6, #06b6d4)',
+            color: variant === 'gold' ? '#1a1520' : '#fff',
+            boxShadow: variant === 'gold'
+              ? '0 0 8px rgba(255,215,0,0.4)'
+              : '0 0 8px rgba(139,92,246,0.4)',
+          }}
+        >
+          {variantLabel}
+        </div>
+      )}
+
+      {/* Gold variant shimmer overlay */}
+      {variant === 'gold' && (
+        <div
+          className="absolute inset-0 pointer-events-none gacha-holo-overlay"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,215,0,0.06) 0%, rgba(255,165,0,0.1) 25%, transparent 50%, rgba(255,215,0,0.06) 75%, rgba(255,165,0,0.08) 100%)',
+            mixBlendMode: 'screen',
+          }}
+        />
+      )}
+      {/* Holographic overlay for rare+ */}
+      {isHighRarity && (
+        <div
+          className="absolute inset-0 pointer-events-none gacha-holo-overlay"
+          style={{
+            background: isLegendary
+              ? `linear-gradient(135deg, rgba(255,215,0,0.05) 0%, rgba(255,165,0,0.08) 25%, rgba(255,215,0,0.03) 50%, rgba(255,165,0,0.06) 75%, rgba(255,215,0,0.05) 100%)`
+              : `linear-gradient(135deg, rgba(167,139,250,0.04) 0%, rgba(192,132,252,0.06) 50%, rgba(167,139,250,0.03) 100%)`,
+            mixBlendMode: 'screen',
+          }}
+        />
+      )}
+
       {/* Top accent line with rarity color */}
       <div
-        className="absolute inset-x-0 top-0 h-px"
-        style={{ background: `linear-gradient(90deg, transparent, ${rarityColor}, transparent)` }}
+        className="absolute inset-x-0 top-0"
+        style={{
+          height: isHighRarity ? '2px' : '1px',
+          background: `linear-gradient(90deg, transparent, ${rarityColor}, transparent)`,
+        }}
       />
 
       {/* Universe emoji */}
       <div className="text-4xl mb-4">{card.universeEmoji || '🔮'}</div>
 
       {/* Personality emoji */}
-      <div className="text-6xl sm:text-7xl mb-4">{card.personalityEmoji}</div>
+      <div className={`text-6xl sm:text-7xl mb-4 ${isLegendary ? 'gacha-legendary-pulse' : ''}`}>
+        {card.personalityEmoji}
+      </div>
 
       {/* Personality name */}
-      <div className="text-xl font-medium mb-2" style={{ color: theme.text }}>
+      <div
+        className="text-xl font-medium mb-2"
+        style={{
+          color: isLegendary ? '#FFD700' : theme.text,
+          textShadow: isLegendary ? '0 0 20px rgba(255,215,0,0.3)' : undefined,
+        }}
+      >
         {card.personalityName}
       </div>
 
@@ -649,6 +731,16 @@ function GachaCardFront({ card, theme, isNew }: GachaCardFrontProps) {
       >
         {card.universeName}
       </div>
+
+      {/* Ownership rarity text */}
+      {ownershipPct !== null && (
+        <div
+          className="mt-3 text-[10px] font-mono tracking-wide"
+          style={{ color: rarityColor, opacity: 0.8 }}
+        >
+          全站仅 {ownershipPct}% 的人拥有此卡
+        </div>
+      )}
 
       {/* Rarity indicator */}
       <div
@@ -674,10 +766,21 @@ function GachaCardFront({ card, theme, isNew }: GachaCardFrontProps) {
         </div>
       )}
 
+      {/* Legendary corner decorations */}
+      {isLegendary && (
+        <>
+          <div className="absolute top-3 left-3 text-xs" style={{ color: '#FFD700', opacity: 0.4 }}>✦</div>
+          <div className="absolute bottom-3 left-3 text-xs" style={{ color: '#FFD700', opacity: 0.4 }}>✦</div>
+        </>
+      )}
+
       {/* Bottom accent line */}
       <div
-        className="absolute inset-x-0 bottom-0 h-px"
-        style={{ background: `linear-gradient(90deg, transparent, ${rarityColor}, transparent)` }}
+        className="absolute inset-x-0 bottom-0"
+        style={{
+          height: isHighRarity ? '2px' : '1px',
+          background: `linear-gradient(90deg, transparent, ${rarityColor}, transparent)`,
+        }}
       />
     </div>
   );

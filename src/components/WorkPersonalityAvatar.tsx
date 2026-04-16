@@ -3,7 +3,7 @@
 import NextImage from 'next/image';
 import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
-import { getWorkTypeImage, getWorkTypeThumbnailImage } from '@/lib/work/personalities';
+import { getWorkTypeImage, getWorkTypeThumbnailImage, getWorkTypeMediumImage } from '@/lib/work/personalities';
 import type { WorkPersonalityType } from '@/lib/work/personalities';
 
 interface Props {
@@ -37,7 +37,7 @@ export function WorkPersonalityAvatar({
 
   const imageSrc = useOriginalImage
     ? getWorkTypeImage(personality.slug)
-    : getWorkTypeThumbnailImage(personality.slug);
+    : getWorkTypeMediumImage(personality.slug);
 
   return (
     <div className={className} style={style}>
@@ -52,6 +52,8 @@ export function WorkPersonalityAvatar({
           priority={priority}
           sizes={sizes}
           className={imageClassName}
+          placeholder="blur"
+          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
           onError={() => {
             if (!useOriginalImage) {
               setUseOriginalImage(true);

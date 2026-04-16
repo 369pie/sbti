@@ -68,6 +68,10 @@ export function getWorkTypeThumbnailImage(slug: string): string {
   return withBasePath(`/images/types/thumbs/work-${slug}.webp`);
 }
 
+export function getWorkTypeMediumImage(slug: string): string {
+  return withBasePath(`/images/types/medium/work-${slug}.webp`);
+}
+
 export const WORK_PERSONALITY_TYPES: WorkPersonalityType[] = [
   {
     slug: 'juan', code: 'JUAN', name: '卷王', tagline: '你卷你的，我已经卷完了。',

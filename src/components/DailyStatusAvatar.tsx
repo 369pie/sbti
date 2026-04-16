@@ -3,7 +3,7 @@
 import NextImage from 'next/image';
 import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
-import { getDailyTypeImage, getDailyTypeThumbnailImage } from '@/lib/daily/statuses';
+import { getDailyTypeImage, getDailyTypeThumbnailImage, getDailyTypeMediumImage } from '@/lib/daily/statuses';
 import type { DailyStatusType } from '@/lib/daily/statuses';
 
 interface Props {
@@ -37,7 +37,7 @@ export function DailyStatusAvatar({
 
   const imageSrc = useOriginalImage
     ? getDailyTypeImage(status.slug)
-    : getDailyTypeThumbnailImage(status.slug);
+    : getDailyTypeMediumImage(status.slug);
 
   return (
     <div className={className} style={style}>
@@ -52,6 +52,8 @@ export function DailyStatusAvatar({
           priority={priority}
           sizes={sizes}
           className={imageClassName}
+          placeholder="blur"
+          blurDataURL="data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA="
           onError={() => {
             if (!useOriginalImage) {
               setUseOriginalImage(true);
