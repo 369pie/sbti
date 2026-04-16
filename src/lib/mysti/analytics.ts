@@ -8,7 +8,11 @@ type MystiEvent =
   | 'mysti_daily_view'
   | 'mysti_daily_share'
   | 'mysti_return_landing'
-  | 'mysti_return_complete';
+  | 'mysti_return_complete'
+  | 'mysti_gacha_view'
+  | 'mysti_gacha_draw'
+  | 'mysti_gacha_result'
+  | 'mysti_gacha_share';
 
 export function trackMystiEvent(event: MystiEvent, properties?: Record<string, unknown>) {
   // Try Vercel Analytics first (client-side only)

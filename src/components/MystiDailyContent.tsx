@@ -259,6 +259,13 @@ export function MystiDailyContent() {
             🔮 查看你的灵魂牌
           </Link>
           <Link
+            href="/mysti/gacha/"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm border transition-all hover:opacity-80"
+            style={{ borderColor: 'rgba(123,97,255,0.45)', color: '#B8B0FF' }}
+          >
+            🎴 每日抽卡
+          </Link>
+          <Link
             href="/mysti/"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm border transition-all hover:opacity-80"
             style={{ borderColor: theme.divider, color: theme.textMuted }}

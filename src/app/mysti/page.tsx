@@ -187,6 +187,14 @@ function MystiLandingContent() {
           >
             ✦ 每日一牌
           </a>
+
+          <a
+            href="/mysti/gacha/"
+            className="block w-full py-3 rounded-xl border text-sm font-medium text-center hover:bg-white/5 transition-all"
+            style={{ borderColor: 'rgba(123,97,255,0.45)', color: '#B8B0FF' }}
+          >
+            🎴 每日抽卡
+          </a>
         </div>
 
         <p className="text-center text-xs mt-8" style={{ color: 'rgba(167,176,200,0.6)' }}>

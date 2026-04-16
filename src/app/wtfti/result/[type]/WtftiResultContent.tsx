@@ -10,7 +10,6 @@ import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
 import { WtftiShareImageGenerator } from '@/components/WtftiShareImageGenerator';
 import type { WtftiShareImageHandle } from '@/components/WtftiShareImageGenerator';
-import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { UniverseSwitcher } from '@/components/UniverseSwitcher';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
 import { UgcShareCTA } from '@/components/UgcShareCTA';
@@ -267,7 +266,7 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
 
       {/* Cross-universe exploration */}
       <section className="max-w-2xl mx-auto px-6 pb-8">
-        <UniverseResultBar slug={p.slug} current="wtfti" />
+        <UniverseSwitcher slug={p.slug} currentUniverseId="wtfti" />
       </section>
 
       {/* Other types */}

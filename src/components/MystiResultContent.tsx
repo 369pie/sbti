@@ -11,6 +11,7 @@ import type { MystiTheme, MystiShareImageGeneratorHandle } from '@/lib/mysti/typ
 import { getMystiTarotData } from '@/lib/mysti/tarot-mapping';
 import { getDualInterpretation } from '@/lib/mysti/dual-interpretation';
 import { MystiShareImageGenerator } from '@/components/MystiShareImageGenerator';
+import { UniverseSwitcher } from '@/components/UniverseSwitcher';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 
 interface Props {
@@ -261,6 +262,26 @@ function SingleModeContent({
             </span>
           ))}
         </div>
+      </motion.div>
+
+      {/* Cross-universe exploration */}
+      <motion.div
+        initial={mounted ? { opacity: 0, y: 16 } : false}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.38 }}
+        className="mb-10"
+      >
+        <UniverseSwitcher
+          slug={personality.slug}
+          currentUniverseId="mysti"
+          theme={{
+            cardSurface: theme.cardSurface,
+            divider: theme.divider,
+            accent: theme.accent,
+            text: theme.text,
+            textMuted: theme.textMuted,
+          }}
+        />
       </motion.div>
 
       {/* Share CTA */}

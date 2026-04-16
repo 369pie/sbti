@@ -1,130 +1,154 @@
 'use client';
 
 import Link from 'next/link';
-import NextImage from 'next/image';
 import { motion } from 'framer-motion';
-import { getLiveUniverses } from '@/lib/universes';
-import { resolvePersonality } from '@/lib/personality-resolver';
-import { getBantiTypeThumbnailImage } from '@/lib/banti/personalities';
-import { getKingsTypeThumbnailImage } from '@/lib/kings/personalities';
-import { getDeltaTypeThumbnailImage } from '@/lib/delta/personalities';
-import { getWtftiTypeThumbnailImage } from '@/lib/wtfti-personalities';
+import { getUniversePreviews, type UniversePreview } from '@/lib/universe-switcher';
 
 interface UniverseSwitcherProps {
   slug: string;
   currentUniverseId: string;
+  theme?: {
+    cardSurface?: string;
+    divider?: string;
+    accent?: string;
+    text?: string;
+    textMuted?: string;
+  };
 }
 
-function getThumbnailForUniverse(universeId: string, slug: string): string | null {
-  switch (universeId) {
-    case 'banti':
-      return getBantiTypeThumbnailImage(slug);
-    case 'kings':
-      return getKingsTypeThumbnailImage(slug);
-    case 'delta':
-      return getDeltaTypeThumbnailImage(slug);
-    case 'wtfti':
-    case 'standard':
-      return getWtftiTypeThumbnailImage(slug);
-    default:
-      return null;
-  }
-}
+export function UniverseSwitcher({ slug, currentUniverseId, theme }: UniverseSwitcherProps) {
+  const previews = getUniversePreviews(slug, currentUniverseId);
 
-export function UniverseSwitcher({ slug, currentUniverseId }: UniverseSwitcherProps) {
-  const others = getLiveUniverses().filter(u => u.id !== currentUniverseId);
+  if (previews.length === 0) return null;
 
-  if (others.length === 0) return null;
+  // Default theme (dark)
+  const defaultTheme = {
+    cardSurface: 'rgba(30, 30, 40, 0.6)',
+    divider: 'rgba(255, 255, 255, 0.1)',
+    accent: '#8b5cf6',
+    text: '#ffffff',
+    textMuted: 'rgba(255, 255, 255, 0.5)',
+  };
+
+  const t = { ...defaultTheme, ...theme };
 
   return (
-    <section className="max-w-5xl mx-auto px-6 pb-10">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.15 }}
+    <div className="w-full">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-xs tracking-wider uppercase" style={{ color: t.textMuted }}>
+          在其他宇宙
+        </span>
+        <div className="flex-1 h-px" style={{ background: t.divider }} />
+      </div>
+
+      {/* Mobile: horizontal scroll, Desktop: grid */}
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide sm:grid sm:grid-cols-3 lg:grid-cols-4 sm:overflow-visible">
+        {previews.map((preview, index) => (
+          <PreviewCard
+            key={preview.universeId}
+            preview={preview}
+            index={index}
+            theme={t}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PreviewCard({
+  preview,
+  index,
+  theme,
+}: {
+  preview: UniversePreview;
+  index: number;
+  theme: {
+    cardSurface: string;
+    divider: string;
+    accent: string;
+    text: string;
+    textMuted: string;
+  };
+}) {
+  const isLive = preview.status === 'live';
+  const cardContent = (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.05 }}
+      className={`
+        flex-shrink-0 w-[140px] sm:w-auto rounded-xl border p-3
+        transition-all duration-200
+        ${preview.isCurrentUniverse ? 'ring-2' : 'hover:border-opacity-80'}
+        ${isLive ? 'cursor-pointer hover:shadow-lg' : 'opacity-60 cursor-not-allowed'}
+      `}
+      style={{
+        background: theme.cardSurface,
+        borderColor: preview.isCurrentUniverse ? theme.accent : theme.divider,
+        boxShadow: preview.isCurrentUniverse
+          ? `0 0 20px ${theme.accent}30, 0 4px 12px rgba(0,0,0,0.2)`
+          : '0 2px 8px rgba(0,0,0,0.1)',
+      }}
+    >
+      {/* Universe emoji */}
+      <div className="text-2xl mb-2">{preview.emoji}</div>
+
+      {/* Universe name */}
+      <div
+        className="text-[10px] tracking-wider uppercase mb-1 truncate"
+        style={{ color: theme.textMuted }}
       >
-        <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
-          🌌 看看你在其他宇宙长什么样
-        </h2>
+        {preview.name}
+      </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
-          {others.map(u => {
-            const resolved = resolvePersonality(u.id, slug);
-            const href =
-              u.id === 'xiuxian'
-                ? `${u.resultPrefix}/result/${slug}/?skin=xiuxian`
-                : `${u.resultPrefix}/result/${slug}/`;
+      {/* Personality name */}
+      <div
+        className="text-sm font-semibold truncate"
+        style={{ color: preview.isCurrentUniverse ? theme.accent : theme.text }}
+      >
+        {preview.personalityName}
+      </div>
 
-            // Locked / coming-soon state
-            if (!resolved) {
-              return (
-                <div
-                  key={u.id}
-                  className="group relative rounded-2xl border border-border-subtle bg-bg-elevated p-3 sm:p-4 flex flex-col items-center text-center opacity-70"
-                >
-                  <div className="flex items-center gap-1.5 text-xs text-text-muted mb-2">
-                    {u.emoji && <span>{u.emoji}</span>}
-                    <span className="font-medium">{u.shortName}</span>
-                  </div>
-                  <div className="flex-1 flex flex-col items-center justify-center min-h-[80px] sm:min-h-[96px]">
-                    <div className="text-2xl mb-1">🔒</div>
-                    <div className="text-xs text-text-muted">即将上线</div>
-                  </div>
-                </div>
-              );
-            }
-
-            const thumbnail = getThumbnailForUniverse(u.id, slug);
-
-            return (
-              <Link
-                key={u.id}
-                href={href}
-                prefetch={false}
-                className="group rounded-2xl border border-border-subtle bg-bg-elevated p-3 sm:p-4 shadow-sm hover:shadow-md hover:border-border transition-all flex flex-col"
-              >
-                {/* Header: emoji + short name */}
-                <div className="flex items-center gap-1.5 text-xs text-text-muted mb-2">
-                  {u.emoji && <span>{u.emoji}</span>}
-                  <span className="font-medium">{u.shortName}</span>
-                </div>
-
-                {/* Visual area */}
-                <div
-                  className="w-full aspect-square rounded-xl overflow-hidden flex items-center justify-center mb-2"
-                  style={{
-                    background: thumbnail
-                      ? `linear-gradient(135deg, ${u.accent}08, ${u.accent}16)`
-                      : `linear-gradient(135deg, ${u.accent}15, ${u.accent}30)`,
-                  }}
-                >
-                  {thumbnail ? (
-                    <NextImage
-                      src={thumbnail}
-                      alt={resolved.name}
-                      width={120}
-                      height={120}
-                      className="w-[82%] h-[82%] object-contain transition-transform duration-300 group-hover:scale-105"
-                    />
-                  ) : (
-                    <span className="text-3xl sm:text-4xl">{resolved.emoji}</span>
-                  )}
-                </div>
-
-                {/* Personality name */}
-                <div className="mt-auto text-center">
-                  <div
-                    className="text-sm font-semibold truncate"
-                    style={{ color: u.accent }}
-                  >
-                    {resolved.name}
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+      {/* Lock icon for coming-soon */}
+      {!isLive && (
+        <div className="absolute top-2 right-2">
+          <svg
+            className="w-3 h-3"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+            style={{ color: theme.textMuted }}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            />
+          </svg>
         </div>
-      </motion.div>
-    </section>
+      )}
+
+      {/* Current universe indicator */}
+      {preview.isCurrentUniverse && (
+        <div
+          className="mt-2 text-[10px] font-medium tracking-wider"
+          style={{ color: theme.accent }}
+        >
+          当前
+        </div>
+      )}
+    </motion.div>
+  );
+
+  if (!isLive) {
+    return cardContent;
+  }
+
+  return (
+    <Link href={preview.path} className="block relative">
+      {cardContent}
+    </Link>
   );
 }
