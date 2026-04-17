@@ -2,6 +2,7 @@
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 import type { DailyStatusType } from '@/lib/daily/statuses';
 import { getDailyTypeImage } from '@/lib/daily/statuses';
 import { DAILY_DIMENSIONS, DAILY_MODEL_COLORS } from '@/lib/daily/dimensions';
@@ -426,26 +427,29 @@ export const DailyShareImageGenerator = forwardRef<DailyShareImageGeneratorHandl
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({ resourceId: 'daily:share', universe: 'daily' });
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const dataUrl = await renderDailyShareImage(status, dimensionScores);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'DAILY');
+        setPreviewUrl(finalUrl);
       } catch (err) {
         console.error('Failed to generate share image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [dimensionScores, generating, status]);
+    }, [dimensionScores, generating, status, tierCtl]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `DAILY-${status.code}.png`, { type: 'image/png' });
-    }, [status.code, previewUrl]);
+      return new File([blob], `DAILY-${status.code}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [status.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -468,10 +472,10 @@ export const DailyShareImageGenerator = forwardRef<DailyShareImageGeneratorHandl
         return;
       }
       const link = document.createElement('a');
-      link.download = `DAILY-${status.code}.png`;
+      link.download = `DAILY-${status.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, status.code, previewUrl]);
+    }, [createPreviewFile, status.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -491,6 +495,13 @@ export const DailyShareImageGenerator = forwardRef<DailyShareImageGeneratorHandl
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}

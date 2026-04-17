@@ -1,10 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import type { CreatorApplicationStatus } from '@/lib/creator/applications';
+import { getApiPath, readApiJson } from '@/lib/api';
+import { useAuth } from '@/components/AuthProvider';
 
 interface CreatorApplicationItem {
   id: string;
+  user_id: string | null;
   name: string;
   email: string;
   phone: string | null;
@@ -44,7 +48,7 @@ function formatDate(value: string): string {
 }
 
 export default function CreatorApplicationsAdminPage() {
-  const [token, setToken] = useState('');
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [status, setStatus] = useState<CreatorApplicationStatus | 'all'>('all');
   const [query, setQuery] = useState('');
   const [items, setItems] = useState<CreatorApplicationItem[]>([]);
@@ -52,14 +56,7 @@ export default function CreatorApplicationsAdminPage() {
   const [error, setError] = useState('');
   const [savingId, setSavingId] = useState('');
 
-  useEffect(() => {
-    const savedToken = localStorage.getItem('creator-admin-token') ?? '';
-    if (savedToken) setToken(savedToken);
-  }, []);
-
   const fetchItems = useCallback(async () => {
-    if (!token) return;
-
     setLoading(true);
     setError('');
 
@@ -69,17 +66,22 @@ export default function CreatorApplicationsAdminPage() {
       if (query.trim()) params.set('q', query.trim());
       params.set('pageSize', '100');
 
-      const res = await fetch(`/api/creator-applications?${params.toString()}`, {
-        headers: {
-          'x-admin-token': token,
-        },
-      });
+      const res = await fetch(getApiPath(`/creator-applications?${params.toString()}`));
+      const data = await readApiJson<{ items?: CreatorApplicationItem[] } & ApiErrorResponse>(res);
 
-      const data = (await res.json()) as { items?: CreatorApplicationItem[] } & ApiErrorResponse;
       if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error('请先登录管理员账号。');
+        }
+        if (res.status === 403) {
+          throw new Error('当前账号没有创作者申请管理权限。');
+        }
         if (data.code === 'SERVER_ENV_MISSING') {
           const details = data.details ? `（${data.details}）` : '';
           throw new Error(`服务端环境变量未配置完整${details}`);
+        }
+        if (data.code === 'DB_SCHEMA_MISSING') {
+          throw new Error('当前环境还没建创作者申请表。请先执行 src/lib/ugc/schema.sql。');
         }
         throw new Error(data.error ?? '获取失败');
       }
@@ -91,29 +93,23 @@ export default function CreatorApplicationsAdminPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, status, query]);
+  }, [query, status]);
 
   useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
-
-  function handleSaveToken() {
-    const nextToken = token.trim();
-    setToken(nextToken);
-    localStorage.setItem('creator-admin-token', nextToken);
-  }
+    if (!authLoading && isAuthenticated) {
+      void fetchItems();
+    }
+  }, [authLoading, isAuthenticated, fetchItems]);
 
   async function updateStatus(item: CreatorApplicationItem, nextStatus: CreatorApplicationStatus) {
-    if (!token) return;
     setSavingId(item.id);
     setError('');
 
     try {
-      const res = await fetch('/api/creator-applications', {
+      const res = await fetch(getApiPath('/creator-applications'), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'x-admin-token': token,
         },
         body: JSON.stringify({
           id: item.id,
@@ -122,8 +118,17 @@ export default function CreatorApplicationsAdminPage() {
         }),
       });
 
-      const data = await res.json();
+      const data = await readApiJson<{ error?: string; code?: string; item?: CreatorApplicationItem }>(res);
       if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error('请先登录管理员账号。');
+        }
+        if (res.status === 403) {
+          throw new Error('当前账号没有创作者申请管理权限。');
+        }
+        if (data.code === 'DB_SCHEMA_MISSING') {
+          throw new Error('当前环境还没建创作者申请表。请先执行 src/lib/ugc/schema.sql。');
+        }
         throw new Error(data.error ?? '更新失败');
       }
 
@@ -136,16 +141,14 @@ export default function CreatorApplicationsAdminPage() {
   }
 
   async function updateAdminNote(item: CreatorApplicationItem, nextNote: string) {
-    if (!token) return;
     setSavingId(item.id);
     setError('');
 
     try {
-      const res = await fetch('/api/creator-applications', {
+      const res = await fetch(getApiPath('/creator-applications'), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'x-admin-token': token,
         },
         body: JSON.stringify({
           id: item.id,
@@ -154,8 +157,17 @@ export default function CreatorApplicationsAdminPage() {
         }),
       });
 
-      const data = await res.json();
+      const data = await readApiJson<{ error?: string; code?: string; item?: CreatorApplicationItem }>(res);
       if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error('请先登录管理员账号。');
+        }
+        if (res.status === 403) {
+          throw new Error('当前账号没有创作者申请管理权限。');
+        }
+        if (data.code === 'DB_SCHEMA_MISSING') {
+          throw new Error('当前环境还没建创作者申请表。请先执行 src/lib/ugc/schema.sql。');
+        }
         throw new Error(data.error ?? '更新失败');
       }
 
@@ -174,48 +186,90 @@ export default function CreatorApplicationsAdminPage() {
     }, {});
   }, [items]);
 
+  const loginHref = `/auth/login/?next=${encodeURIComponent('/creator/applications/')}`;
+
+  if (authLoading) {
+    return (
+      <div className="max-w-3xl mx-auto px-6 py-20">
+        <div className="rounded-2xl border border-border-subtle bg-bg-elevated p-6 text-sm text-text-muted">
+          正在检查管理员登录状态...
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="max-w-3xl mx-auto px-6 py-20">
+        <div className="rounded-3xl border border-border-subtle bg-bg-elevated p-8 sm:p-10 text-center">
+          <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Creator Admin</span>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-text-primary">管理员登录后可查看申请管理后台</h1>
+          <p className="mt-4 text-text-secondary leading-8">
+            该页面仅面向平台管理员开放。普通申请进度请在个人中心查看。
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Link
+              href={loginHref}
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-white font-medium hover:bg-accent/90 transition-colors"
+            >
+              登录管理员账号
+            </Link>
+            <Link
+              href="/me/"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-border-subtle text-text-secondary hover:text-text-primary hover:border-border transition-colors"
+            >
+              去个人中心
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-12 sm:py-16">
       <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Creator Admin</span>
       <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-4">创作者申请管理后台</h1>
       <p className="text-text-secondary leading-8 text-base mb-8">
-        用于查看创作者申请、筛选线索、更新跟进状态。此页面需要管理员 token 才能读取数据。
+        管理员登录后可查看创作者申请、筛选线索、更新审核状态。普通用户的申请进度会在个人中心展示。
       </p>
+
+      <div className="flex flex-wrap gap-3 mb-6 text-sm">
+        <Link
+          href="/creator/admin/ops/"
+          className="inline-flex items-center rounded-xl bg-accent px-4 py-2.5 font-medium text-white hover:bg-accent/90 transition-colors"
+        >
+          去经营总看板
+        </Link>
+        <Link
+          href="/creator/admin/"
+          className="inline-flex items-center rounded-xl border border-border-subtle px-4 py-2.5 font-medium text-text-secondary hover:text-text-primary hover:border-border transition-colors"
+        >
+          去审核队列
+        </Link>
+      </div>
 
       <div className="rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 mb-6">
         使用前请先在服务端配置环境变量：
         <span className="font-mono"> SUPABASE_SERVICE_ROLE_KEY </span>
         （或
         <span className="font-mono"> SUPABASE_SECRET_KEY </span>
-        ）和
-        <span className="font-mono"> CREATOR_ADMIN_TOKEN </span>
+        ）以及
+        <span className="font-mono"> ADMIN_USER_IDS </span>
         。
       </div>
 
-      <section className="rounded-2xl border border-border-subtle bg-bg-elevated p-5 sm:p-6 mb-6 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3">
-          <input
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            placeholder="输入 CREATOR_ADMIN_TOKEN"
-            className="w-full rounded-xl border border-border-subtle bg-bg-secondary px-3 py-2.5 text-sm text-text-primary outline-none focus:border-accent"
-          />
-          <button
-            onClick={handleSaveToken}
-            className="px-4 py-2.5 rounded-xl bg-accent text-white text-sm font-medium"
-          >
-            保存 Token
-          </button>
-        </div>
-
+      <section className="rounded-2xl border border-border-subtle bg-bg-elevated p-5 sm:p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-[180px_1fr_auto] gap-3">
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as CreatorApplicationStatus | 'all')}
             className="rounded-xl border border-border-subtle bg-bg-secondary px-3 py-2.5 text-sm text-text-primary outline-none focus:border-accent"
           >
-            {STATUS_OPTIONS.map(option => (
-              <option key={option.value} value={option.value}>{option.label}</option>
+            {STATUS_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
             ))}
           </select>
 
@@ -227,7 +281,7 @@ export default function CreatorApplicationsAdminPage() {
           />
 
           <button
-            onClick={fetchItems}
+            onClick={() => void fetchItems()}
             className="px-4 py-2.5 rounded-xl border border-border-subtle text-text-secondary hover:text-text-primary"
           >
             刷新
@@ -240,7 +294,7 @@ export default function CreatorApplicationsAdminPage() {
       )}
 
       <section className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
-        {STATUS_OPTIONS.filter(s => s.value !== 'all').map(s => (
+        {STATUS_OPTIONS.filter((s) => s.value !== 'all').map((s) => (
           <article key={s.value} className="rounded-xl border border-border-subtle bg-bg-elevated p-3 text-center">
             <p className="text-xs text-text-muted">{s.label}</p>
             <p className="text-xl font-semibold text-text-primary mt-1">{stats[s.value] ?? 0}</p>
@@ -252,11 +306,11 @@ export default function CreatorApplicationsAdminPage() {
         {loading && <p className="text-sm text-text-muted">加载中...</p>}
         {!loading && items.length === 0 && (
           <div className="rounded-2xl border border-border-subtle bg-bg-elevated p-6 text-sm text-text-muted">
-            暂无数据。请确认 Token 正确，或等待申请提交。
+            当前没有符合筛选条件的申请记录。
           </div>
         )}
 
-        {items.map(item => (
+        {items.map((item) => (
           <article key={item.id} className="rounded-2xl border border-border-subtle bg-bg-elevated p-5 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
@@ -266,18 +320,21 @@ export default function CreatorApplicationsAdminPage() {
               <div className="flex items-center gap-2">
                 <select
                   value={item.status}
-                  onChange={(e) => updateStatus(item, e.target.value as CreatorApplicationStatus)}
+                  onChange={(e) => void updateStatus(item, e.target.value as CreatorApplicationStatus)}
                   disabled={savingId === item.id}
                   className="rounded-lg border border-border-subtle bg-bg-secondary px-2.5 py-1.5 text-xs text-text-primary"
                 >
-                  {STATUS_OPTIONS.filter(s => s.value !== 'all').map(s => (
-                    <option key={s.value} value={s.value}>{s.label}</option>
+                  {STATUS_OPTIONS.filter((s) => s.value !== 'all').map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
                   ))}
                 </select>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-text-secondary">
+              <p>账号用户：{item.user_id ? `${item.user_id.slice(0, 8)}...` : '未绑定账号'}</p>
               <p>邮箱：{item.email}</p>
               <p>手机：{item.phone ?? '-'}</p>
               <p>微信：{item.wechat_id ?? '-'}</p>
@@ -308,7 +365,7 @@ export default function CreatorApplicationsAdminPage() {
                   }
                 }}
                 rows={2}
-                placeholder="管理员备注（失焦自动保存）"
+                placeholder="管理员备注（仅后台可见，失焦自动保存）"
                 className="w-full rounded-xl border border-border-subtle bg-bg-secondary px-3 py-2 text-sm text-text-primary outline-none focus:border-accent resize-y"
               />
               <div className="text-xs text-text-muted md:text-right">

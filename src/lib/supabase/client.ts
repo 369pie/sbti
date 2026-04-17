@@ -1,4 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Fallback values — these are public keys, safe to embed.
 // .env.local should override them, but if env injection fails these keep things working.
@@ -27,11 +28,18 @@ function readClientEnv(keys: readonly string[]): string | undefined {
   return undefined;
 }
 
+let browserClientSingleton: SupabaseClient | null = null;
+
 export function createBrowserSupabaseClient() {
+  if (browserClientSingleton) {
+    return browserClientSingleton;
+  }
+
   const url = readClientEnv(URL_KEYS) ?? FALLBACK_URL;
   const key = readClientEnv(KEY_KEYS) ?? FALLBACK_KEY;
 
-  return createBrowserClient(url, key);
+  browserClientSingleton = createBrowserClient(url, key);
+  return browserClientSingleton;
 }
 
 export const createClient = createBrowserSupabaseClient;

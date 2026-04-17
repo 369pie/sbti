@@ -12,8 +12,12 @@ import { getMystiTarotData } from '@/lib/mysti/tarot-mapping';
 import { getDualInterpretation } from '@/lib/mysti/dual-interpretation';
 import { MystiShareImageGenerator } from '@/components/MystiShareImageGenerator';
 import { UniverseSwitcher } from '@/components/UniverseSwitcher';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
+import { MystiSoulLetterSection } from '@/components/MystiSoulLetterSection';
+import { Typewriter } from '@/components/Typewriter';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 import { markCollected } from '@/lib/mysti/collection';
+import { recordDualPair } from '@/lib/mysti/dual-archive';
 
 interface Props {
   wtftiPersonality: WtftiPersonality;
@@ -31,13 +35,30 @@ export function MystiResultContent({ wtftiPersonality }: Props) {
     markCollected('mysti', wtftiPersonality.slug);
   }, [wtftiPersonality.slug]);
 
-  // Track dual view
+  // Track dual view + W3 sink to relationship archive
   useEffect(() => {
     if (partnerPersonality && wtftiPersonality) {
       trackMystiEvent('mysti_dual_view', {
         personality: wtftiPersonality.slug,
         partner: partnerPersonality.slug,
       });
+      const selfData = getMystiTarotData(wtftiPersonality.slug);
+      const otherData = getMystiTarotData(partnerPersonality.slug);
+      if (selfData && otherData) {
+        const interp = getDualInterpretation(
+          wtftiPersonality.slug,
+          partnerPersonality.slug,
+          selfData,
+          otherData,
+        );
+        recordDualPair({
+          selfSlug: wtftiPersonality.slug,
+          partnerSlug: partnerPersonality.slug,
+          archetypeId: interp.archetype.id,
+          archetypeName: interp.archetype.name,
+          archetypeEmoji: interp.archetype.emoji,
+        });
+      }
     }
   }, [partnerPersonality, wtftiPersonality]);
 
@@ -268,11 +289,12 @@ function SingleModeContent({
         ))}
       </motion.div>
 
-      {/* Shadow card */}
+      {/* Shadow card — W2: 延迟揭晓，下滑触发后才渐显 */}
       <motion.div
-        initial={mounted ? { opacity: 0, y: 16 } : false}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.35 }}
+        initial={mounted ? { opacity: 0, y: 28, filter: 'blur(8px)' } : false}
+        whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        viewport={{ once: true, amount: 0.55, margin: '0px 0px -10% 0px' }}
+        transition={{ duration: 0.9, ease: 'easeOut' }}
         className="rounded-xl border p-4 mb-5"
         style={{ borderColor: theme.divider, background: `${theme.cardSurface}80` }}
       >
@@ -295,12 +317,13 @@ function SingleModeContent({
         )}
       </motion.div>
 
-      {/* Why this card */}
+      {/* Why this card — W2: 神谕段落以打字机方式逐字呈现 */}
       {data.whyThisCard && (
         <motion.div
           initial={mounted ? { opacity: 0, y: 14 } : false}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.37 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.6 }}
           className="rounded-xl border p-4 sm:p-6 mb-6"
           style={{ borderColor: theme.divider, background: `${theme.cardSurface}80` }}
         >
@@ -308,17 +331,23 @@ function SingleModeContent({
             为什么是这张牌？
           </div>
           <p className="text-sm sm:text-[15px] leading-7 sm:leading-8 text-center" style={{ color: theme.text }}>
-            {data.whyThisCard}
+            <Typewriter text={data.whyThisCard} speedMs={32} startDelayMs={400} />
           </p>
         </motion.div>
       )}
+
+      {/* Soul Letter（W4 付费内容） */}
+      <MystiSoulLetterSection
+        slug={personality.slug}
+        displayName={personality.wtftiName}
+      />
 
       {/* Cross-universe exploration */}
       <motion.div
         initial={mounted ? { opacity: 0, y: 16 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.38 }}
-        className="mb-6"
+        className="mb-6 mt-10"
       >
         <UniverseSwitcher
           slug={personality.slug}
@@ -331,6 +360,9 @@ function SingleModeContent({
             textMuted: theme.textMuted,
           }}
         />
+        <div className="mt-4">
+          <WtfiTheoryWiring universe="mysti" variant="dark" />
+        </div>
       </motion.div>
 
       {/* Share CTA */}
@@ -367,12 +399,71 @@ function SingleModeContent({
         </Link>
       </motion.div>
 
-      {/* Back links */}
+      {/* Explore more — guide users to other Mysti features */}
+      <motion.div
+        initial={mounted ? { opacity: 0, y: 16 } : false}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+        className="mt-8 rounded-2xl border p-5"
+        style={{ borderColor: theme.divider, background: `${theme.cardSurface}60` }}
+      >
+        <div className="text-xs tracking-wider uppercase mb-4 text-center" style={{ color: theme.accent }}>
+          继续探索灵鉴
+        </div>
+        <div className="grid grid-cols-2 gap-2.5">
+          <Link
+            href="/mysti/daily/"
+            className="group flex items-center gap-3 rounded-xl border p-3 transition-all hover:bg-white/5"
+            style={{ borderColor: theme.divider }}
+          >
+            <span className="text-lg shrink-0">✦</span>
+            <div className="min-w-0">
+              <div className="text-xs font-medium" style={{ color: theme.text }}>每日一牌</div>
+              <div className="text-[10px]" style={{ color: theme.textMuted }}>今天的能量指引</div>
+            </div>
+          </Link>
+          <Link
+            href="/mysti/gacha/"
+            className="group flex items-center gap-3 rounded-xl border p-3 transition-all hover:bg-white/5"
+            style={{ borderColor: theme.divider }}
+          >
+            <span className="text-lg shrink-0">🎴</span>
+            <div className="min-w-0">
+              <div className="text-xs font-medium" style={{ color: theme.text }}>每日抽卡</div>
+              <div className="text-[10px]" style={{ color: theme.textMuted }}>免费一抽灵魂卡牌</div>
+            </div>
+          </Link>
+          <Link
+            href="/mysti/collection/"
+            className="group flex items-center gap-3 rounded-xl border p-3 transition-all hover:bg-white/5"
+            style={{ borderColor: theme.divider }}
+          >
+            <span className="text-lg shrink-0">📖</span>
+            <div className="min-w-0">
+              <div className="text-xs font-medium" style={{ color: theme.text }}>图鉴墙</div>
+              <div className="text-[10px]" style={{ color: theme.textMuted }}>查看收集进度</div>
+            </div>
+          </Link>
+          <Link
+            href={`/mysti/?slug=${encodeURIComponent(personality.slug)}`}
+            className="group flex items-center gap-3 rounded-xl border p-3 transition-all hover:bg-white/5"
+            style={{ borderColor: theme.divider }}
+          >
+            <span className="text-lg shrink-0">💌</span>
+            <div className="min-w-0">
+              <div className="text-xs font-medium" style={{ color: theme.text }}>邀请合测</div>
+              <div className="text-[10px]" style={{ color: theme.textMuted }}>拉 TA 看关系灵鉴</div>
+            </div>
+          </Link>
+        </div>
+      </motion.div>
+
+      {/* Retest + Home */}
       <motion.div
         initial={mounted ? { opacity: 0 } : false}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
-        className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3"
+        transition={{ duration: 0.5, delay: 0.55 }}
+        className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3"
       >
         <Link
           href="/wtfti/test/"
@@ -382,11 +473,11 @@ function SingleModeContent({
           重新测试
         </Link>
         <Link
-          href="/wtfti/"
+          href="/mysti/"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm border transition-all hover:opacity-80"
           style={{ borderColor: theme.divider, color: theme.textMuted }}
         >
-          返回 WTFTI 首页
+          返回灵鉴首页
         </Link>
       </motion.div>
     </>
@@ -640,12 +731,71 @@ function DualModeContent({
         </div>
       </motion.div>
 
-      {/* Back links */}
+      {/* Explore more — guide users to other Mysti features */}
+      <motion.div
+        initial={mounted ? { opacity: 0, y: 16 } : false}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+        className="mt-8 rounded-2xl border p-5"
+        style={{ borderColor: theme.divider, background: `${theme.cardSurface}60` }}
+      >
+        <div className="text-xs tracking-wider uppercase mb-4 text-center" style={{ color: theme.accent }}>
+          继续探索灵鉴
+        </div>
+        <div className="grid grid-cols-2 gap-2.5">
+          <Link
+            href="/mysti/daily/"
+            className="group flex items-center gap-3 rounded-xl border p-3 transition-all hover:bg-white/5"
+            style={{ borderColor: theme.divider }}
+          >
+            <span className="text-lg shrink-0">✦</span>
+            <div className="min-w-0">
+              <div className="text-xs font-medium" style={{ color: theme.text }}>每日一牌</div>
+              <div className="text-[10px]" style={{ color: theme.textMuted }}>今天的能量指引</div>
+            </div>
+          </Link>
+          <Link
+            href="/mysti/gacha/"
+            className="group flex items-center gap-3 rounded-xl border p-3 transition-all hover:bg-white/5"
+            style={{ borderColor: theme.divider }}
+          >
+            <span className="text-lg shrink-0">🎴</span>
+            <div className="min-w-0">
+              <div className="text-xs font-medium" style={{ color: theme.text }}>每日抽卡</div>
+              <div className="text-[10px]" style={{ color: theme.textMuted }}>免费一抽灵魂卡牌</div>
+            </div>
+          </Link>
+          <Link
+            href="/mysti/collection/"
+            className="group flex items-center gap-3 rounded-xl border p-3 transition-all hover:bg-white/5"
+            style={{ borderColor: theme.divider }}
+          >
+            <span className="text-lg shrink-0">📖</span>
+            <div className="min-w-0">
+              <div className="text-xs font-medium" style={{ color: theme.text }}>图鉴墙</div>
+              <div className="text-[10px]" style={{ color: theme.textMuted }}>查看收集进度</div>
+            </div>
+          </Link>
+          <Link
+            href="/mysti/"
+            className="group flex items-center gap-3 rounded-xl border p-3 transition-all hover:bg-white/5"
+            style={{ borderColor: theme.divider }}
+          >
+            <span className="text-lg shrink-0">🔮</span>
+            <div className="min-w-0">
+              <div className="text-xs font-medium" style={{ color: theme.text }}>灵鉴首页</div>
+              <div className="text-[10px]" style={{ color: theme.textMuted }}>选择新的人格组合</div>
+            </div>
+          </Link>
+        </div>
+      </motion.div>
+
+      {/* Retest */}
       <motion.div
         initial={mounted ? { opacity: 0 } : false}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
-        className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3"
+        transition={{ duration: 0.5, delay: 0.55 }}
+        className="mt-5 text-center"
       >
         <Link
           href="/wtfti/test/"
@@ -653,13 +803,6 @@ function DualModeContent({
           style={{ background: `linear-gradient(90deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`, color: '#fff' }}
         >
           重新测试
-        </Link>
-        <Link
-          href="/wtfti/"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm border transition-all hover:opacity-80"
-          style={{ borderColor: theme.divider, color: theme.textMuted }}
-        >
-          返回 WTFTI 首页
         </Link>
       </motion.div>
     </>

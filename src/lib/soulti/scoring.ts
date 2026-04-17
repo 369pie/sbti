@@ -194,3 +194,81 @@ export function calculateSoultiLayeredResult(
 
   return { overall, daySelf, nightSelf, dreamTendency };
 }
+
+// ── Tear Rate (撕裂度) ──────────────────────────────────────────────────
+//
+// 计算 "白天的你" 和 "深夜的你" 之间的距离。
+// 基于两个维度向量的欧氏距离归一化到 [0, 100]。
+//
+// 语义：
+//   - 0-20%   高度一致 · "白天和深夜的你几乎是同一个人"
+//   - 20-50%  局部错位 · "在某些轴上你白天和深夜判若两人"
+//   - 50-80%  明显撕裂 · "你的白天和深夜是两种不同的保护模式"
+//   - 80-100% 极度撕裂 · "你在白天和深夜之间反复横跳"
+
+export interface TearRateInfo {
+  percent: number;              // 0-100 integer
+  level: 'aligned' | 'partial' | 'split' | 'extreme';
+  label: string;                // 一致 / 局部错位 / 明显撕裂 / 极度撕裂
+  narrative: string;            // 一句话描述
+  divergentAxes: string[];      // 日夜向量差异最大的轴 ID（J1-J5），用于高亮
+}
+
+export function calculateTearRate(layered: SoultiLayeredResult): TearRateInfo {
+  const day = layered.daySelf.dimensions;
+  const night = layered.nightSelf.dimensions;
+
+  // 按 id 取值
+  const dayMap = new Map(day.map(d => [d.id, d.score]));
+  const nightMap = new Map(night.map(d => [d.id, d.score]));
+
+  // 每轴差值（绝对值）
+  const diffs: { id: string; delta: number }[] = [];
+  let sumSq = 0;
+  const allIds = new Set([...dayMap.keys(), ...nightMap.keys()]);
+  for (const id of allIds) {
+    const a = dayMap.get(id) ?? 2;
+    const b = nightMap.get(id) ?? 2;
+    const delta = Math.abs(a - b);
+    diffs.push({ id, delta });
+    sumSq += delta * delta;
+  }
+
+  // 归一化到 0-100
+  // 每轴最大差距=2（从1到3），5轴 → sqrt(5*4)=sqrt(20)≈4.47
+  const maxEuclid = Math.sqrt(allIds.size * 4);
+  const euclid = Math.sqrt(sumSq);
+  const percent = Math.round((euclid / maxEuclid) * 100);
+
+  // 取差异最大的 2 个轴
+  const divergentAxes = diffs
+    .sort((a, b) => b.delta - a.delta)
+    .slice(0, 2)
+    .filter(d => d.delta > 0.4)
+    .map(d => d.id);
+
+  let level: TearRateInfo['level'];
+  let label: string;
+  let narrative: string;
+
+  if (percent < 20) {
+    level = 'aligned';
+    label = '高度一致';
+    narrative = '白天的你和深夜的你几乎是同一个人——这份完整性，本身就很珍贵。';
+  } else if (percent < 50) {
+    level = 'partial';
+    label = '局部错位';
+    narrative = '在大多数时刻你是稳定的，但某些轴上，白天和深夜的你有着不同的答案。';
+  } else if (percent < 80) {
+    level = 'split';
+    label = '明显撕裂';
+    narrative = '白天和深夜的你，是两种不同的保护模式在轮班。你不是分裂——你是在用不同的方式活过每一天。';
+  } else {
+    level = 'extreme';
+    label = '极度撕裂';
+    narrative = '白天和深夜的你判若两人。这种撕裂一定很累，但它也是你最真实的样子——你从来不是单一的。';
+  }
+
+  return { percent, level, label, narrative, divergentAxes };
+}
+

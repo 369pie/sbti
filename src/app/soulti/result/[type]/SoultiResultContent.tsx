@@ -8,15 +8,20 @@ import { SOULTI_PERSONALITY_TYPES, getSoultiRarity, getSoultiResonance, getSoult
 import type { SoultiPersonalityType } from '@/lib/soulti/personalities';
 import type { SoultiDimensionScore } from '@/lib/soulti/scoring';
 import type { SoultiLayeredResult } from '@/lib/soulti/scoring';
+import { calculateTearRate } from '@/lib/soulti/scoring';
 import { SoultiShareImageGenerator } from '@/components/SoultiShareImageGenerator';
 import type { SoultiShareImageGeneratorHandle } from '@/components/SoultiShareImageGenerator';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { SoultiCommunityCTA } from '@/components/SoultiCommunityCTA';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 import { getCurrentWeeklyPrompt } from '@/lib/soulti/deep-report';
 import { useAuth } from '@/components/AuthProvider';
+import { SoultiPortraitShareCard } from '@/components/SoultiPortraitShareCard';
+import { getSoultiExtendedSections, generateSoulLetter } from '@/lib/soulti/extended-sections';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 
 interface Props {
   personality: SoultiPersonalityType;
@@ -226,6 +231,21 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
           >
             {personality.name}
           </h2>
+
+          {/* Resonance sub-title — historical woman binding (HERTI-style naming layer) */}
+          {resonance && (
+            <p
+              className="text-xs tracking-[0.3em] mb-0"
+              style={{
+                fontFamily: serifFont,
+                color: personality.color,
+                fontStyle: 'italic',
+                opacity: 0.85,
+              }}
+            >
+              · {resonance.soulOrigin.zhName} ·
+            </p>
+          )}
 
           {/* Rarity */}
           <div className="flex items-center justify-center gap-2 mt-4 mb-2">
@@ -535,16 +555,99 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
               );
             })}
 
-            {/* Tension hint — if day and night differ */}
-            {layered.daySelf.slug !== layered.nightSelf.slug && (
-              <p
-                className="text-center text-xs text-text-primary opacity-90 mt-8 leading-relaxed"
-                style={{ fontFamily: serifFont, fontStyle: 'italic' }}
-              >
-                白天你是{dayP.name}，深夜你变成{nightP.name}。<br />
-                这不是矛盾——是你的不同面在轮流照顾你。
-              </p>
-            )}
+            {/* ── 撕裂度 Tear Rate ── 独有功能，HERTI 永远无法提供 */}
+            {(() => {
+              const tear = calculateTearRate(layered);
+              const ringColor =
+                tear.level === 'aligned' ? '#5b8a72' :
+                tear.level === 'partial' ? '#8b7355' :
+                tear.level === 'split' ? '#b07850' :
+                '#7a6b8a';
+              const circ = 2 * Math.PI * 42;
+              const offset = circ * (1 - tear.percent / 100);
+              const divergentNames = tear.divergentAxes
+                .map(id => {
+                  const dim = SOULTI_DIMENSIONS.find(d => d.id === id);
+                  return dim ? SOULTI_MODEL_NAMES[dim.model] : null;
+                })
+                .filter(Boolean)
+                .join(' × ');
+
+              return (
+                <div className="mt-10 rounded-2xl border p-6 sm:p-8" style={{ borderColor: `${ringColor}25`, background: '#FDFCFA' }}>
+                  <p
+                    className="text-[10px] tracking-[0.35em] font-medium uppercase mb-5 text-center"
+                    style={{ fontFamily: serifFont, color: ringColor }}
+                  >
+                    TEAR RATE · 撕裂度
+                  </p>
+
+                  <div className="flex items-center justify-center gap-6 sm:gap-8">
+                    {/* Ring indicator */}
+                    <div className="relative">
+                      <svg width="100" height="100" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="#EDE8E2" strokeWidth="4" />
+                        <motion.circle
+                          cx="50" cy="50" r="42"
+                          fill="none"
+                          stroke={ringColor}
+                          strokeWidth="4"
+                          strokeLinecap="round"
+                          strokeDasharray={circ}
+                          initial={{ strokeDashoffset: circ }}
+                          animate={{ strokeDashoffset: offset }}
+                          transition={{ delay: 0.4, duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
+                          style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}
+                        />
+                        <text
+                          x="50" y="50"
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          fontSize="22"
+                          fontFamily={serifFont}
+                          fill={ringColor}
+                          fontWeight="400"
+                        >
+                          {tear.percent}%
+                        </text>
+                      </svg>
+                    </div>
+
+                    {/* Label & narrative */}
+                    <div className="flex-1 max-w-[260px]">
+                      <p
+                        className="text-sm tracking-[0.2em] mb-1"
+                        style={{ fontFamily: serifFont, color: ringColor }}
+                      >
+                        {tear.label}
+                      </p>
+                      {divergentNames && (
+                        <p className="text-[10px] text-[#6A6054] tracking-wider mb-2" style={{ fontFamily: serifFont }}>
+                          差异最大 · {divergentNames}
+                        </p>
+                      )}
+                      <p
+                        className="text-xs leading-[1.9] text-[#6A6054]"
+                        style={{ fontFamily: serifFont }}
+                      >
+                        {tear.narrative}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Tension hint — when day and night differ */}
+                  {layered.daySelf.slug !== layered.nightSelf.slug && (
+                    <p
+                      className="text-center text-xs text-text-primary opacity-90 mt-6 pt-5 border-t leading-relaxed"
+                      style={{ fontFamily: serifFont, fontStyle: 'italic', borderColor: `${ringColor}15` }}
+                    >
+                      白天你是{dayP.name}，深夜你变成{nightP.name}。<br />
+                      这不是矛盾——是你的不同面在轮流照顾你。
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
           </motion.section>
         );
       })()}
@@ -759,6 +862,33 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
             >
               {resonance.soulOrigin.description}
             </p>
+
+            {/* ── 她也曾像你一样 · Connector narrative ── */}
+            <div className="mt-8 pt-7" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <p
+                className="text-[10px] tracking-[0.4em] uppercase mb-4"
+                style={{ fontFamily: serifFont, color: 'rgba(255,255,255,0.45)' }}
+              >
+                · 她也曾像你一样 ·
+              </p>
+              <p
+                className="text-sm leading-[2]"
+                style={{ fontFamily: serifFont, color: 'rgba(255,255,255,0.82)', fontStyle: 'italic' }}
+              >
+                她也曾以「{personality.name}」的方式活过——
+                <br />
+                也曾{personality.tagline.replace(/，/g, '、')}。
+                <br />
+                而她最终，把这种{personality.name}的力量，留给了世界。
+              </p>
+              <p
+                className="text-[11px] leading-[1.9] mt-5"
+                style={{ color: 'rgba(255,255,255,0.55)', fontFamily: serifFont }}
+              >
+                你不是第一个以这种方式保护自己的人——<br />
+                你也不会是最后一个。
+              </p>
+            </div>
           </div>
         </motion.section>
       )}
@@ -772,9 +902,11 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
           transition={{ delay: 0.5, duration: 0.5 }}
         >
           <div className="grid grid-cols-2 gap-3">
-            {mirrorType && (
+            {mirrorType && (() => {
+              const mRarity = getSoultiRarity(mirrorType.slug);
+              return (
               <Link
-                href={`/soulti/result/${mirrorType.slug}`}
+                href={`/soulti/result/${mirrorType.slug}/`}
                 className="group rounded-2xl border border-border-subtle/80 p-6 transition-all hover:border-border hover:shadow-sm"
                 style={{ background: '#FDFCFA' }}
               >
@@ -791,11 +923,20 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
                 <p className="text-sm text-text-primary" style={{ fontFamily: serifFont }}>
                   {mirrorType.name}
                 </p>
+                <p className="mt-2 text-[10px]" style={{ color: mRarity.color }}>
+                  {mRarity.label} · 仅 {mRarity.populationPct.toFixed(1)}%
+                </p>
+                <p className="mt-1 text-[10px] text-[#8a7f72]" style={{ fontFamily: serifFont }}>
+                  {mirrorType.tagline}
+                </p>
               </Link>
-            )}
-            {oppositeType && (
+              );
+            })()}
+            {oppositeType && (() => {
+              const oRarity = getSoultiRarity(oppositeType.slug);
+              return (
               <Link
-                href={`/soulti/result/${oppositeType.slug}`}
+                href={`/soulti/result/${oppositeType.slug}/`}
                 className="group rounded-2xl border border-border-subtle/80 p-6 transition-all hover:border-border hover:shadow-sm"
                 style={{ background: '#FDFCFA' }}
               >
@@ -812,8 +953,15 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
                 <p className="text-sm text-text-primary" style={{ fontFamily: serifFont }}>
                   {oppositeType.name}
                 </p>
+                <p className="mt-2 text-[10px]" style={{ color: oRarity.color }}>
+                  {oRarity.label} · 仅 {oRarity.populationPct.toFixed(1)}%
+                </p>
+                <p className="mt-1 text-[10px] text-[#8a7f72]" style={{ fontFamily: serifFont }}>
+                  {oppositeType.tagline}
+                </p>
               </Link>
-            )}
+              );
+            })()}
           </div>
         </motion.section>
       )}
@@ -944,7 +1092,171 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
         </Link>
       </motion.section>
 
+      {/* ── S-06 · 7 段式扩展（此刻送你 · 如果你开始不安） ── */}
+      {(() => {
+        const ext = getSoultiExtendedSections(personality, resonance);
+        return (
+          <motion.section
+            className="max-w-2xl mx-auto px-6 pb-12"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.74, duration: 0.5 }}
+          >
+            <div className="space-y-4">
+              {ext.map((s) => {
+                const locked = s.locked && !isAuthenticated;
+                return (
+                  <div
+                    key={s.title}
+                    className="rounded-2xl border p-6 sm:p-7 relative overflow-hidden"
+                    style={{ borderColor: `${personality.color}20`, background: '#FDFCFA' }}
+                  >
+                    <p
+                      className="text-[10px] tracking-[0.3em] uppercase mb-3"
+                      style={{ fontFamily: serifFont, color: personality.color }}
+                    >
+                      {s.title}
+                    </p>
+                    <p
+                      className={`text-[14px] leading-[2] whitespace-pre-line ${locked ? 'blur-sm select-none' : ''}`}
+                      style={{ fontFamily: serifFont, color: '#3a352f' }}
+                    >
+                      {s.body}
+                    </p>
+                    {locked && (
+                      <div className="absolute inset-0 flex items-end justify-center pb-6 bg-gradient-to-b from-transparent via-[#FDFCFA]/80 to-[#FDFCFA]">
+                        <Link
+                          href={unlockHref}
+                          className="px-5 py-2 rounded-full text-xs border"
+                          style={{
+                            fontFamily: serifFont,
+                            background: personality.color,
+                            color: '#fff',
+                            borderColor: personality.color,
+                          }}
+                        >
+                          登录后展开「如果你开始不安」
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </motion.section>
+        );
+      })()}
+
+      {/* ── S-01b · 灵魂长信（登录解锁） ── */}
+      {(() => {
+        const tearRate = layered ? calculateTearRate(layered).percent : 0;
+        const letter = generateSoulLetter(personality, resonance, { tearRate });
+        const locked = !isAuthenticated;
+        return (
+          <motion.section
+            className="max-w-2xl mx-auto px-6 pb-12"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.76, duration: 0.5 }}
+          >
+            <div
+              className="rounded-3xl p-6 sm:p-8 relative overflow-hidden"
+              style={{ background: 'linear-gradient(180deg, #FDFCFA, #F5EFE5)', border: `1px solid ${personality.color}22` }}
+            >
+              <p className="text-[10px] tracking-[0.3em] uppercase mb-4 text-center" style={{ fontFamily: serifFont, color: '#8b7355' }}>
+                SOUL LETTER · 灵魂长信
+              </p>
+              <div className={locked ? 'blur-sm select-none' : ''}>
+                <p className="text-base mb-4" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+                  {letter.salutation}
+                </p>
+                {letter.paragraphs.map((para, i) => (
+                  <p key={i} className="text-[14px] leading-[2.1] mb-3" style={{ fontFamily: serifFont, color: '#3a352f' }}>
+                    {para}
+                  </p>
+                ))}
+                <p className="mt-4 text-xs tracking-[0.2em] text-right" style={{ fontFamily: serifFont, color: '#8b7355' }}>
+                  — {letter.signature}
+                </p>
+              </div>
+              {locked && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Link
+                    href={unlockHref}
+                    className="px-6 py-3 rounded-full text-sm"
+                    style={{
+                      fontFamily: serifFont,
+                      background: personality.color,
+                      color: '#fff',
+                    }}
+                  >
+                    登录阅读你的灵魂长信
+                  </Link>
+                </div>
+              )}
+            </div>
+          </motion.section>
+        );
+      })()}
+
+      {/* ── S-02 · 纵向分享卡 ── */}
+      <motion.section
+        className="max-w-2xl mx-auto px-6 pb-12"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.78, duration: 0.5 }}
+      >
+        <p className="text-[10px] tracking-[0.3em] uppercase mb-4 text-center" style={{ fontFamily: serifFont, color: '#8b7355' }}>
+          PORTRAIT CARD · 9:16 分享卡
+        </p>
+        <SoultiPortraitShareCard personality={personality} tearRate={layered ? calculateTearRate(layered).percent : undefined} />
+      </motion.section>
+
+      {/* ── SoulTI 宇宙导航 ── */}
+      <motion.section
+        className="max-w-2xl mx-auto px-6 pb-12"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8, duration: 0.5 }}
+      >
+        <p className="text-[10px] tracking-[0.3em] uppercase mb-4 text-center" style={{ fontFamily: serifFont, color: '#8b7355' }}>
+          SOULTI UNIVERSE · 继续探索
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { href: '/soulti/map/', label: '全景图谱', desc: '32 型 × 5 轴' },
+            { href: '/soulti/origin/', label: '历史原型', desc: '32 位她' },
+            { href: `/soulti/pair/?a=${personality.slug}`, label: '双人共振', desc: '测 TA 和你' },
+            { href: '/soulti/rarity/', label: '稀有度榜', desc: '你是哪一档' },
+          ].map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="block rounded-2xl border p-4 text-center transition-all hover:-translate-y-0.5"
+              style={{ borderColor: `${personality.color}25`, background: '#FDFCFA' }}
+            >
+              <p className="text-sm mb-1" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+                {link.label}
+              </p>
+              <p className="text-[10px]" style={{ fontFamily: serifFont, color: '#8a7f72' }}>
+                {link.desc}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </motion.section>
+
+      <SoultiCommunityCTA
+        personalityName={personality.name}
+        rarity={rarity}
+        accentColor={personality.color}
+      />
+
       <CrossTestRecommendations currentTest="soulti" personalityName={personality.name} />
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <WtfiTheoryWiring universe="soulti" dimensionScores={dimensionScores} />
+      </section>
 
       {/* ── Share section ── */}
       <section className="max-w-2xl mx-auto px-6 pb-16">

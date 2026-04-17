@@ -1,5 +1,14 @@
 import { NextResponse } from 'next/server';
 
+import {
+  ASSET_KEYS,
+  ASSET_MODULE_IDS,
+  ASSET_MODULE_IDS_LIST,
+  ASSET_MODULE_KINDS,
+  getAssetKeyFromModuleId,
+  mergeAssetPayload,
+  type SyncedAssetKey,
+} from '@/lib/assets/asset-contract';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 
@@ -27,6 +36,12 @@ interface SourceModuleRow {
   is_current: boolean;
 }
 
+interface AssetStateRow {
+  id: string;
+  module_id: string;
+  source_payload: Record<string, unknown> | null;
+}
+
 interface SourceIdentifyAssessmentRow {
   id: string;
   actor_user_id: string;
@@ -41,6 +56,62 @@ function json(body: unknown, init?: ResponseInit) {
       ...init?.headers,
     },
   });
+}
+
+type AdminClient = ReturnType<typeof createAdminSupabaseClient>;
+
+function extractAssetStatePayload(sourcePayload: Record<string, unknown> | null): unknown {
+  if (!sourcePayload) return null;
+  return 'state' in sourcePayload ? sourcePayload.state : sourcePayload;
+}
+
+async function upsertMergedAssetState(
+  adminClient: AdminClient,
+  userId: string,
+  assetKey: SyncedAssetKey,
+  payload: unknown,
+  rowId: string | null,
+  nowIso: string,
+) {
+  const nextPayload = {
+    assetKey,
+    schemaVersion: 1,
+    state: payload,
+  };
+
+  if (rowId) {
+    await adminClient
+      .from('user_module_results')
+      .update({
+        module_kind: ASSET_MODULE_KINDS[assetKey],
+        result_slug: 'asset_state_v1',
+        comparability_group: 'asset_sync',
+        source_version: 'asset-sync-v1',
+        source_payload: nextPayload,
+        observed_at: nowIso,
+        updated_at: nowIso,
+        is_current: true,
+        is_ephemeral: false,
+        expires_at: null,
+      })
+      .eq('id', rowId);
+    return;
+  }
+
+  await adminClient
+    .from('user_module_results')
+    .insert({
+      user_id: userId,
+      module_kind: ASSET_MODULE_KINDS[assetKey],
+      module_id: ASSET_MODULE_IDS[assetKey],
+      result_slug: 'asset_state_v1',
+      comparability_group: 'asset_sync',
+      source_version: 'asset-sync-v1',
+      source_payload: nextPayload,
+      is_current: true,
+      is_ephemeral: false,
+      observed_at: nowIso,
+    });
 }
 
 export async function POST(request: Request) {
@@ -163,6 +234,58 @@ export async function POST(request: Request) {
       .select('id, module_id, is_current')
       .eq('user_id', sourceUserId);
 
+    const { data: sourceAssetRows } = await adminClient
+      .from('user_module_results')
+      .select('id, module_id, source_payload')
+      .eq('user_id', sourceUserId)
+      .eq('is_current', true)
+      .in('module_id', ASSET_MODULE_IDS_LIST);
+
+    const { data: targetAssetRows } = await adminClient
+      .from('user_module_results')
+      .select('id, module_id, source_payload')
+      .eq('user_id', user.id)
+      .eq('is_current', true)
+      .in('module_id', ASSET_MODULE_IDS_LIST);
+
+    const sourceAssetMap = new Map(
+      ((sourceAssetRows ?? []) as AssetStateRow[]).map((row) => [row.module_id, row]),
+    );
+    const targetAssetMap = new Map(
+      ((targetAssetRows ?? []) as AssetStateRow[]).map((row) => [row.module_id, row]),
+    );
+
+    for (const assetKey of ASSET_KEYS) {
+      const moduleId = ASSET_MODULE_IDS[assetKey];
+      const sourceRow = sourceAssetMap.get(moduleId);
+      if (!sourceRow) continue;
+
+      const targetRow = targetAssetMap.get(moduleId);
+      const mergedPayload = mergeAssetPayload(
+        assetKey,
+        extractAssetStatePayload(targetRow?.source_payload ?? null),
+        extractAssetStatePayload(sourceRow.source_payload),
+      );
+
+      if (!mergedPayload) continue;
+
+      await upsertMergedAssetState(
+        adminClient,
+        user.id,
+        assetKey,
+        mergedPayload,
+        targetRow?.id ?? null,
+        nowIso,
+      );
+    }
+
+    if ((sourceAssetRows ?? []).length > 0) {
+      await adminClient
+        .from('user_module_results')
+        .delete()
+        .in('id', (sourceAssetRows as AssetStateRow[]).map((row) => row.id));
+    }
+
     const { data: targetCurrentModules } = await adminClient
       .from('user_module_results')
       .select('module_id')
@@ -173,7 +296,9 @@ export async function POST(request: Request) {
       (targetCurrentModules ?? []).map((row) => row.module_id as string),
     );
 
-    for (const row of ((sourceModules ?? []) as SourceModuleRow[])) {
+    for (const row of ((sourceModules ?? []) as SourceModuleRow[]).filter(
+      (moduleRow) => getAssetKeyFromModuleId(moduleRow.module_id) == null,
+    )) {
       await adminClient
         .from('user_module_results')
         .update({

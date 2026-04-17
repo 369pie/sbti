@@ -4,6 +4,7 @@ import { DAILY_MODEL_NAMES, DAILY_MODEL_COLORS } from '@/lib/daily/dimensions';
 import type { DailyModelType } from '@/lib/daily/dimensions';
 import { DAILY_STATUS_TYPES, getDailyTypeThumbnailImage } from '@/lib/daily/statuses';
 import { DailyTodayCTA } from '@/components/DailyTodayCTA';
+import DailyMoonPhasePanel from '@/components/DailyMoonPhasePanel';
 
 const MODELS: { key: DailyModelType; label: string }[] = [
   { key: 'energy', label: '你今天有多少电' },
@@ -61,6 +62,9 @@ export default function DailyHomeContent() {
           </div>
         </div>
       </section>
+
+      {/* Moon phase + streak (E-11) */}
+      <DailyMoonPhasePanel />
 
       {/* 5 Dimensions */}
       <section className="max-w-3xl mx-auto px-6 pb-20">

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
+import { useShareTier } from '@/lib/use-share-tier';
 import { getTypeImage } from '@/lib/personalities';
 import { SHARE_SITE_URL } from '@/lib/site';
 import type { SquadAnalysis } from '@/lib/squad';
@@ -380,6 +381,7 @@ export const SquadShareImageGenerator = forwardRef<SquadShareImageGeneratorHandl
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({ resourceId: `squad:${analysis.groupName}`, universe: 'squad' });
 
     // Preload member images + squad personality image
     useEffect(() => {
@@ -392,23 +394,25 @@ export const SquadShareImageGenerator = forwardRef<SquadShareImageGeneratorHandl
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const url = await renderSquadImage(analysis);
-        setPreviewUrl(url);
+        const finalUrl = await tierCtl.applyOverlay(url, '#FFF9F2', 'SQUAD');
+        setPreviewUrl(finalUrl);
       } catch (err) {
         console.error('Failed to generate squad image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [analysis, generating]);
+    }, [analysis, generating, tierCtl]);
 
     const createFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `SBTI-Squad-${analysis.groupName}.png`, { type: 'image/png' });
-    }, [analysis.groupName, previewUrl]);
+      return new File([blob], `SBTI-Squad-${analysis.groupName}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [analysis.groupName, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -431,10 +435,10 @@ export const SquadShareImageGenerator = forwardRef<SquadShareImageGeneratorHandl
         return;
       }
       const link = document.createElement('a');
-      link.download = `SBTI-Squad-${analysis.groupName}.png`;
+      link.download = `SBTI-Squad-${analysis.groupName}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [analysis.groupName, createFile, previewUrl]);
+    }, [analysis.groupName, createFile, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;

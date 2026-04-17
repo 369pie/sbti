@@ -12,7 +12,8 @@ type MystiEvent =
   | 'mysti_gacha_view'
   | 'mysti_gacha_draw'
   | 'mysti_gacha_result'
-  | 'mysti_gacha_share';
+  | 'mysti_gacha_share'
+  | 'mysti_share_tier_unlock_click';
 
 export function trackMystiEvent(event: MystiEvent, properties?: Record<string, unknown>) {
   // Try Vercel Analytics first (client-side only)

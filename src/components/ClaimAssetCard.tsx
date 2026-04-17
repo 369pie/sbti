@@ -8,6 +8,8 @@ import type {
   ClaimResultPayload,
   CptiClaimRequest,
 } from '@/lib/cpti/claim';
+import { getApiPath } from '@/lib/api';
+import { withBasePath } from '@/lib/site';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 
 type ClaimState = 'idle' | 'claiming' | 'claimed' | 'error';
@@ -116,7 +118,7 @@ export function ClaimAssetCard({
         }
       }
 
-      await fetch('/api/cpti/users/bootstrap', {
+      await fetch(getApiPath('/cpti/users/bootstrap'), {
         method: 'POST',
       });
 
@@ -138,7 +140,7 @@ export function ClaimAssetCard({
             };
 
       // Call claim API
-      const response = await fetch('/api/cpti/claim', {
+      const response = await fetch(getApiPath('/cpti/claim'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -168,10 +170,10 @@ export function ClaimAssetCard({
     if (claimState === 'claimed') {
       // Navigate to WTF CARD or continue exploring
       if (variant === 'result') {
-        window.location.href = '/card';
+        window.location.href = withBasePath('/card');
       } else {
         // Continue exploring relationships
-        window.location.href = '/cpti';
+        window.location.href = withBasePath('/cpti');
       }
       return;
     }
@@ -183,7 +185,7 @@ export function ClaimAssetCard({
     if (claimState === 'idle' || claimState === 'error') {
       handleClaim();
     } else if (claimState === 'claimed') {
-      window.location.href = '/auth/claimed?next=/card';
+      window.location.href = withBasePath('/auth/claimed?next=/card');
     }
   }, [claimState, handleClaim]);
 

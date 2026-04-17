@@ -12,6 +12,7 @@ import { DailyStatusAvatar } from '@/components/DailyStatusAvatar';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
 import { ResultDiagnosticsPanel } from '@/components/ResultDiagnosticsPanel';
 import { generateDailyFortune, loadTodayResult, msUntilMidnight, cacheDailyResult } from '@/lib/daily/fortune';
@@ -294,6 +295,10 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
       </section>
 
       <CrossTestRecommendations currentTest="daily" personalityName={status.name} />
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <WtfiTheoryWiring universe="daily" dimensionScores={dimensionScores} />
+      </section>
 
       {/* Share section */}
       <section className="max-w-2xl mx-auto px-6 pb-16">

@@ -20,6 +20,9 @@ import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 import { UniverseProgressBar } from '@/components/UniverseProgressBar';
+import { TheoryAnchorCard } from '@/components/TheoryAnchorCard';
+import { persistUniverseProfile } from '@/lib/wtfi/cci';
+import { projectLegacyToWtfi } from '@/lib/wtfi/dimension-alias';
 
 interface Props {
   wtftiPersonality: WtftiPersonality;
@@ -35,6 +38,16 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
   useEffect(() => {
     markCollected('wtfti', p.slug);
   }, [p.slug]);
+
+  // 把当前 15 维得分映射到 W/T/F/I 4 轴，沉淀到 CCI profile 池
+  useEffect(() => {
+    const legacyMap: Record<string, number> = {};
+    for (const d of dimensionScores) {
+      legacyMap[d.id] = d.score;
+    }
+    const wtfiAxes = projectLegacyToWtfi(legacyMap);
+    persistUniverseProfile({ universe: 'wtfti', axes: wtfiAxes });
+  }, [dimensionScores]);
 
   const shareUrl = getSiteUrl(`/wtfti/result/${p.slug}/`);
 
@@ -277,6 +290,11 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
 
       {/* Cross-universe exploration */}
       <UniverseProgressBar currentUniverseId="wtfti" />
+
+      {/* WTFTI 理论锚点：说明这个宇宙点亮了哪几条 W-T-F-I 轴 */}
+      <section className="max-w-2xl mx-auto px-6 pb-6">
+        <TheoryAnchorCard universe="wtfti" variant="light" />
+      </section>
 
       <section className="max-w-2xl mx-auto px-6 pb-8">
         <UniverseSwitcher slug={p.slug} currentUniverseId="wtfti" />

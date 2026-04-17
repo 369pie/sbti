@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import type { DeltaPersonality } from '@/lib/delta/personalities';
 import { DELTA_PERSONALITIES, getDeltaTypeImage } from '@/lib/delta/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
+import { markCollected } from '@/lib/mysti/collection';
 import { DeltaTypeArt } from '@/components/DeltaTypeArt';
 import { DeltaShareImageGenerator } from '@/components/DeltaShareImageGenerator';
 import type { DeltaShareImageHandle } from '@/components/DeltaShareImageGenerator';
@@ -17,6 +18,8 @@ import { UniverseProgressBar } from '@/components/UniverseProgressBar';
 import { UgcShareCTA } from '@/components/UgcShareCTA';
 import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { UniverseSwitcher } from '@/components/UniverseSwitcher';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 
 interface Props {
@@ -30,6 +33,9 @@ export function DeltaResultContent({ deltaPersonality: p, dimensionScores }: Pro
   const shareRef = useRef<DeltaShareImageHandle>(null);
 
   const shareUrl = getSiteUrl(`/wtfti/delta/result/${p.slug}/`);
+
+  // Mark as collected for Mysti collection wall
+  useEffect(() => { markCollected('delta', p.slug); }, [p.slug]);
   const typeImageUrl = getDeltaTypeImage(p.slug);
 
   const copyShareText = useCallback(() => {
@@ -311,6 +317,14 @@ export function DeltaResultContent({ deltaPersonality: p, dimensionScores }: Pro
             返回三角TI 首页
           </Link>
         </div>
+      </section>
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <UniverseSwitcher slug={p.slug} currentUniverseId="delta" />
+      </section>
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <WtfiTheoryWiring universe="delta" dimensionScores={dimensionScores} />
       </section>
 
       <DailyCheckInCTA />

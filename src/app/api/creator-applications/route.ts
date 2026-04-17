@@ -1,18 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
+import { getAuthUser } from '@/lib/supabase/middleware';
+import { withClaimedAuth } from '@/lib/supabase/with-auth';
+import { ADMIN_USER_IDS_ENV, hasConfiguredAdminUsers, isAdminUserId } from '@/lib/admin/roles';
 import {
-  getAdminTokenFromRequest,
-  isCreatorAdminTokenValid,
+  CREATOR_APPLICATIONS_TABLE,
+  getCreatorApplicationsSchemaDetails,
   isCreatorApplicationStatus,
+  isCreatorApplicationsTableMissing,
   normalizeCreatorApplicationInput,
   validateCreatorApplicationInput,
 } from '@/lib/creator/applications';
 
-const TABLE_NAME = 'creator_applications';
+const TABLE_NAME = CREATOR_APPLICATIONS_TABLE;
+const RESETTABLE_STATUSES = new Set(['rejected', 'archived']);
 
 function isServerEnvMisconfigured(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
-  return error.message.includes('Missing Supabase') || error.message.includes('Missing CREATOR_ADMIN_TOKEN');
+  return error.message.includes('Missing Supabase') || error.message.includes(`Missing ${ADMIN_USER_IDS_ENV}`);
 }
 
 function getServerEnvErrorResponse(error: unknown) {
@@ -27,10 +32,47 @@ function getServerEnvErrorResponse(error: unknown) {
   );
 }
 
-function requireCreatorAdminTokenConfigured() {
-  if (!process.env.CREATOR_ADMIN_TOKEN?.trim()) {
-    throw new Error('Missing CREATOR_ADMIN_TOKEN. Set this in local env or deployment settings.');
+function getMissingTableErrorResponse() {
+  return NextResponse.json(
+    {
+      error: '当前环境尚未初始化创作者申请数据表，请先执行数据库 schema',
+      code: 'DB_SCHEMA_MISSING',
+      details: getCreatorApplicationsSchemaDetails(),
+    },
+    { status: 500 }
+  );
+}
+
+async function requireAdminUser() {
+  if (!hasConfiguredAdminUsers()) {
+    return {
+      response: NextResponse.json(
+        {
+          error: '服务端管理员白名单未配置',
+          code: 'SERVER_ENV_MISSING',
+          details:
+            `Missing ${ADMIN_USER_IDS_ENV}. ` +
+            'Set this to a comma-separated list of Supabase user IDs allowed to manage creator applications.',
+        },
+        { status: 500 }
+      ),
+    };
   }
+
+  const { user } = await getAuthUser();
+  if (!user || user.is_anonymous) {
+    return {
+      response: NextResponse.json({ error: '请先登录管理员账号' }, { status: 401 }),
+    };
+  }
+
+  if (!isAdminUserId(user.id)) {
+    return {
+      response: NextResponse.json({ error: '仅管理员可访问' }, { status: 403 }),
+    };
+  }
+
+  return { user };
 }
 
 function getPagination(searchParams: URLSearchParams) {
@@ -48,10 +90,8 @@ function getPagination(searchParams: URLSearchParams) {
   };
 }
 
-export async function POST(req: NextRequest) {
+export const POST = withClaimedAuth(async (req, _context, user) => {
   try {
-    requireCreatorAdminTokenConfigured();
-
     const rawBody = await req.json();
     const input = normalizeCreatorApplicationInput(rawBody);
     const validationError = validateCreatorApplicationInput(input);
@@ -63,28 +103,85 @@ export async function POST(req: NextRequest) {
     const admin = createAdminSupabaseClient();
     const now = new Date().toISOString();
 
-    const { data, error } = await admin
+    const { data: existingByUser, error: existingByUserError } = await admin
       .from(TABLE_NAME)
-      .insert({
-        name: input.name,
-        email: input.email,
-        phone: input.phone ?? null,
-        wechat_id: input.wechatId ?? null,
-        xiaohongshu_handle: input.xiaohongshuHandle ?? null,
-        content_vertical: input.contentVertical ?? null,
-        wants_free: input.wantsFree,
-        wants_paid: input.wantsPaid,
-        intro: input.intro ?? null,
-        source_page: input.sourcePage ?? null,
-        status: 'new',
-        created_at: now,
-        updated_at: now,
-      })
       .select('id, status, created_at')
-      .single();
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (existingByUserError) {
+      console.error('[creator-applications POST] Existing-by-user query failed:', existingByUserError);
+      if (isCreatorApplicationsTableMissing(existingByUserError)) {
+        return getMissingTableErrorResponse();
+      }
+      return NextResponse.json({ error: '提交失败，请稍后重试' }, { status: 500 });
+    }
+
+    let existing = existingByUser;
+
+    if (!existing) {
+      const { data: existingByEmail, error: existingByEmailError } = await admin
+        .from(TABLE_NAME)
+        .select('id, status, created_at')
+        .eq('email', input.email)
+        .is('user_id', null)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (existingByEmailError) {
+        console.error('[creator-applications POST] Existing-by-email query failed:', existingByEmailError);
+        if (isCreatorApplicationsTableMissing(existingByEmailError)) {
+          return getMissingTableErrorResponse();
+        }
+        return NextResponse.json({ error: '提交失败，请稍后重试' }, { status: 500 });
+      }
+
+      existing = existingByEmail;
+    }
+
+    const nextStatus =
+      existing && RESETTABLE_STATUSES.has(existing.status)
+        ? 'new'
+        : existing?.status ?? 'new';
+
+    const payload = {
+      user_id: user.id,
+      name: input.name,
+      email: input.email,
+      phone: input.phone ?? null,
+      wechat_id: input.wechatId ?? null,
+      xiaohongshu_handle: input.xiaohongshuHandle ?? null,
+      content_vertical: input.contentVertical ?? null,
+      wants_free: input.wantsFree,
+      wants_paid: input.wantsPaid,
+      intro: input.intro ?? null,
+      source_page: input.sourcePage ?? null,
+      status: nextStatus,
+      updated_at: now,
+    };
+
+    const { data, error } = existing
+      ? await admin
+          .from(TABLE_NAME)
+          .update(payload)
+          .eq('id', existing.id)
+          .select('id, status, created_at, updated_at')
+          .single()
+      : await admin
+          .from(TABLE_NAME)
+          .insert({
+            ...payload,
+            created_at: now,
+          })
+          .select('id, status, created_at, updated_at')
+          .single();
 
     if (error) {
-      console.error('[creator-applications POST] Insert failed:', error);
+      console.error('[creator-applications POST] Save failed:', error);
+      if (isCreatorApplicationsTableMissing(error)) {
+        return getMissingTableErrorResponse();
+      }
       return NextResponse.json({ error: '提交失败，请稍后重试' }, { status: 500 });
     }
 
@@ -94,8 +191,10 @@ export async function POST(req: NextRequest) {
         applicationId: data.id,
         status: data.status,
         createdAt: data.created_at,
+        updatedAt: data.updated_at,
+        alreadyExists: !!existing,
       },
-      { status: 201 }
+      { status: existing ? 200 : 201 }
     );
   } catch (error) {
     console.error('[creator-applications POST] Unexpected error:', error);
@@ -104,15 +203,13 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({ error: '提交失败，请稍后重试' }, { status: 500 });
   }
-}
+});
 
 export async function GET(req: NextRequest) {
   try {
-    requireCreatorAdminTokenConfigured();
-
-    const token = getAdminTokenFromRequest(req);
-    if (!isCreatorAdminTokenValid(token)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { response } = await requireAdminUser();
+    if (response) {
+      return response;
     }
 
     const { searchParams } = new URL(req.url);
@@ -147,6 +244,9 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       console.error('[creator-applications GET] Query failed:', error);
+      if (isCreatorApplicationsTableMissing(error)) {
+        return getMissingTableErrorResponse();
+      }
       return NextResponse.json({ error: '获取数据失败' }, { status: 500 });
     }
 
@@ -169,11 +269,9 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    requireCreatorAdminTokenConfigured();
-
-    const token = getAdminTokenFromRequest(req);
-    if (!isCreatorAdminTokenValid(token)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { response } = await requireAdminUser();
+    if (response) {
+      return response;
     }
 
     const body = (await req.json()) as {
@@ -195,6 +293,52 @@ export async function PATCH(req: NextRequest) {
     }
 
     const admin = createAdminSupabaseClient();
+    const { data: existing, error: existingError } = await admin
+      .from(TABLE_NAME)
+      .select('id, name, user_id, status')
+      .eq('id', id)
+      .single();
+
+    if (existingError) {
+      console.error('[creator-applications PATCH] Existing item lookup failed:', existingError);
+      if (isCreatorApplicationsTableMissing(existingError)) {
+        return getMissingTableErrorResponse();
+      }
+      return NextResponse.json({ error: '未找到对应申请' }, { status: 404 });
+    }
+
+    if (status === 'approved') {
+      if (!existing.user_id) {
+        return NextResponse.json({ error: '该申请未绑定用户账号，无法开通创作者工作台' }, { status: 400 });
+      }
+
+      const { data: creator, error: creatorLookupError } = await admin
+        .from('creators')
+        .select('id')
+        .eq('user_id', existing.user_id)
+        .limit(1)
+        .maybeSingle();
+
+      if (creatorLookupError) {
+        console.error('[creator-applications PATCH] Creator lookup failed:', creatorLookupError);
+        return NextResponse.json({ error: '开通创作者身份失败，请稍后重试' }, { status: 500 });
+      }
+
+      if (!creator) {
+        const creatorName = (existing.name || '').trim() || '新创作者';
+        const { error: creatorCreateError } = await admin
+          .from('creators')
+          .insert({
+            user_id: existing.user_id,
+            name: creatorName.slice(0, 80),
+          });
+
+        if (creatorCreateError) {
+          console.error('[creator-applications PATCH] Creator auto-provision failed:', creatorCreateError);
+          return NextResponse.json({ error: '开通创作者身份失败，请稍后重试' }, { status: 500 });
+        }
+      }
+    }
 
     const { data, error } = await admin
       .from(TABLE_NAME)
@@ -209,6 +353,9 @@ export async function PATCH(req: NextRequest) {
 
     if (error) {
       console.error('[creator-applications PATCH] Update failed:', error);
+      if (isCreatorApplicationsTableMissing(error)) {
+        return getMissingTableErrorResponse();
+      }
       return NextResponse.json({ error: '更新失败' }, { status: 500 });
     }
 

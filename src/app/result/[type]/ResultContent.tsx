@@ -10,6 +10,7 @@ import type { DimensionScore } from '@/lib/scoring';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { getXiuxianSkin } from '@/lib/xiuxian';
 import { getXiuxianLaunchOnlyTypes } from '@/lib/xiuxian-v2';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
@@ -18,6 +19,7 @@ import { UniverseProgressBar } from '@/components/UniverseProgressBar';
 import { UgcShareCTA } from '@/components/UgcShareCTA';
 import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { UniverseSwitcher } from '@/components/UniverseSwitcher';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
 import { ResultDiagnosticsPanel } from '@/components/ResultDiagnosticsPanel';
@@ -535,6 +537,15 @@ export function ResultContent({ personality, dimensionScores }: Props) {
       )}
 
       <CrossTestRecommendations currentTest="sbti" personalityName={personality.name} />
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <WtfiTheoryWiring universe="sbti" dimensionScores={dimensionScores} />
+      </section>
+
+      {/* Universe Switcher — same personality in other universes */}
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <UniverseSwitcher slug={personality.slug} currentUniverseId="standard" />
+      </section>
 
       {/* Share section */}
       <section ref={shareSectionRef} className="max-w-2xl mx-auto px-6 pb-16">

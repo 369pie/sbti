@@ -17,8 +17,8 @@ export interface Universe {
   shortName: string;
   /** Leading emoji */
   emoji: string;
-  /** Current availability */
-  status: 'live' | 'coming-soon';
+  /** Current availability. `limited` = event-window universe (see lib/limited-universe.ts) */
+  status: 'live' | 'coming-soon' | 'limited';
   /** Theme accent colour (hex) */
   accent: string;
   /** URL path for the test page (quiz directly) */
@@ -62,13 +62,26 @@ function buildUgcUniverseEntries(): Universe[] {
 
 export const UNIVERSES: Universe[] = [
   {
+    id: 'first-look',
+    name: '初见',
+    shortName: '初见',
+    emoji: '☾',
+    status: 'live',
+    accent: '#C07A8E',
+    testPath: '/test/',
+    landingPath: '/test/',
+    resultPrefix: '/test',
+    galleryTabId: undefined,
+    activeClass: 'bg-bg-elevated text-text-primary shadow-sm font-medium',
+  },
+  {
     id: 'standard',
     name: '标准版',
     shortName: '标准',
     emoji: '',
     status: 'live',
     accent: '#e8729c',
-    testPath: '/test/',
+    testPath: '/test/classic/',
     landingPath: '/',
     resultPrefix: '',
     galleryTabId: 'sbti',
@@ -81,7 +94,7 @@ export const UNIVERSES: Universe[] = [
     emoji: '🔮',
     status: 'live',
     accent: '#a855f7',
-    testPath: '/test/?skin=xiuxian',
+    testPath: '/test/classic/?skin=xiuxian',
     landingPath: '/?skin=xiuxian',
     resultPrefix: '',
     galleryTabId: 'sbti',
@@ -102,7 +115,7 @@ export const UNIVERSES: Universe[] = [
   },
   {
     id: 'banti',
-    name: '班TI',
+    name: '班TI（打工人）',
     shortName: '班TI',
     emoji: '💼',
     status: 'live',
@@ -166,6 +179,32 @@ export const UNIVERSES: Universe[] = [
     activeClass: 'bg-rose-50 text-rose-600 shadow-sm font-medium',
   },
   // ── 后续 IP 宇宙在此追加 ──
+  {
+    id: 'hogti',
+    name: '霍格沃茨TI',
+    shortName: '霍格',
+    emoji: '⚡',
+    status: 'live',
+    accent: '#3a2f6b',
+    testPath: '/hogti/test/',
+    landingPath: '/hogti/',
+    resultPrefix: '/hogti',
+    galleryTabId: 'hogti',
+    activeClass: 'bg-amber-100 text-amber-800 shadow-sm font-medium',
+  },
+  {
+    id: 'fanrenti',
+    name: '凡人TI · 修仙',
+    shortName: '凡修',
+    emoji: '🪷',
+    status: 'live',
+    accent: '#2a4d4f',
+    testPath: '/fanrenti/test/',
+    landingPath: '/fanrenti/',
+    resultPrefix: '/fanrenti',
+    galleryTabId: 'fanrenti',
+    activeClass: 'bg-teal-50 text-teal-800 shadow-sm font-medium',
+  },
   {
     id: 'delta',
     name: '三角TI',

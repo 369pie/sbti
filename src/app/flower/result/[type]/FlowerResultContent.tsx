@@ -12,6 +12,7 @@ import type { FlowerShareImageGeneratorHandle } from '@/components/FlowerShareIm
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
 import { UniverseProgressBar } from '@/components/UniverseProgressBar';
 import { UgcShareCTA } from '@/components/UgcShareCTA';
@@ -237,6 +238,10 @@ export function FlowerResultContent({ personality, dimensionScores }: Props) {
       </section>
 
       <CrossTestRecommendations currentTest="flower" personalityName={personality.name} />
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <WtfiTheoryWiring universe="flower" dimensionScores={dimensionScores} />
+      </section>
 
       {/* Share section */}
       <section className="max-w-2xl mx-auto px-6 pb-16">

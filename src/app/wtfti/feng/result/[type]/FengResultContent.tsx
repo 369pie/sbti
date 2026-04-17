@@ -2,14 +2,16 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import type { FengPersonality } from '@/lib/feng/personalities';
 import { FENG_PERSONALITIES, getFengTypeImage } from '@/lib/feng/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
+import { markCollected } from '@/lib/mysti/collection';
 import { FengShareImageGenerator } from '@/components/FengShareImageGenerator';
 import type { FengShareImageHandle } from '@/components/FengShareImageGenerator';
 import { UniverseSwitcher } from '@/components/UniverseSwitcher';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
 import { UgcShareCTA } from '@/components/UgcShareCTA';
@@ -242,6 +244,9 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
 
   const shareUrl = getSiteUrl(`/wtfti/feng/result/${p.slug}/`);
 
+  // Mark as collected for Mysti collection wall
+  useEffect(() => { markCollected('feng', p.slug); }, [p.slug]);
+
   const copyShareText = useCallback(() => {
     const text = `疯TI · 我竟然是${p.fengName}？？\n"【${p.tagline}】"\n来测测你的发疯人格 → ${shareUrl}`;
     navigator.clipboard.writeText(text);
@@ -430,6 +435,10 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
 
       {/* Visual Universe Switcher */}
       <UniverseSwitcher slug={p.slug} currentUniverseId="feng" />
+
+      <section className="max-w-2xl mx-auto px-6 pb-6">
+        <WtfiTheoryWiring universe="feng" variant="dark" dimensionScores={dimensionScores} />
+      </section>
 
       {/* 发疯一击 - premium card */}
       <section className="max-w-2xl mx-auto px-6 pb-6">

@@ -9,12 +9,94 @@ import type { MystiTheme, MystiShareImageGeneratorHandle } from '@/lib/mysti/typ
 import { getMystiTarotData } from '@/lib/mysti/tarot-mapping';
 import { getDualInterpretation } from '@/lib/mysti/dual-interpretation';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
+import {
+  SHARE_CARD_TIERS,
+  SHARE_CARD_TIER_LABEL,
+  type ShareCardTier,
+} from '@/lib/share-card-tiers';
+import { isUnlocked, SKU_PRICES, type MystiSku } from '@/lib/mysti/unlock';
 
 const CARD_WIDTH = 540;
 const MAX_H = 4000;
 const CARD_SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_SERIF = 'Georgia, "Songti SC", "SimSun", serif';
+
+/**
+ * 给一张已经渲染好的卡片 dataUrl 套上 L3 档位的视觉装饰：
+ *   - plus    : 烫金双线内框 + PLUS · MYSTI 顶部小标 + 遮去站点水印行
+ *   - atelier : 双层金箔外框 + N° 编号印戳 + 衬线"ATELIER"题头 + 遮水印
+ *
+ * 不会重新跑底层 canvas 渲染，只在结果像素上做 paint-over，保持非破坏性。
+ */
+async function applyTierOverlay(
+  baseDataUrl: string,
+  tier: 'plus' | 'atelier',
+  bgColor: string,
+): Promise<string> {
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error('overlay base image load failed'));
+    img.src = baseDataUrl;
+  });
+  const c = document.createElement('canvas');
+  c.width = img.width;
+  c.height = img.height;
+  const ctx = c.getContext('2d');
+  if (!ctx) throw new Error('overlay canvas ctx unavailable');
+  ctx.drawImage(img, 0, 0);
+
+  // 1. 抹掉底部最后 ~5% 的水印条
+  const watermarkH = Math.round(img.height * 0.05);
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, img.height - watermarkH, img.width, watermarkH);
+
+  // 2. 内描边
+  const isAtelier = tier === 'atelier';
+  const inset = isAtelier ? 22 : 14;
+  const goldOuter = '#C9A86C';
+  const goldInner = '#E5C98A';
+  ctx.strokeStyle = goldOuter;
+  ctx.lineWidth = isAtelier ? 4 : 2.5;
+  ctx.strokeRect(inset, inset, img.width - inset * 2, img.height - inset * 2);
+  if (isAtelier) {
+    ctx.strokeStyle = goldInner;
+    ctx.lineWidth = 1;
+    const inset2 = inset + 6;
+    ctx.strokeRect(inset2, inset2, img.width - inset2 * 2, img.height - inset2 * 2);
+  }
+
+  // 3. 顶部 ribbon / 题头
+  ctx.textBaseline = 'middle';
+  if (isAtelier) {
+    ctx.font = `italic 600 ${Math.round(img.width * 0.034)}px Fraunces, "Cormorant Garamond", Georgia, serif`;
+    ctx.fillStyle = goldInner;
+    ctx.textAlign = 'center';
+    ctx.fillText('— N° ATELIER · MYSTI —', img.width / 2, inset + 30);
+  } else {
+    ctx.font = `600 ${Math.round(img.width * 0.026)}px ${FONT_SANS}`;
+    ctx.fillStyle = goldOuter;
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '0.32em';
+    ctx.fillText('PLUS · MYSTI', img.width / 2, inset + 22);
+  }
+
+  // 4. 底部 tier 自定义水印
+  ctx.font = `${Math.round(img.width * 0.022)}px ${FONT_SERIF}`;
+  ctx.fillStyle = isAtelier ? goldInner : goldOuter;
+  ctx.textAlign = 'center';
+  const footY = img.height - inset - 18;
+  if (isAtelier) {
+    const numero = `N° ${(Math.floor(Math.random() * 8888) + 1).toString().padStart(4, '0')} · MYSTI ATELIER`;
+    ctx.fillText(numero, img.width / 2, footY);
+  } else {
+    ctx.fillText('MYSTI · PLUS EDITION', img.width / 2, footY);
+  }
+
+  return c.toDataURL('image/png');
+}
 
 function isMobile() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -686,22 +768,66 @@ interface Props {
   personality: WtftiPersonality;
   partner?: WtftiPersonality;
   themeId?: MystiTheme['id'];
+  /** L3 分享卡档位；free=奇迹奇迹奥 plus=烫金精修 atelier=N° 藏品 */
+  defaultTier?: ShareCardTier;
+  /** 是否允许用户切换档位（默认 true） */
+  allowTierSwitch?: boolean;
 }
 
+const TIER_TO_SKU: Record<Exclude<ShareCardTier, 'free'>, MystiSku> = {
+  plus: 'share-plus',
+  atelier: 'share-atelier',
+};
+
 export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandle, Props>(
-  function MystiShareImageGenerator({ personality, partner, themeId = 'celestial' }, ref) {
+  function MystiShareImageGenerator(
+    { personality, partner, themeId = 'celestial', defaultTier = 'free', allowTierSwitch = true },
+    ref,
+  ) {
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const [tier, setTier] = useState<ShareCardTier>(defaultTier);
 
     const theme = MYSTI_THEMES[themeId];
+    const tierTokens = SHARE_CARD_TIERS[tier];
+    const resourceId = partner ? `${personality.slug}-${partner.slug}` : personality.slug;
+
+    const tierUnlocked = useCallback(
+      (t: ShareCardTier) => t === 'free' || isUnlocked(TIER_TO_SKU[t as 'plus' | 'atelier'], resourceId),
+      [resourceId],
+    );
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      // Gating: 付费档位未解锁 → 直接调起支付（同 MystiPaywall 流程）
+      if (tier !== 'free' && !tierUnlocked(tier)) {
+        const sku = TIER_TO_SKU[tier as 'plus' | 'atelier'];
+        trackMystiEvent('mysti_share_tier_unlock_click', { tier, sku, resourceId });
+        try {
+          setGenerating(true);
+          const res = await fetch('/api/mysti/payment/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sku, resourceId, paymentType: 'wxpay' }),
+          });
+          const data = (await res.json()) as { url?: string; error?: string };
+          if (data.url && typeof window !== 'undefined') {
+            window.location.href = data.url;
+            return;
+          }
+          setSaveHint(data.error || '支付下单失败，请稍后再试。');
+        } catch (e) {
+          setSaveHint(`支付下单失败：${String(e)}`);
+        } finally {
+          setGenerating(false);
+        }
+        return;
+      }
       setGenerating(true);
       setSaveHint(null);
       const isDual = !!partner;
-      trackMystiEvent('mysti_share_generate', { isDual, personality: personality.slug, partner: partner?.slug });
+      trackMystiEvent('mysti_share_generate', { isDual, personality: personality.slug, partner: partner?.slug, tier });
       try {
         // Compute reading for single mode
         const readingText = !partner ? (getMystiTarotData(personality.slug)?.reading) : undefined;
@@ -718,24 +844,26 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
           }
         }
         const dataUrl = await renderMystiShareImage(personality, partner, themeId, readingText, bondTaglineText, dynamicsText);
-        setPreviewUrl(dataUrl);
+        const finalUrl = tier === 'free' ? dataUrl : await applyTierOverlay(dataUrl, tier, theme.bg);
+        setPreviewUrl(finalUrl);
       } catch (e) {
         console.error('Mysti share image generation failed:', e);
       } finally {
         setGenerating(false);
       }
-    }, [generating, personality, partner, themeId]);
+    }, [generating, personality, partner, themeId, tier, tierUnlocked, resourceId, theme.bg]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
       const code = partner ? `${personality.code}-${partner.code}` : personality.code;
-      return new File([blob], `Mysti-${code}.png`, { type: 'image/png' });
-    }, [personality.code, partner, previewUrl]);
+      const tierSuffix = tier === 'free' ? '' : `-${tier}`;
+      return new File([blob], `Mysti-${code}${tierSuffix}.png`, { type: 'image/png' });
+    }, [personality.code, partner, previewUrl, tier]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
-      trackMystiEvent('mysti_share_download', { personality: personality.slug, partner: partner?.slug });
+      trackMystiEvent('mysti_share_download', { personality: personality.slug, partner: partner?.slug, tier });
       if (isMobile()) {
         try {
           const file = await createPreviewFile();
@@ -752,10 +880,11 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
       }
       const link = document.createElement('a');
       const code = partner ? `${personality.code}-${partner.code}` : personality.code;
-      link.download = `Mysti-${code}.png`;
+      const tierSuffix = tier === 'free' ? '' : `-${tier}`;
+      link.download = `Mysti-${code}${tierSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, personality.code, partner, previewUrl]);
+    }, [createPreviewFile, personality.code, partner, previewUrl, tier]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -779,6 +908,43 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
 
     return (
       <div>
+        {allowTierSwitch && (
+          <div className="mb-3 grid grid-cols-3 gap-2">
+            {(['free', 'plus', 'atelier'] as const).map(t => {
+              const active = tier === t;
+              const unlocked = tierUnlocked(t);
+              const label = SHARE_CARD_TIER_LABEL[t];
+              const sku = t === 'free' ? null : TIER_TO_SKU[t];
+              const price = sku ? SKU_PRICES[sku].price : 0;
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setTier(t)}
+                  className={[
+                    'rounded-xl border px-2 py-2 text-left transition-all cursor-pointer',
+                    active
+                      ? 'border-white/60 bg-white/15 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.45)]'
+                      : 'border-white/15 bg-white/5 hover:border-white/35 hover:bg-white/10',
+                  ].join(' ')}
+                >
+                  <div className="flex items-center gap-1 text-[11px] font-medium text-white">
+                    {t !== 'free' && !unlocked && <span aria-hidden>🔒</span>}
+                    {label.name}
+                  </div>
+                  <div className="mt-0.5 text-[10px] leading-tight text-white/55 line-clamp-1">
+                    {label.tagline}
+                  </div>
+                  {t !== 'free' && (
+                    <div className={`mt-1 text-[10px] font-semibold ${unlocked ? 'text-emerald-300' : 'text-amber-300'}`}>
+                      {unlocked ? '已解锁' : `¥${price.toFixed(1)}`}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
         <button
           onClick={handleGenerate}
           disabled={generating}
@@ -790,12 +956,19 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
               <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               生成中…
             </>
+          ) : tier !== 'free' && !tierUnlocked(tier) ? (
+            <>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              {SHARE_CARD_TIER_LABEL[tier].cta} · ¥{SKU_PRICES[TIER_TO_SKU[tier as 'plus' | 'atelier']].price.toFixed(1)}
+            </>
           ) : (
             <>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              📸 生成灵鉴卡牌
+              {tier === 'free' ? '📸 生成灵鉴卡牌' : `📸 生成 ${SHARE_CARD_TIER_LABEL[tier].name} 卡`}
             </>
           )}
         </button>
@@ -819,7 +992,7 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
                 </svg>
               </button>
 
-              <div className="rounded-2xl overflow-hidden shadow-2xl mb-4">
+              <div className={`rounded-2xl overflow-hidden shadow-2xl mb-4 ${tierTokens.containerClass}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={previewUrl} alt="灵鉴分享卡片" className="w-full" />
               </div>

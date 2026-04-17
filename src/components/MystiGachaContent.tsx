@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ASSET_SYNC_EVENT } from '@/lib/assets/asset-contract';
 import { MYSTI_THEMES } from '@/lib/mysti/themes';
 import type { MystiTheme } from '@/lib/mysti/types';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
@@ -60,24 +61,27 @@ export function MystiGachaContent() {
   const shareRef = useRef<{ generate: () => void }>(null);
 
   useEffect(() => {
-    setMounted(true);
-
-    // Check if already drawn today
-    if (hasDrawnToday()) {
-      const existing = getTodayDrawResult();
-      if (existing) {
-        setGachaResult(existing);
-        setIsFlipped(true);
-        setShowGlow(true);
+    const refreshLocalState = () => {
+      if (hasDrawnToday()) {
+        const existing = getTodayDrawResult();
+        if (existing) {
+          setGachaResult(existing);
+          setIsFlipped(true);
+          setShowGlow(true);
+        }
       }
-    }
 
-    // Load collection stats
-    setCollectionCount(getCollectionCount());
-    setCollectionTotal(getCollectionTotal());
-    setRarityDist(getRarityDistribution());
+      setCollectionCount(getCollectionCount());
+      setCollectionTotal(getCollectionTotal());
+      setRarityDist(getRarityDistribution());
+    };
+
+    setMounted(true);
+    refreshLocalState();
+    window.addEventListener(ASSET_SYNC_EVENT, refreshLocalState);
 
     trackMystiEvent('mysti_gacha_view');
+    return () => window.removeEventListener(ASSET_SYNC_EVENT, refreshLocalState);
   }, []);
 
   // Countdown timer

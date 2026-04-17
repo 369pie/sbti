@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 import { toQrDataUrl } from '@/lib/qr-code';
 import type { PersonalityType } from '@/lib/personalities';
 import { getTypeImage, getXiuxianTypeImage, getRarity } from '@/lib/personalities';
@@ -506,30 +507,36 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({
+      resourceId: `${isXiuxian ? 'xiuxian' : 'sbti'}:${personality.code}`,
+      universe: isXiuxian ? 'xiuxian' : 'sbti',
+    });
     const shareDisplayName = isXiuxian
       ? (getXiuxianSkin(personality.slug)?.displayName ?? personality.name)
       : personality.name;
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
 
       try {
         const dataUrl = await renderShareImage(personality, dimensionScores, isXiuxian);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'SBTI');
+        setPreviewUrl(finalUrl);
       } catch (err) {
         console.error('Failed to generate share image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [dimensionScores, generating, isXiuxian, personality]);
+    }, [dimensionScores, generating, isXiuxian, personality, tierCtl]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `SBTI-${personality.code}.png`, { type: 'image/png' });
-    }, [personality.code, previewUrl]);
+      return new File([blob], `SBTI-${personality.code}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -560,10 +567,10 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
       }
 
       const link = document.createElement('a');
-      link.download = `SBTI-${personality.code}.png`;
+      link.download = `SBTI-${personality.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, personality.code, previewUrl]);
+    }, [createPreviewFile, personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -586,6 +593,13 @@ export const ShareImageGenerator = forwardRef<ShareImageGeneratorHandle, Props>(
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}

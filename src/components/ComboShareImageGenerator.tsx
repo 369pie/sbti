@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 import { getTypeImage } from '@/lib/personalities';
 import type { ComboResult } from '@/lib/combo';
 import { getComboPersonalityImage } from '@/lib/combo';
@@ -396,6 +397,7 @@ export const ComboShareImageGenerator = forwardRef<ComboShareImageGeneratorHandl
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({ resourceId: 'combo:share', universe: 'combo' });
 
     const prepareAssets = useCallback(async () => {
       await Promise.all([
@@ -411,23 +413,25 @@ export const ComboShareImageGenerator = forwardRef<ComboShareImageGeneratorHandl
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const dataUrl = await renderComboShareImage(result);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'COMBO');
+        setPreviewUrl(finalUrl);
       } catch (err) {
         console.error('Failed to generate combo share image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [generating, result]);
+    }, [generating, result, tierCtl]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `SBTI-Combo-${result.personality.code}.png`, { type: 'image/png' });
-    }, [previewUrl, result.personality.code]);
+      return new File([blob], `SBTI-Combo-${result.personality.code}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [previewUrl, result.personality.code, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -450,10 +454,10 @@ export const ComboShareImageGenerator = forwardRef<ComboShareImageGeneratorHandl
         return;
       }
       const link = document.createElement('a');
-      link.download = `SBTI-Combo-${result.personality.code}.png`;
+      link.download = `SBTI-Combo-${result.personality.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, previewUrl, result.personality.code]);
+    }, [createPreviewFile, previewUrl, result.personality.code, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -475,6 +479,13 @@ export const ComboShareImageGenerator = forwardRef<ComboShareImageGeneratorHandl
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}

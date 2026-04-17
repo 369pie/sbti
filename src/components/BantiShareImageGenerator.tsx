@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useImperativeHandle, useState, forwardRef } from 'react';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 import { toQrDataUrl } from '@/lib/qr-code';
 import type { BantiPersonality } from '@/lib/banti/personalities';
 import type { DimensionScore } from '@/lib/scoring';
@@ -336,6 +337,7 @@ export const BantiShareImageGenerator = forwardRef<BantiShareImageHandle, Props>
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({ resourceId: `banti:${personality.code}`, universe: 'banti' });
 
     const prepareAssets = useCallback(async () => {
       await Promise.all([
@@ -350,23 +352,25 @@ export const BantiShareImageGenerator = forwardRef<BantiShareImageHandle, Props>
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const dataUrl = await renderBantiShareImage(personality, imageUrl);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'BANTI');
+        setPreviewUrl(finalUrl);
       } catch (err) {
         console.error('Failed to generate BanTI share image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [generating, imageUrl, personality]);
+    }, [generating, imageUrl, personality, tierCtl]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `BanTI-${personality.code}.png`, { type: 'image/png' });
-    }, [personality.code, previewUrl]);
+      return new File([blob], `BanTI-${personality.code}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -389,10 +393,10 @@ export const BantiShareImageGenerator = forwardRef<BantiShareImageHandle, Props>
         return;
       }
       const link = document.createElement('a');
-      link.download = `BanTI-${personality.code}.png`;
+      link.download = `BanTI-${personality.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, personality.code, previewUrl]);
+    }, [createPreviewFile, personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -412,6 +416,13 @@ export const BantiShareImageGenerator = forwardRef<BantiShareImageHandle, Props>
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}

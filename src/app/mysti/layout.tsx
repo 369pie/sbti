@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
+import { MystiThemeProvider } from '@/components/MystiThemeProvider';
+import { MystiThemeToggle } from '@/components/MystiThemeToggle';
+import { getAutoTimeTheme } from '@/lib/mysti/themes-v2';
 
 export const metadata: Metadata = {
   title: 'WTFTI 灵鉴 — 用塔罗重新翻译你的人格',
@@ -23,5 +26,10 @@ export const metadata: Metadata = {
 };
 
 export default function MystiLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <MystiThemeProvider defaultTheme={getAutoTimeTheme()}>
+      {children}
+      <MystiThemeToggle />
+    </MystiThemeProvider>
+  );
 }

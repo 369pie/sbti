@@ -86,7 +86,7 @@ export function getSoultiTypeThumbnailImage(slug: string): string {
 }
 
 export function getSoultiTypeMediumImage(slug: string): string {
-  return withBasePath(`/images/types/soulti/medium/${slug}.webp`);
+  return withBasePath(`/images/types/soulti/medium/${slug}.png`);
 }
 
 export function getSoultiTypeEmojiFallbackImage(slug: string, size = 320): string {

@@ -2,6 +2,7 @@
 
 import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 import { SHARE_SITE_URL } from '@/lib/site';
 import { MYSTI_THEMES } from '@/lib/mysti/themes';
 import type { MystiTheme, MystiShareImageGeneratorHandle } from '@/lib/mysti/types';
@@ -305,11 +306,13 @@ export const MystiGachaShareImageGenerator = forwardRef<MystiShareImageGenerator
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({ resourceId: 'mysti-gacha:share', universe: 'mysti-gacha' });
 
     const theme = MYSTI_THEMES[themeId];
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       trackMystiEvent('mysti_gacha_share', {
@@ -319,19 +322,20 @@ export const MystiGachaShareImageGenerator = forwardRef<MystiShareImageGenerator
       });
       try {
         const dataUrl = await renderGachaShareImage(result, collectionCount, collectionTotal, themeId);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#0A0612', 'MYSTI');
+        setPreviewUrl(finalUrl);
       } catch (e) {
         console.error('Gacha share image generation failed:', e);
       } finally {
         setGenerating(false);
       }
-    }, [generating, result, collectionCount, collectionTotal, themeId]);
+    }, [generating, result, collectionCount, collectionTotal, themeId, tierCtl]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `WTFTI-每日抽卡-${result.card.personalityName}.png`, { type: 'image/png' });
-    }, [result.card.personalityName, previewUrl]);
+      return new File([blob], `WTFTI-每日抽卡-${result.card.personalityName}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [result.card.personalityName, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -350,10 +354,10 @@ export const MystiGachaShareImageGenerator = forwardRef<MystiShareImageGenerator
         return;
       }
       const link = document.createElement('a');
-      link.download = `WTFTI-每日抽卡-${result.card.personalityName}.png`;
+      link.download = `WTFTI-每日抽卡-${result.card.personalityName}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, result.card.personalityName, previewUrl]);
+    }, [createPreviewFile, result.card.personalityName, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -374,6 +378,13 @@ export const MystiGachaShareImageGenerator = forwardRef<MystiShareImageGenerator
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="dark"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}

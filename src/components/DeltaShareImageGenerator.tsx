@@ -2,6 +2,7 @@
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 import type { DeltaPersonality } from '@/lib/delta/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { SHARE_SITE_URL } from '@/lib/site';
@@ -324,6 +325,7 @@ export const DeltaShareImageGenerator = forwardRef<DeltaShareImageHandle, Props>
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({ resourceId: 'delta:share', universe: 'delta' });
 
     const prepareAssets = useCallback(async () => {
       await Promise.all([
@@ -338,24 +340,26 @@ export const DeltaShareImageGenerator = forwardRef<DeltaShareImageHandle, Props>
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
 
       try {
         const dataUrl = await renderDeltaShareImage(personality, imageUrl);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'DELTA');
+        setPreviewUrl(finalUrl);
       } catch (error) {
         console.error('Failed to generate Delta share image:', error);
       } finally {
         setGenerating(false);
       }
-    }, [generating, imageUrl, personality]);
+    }, [generating, imageUrl, personality, tierCtl]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `DeltaTI-${personality.code}.png`, { type: 'image/png' });
-    }, [personality.code, previewUrl]);
+      return new File([blob], `DeltaTI-${personality.code}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -381,10 +385,10 @@ export const DeltaShareImageGenerator = forwardRef<DeltaShareImageHandle, Props>
       }
 
       const link = document.createElement('a');
-      link.download = `DeltaTI-${personality.code}.png`;
+      link.download = `DeltaTI-${personality.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, personality.code, previewUrl]);
+    }, [createPreviewFile, personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -405,6 +409,13 @@ export const DeltaShareImageGenerator = forwardRef<DeltaShareImageHandle, Props>
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}

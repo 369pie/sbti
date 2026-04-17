@@ -10,6 +10,7 @@ import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
 import { UniverseProgressBar } from '@/components/UniverseProgressBar';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { UniverseSwitcher } from '@/components/UniverseSwitcher';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 
 interface Props {
@@ -308,6 +309,10 @@ export function UgcResultContent({ universeConfig: cfg, personality: p, dimensio
             </Link>
           </div>
         </div>
+      </section>
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <UniverseSwitcher slug={p.slug} currentUniverseId={universeId} />
       </section>
 
       <ResultClosureEngine

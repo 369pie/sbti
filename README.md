@@ -37,6 +37,8 @@ Open `http://localhost:3000` in your browser.
 - `pnpm run dev:turbo`
 - `pnpm build`
 - `pnpm lint`
+- `pnpm run ugc:smoke-seed`
+- `pnpm run ugc:share-check`
 - `pnpm run images:thumbs`
 - `pnpm run images:medium`
 - `pnpm run images:all`
@@ -69,6 +71,7 @@ Copy `.env.example` to `.env.local` and fill in:
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
 SUPABASE_SECRET_KEY=...
+ADMIN_USER_IDS=uuid1,uuid2
 ```
 
 The helpers also accept legacy fallback names:
@@ -77,3 +80,30 @@ The helpers also accept legacy fallback names:
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
 ```
+
+Before using creator application submission/admin APIs, run the shared schema in the Supabase SQL Editor:
+
+```sql
+-- use the full shared schema
+src/lib/ugc/schema.sql
+```
+
+If you are aligning an older UGC database that predates the April 2026 smoke-test fixes, apply the incremental migration first:
+
+```sql
+src/lib/ugc/migrations/2026-04-17-ugc-runtime-alignment.sql
+```
+
+If you only need the creator beta funnel table, the minimal subset is documented in:
+
+```text
+docs/05-operations/infra/creator-applications-schema.sql
+```
+
+Creator applications are now bound to authenticated users. Submit through `/creator/apply/`, then check the current status in `/me/`.
+
+## UGC Smoke Checks
+
+`pnpm run ugc:smoke-seed` refreshes the published/review universes used during creator public/admin smoke testing.
+
+`pnpm run ugc:share-check` verifies the public `/api/ugc/result` -> `/api/ugc/share` contract against a running local app, including the `pendingResult`, `updated`, and `alreadyShared` responses. The script temporarily inserts a result row and then restores the cached counters afterward.

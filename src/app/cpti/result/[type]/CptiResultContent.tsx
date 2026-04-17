@@ -24,6 +24,7 @@ import { encodeCptiInvite } from '@/lib/cpti/cpti-invite';
 import { cptiApi } from '@/lib/cpti/cpti-api';
 import { ClaimAssetCard } from '@/components/ClaimAssetCard';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 
 interface Props {
   personality: CptiPersonalityType;
@@ -262,6 +263,10 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
       </section>
 
       <CrossTestRecommendations currentTest="cpti" personalityName={personality.name} />
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <WtfiTheoryWiring universe="cpti" />
+      </section>
 
       {/* Claim Asset Card */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
@@ -547,7 +552,7 @@ function InviteAndStealthCTA({ personality }: { personality: CptiPersonalityType
       </div>
 
       {/* Pair Code CTA */}
-      <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 sm:p-8 text-center">
+      <div className="rounded-2xl border border-gold/30 bg-gold/5 p-6 sm:p-8 text-center">
         <div className="text-3xl mb-3">🔗</div>
         <h3 className="text-lg font-semibold mb-2">快速配对码</h3>
         <p className="text-sm text-text-muted mb-4">
@@ -560,11 +565,11 @@ function InviteAndStealthCTA({ personality }: { personality: CptiPersonalityType
           <button
             onClick={generatePairCode}
             disabled={isGeneratingPairCode}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-500 text-white font-medium text-sm hover:bg-amber-600 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gold text-bg-elevated font-medium text-sm hover:bg-gold-leaf transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isGeneratingPairCode ? (
               <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-bg-elevated border-t-transparent rounded-full animate-spin" />
                 生成中...
               </>
             ) : (

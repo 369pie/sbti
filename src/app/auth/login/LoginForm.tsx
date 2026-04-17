@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { finalizeClaimedSession, stageAnonymousSourceForMerge } from '@/lib/auth/claimed-session';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { signInWithPassword } from '@/lib/supabase/auth';
 import { useAuth } from '@/components/AuthProvider';
@@ -32,6 +33,8 @@ export function LoginForm() {
 
     setLoading(true);
     try {
+      await stageAnonymousSourceForMerge();
+
       const supabase = createBrowserSupabaseClient();
       const result = await signInWithPassword(supabase, login.trim(), password);
 
@@ -41,6 +44,7 @@ export function LoginForm() {
       }
 
       await refresh();
+      await finalizeClaimedSession().catch(() => null);
       router.push(redirectTo);
     } finally {
       setLoading(false);

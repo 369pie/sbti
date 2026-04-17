@@ -15,6 +15,8 @@ import { getWorkRarity, getWorkTypeImage, WORK_PERSONALITY_TYPES } from '@/lib/w
 import { getXiuxianSkin } from '@/lib/xiuxian';
 import { getXiuxianLaunchOnlyTypes } from '@/lib/xiuxian-v2';
 import { XPTI_PERSONALITY_TYPES, getXptiRarity, getXptiTypeThumbnailImage } from '@/lib/xpti/personalities';
+import { HOGTI_PERSONALITIES, getHogtiTypeThumbnailImage, getHogtiItemColor, getHogtiItemEmoji, getHogtiCharacterName } from '@/lib/hogti/personalities';
+import { FANRENTI_PERSONALITIES, getFanrentiTypeThumbnailImage, getFanrentiItemColor, getFanrentiItemEmoji, getFanrentiCharacterName } from '@/lib/fanrenti/personalities';
 
 export interface GalleryRarity {
   label: string;
@@ -162,6 +164,28 @@ function buildIpTabs(): GalleryTab[] {
     href: `/wtfti/delta/result/${personality.slug}/`,
   }));
 
+  const hogtiItems: GalleryItem[] = HOGTI_PERSONALITIES.map((personality) => ({
+    slug: personality.slug,
+    code: personality.number,
+    name: getHogtiCharacterName(personality.slug),
+    tagline: personality.tagline,
+    color: getHogtiItemColor(personality.slug),
+    emoji: getHogtiItemEmoji(personality.slug),
+    image: getHogtiTypeThumbnailImage(personality.slug),
+    href: `/hogti/result/${personality.slug}/`,
+  }));
+
+  const fanrentiItems: GalleryItem[] = FANRENTI_PERSONALITIES.map((personality) => ({
+    slug: personality.slug,
+    code: personality.number,
+    name: getFanrentiCharacterName(personality.slug),
+    tagline: personality.tagline,
+    color: getFanrentiItemColor(personality.slug),
+    emoji: getFanrentiItemEmoji(personality.slug),
+    image: getFanrentiTypeThumbnailImage(personality.slug),
+    href: `/fanrenti/result/${personality.slug}/`,
+  }));
+
   return [
     {
       id: 'wtfti',
@@ -207,6 +231,24 @@ function buildIpTabs(): GalleryTab[] {
       testHref: '/wtfti/delta/test/',
       description: `同一套 15 维度模型，翻译成三角洲行动战区语境：${deltaItems.length} 张干员人格图鉴卡，你在战场上是哪种兵。`,
       items: deltaItems,
+    },
+    {
+      id: 'hogti',
+      label: '霍格沃茨TI',
+      emoji: '⚡',
+      accent: '#3a2f6b',
+      testHref: '/hogti/test/',
+      description: `霍格沃茨分院帽已就绪——${hogtiItems.length} 种人格对应 HP 正典角色，你是哪一位？`,
+      items: hogtiItems,
+    },
+    {
+      id: 'fanrenti',
+      label: '凡人TI · 修仙',
+      emoji: '🪷',
+      accent: '#2a4d4f',
+      testHref: '/fanrenti/test/',
+      description: `道心鉴定中——${fanrentiItems.length} 种凡人修仙传角色，测你的修仙人格。`,
+      items: fanrentiItems,
     },
   ];
 }

@@ -7,6 +7,7 @@ import type { SoultiPersonalityType } from '@/lib/soulti/personalities';
 import { SOULTI_DIMENSIONS, SOULTI_MODEL_COLORS } from '@/lib/soulti/dimensions';
 import { SHARE_SITE_URL } from '@/lib/site';
 import type { SoultiDimensionScore } from '@/lib/soulti/scoring';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 
 export interface SoultiShareImageGeneratorHandle {
   generate: () => void;
@@ -466,26 +467,32 @@ export const SoultiShareImageGenerator = forwardRef<SoultiShareImageGeneratorHan
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({
+      resourceId: `soulti:${personality.code}`,
+      universe: 'soulti',
+    });
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const dataUrl = await renderSoultiShareImage(personality, dimensionScores);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'SOULTI');
+        setPreviewUrl(finalUrl);
       } catch (e) {
         console.error('Share image generation failed:', e);
       } finally {
         setGenerating(false);
       }
-    }, [generating, personality, dimensionScores]);
+    }, [generating, personality, dimensionScores, tierCtl]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `soulti-${personality.code}.png`, { type: 'image/png' });
-    }, [personality.code, previewUrl]);
+      return new File([blob], `soulti-${personality.code}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -504,10 +511,10 @@ export const SoultiShareImageGenerator = forwardRef<SoultiShareImageGeneratorHan
         return;
       }
       const link = document.createElement('a');
-      link.download = `soulti-${personality.code}.png`;
+      link.download = `soulti-${personality.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, personality.code, previewUrl]);
+    }, [createPreviewFile, personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -527,6 +534,13 @@ export const SoultiShareImageGenerator = forwardRef<SoultiShareImageGeneratorHan
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}
@@ -574,7 +588,7 @@ export const SoultiShareImageGenerator = forwardRef<SoultiShareImageGeneratorHan
                 className="w-full max-w-sm mx-auto animate-in fade-in zoom-in-95 duration-200"
                 onClick={e => e.stopPropagation()}
               >
-                <div className="rounded-2xl overflow-hidden shadow-2xl">
+                <div className={`rounded-2xl overflow-hidden shadow-2xl ${tierCtl.tierTokens.containerClass}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={previewUrl} alt="分享图片" className="w-full" />
                 </div>

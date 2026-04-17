@@ -213,10 +213,10 @@ export default function CreatorPage() {
               立即申请内测
             </Link>
             <Link
-              href="/creator/applications/"
+              href="/me/"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border-subtle text-text-secondary hover:text-text-primary hover:border-border transition-colors"
             >
-              管理后台入口
+              查看我的申请进度
             </Link>
           </div>
         </div>

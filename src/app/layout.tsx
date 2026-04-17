@@ -2,11 +2,52 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import Link from "next/link";
 import Script from "next/script";
+import { Noto_Serif_SC, Noto_Sans_SC, Cormorant_Garamond, Fraunces, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
 import { AuthProvider } from "@/components/AuthProvider";
 import { FollowMeInline } from '@/components/FollowMeLinks';
 import { getLegacyRedirectScript, getSiteLabel, getSiteOrigin, getSiteUrl, isLegacyPagesBuild } from "@/lib/site";
+
+// ─── Typography system v3: Editorial Feminine ──────────────────────────────
+const notoSerifSC = Noto_Serif_SC({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-serif-sc",
+  preload: false,
+});
+
+const notoSansSC = Noto_Sans_SC({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-sans-sc",
+  preload: false,
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-cormorant",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-fraunces",
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
+  variable: "--font-mono-ui",
+});
 
 export const metadata: Metadata = {
   metadataBase: getSiteOrigin() ? new URL(getSiteOrigin()) : undefined,
@@ -73,10 +114,9 @@ export default function RootLayout({
     <html
       lang="zh-CN"
       data-scroll-behavior="smooth"
-      className="h-full antialiased"
+      className={`${notoSerifSC.variable} ${notoSansSC.variable} ${cormorant.variable} ${fraunces.variable} ${jetbrains.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <AuthProvider>
+      <body className="min-h-full flex flex-col paper-texture">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -126,26 +166,27 @@ export default function RootLayout({
             </div>
           </noscript>
         )}
-        <Navigation />
-        <main className="flex-1">{children}</main>
-        <footer className="border-t border-border-subtle py-8 px-6 text-center text-text-muted text-sm">
-          <div className="max-w-5xl mx-auto">
-            <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
-              <Link href="/card/" prefetch={false} className="hover:text-text-primary transition-colors">我的 WTF Card</Link>
-              <Link href="/types/" prefetch={false} className="hover:text-text-primary transition-colors">人设图鉴</Link>
-              <Link href="/guide/" prefetch={false} className="hover:text-text-primary transition-colors">测试说明</Link>
-              <Link href="/about/" prefetch={false} className="hover:text-text-primary transition-colors">关于测试</Link>
-              <Link href="/creator/" prefetch={false} className="hover:text-text-primary transition-colors">创作者中心</Link>
-              <Link href="/contact/" prefetch={false} className="hover:text-text-primary transition-colors">联系与社群</Link>
-              <Link href="/privacy/" prefetch={false} className="hover:text-text-primary transition-colors">隐私说明</Link>
-              <Link href="/terms/" prefetch={false} className="hover:text-text-primary transition-colors">使用条款</Link>
+        <AuthProvider>
+          <Navigation />
+          <main className="flex-1">{children}</main>
+          <footer className="border-t border-border-subtle py-8 px-6 text-center text-text-muted text-sm">
+            <div className="max-w-5xl mx-auto">
+              <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
+                <Link href="/card/" prefetch={false} className="hover:text-text-primary transition-colors">我的 WTF Card</Link>
+                <Link href="/types/" prefetch={false} className="hover:text-text-primary transition-colors">人设图鉴</Link>
+                <Link href="/guide/" prefetch={false} className="hover:text-text-primary transition-colors">测试说明</Link>
+                <Link href="/about/" prefetch={false} className="hover:text-text-primary transition-colors">关于测试</Link>
+                <Link href="/creator/" prefetch={false} className="hover:text-text-primary transition-colors">创作者中心</Link>
+                <Link href="/contact/" prefetch={false} className="hover:text-text-primary transition-colors">联系与社群</Link>
+                <Link href="/privacy/" prefetch={false} className="hover:text-text-primary transition-colors">隐私说明</Link>
+                <Link href="/terms/" prefetch={false} className="hover:text-text-primary transition-colors">使用条款</Link>
+              </div>
+              <FollowMeInline />
+              <p>WTFTI 更适合拿来娱乐和自我观察，不适合作为严肃的心理诊断结果。</p>
+              <p className="mt-2 opacity-60">What&apos;s The F* Type Inside</p>
+              <p className="mt-2 opacity-50">SBTI 主题原创作者：B站 @Q肉儿串儿、如有侵权请联系</p>
             </div>
-            <FollowMeInline />
-            <p>WTFTI 更适合拿来娱乐和自我观察，不适合作为严肃的心理诊断结果。</p>
-            <p className="mt-2 opacity-60">What&apos;s The F* Type Inside</p>
-            <p className="mt-2 opacity-50">SBTI 主题原创作者：B站 @Q肉儿串儿、如有侵权请联系</p>
-          </div>
-        </footer>
+          </footer>
         </AuthProvider>
         <Analytics />
       </body>

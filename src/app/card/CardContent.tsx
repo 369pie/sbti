@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from '@/components/AuthProvider';
+import { ASSET_SYNC_EVENT, type AssetSummary, type AssetSyncEventDetail } from '@/lib/assets/asset-contract';
+import { getApiPath, readApiJson } from '@/lib/api';
 import type { SoultiLayeredResult } from '@/lib/soulti/scoring';
 import { getAllCollected, getCollectionCount } from '@/lib/mysti/collection';
 import {
@@ -28,8 +30,98 @@ import {
   type CptiRelationshipType,
 } from '@/lib/cpti/relationships';
 import { cptiApi } from '@/lib/cpti/cpti-api';
+import { getGachaRarityStyle } from '@/lib/gacha';
+import { PersonaShardOrb } from '@/components/PersonaShardOrb';
+import { useShardState, recordCardVisit } from '@/lib/persona-shard';
+
+interface CardAssetsResponse {
+  assets?: {
+    'wtf-card'?: WtfCardData | null;
+  };
+  summary?: {
+    wtfCard?: AssetSummary['wtfCard'];
+  };
+}
+
+// Deterministic per-slug rarity — same hash as gacha.slugRarity so badges
+// match anywhere (E-07 per-card rarity badge).
+function cardRarity(slug: string): 'S' | 'A' | 'B' | 'C' | 'D' {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) hash = (hash * 31 + slug.charCodeAt(i)) & 0xffffffff;
+  const bucket = Math.abs(hash) % 100;
+  if (bucket < 1) return 'S';
+  if (bucket < 5) return 'A';
+  if (bucket < 20) return 'B';
+  if (bucket < 55) return 'C';
+  return 'D';
+}
 
 // ─── Badge component ─────────────────────────────────────
+
+// ─── Shard preview row (added 2026-04-17) ───────────────────────────────────
+
+function ShardPreviewRow({ card }: { card: WtfCardData }) {
+  const firstLit = useMemo(() => {
+    for (const uid of CARD_UNIVERSE_IDS) {
+      const r = card.results[uid];
+      if (r?.slug) return { uid, slug: r.slug };
+    }
+    return null;
+  }, [card]);
+
+  useEffect(() => {
+    recordCardVisit();
+  }, []);
+
+  if (!firstLit) return null;
+  return <ShardPreviewInner uid={firstLit.uid} slug={firstLit.slug} />;
+}
+
+function ShardPreviewInner({ uid, slug }: { uid: string; slug: string }) {
+  const universe = getUniverse(uid);
+  const resolved = resolvePersonality(uid, slug);
+  const accent = universe?.accent ?? '#888';
+  const symbol = resolved?.emoji ?? universe?.emoji ?? '✦';
+  const shardState = useShardState(uid, slug);
+
+  if (!universe) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.15, duration: 0.4 }}
+      className="mb-6 rounded-3xl border border-border-subtle bg-bg-secondary/30 px-5 py-6"
+    >
+      <div className="flex flex-col sm:flex-row items-center gap-5">
+        <div className="shrink-0">
+          <PersonaShardOrb state={shardState} accent={accent} symbol={symbol} size={120} showLineInitially={false} />
+        </div>
+        <div className="flex-1 text-center sm:text-left">
+          <p className="text-[11px] font-mono tracking-[0.28em] uppercase text-text-muted mb-1">
+            Persona Shard · {universe.shortName}
+          </p>
+          <p className="text-sm font-semibold mb-1" style={{ color: accent }}>
+            {resolved?.name ?? slug}
+          </p>
+          <p className="text-xs text-text-muted leading-relaxed mb-3">
+            你的多宇宙人格开始有生命了——每枚碎片会根据你的行为改变心绪、苏醒、共鸣。
+          </p>
+          <Link
+            href={`/card/shard/?universe=${encodeURIComponent(uid)}&slug=${encodeURIComponent(slug)}`}
+            className="inline-flex items-center gap-1 text-xs font-medium hover:underline"
+            style={{ color: accent }}
+          >
+            进入碎片档案
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 function UniverseBadge({
   universeId,
@@ -84,6 +176,19 @@ function UniverseBadge({
           <div className="text-xs font-medium text-text-primary mt-0.5 leading-tight">
             {resolved.name}
           </div>
+          {/* Per-card rarity badge (E-07) */}
+          {slug && (() => {
+            const rarity = cardRarity(slug);
+            const style = getGachaRarityStyle(rarity);
+            return (
+              <span
+                className="absolute top-1.5 right-1.5 text-[9px] font-mono px-1.5 py-0.5 rounded-full"
+                style={{ color: style.color, background: style.glow, border: `1px solid ${style.color}40` }}
+              >
+                {rarity}
+              </span>
+            );
+          })()}
         </Link>
       ) : (
         <Link
@@ -701,17 +806,45 @@ export function CardContent() {
   const theirEncoded = searchParams.get('c');
   const { isAuthenticated, displayName } = useAuth();
 
-  const [card, setCard] = useState<WtfCardData | null>(() => (
-    typeof window === 'undefined' ? null : getOrCreateCard()
-  ));
+  const [card, setCard] = useState<WtfCardData | null>(null);
   const [backendSynced, setBackendSynced] = useState(false);
+  const [remoteCardSummary, setRemoteCardSummary] = useState<AssetSummary['wtfCard'] | null>(null);
   const [syncedSlugs, setSyncedSlugs] = useState<Set<string>>(new Set());
   const [cardTab, setCardTab] = useState<'universe' | 'relationship' | 'appraisal'>('universe');
-  const [pinnedIds, setPinnedIds] = useState<string[]>(() => {
-    if (typeof window === 'undefined') return [];
-    const c = loadCard();
-    return c?.pinnedUniverses ?? [];
-  });
+  const [pinnedIds, setPinnedIds] = useState<string[]>([]);
+
+  const hydrateLocalCard = useCallback(() => {
+    const nextCard = getOrCreateCard();
+    setCard(nextCard);
+    setPinnedIds(nextCard.pinnedUniverses ?? []);
+  }, []);
+
+  useEffect(() => {
+    hydrateLocalCard();
+  }, [hydrateLocalCard]);
+
+  useEffect(() => {
+    const refreshCard = (event?: Event) => {
+      const nextCard = loadCard();
+      if (nextCard) {
+        setCard(nextCard);
+        setPinnedIds(nextCard.pinnedUniverses ?? []);
+      } else {
+        hydrateLocalCard();
+      }
+
+      const detail = event instanceof CustomEvent
+        ? (event.detail as AssetSyncEventDetail | undefined)
+        : undefined;
+      if (detail?.summary?.wtfCard) {
+        setRemoteCardSummary(detail.summary.wtfCard);
+        setBackendSynced(true);
+      }
+    };
+
+    window.addEventListener(ASSET_SYNC_EVENT, refreshCard);
+    return () => window.removeEventListener(ASSET_SYNC_EVENT, refreshCard);
+  }, [hydrateLocalCard]);
 
   // Sync auth nickname to WTF Card when logged in and card nickname is empty
   useEffect(() => {
@@ -733,18 +866,41 @@ export function CardContent() {
     return decodeCardData(theirEncoded);
   }, [theirEncoded]);
 
-  // Fetch backend collection on mount (fire-and-forget)
+  // Fetch backend truth on mount (fire-and-forget)
   useEffect(() => {
     let cancelled = false;
-    cptiApi.getCollection()
-      .then((data) => {
+    Promise.all([
+      cptiApi.getCollection().catch(() => null),
+      fetch(getApiPath('/assets/me'), {
+        credentials: 'include',
+        headers: { Accept: 'application/json' },
+      }).then((response) => {
+        if (!response.ok) return null;
+        return readApiJson<CardAssetsResponse>(response);
+      }).catch(() => null),
+    ])
+      .then(([collectionData, assetData]) => {
         if (cancelled) return;
-        const recentRelationships = data?.recentRelationships ?? [];
+
+        const recentRelationships = collectionData?.recentRelationships ?? [];
         const slugs = new Set<string>(
           recentRelationships.map((r) => r.slug).filter(Boolean)
         );
         setSyncedSlugs(slugs);
-        setBackendSynced(true);
+
+        const remoteCard = assetData?.assets?.['wtf-card'] ?? null;
+        if (remoteCard) {
+          setCard(remoteCard);
+          setPinnedIds(remoteCard.pinnedUniverses ?? []);
+        }
+
+        if (assetData?.summary?.wtfCard) {
+          setRemoteCardSummary(assetData.summary.wtfCard);
+        }
+
+        if (collectionData || assetData?.summary?.wtfCard) {
+          setBackendSynced(true);
+        }
       })
       .catch(() => {
         // Backend unavailable — stay in local-only mode
@@ -778,8 +934,10 @@ export function CardContent() {
     );
   }
 
-  const litCount = getLitCount(card);
-  const totalCount = getTotalCount();
+  const localLitCount = getLitCount(card);
+  const localTotalCount = getTotalCount();
+  const litCount = remoteCardSummary?.lit ?? localLitCount;
+  const totalCount = remoteCardSummary?.total ?? localTotalCount;
 
   // Merge backend relationships with local: backend supplements, prefers backend for duplicates
   const mergedRelationships = (() => {
@@ -926,6 +1084,9 @@ export function CardContent() {
       {/* Tab content */}
       {cardTab === 'universe' && (
         <>
+          {/* Shard intro (first lit universe becomes preview) */}
+          <ShardPreviewRow card={card} />
+
           {/* Badge grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
             {CARD_UNIVERSE_IDS.map((uid, i) => (

@@ -1,8 +1,10 @@
 -- Creator applications table for WTFTI creator beta funnel.
 -- Run this in Supabase SQL editor before using /api/creator-applications.
+-- Canonical shared schema now also includes this table in src/lib/ugc/schema.sql.
 
 create table if not exists public.creator_applications (
   id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete set null,
   name text not null,
   email text not null,
   phone text,
@@ -22,6 +24,9 @@ create table if not exists public.creator_applications (
   )
 );
 
+alter table public.creator_applications
+  add column if not exists user_id uuid references auth.users(id) on delete set null;
+
 create index if not exists creator_applications_created_at_idx
   on public.creator_applications (created_at desc);
 
@@ -33,6 +38,10 @@ create index if not exists creator_applications_email_idx
 
 create index if not exists creator_applications_wechat_idx
   on public.creator_applications (wechat_id);
+
+create unique index if not exists creator_applications_user_id_uidx
+  on public.creator_applications (user_id)
+  where user_id is not null;
 
 -- Optional: lock down direct client access and force server-side API usage.
 alter table public.creator_applications enable row level security;

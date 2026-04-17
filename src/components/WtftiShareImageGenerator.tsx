@@ -5,6 +5,7 @@ import { toQrDataUrl } from '@/lib/qr-code';
 import type { WtftiPersonality } from '@/lib/wtfti-personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { SHARE_SITE_URL } from '@/lib/site';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 
 export interface WtftiShareImageHandle {
   generate: () => void;
@@ -391,6 +392,10 @@ export const WtftiShareImageGenerator = forwardRef<WtftiShareImageHandle, Props>
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({
+      resourceId: `wtfti:${personality.code}`,
+      universe: 'wtfti',
+    });
 
     const prepareAssets = useCallback(async () => {
       await Promise.all([
@@ -405,23 +410,26 @@ export const WtftiShareImageGenerator = forwardRef<WtftiShareImageHandle, Props>
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      // Tier gating: 收费档未解锁 → 跳起支付
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const dataUrl = await renderWtftiShareImage(personality, imageUrl);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'WTFTI');
+        setPreviewUrl(finalUrl);
       } catch (err) {
         console.error('Failed to generate WTFTI share image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [generating, imageUrl, personality]);
+    }, [generating, imageUrl, personality, tierCtl]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `WTFTI-${personality.code}.png`, { type: 'image/png' });
-    }, [personality.code, previewUrl]);
+      return new File([blob], `WTFTI-${personality.code}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -444,10 +452,10 @@ export const WtftiShareImageGenerator = forwardRef<WtftiShareImageHandle, Props>
         return;
       }
       const link = document.createElement('a');
-      link.download = `WTFTI-${personality.code}.png`;
+      link.download = `WTFTI-${personality.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, personality.code, previewUrl]);
+    }, [createPreviewFile, personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -467,6 +475,13 @@ export const WtftiShareImageGenerator = forwardRef<WtftiShareImageHandle, Props>
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}
@@ -506,7 +521,7 @@ export const WtftiShareImageGenerator = forwardRef<WtftiShareImageHandle, Props>
                 </svg>
               </button>
 
-              <div className="rounded-2xl overflow-hidden shadow-2xl mb-4">
+              <div className={`rounded-2xl overflow-hidden shadow-2xl mb-4 ${tierCtl.tierTokens.containerClass}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={previewUrl} alt={`WTF ${personality.number} · ${personality.wtftiName}`} className="w-full" />
               </div>

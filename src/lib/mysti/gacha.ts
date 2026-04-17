@@ -5,6 +5,7 @@
  * Each day, users can draw one random personality card from any universe.
  */
 
+import { queueAssetSync } from '@/lib/assets/asset-sync';
 import { WTFTI_PERSONALITIES } from '@/lib/wtfti-personalities';
 import type { WtftiPersonality } from '@/lib/wtfti-personalities';
 
@@ -189,6 +190,7 @@ export function getCollection(): GachaCollection {
 function saveCollection(collection: GachaCollection): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(GACHA_COLLECTION_KEY, JSON.stringify(collection));
+  queueAssetSync('mysti-gacha');
 }
 
 export function getCollectionCount(): number {
@@ -247,6 +249,7 @@ export function markDrawnToday(): void {
   if (typeof window === 'undefined') return;
   const today = getDateString(new Date());
   localStorage.setItem(GACHA_DAILY_DRAW_KEY, today);
+  queueAssetSync('mysti-gacha');
 }
 
 export function getTodayDrawResult(): GachaResult | null {
@@ -268,6 +271,7 @@ export function getTodayDrawResult(): GachaResult | null {
 function saveDrawResult(result: GachaResult): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem('gacha-last-result', JSON.stringify(result));
+  queueAssetSync('mysti-gacha');
 }
 
 // ─── Card rarity determination ───────────────────────────────────────────────

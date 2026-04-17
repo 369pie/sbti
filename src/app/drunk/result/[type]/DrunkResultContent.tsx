@@ -15,6 +15,8 @@ import { CrossTestRecommendations } from '@/components/CrossTestRecommendations'
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
 import { ResultDiagnosticsPanel } from '@/components/ResultDiagnosticsPanel';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { Glyph } from '@/components/Glyph';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 
 const emptySubscribe = () => () => {};
 
@@ -65,7 +67,7 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
 
         <div className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center relative">
           <button onClick={() => shareRef.current?.generate()}
-            className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-amber-400 transition-all cursor-pointer"
+            className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-gold transition-all cursor-pointer"
             title="生成分享图片">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -147,6 +149,10 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
 
       <CrossTestRecommendations currentTest="drunk" personalityName={persona.name} />
 
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <WtfiTheoryWiring universe="drunk" dimensionScores={dimensionScores} />
+      </section>
+
       {/* Share section */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 0.5 }}>
@@ -154,8 +160,15 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
           <div className="space-y-3">
             <DrunkShareImageGenerator ref={shareRef} persona={persona} dimensionScores={activeDimensionScores} />
             <button onClick={copyShareText}
-              className="w-full py-3 rounded-xl border border-amber-500/20 bg-amber-500/5 text-sm text-amber-400 hover:bg-amber-500/10 transition-all cursor-pointer">
-              {textCopied ? '已复制分享文案 ✓' : '📋 复制分享文案'}
+              className="w-full py-3 rounded-xl border border-gold/30 bg-gold/5 text-sm text-gold hover:bg-gold/10 transition-all cursor-pointer">
+              {textCopied ? (
+                '已复制分享文案 ✓'
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  <Glyph name="copy" size={14} />
+                  <span>复制分享文案</span>
+                </span>
+              )}
             </button>
             <div className="flex gap-3">
               <button onClick={copyLink}

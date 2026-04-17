@@ -2,6 +2,7 @@
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 import type { CptiRelationshipType } from '@/lib/cpti/relationships';
 import {
   getCptiRelationshipTypeImage,
@@ -314,20 +315,23 @@ export const CptiRelationshipShareImageGenerator = forwardRef<CptiRelationshipSh
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({ resourceId: 'cpti-relationship:share', universe: 'cpti-relationship' });
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const dataUrl = await renderCptiRelationshipShareImage(relationship, nicknameA, nicknameB);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'CPTI');
+        setPreviewUrl(finalUrl);
       } catch (err) {
         console.error('Failed to generate share image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [relationship, nicknameA, nicknameB, generating]);
+    }, [relationship, nicknameA, nicknameB, generating, tierCtl]);
 
     const handleQuickDownload = useCallback(async () => {
       if (!previewUrl) {
@@ -335,16 +339,16 @@ export const CptiRelationshipShareImageGenerator = forwardRef<CptiRelationshipSh
         return;
       }
       const link = document.createElement('a');
-      link.download = `CPTI-关系-${relationship.code}.png`;
+      link.download = `CPTI-关系-${relationship.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [handleGenerate, relationship.code, previewUrl]);
+    }, [handleGenerate, relationship.code, previewUrl, tierCtl.fileSuffix]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `CPTI-关系-${relationship.code}.png`, { type: 'image/png' });
-    }, [relationship.code, previewUrl]);
+      return new File([blob], `CPTI-关系-${relationship.code}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [relationship.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -367,10 +371,10 @@ export const CptiRelationshipShareImageGenerator = forwardRef<CptiRelationshipSh
         return;
       }
       const link = document.createElement('a');
-      link.download = `CPTI-关系-${relationship.code}.png`;
+      link.download = `CPTI-关系-${relationship.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, relationship.code, previewUrl]);
+    }, [createPreviewFile, relationship.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -390,6 +394,13 @@ export const CptiRelationshipShareImageGenerator = forwardRef<CptiRelationshipSh
 
     return (
       <div className="space-y-2.5">
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+          className="mb-3"
+        />
         <button
           onClick={handleQuickDownload}
           disabled={generating}

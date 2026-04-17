@@ -2,6 +2,7 @@
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 import { getFlowerRarity, getFlowerTypeImage } from '@/lib/flower/personalities';
 import type { FlowerPersonalityType } from '@/lib/flower/personalities';
 import { FLOWER_DIMENSIONS, FLOWER_MODEL_COLORS } from '@/lib/flower/dimensions';
@@ -421,26 +422,29 @@ export const FlowerShareImageGenerator = forwardRef<FlowerShareImageGeneratorHan
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({ resourceId: 'flower:share', universe: 'flower' });
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const dataUrl = await renderFlowerShareImage(personality, dimensionScores);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'FLOWER');
+        setPreviewUrl(finalUrl);
       } catch (e) {
         console.error('Share image generation failed:', e);
       } finally {
         setGenerating(false);
       }
-    }, [dimensionScores, generating, personality]);
+    }, [dimensionScores, generating, personality, tierCtl]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `花TI-${personality.flower}.png`, { type: 'image/png' });
-    }, [personality.flower, previewUrl]);
+      return new File([blob], `花TI-${personality.flower}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [personality.flower, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -459,10 +463,10 @@ export const FlowerShareImageGenerator = forwardRef<FlowerShareImageGeneratorHan
         return;
       }
       const link = document.createElement('a');
-      link.download = `花TI-${personality.flower}.png`;
+      link.download = `花TI-${personality.flower}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, personality.flower, previewUrl]);
+    }, [createPreviewFile, personality.flower, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -482,6 +486,13 @@ export const FlowerShareImageGenerator = forwardRef<FlowerShareImageGeneratorHan
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}

@@ -3,17 +3,20 @@
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import type { KingsPersonality } from '@/lib/kings/personalities';
 import { KINGS_PERSONALITIES, getKingsTypeMediumImage, getKingsTypeThumbnailImage } from '@/lib/kings/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
+import { markCollected } from '@/lib/mysti/collection';
 import { KingsTypeArt } from '@/components/KingsTypeArt';
 import { KingsShareImageGenerator } from '@/components/KingsShareImageGenerator';
 import type { KingsShareImageHandle } from '@/components/KingsShareImageGenerator';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
+import { UniverseSwitcher } from '@/components/UniverseSwitcher';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 
 interface Props {
   kingsPersonality: KingsPersonality;
@@ -26,6 +29,9 @@ export function KingsResultContent({ kingsPersonality: p, dimensionScores }: Pro
   const shareRef = useRef<KingsShareImageHandle>(null);
 
   const shareUrl = getSiteUrl(`/wtfti/kings/result/${p.slug}/`);
+
+  // Mark as collected for Mysti collection wall
+  useEffect(() => { markCollected('kings', p.slug); }, [p.slug]);
   const typeImageUrl = getKingsTypeMediumImage(p.slug);
 
   const copyShareText = useCallback(() => {
@@ -307,6 +313,14 @@ export function KingsResultContent({ kingsPersonality: p, dimensionScores }: Pro
             返回王者TI 首页
           </Link>
         </div>
+      </section>
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <UniverseSwitcher slug={p.slug} currentUniverseId="kings" />
+      </section>
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <WtfiTheoryWiring universe="kings" dimensionScores={dimensionScores} />
       </section>
 
       <ResultClosureEngine

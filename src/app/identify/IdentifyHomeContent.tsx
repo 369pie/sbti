@@ -23,146 +23,156 @@ const HOW_IT_WORKS = [
 export default function IdentifyHomeContent() {
   return (
     <div className="min-h-screen">
-      {/* Hero */}
+      {/* ── Hero · Editorial magazine cover ── */}
       <section className="relative overflow-hidden">
-        <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
+        <div className="max-w-5xl mx-auto px-6 sm:px-10 pt-20 sm:pt-32 pb-24 sm:pb-32">
           <div className="animate-fade-up">
-            <span className="inline-block text-xs font-mono tracking-[0.25em] text-text-muted mb-6 uppercase">
-              Friend Identifier · 好友人格鉴定
-            </span>
+            <div className="flex items-center gap-4 mb-10">
+              <span className="serial-number text-sm">Issue 02</span>
+              <span className="editorial-rule flex-1 max-w-[80px]" />
+              <span className="eyebrow">Friend Identifier</span>
+            </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
-              你朋友是
-              <br />
-              <span className="bg-gradient-to-r from-pink-400 via-rose-400 to-red-400 bg-clip-text text-transparent">什么 WTF 人格？</span>
+            <h1 className="editorial-display text-5xl sm:text-7xl md:text-8xl mb-8 max-w-4xl">
+              你朋友<br />
+              <span className="editorial-italic" style={{ color: 'var(--color-rose-deep)' }}>
+                是什么 WTF 人格？
+              </span>
             </h1>
 
-            <p className="text-text-secondary text-lg sm:text-xl leading-relaxed max-w-xl mx-auto mb-4">
-              不用 ta 来测——你来帮 ta 鉴定。
-              <br />
-              10 道题 · 鉴定 ta 的隐藏人格 · 生成鉴定书 · 分享给 ta 
-            </p>
+            <hr className="editorial-rule w-24 mb-8" />
 
-            <p className="text-text-muted text-sm mb-10">
-              ta 不服？让 ta 自己来测对比一下 😏
+            <p className="text-base sm:text-lg leading-[1.85] text-text-secondary max-w-xl">
+              不用 ta 来测——你来帮 ta 鉴定。<br className="hidden sm:block" />
+              <span className="text-text-muted">ta 不服？让 ta 自己来测对比一下。</span>
             </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/identify/test"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-medium text-base hover:from-pink-600 hover:to-rose-600 transition-all duration-200"
-              >
-                开始鉴定好友
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
-              <Link
-                href="/"
-                prefetch={false}
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:border-border hover:bg-bg-secondary/50 transition-all duration-200 text-base"
-              >
-                ← 返回首页
-              </Link>
-            </div>
           </div>
 
-          {/* Stats */}
-          <div className="mt-16 grid grid-cols-3 gap-px bg-border-subtle rounded-2xl overflow-hidden animate-fade-up-delay-1">
+          <div className="mt-12 sm:mt-16 flex flex-wrap items-center gap-4 animate-fade-up-delay-1">
+            <Link href="/identify/test" className="btn btn-ink">
+              开始鉴定
+              <span className="opacity-60">→</span>
+            </Link>
+            <Link href="/" prefetch={false} className="btn btn-ghost">
+              ← 返回首页
+            </Link>
+            <span className="eyebrow ml-2 hidden sm:inline">
+              10 题 · 约 1 分钟 · 5 维度
+            </span>
+          </div>
+
+          {/* Stats strip */}
+          <div className="mt-20 grid grid-cols-3 animate-fade-up-delay-2" style={{ borderTop: '1px solid var(--color-rule-soft)', borderBottom: '1px solid var(--color-rule-soft)' }}>
             {[
-              { value: '5 维', label: '鉴定维度' },
-              { value: '21 种', label: '可鉴定人格' },
-              { value: '10 题', label: '约1分钟' },
-            ].map(stat => (
-              <div key={stat.label} className="bg-bg-secondary/60 px-4 py-6 text-center">
-                <div className="text-2xl font-semibold text-text-primary mb-1">{stat.value}</div>
-                <div className="text-xs text-text-muted">{stat.label}</div>
+              { value: '5', label: '鉴定维度' },
+              { value: '21', label: '可鉴定人格' },
+              { value: '10', label: '题 · 约 1 分钟' },
+            ].map((stat, idx) => (
+              <div
+                key={stat.label}
+                className="py-8 text-center"
+                style={{ borderLeft: idx > 0 ? '1px solid var(--color-rule-soft)' : 'none' }}
+              >
+                <div className="stat-value text-4xl sm:text-5xl text-text-primary leading-none">{stat.value}</div>
+                <div className="eyebrow mt-3">{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* History / notification loop */}
-      <section className="max-w-3xl mx-auto px-6 pb-8">
+      {/* History */}
+      <section className="max-w-5xl mx-auto px-6 sm:px-10 py-16" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="animate-fade-up">
           <IdentifyHistoryPanel variant="home" />
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="max-w-3xl mx-auto px-6 pb-20">
-        <div className="animate-fade-up">
-          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-8">
-            鉴定流程
+      {/* How it works — editorial index */}
+      <section className="max-w-5xl mx-auto px-6 sm:px-10 py-20 sm:py-24" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="animate-fade-up mb-12">
+          <span className="serial-number text-xs mr-3">03</span>
+          <span className="eyebrow">How it works</span>
+          <h2 className="section-headline text-3xl sm:text-4xl mt-3">
+            鉴定<span className="editorial-italic">流程</span>
           </h2>
+        </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {HOW_IT_WORKS.map(item => (
-              <div
-                key={item.step}
-                className="rounded-xl border border-border-subtle bg-bg-secondary/30 p-4 text-center"
-              >
-                <div className="text-2xl font-mono font-bold bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent mb-2">
-                  {item.step}
-                </div>
-                <div className="text-sm font-medium text-text-primary mb-1">{item.title}</div>
-                <div className="text-xs text-text-muted">{item.desc}</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-px" style={{ backgroundColor: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
+          {HOW_IT_WORKS.map((item) => (
+            <div
+              key={item.step}
+              className="p-6 sm:p-8"
+              style={{ backgroundColor: 'var(--color-bg-elevated)' }}
+            >
+              <div className="stat-value text-4xl mb-6 text-text-primary">{item.step}</div>
+              <div className="text-base text-text-primary mb-1" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
+                {item.title}
               </div>
-            ))}
-          </div>
+              <div className="text-xs text-text-muted leading-relaxed">{item.desc}</div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* 5 Dimensions */}
-      <section className="max-w-3xl mx-auto px-6 pb-20">
-        <div className="animate-fade-up">
-          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-8">
-            五大鉴定维度
+      {/* 5 Dimensions — editorial list */}
+      <section className="max-w-5xl mx-auto px-6 sm:px-10 py-20 sm:py-24" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="animate-fade-up mb-12">
+          <span className="serial-number text-xs mr-3">04</span>
+          <span className="eyebrow">Five dimensions</span>
+          <h2 className="section-headline text-3xl sm:text-4xl mt-3">
+            五大<span className="editorial-italic">鉴定维度</span>
           </h2>
+        </div>
 
-          <div className="grid gap-3">
-            {MODELS.map(m => {
-              const color = IDENTIFY_MODEL_COLORS[m.key];
-              return (
-                <div
-                  key={m.key}
-                  className="flex items-center gap-4 px-5 py-4 rounded-xl border border-border-subtle bg-bg-secondary/30"
+        <ul style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+          {MODELS.map((m, idx) => {
+            const color = IDENTIFY_MODEL_COLORS[m.key];
+            return (
+              <li
+                key={m.key}
+                className="group flex items-center gap-6 sm:gap-10 py-6 sm:py-8"
+                style={{ borderBottom: '1px solid var(--color-rule-soft)' }}
+              >
+                <span className="serial-number text-sm w-10 shrink-0">0{idx + 1}</span>
+                <span
+                  className="eyebrow shrink-0 w-20"
+                  style={{ color: color.base }}
                 >
-                  <span
-                    className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-xs font-mono font-semibold"
-                    style={{ background: color.bg, color: color.base }}
-                  >
-                    {m.key.slice(0, 2).toUpperCase()}
-                  </span>
-                  <div>
-                    <div className="text-sm font-medium text-text-primary">{IDENTIFY_MODEL_NAMES[m.key]}</div>
-                    <div className="text-xs text-text-muted">{m.label}</div>
+                  {m.key}
+                </span>
+                <div className="flex-1">
+                  <div className="text-lg sm:text-xl text-text-primary mb-1" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.015em' }}>
+                    {IDENTIFY_MODEL_NAMES[m.key]}
+                  </div>
+                  <div className="text-sm text-text-secondary italic" style={{ fontFamily: 'var(--font-editorial)' }}>
+                    {m.label}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              </li>
+            );
+          })}
+        </ul>
       </section>
 
-      {/* CTA bottom */}
-      <section className="max-w-3xl mx-auto px-6 pb-24 text-center">
-        <div className="animate-fade-up-delay-1">
-          <div className="rounded-2xl border border-border-subtle bg-bg-secondary/30 p-8 sm:p-12">
-            <div className="text-4xl mb-4">🔍</div>
-            <h2 className="text-2xl font-semibold mb-3">想好鉴定谁了吗？</h2>
-            <p className="text-text-secondary mb-6">10 道题，一分钟，生成鉴定书</p>
-            <Link
-              href="/identify/test"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-medium text-base hover:from-pink-600 hover:to-rose-600 transition-all"
-            >
-              开始鉴定
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
+      {/* Final CTA — editorial block */}
+      <section className="max-w-5xl mx-auto px-6 sm:px-10 py-20 sm:py-28" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="animate-fade-up-delay-1 p-10 sm:p-16" style={{ background: 'var(--color-paper-warm)', border: '1px solid var(--color-rule)' }}>
+          <div className="flex items-center gap-4 mb-8">
+            <span className="serial-number text-xs">Coda</span>
+            <span className="editorial-rule w-16" />
+            <span className="eyebrow" style={{ color: 'var(--color-rose-deep)' }}>Final call</span>
           </div>
+          <h2 className="editorial-display text-4xl sm:text-6xl mb-6 max-w-3xl">
+            想好<span className="editorial-italic">鉴定谁</span>了吗？
+          </h2>
+          <p className="text-base sm:text-lg leading-[1.85] text-text-secondary max-w-xl mb-10">
+            10 道题，约一分钟。鉴定书一份，分享链接一枚——足够让 ta 惊掉下巴。
+          </p>
+          <Link href="/identify/test" className="btn btn-rose">
+            开始鉴定
+            <span className="opacity-70">→</span>
+          </Link>
         </div>
       </section>
     </div>

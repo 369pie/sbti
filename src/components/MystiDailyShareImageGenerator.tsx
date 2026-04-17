@@ -2,6 +2,7 @@
 
 import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 import { SHARE_SITE_URL } from '@/lib/site';
 import { MYSTI_THEMES } from '@/lib/mysti/themes';
 import type { MystiTheme, MystiShareImageGeneratorHandle } from '@/lib/mysti/types';
@@ -376,29 +377,32 @@ export const MystiDailyShareImageGenerator = forwardRef<MystiShareImageGenerator
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({ resourceId: 'mysti-daily:share', universe: 'mysti-daily' });
 
     const theme = MYSTI_THEMES[themeId];
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       trackMystiEvent('mysti_daily_share', { arcanaName: dailyCard.arcanaNameCN });
       try {
         const dataUrl = await renderDailyShareImage(dailyCard, themeId);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#0A0612', 'MYSTI');
+        setPreviewUrl(finalUrl);
       } catch (e) {
         console.error('Daily share image generation failed:', e);
       } finally {
         setGenerating(false);
       }
-    }, [generating, dailyCard, themeId]);
+    }, [generating, dailyCard, themeId, tierCtl]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `WTFTI-每日一牌-${dailyCard.arcanaNameCN}.png`, { type: 'image/png' });
-    }, [dailyCard.arcanaNameCN, previewUrl]);
+      return new File([blob], `WTFTI-每日一牌-${dailyCard.arcanaNameCN}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [dailyCard.arcanaNameCN, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -417,10 +421,10 @@ export const MystiDailyShareImageGenerator = forwardRef<MystiShareImageGenerator
         return;
       }
       const link = document.createElement('a');
-      link.download = `WTFTI-每日一牌-${dailyCard.arcanaNameCN}.png`;
+      link.download = `WTFTI-每日一牌-${dailyCard.arcanaNameCN}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, dailyCard.arcanaNameCN, previewUrl]);
+    }, [createPreviewFile, dailyCard.arcanaNameCN, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -441,6 +445,13 @@ export const MystiDailyShareImageGenerator = forwardRef<MystiShareImageGenerator
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="dark"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}

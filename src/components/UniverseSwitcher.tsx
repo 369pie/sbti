@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { getUniversePreviews, type UniversePreview } from '@/lib/universe-switcher';
+import { getLimitedStatus, formatCountdown } from '@/lib/limited-universe';
 
 interface UniverseSwitcherProps {
   slug: string;
@@ -72,6 +73,8 @@ function PreviewCard({
   };
 }) {
   const isLive = preview.status === 'live';
+  const limitedStatus = preview.status === 'limited' ? getLimitedStatus(preview.universeId) : null;
+  const isOpen = isLive || (limitedStatus?.isOpen ?? false);
   const cardContent = (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -79,7 +82,7 @@ function PreviewCard({
       transition={{ duration: 0.4, delay: index * 0.05 }}
       className={`
         flex-shrink-0 w-[140px] sm:w-auto rounded-xl border p-3
-        transition-all duration-200
+        tranOpenon-all duration-200
         ${preview.isCurrentUniverse ? 'ring-2' : 'hover:border-opacity-80'}
         ${isLive ? 'cursor-pointer hover:shadow-lg' : 'opacity-60 cursor-not-allowed'}
       `}
@@ -111,7 +114,7 @@ function PreviewCard({
       </div>
 
       {/* Lock icon for coming-soon */}
-      {!isLive && (
+      {!isLive && !limitedStatus && (
         <div className="absolute top-2 right-2">
           <svg
             className="w-3 h-3"
@@ -130,6 +133,19 @@ function PreviewCard({
         </div>
       )}
 
+      {/* Limited-window countdown (E-08) */}
+      {limitedStatus && (
+        <div
+          className="mt-2 text-[9px] font-mono tracking-wider"
+          style={{ color: limitedStatus.isOpen ? '#f59e0b' : theme.textMuted }}
+        >
+          {limitedStatus.label}
+          {limitedStatus.isOpen && limitedStatus.countdownMs != null && (
+            <> · {formatCountdown(limitedStatus.countdownMs)}</>
+          )}
+        </div>
+      )}
+
       {/* Current universe indicator */}
       {preview.isCurrentUniverse && (
         <div
@@ -142,7 +158,7 @@ function PreviewCard({
     </motion.div>
   );
 
-  if (!isLive) {
+  if (!isOpen) {
     return cardContent;
   }
 

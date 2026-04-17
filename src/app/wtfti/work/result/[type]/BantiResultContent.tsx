@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import type { BantiPersonality } from '@/lib/banti/personalities';
 import { BANTI_PERSONALITIES, getBantiTypeImage } from '@/lib/banti/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
+import { markCollected } from '@/lib/mysti/collection';
 import { BantiShareImageGenerator } from '@/components/BantiShareImageGenerator';
 import type { BantiShareImageHandle } from '@/components/BantiShareImageGenerator';
 import { BantiTypeArt } from '@/components/BantiTypeArt';
@@ -17,7 +18,10 @@ import { UniverseProgressBar } from '@/components/UniverseProgressBar';
 import { UgcShareCTA } from '@/components/UgcShareCTA';
 import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { UniverseSwitcher } from '@/components/UniverseSwitcher';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
+import { Glyph } from '@/components/Glyph';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 
 interface Props {
@@ -31,6 +35,9 @@ export function BantiResultContent({ bantiPersonality: p, dimensionScores }: Pro
   const shareRef = useRef<BantiShareImageHandle>(null);
 
   const shareUrl = getSiteUrl(`/wtfti/work/result/${p.slug}/`);
+
+  // Mark as collected for Mysti collection wall
+  useEffect(() => { markCollected('banti', p.slug); }, [p.slug]);
 
   const copyShareText = useCallback(() => {
     const text = `班TI · 我在职场居然是${p.workName}？？\n"${p.tagline}"\n来测测你的班TI → ${shareUrl}`;
@@ -181,8 +188,9 @@ export function BantiResultContent({ bantiPersonality: p, dimensionScores }: Pro
           transition={{ duration: 0.5, delay: 0.3 }}
           className="rounded-2xl border border-border-subtle bg-bg-elevated p-6 sm:p-8 shadow-sm"
         >
-          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
-            📋 工位症状清单
+          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4 flex items-center gap-2">
+            <Glyph name="list" size={14} tone="gold" />
+            <span>工位症状清单</span>
           </h2>
           <ul className="space-y-3">
             {p.copy.symptoms.map((s, i) => (
@@ -330,6 +338,14 @@ export function BantiResultContent({ bantiPersonality: p, dimensionScores }: Pro
             返回班TI 首页
           </Link>
         </div>
+      </section>
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <UniverseSwitcher slug={p.slug} currentUniverseId="banti" />
+      </section>
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <WtfiTheoryWiring universe="banti" dimensionScores={dimensionScores} />
       </section>
 
       <ResultClosureEngine

@@ -4,6 +4,8 @@ import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
+import { finalizeClaimedSession, stageAnonymousSourceForMerge } from '@/lib/auth/claimed-session';
+import { getApiPath } from '@/lib/api';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -51,7 +53,9 @@ export function RegisterForm() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/register/', {
+      await stageAnonymousSourceForMerge();
+
+      const res = await fetch(getApiPath('/auth/register/'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -72,6 +76,7 @@ export function RegisterForm() {
       if (data.autoSignedIn) {
         // Server signed us in — refresh client auth state and go
         await refresh();
+        await finalizeClaimedSession().catch(() => null);
         router.push(redirectTo);
       } else {
         // Redirect to login with success message
@@ -80,7 +85,7 @@ export function RegisterForm() {
     } finally {
       setLoading(false);
     }
-  }, [username, nickname, password, email, redirectTo, router, validate]);
+  }, [username, nickname, password, email, redirectTo, refresh, router, validate]);
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4 py-12">

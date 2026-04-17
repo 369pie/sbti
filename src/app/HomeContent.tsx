@@ -44,6 +44,7 @@ const RELATIONSHIP_PLAYS = [
 /** Casual / quick tests */
 const CASUAL_TESTS = [
   { href: '/daily/', emoji: '🎲', label: '今日模式', desc: '6题秒测今天状态' },
+  { href: '/gacha/', emoji: '🎴', label: '今日抽签', desc: '每天一抽 · S/A/B/C' },
   { href: '/drunk/', emoji: '🍺', label: '酒后人设', desc: '喝多了你是谁？' },
   { href: '/work/', emoji: '💼', label: '打工人设', desc: '你的职场角色' },
   { href: '/love/', emoji: '💗', label: '恋爱人设', desc: '你的恋爱角色' },
@@ -88,65 +89,108 @@ export default function HomeContent() {
   return (
     <div className="min-h-screen">
 
-      {/* ── Hero ── */}
+      {/* ── Hero — Editorial magazine cover ── */}
       <section className="relative overflow-hidden">
-        <div className="max-w-3xl mx-auto px-6 pt-24 pb-16 text-center relative">
+        <div className="max-w-5xl mx-auto px-6 sm:px-10 pt-20 sm:pt-32 pb-24 sm:pb-32 relative">
           <div className="animate-fade-up">
-            <span className="section-label mb-8 block">
-              What&apos;s The F* Type Inside
-            </span>
+            {/* Issue marker */}
+            <div className="flex items-center gap-4 mb-10">
+              <span className="serial-number text-sm">Issue 01</span>
+              <span className="editorial-rule flex-1 max-w-[80px]" />
+              <span className="eyebrow">What&apos;s The F* Type Inside</span>
+            </div>
 
-            <h1 className="mb-6 leading-[1.05]">
-              <span className="brand-wtf text-5xl sm:text-6xl md:text-7xl" style={{ color: '#ff4d6d' }}>
-                WTF
-              </span>
-              <span className="brand-ti text-5xl sm:text-6xl md:text-7xl text-text-primary">
-                TI
-              </span>
-              <br />
-              <span className="wtfti-gradient-text text-2xl sm:text-3xl md:text-4xl mt-2 inline-block section-headline">
-                我居然是这种人？
+            {/* Big brand mark */}
+            <h1 className="mb-8 leading-[0.95]">
+              <span className="brand-wtf block text-[22vw] sm:text-[14rem] md:text-[16rem]" style={{ color: 'var(--color-rose)' }}>
+                WTF<span className="brand-ti text-[14vw] sm:text-[9rem] md:text-[10rem] ml-2" style={{ color: 'var(--color-ink)' }}>ti</span>
               </span>
             </h1>
 
-            <p className="display-tagline text-text-secondary text-lg sm:text-xl leading-relaxed max-w-md mx-auto mb-10">
-              多宇宙人格测试平台
-              <span className="mx-2 text-border">·</span>
-              同一个你，不同宇宙完全不同的人格翻译
-            </p>
+            {/* Serif subline */}
+            <div className="max-w-2xl">
+              <p className="editorial-display text-3xl sm:text-5xl md:text-6xl mb-6">
+                我居然<span className="editorial-italic" style={{ color: 'var(--color-rose-deep)' }}>是这种人？</span>
+              </p>
+              <hr className="editorial-rule w-24 mb-6" />
+              <p className="text-base sm:text-lg leading-[1.8] text-text-secondary max-w-xl">
+                一份写给当代女性的人格图鉴。<br className="hidden sm:block" />
+                同一个你，在不同宇宙里，被翻译成完全不同的样子。
+              </p>
+            </div>
           </div>
 
-          {/* 4 intent cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-fade-up-delay-1">
+          {/* Primary CTA row */}
+          <div className="mt-12 sm:mt-16 flex flex-wrap items-center gap-4 animate-fade-up-delay-1">
+            <Link href="/test/" prefetch={false} className="btn btn-ink">
+              开始测试
+              <span className="opacity-60">→</span>
+            </Link>
+            <Link href="/types/" prefetch={false} className="btn btn-ghost">
+              先翻翻图鉴
+            </Link>
+            <span className="eyebrow ml-2 hidden sm:inline">
+              {universes.length} 个宇宙 · 100+ 种人格
+            </span>
+          </div>
+        </div>
+
+        {/* Horizontal rule to separate hero */}
+        <hr className="editorial-rule-soft max-w-5xl mx-6 sm:mx-auto" />
+      </section>
+
+      {/* ── Intent grid — "你想做什么？" ── */}
+      <section className="py-20 sm:py-28 px-6 sm:px-10">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-baseline justify-between mb-12 animate-fade-up">
+            <div>
+              <span className="serial-number text-xs mr-3">02</span>
+              <span className="eyebrow">Where to start</span>
+              <h2 className="section-headline text-3xl sm:text-4xl mt-3">
+                你今天想做什么？
+              </h2>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-rule-soft border border-rule-soft" style={{ backgroundColor: 'var(--color-rule-soft)', borderColor: 'var(--color-rule-soft)' }}>
             {HERO_INTENTS.map((item, i) => (
               <Link
                 key={item.href}
                 href={item.href}
                 prefetch={false}
-                className="group block rounded-2xl border border-border-subtle bg-bg-elevated p-4 text-center transition-all hover:-translate-y-0.5 hover:shadow-lg"
-                style={{ animationDelay: `${i * 60}ms` }}
+                className="group relative block p-6 sm:p-8 transition-colors duration-500"
+                style={{ backgroundColor: 'var(--color-bg-elevated)', animationDelay: `${i * 60}ms` }}
               >
-                <div className="text-3xl mb-2">{item.emoji}</div>
-                <h3 className="text-sm font-semibold text-text-primary mb-1">{item.label}</h3>
-                <p className="text-[11px] text-text-muted">{item.desc}</p>
-                <div
-                  className="mt-3 h-0.5 rounded-full opacity-0 group-hover:opacity-60 transition-opacity"
-                  style={{ background: item.accent }}
+                <span className="serial-number text-xs block mb-8">
+                  0{i + 1}
+                </span>
+                <div className="text-4xl mb-6 transition-transform duration-500 group-hover:scale-110 origin-left">{item.emoji}</div>
+                <h3 className="font-display text-xl text-text-primary mb-1" style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}>
+                  {item.label}
+                </h3>
+                <p className="text-xs text-text-muted">{item.desc}</p>
+                <span
+                  className="absolute left-6 sm:left-8 bottom-4 h-px w-8 transition-all duration-500 group-hover:w-16"
+                  style={{ background: item.accent, opacity: 0.5 }}
                 />
               </Link>
             ))}
           </div>
 
-          {/* Stats */}
-          <div className="mt-12 grid grid-cols-3 gap-3 animate-fade-up-delay-2">
+          {/* Stats row */}
+          <div className="mt-16 grid grid-cols-3 animate-fade-up-delay-2" style={{ borderTop: '1px solid var(--color-rule-soft)', borderBottom: '1px solid var(--color-rule-soft)' }}>
             {[
-              { value: `${universes.length}`, label: '个测试宇宙' },
-              { value: '100+', label: '种人格类型' },
-              { value: '10+', label: '种社交玩法' },
-            ].map(stat => (
-              <div key={stat.label} className="bg-bg-elevated rounded-2xl border border-border-subtle px-4 py-5 text-center shadow-sm">
-                <div className="stat-value text-2xl text-text-primary">{stat.value}</div>
-                <div className="text-xs text-text-muted mt-1">{stat.label}</div>
+              { value: `${universes.length}`, label: '测试宇宙' },
+              { value: '100+', label: '种人格' },
+              { value: '10+', label: '社交玩法' },
+            ].map((stat, idx) => (
+              <div
+                key={stat.label}
+                className="py-8 text-center"
+                style={{ borderLeft: idx > 0 ? '1px solid var(--color-rule-soft)' : 'none' }}
+              >
+                <div className="stat-value text-4xl sm:text-5xl text-text-primary leading-none">{stat.value}</div>
+                <div className="eyebrow mt-3">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -154,48 +198,52 @@ export default function HomeContent() {
       </section>
 
       {/* ── Hot Picks — 推荐测试 ── */}
-      <section className="py-16 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8 animate-fade-up">
-            <span className="section-label block mb-2">Recommended</span>
-            <h2 className="section-headline text-2xl sm:text-3xl">
-              不知道从哪开始？先试这几个
-            </h2>
+      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-12 animate-fade-up flex items-baseline justify-between">
+            <div>
+              <span className="serial-number text-xs mr-3">03</span>
+              <span className="eyebrow">Editor&apos;s picks</span>
+              <h2 className="section-headline text-3xl sm:text-4xl mt-3">
+                不知道从哪开始，<br className="sm:hidden" />
+                <span className="editorial-italic" style={{ color: 'var(--color-rose)' }}>先试这几个</span>
+              </h2>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-px" style={{ backgroundColor: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
             {HOT_PICKS.map((item, i) => (
               <Link
                 key={item.href}
                 href={item.href}
                 prefetch={false}
-                className="animate-fade-up group block rounded-3xl border border-pink-100 bg-gradient-to-br from-pink-50/60 via-white to-fuchsia-50/40 p-5 sm:p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
-                style={{ animationDelay: `${i * 70}ms` }}
+                className="animate-fade-up group relative block p-7 sm:p-10 transition-colors duration-500"
+                style={{ backgroundColor: 'var(--color-bg-elevated)', animationDelay: `${i * 70}ms` }}
               >
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">{item.emoji}</span>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-base font-semibold text-text-primary">{item.label}</h3>
-                        {item.tag && (
-                          <span
-                            className="text-[10px] font-medium px-1.5 py-0.5 rounded-full text-white"
-                            style={{ background: item.accent }}
-                          >
-                            {item.tag}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-text-secondary">{item.desc}</p>
-                    </div>
-                  </div>
-                  <svg
-                    className="w-5 h-5 text-text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-1"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
+                <div className="flex items-start justify-between gap-4 mb-6">
+                  <span className="serial-number text-xs">N°{String(i + 1).padStart(2, '0')}</span>
+                  {item.tag && (
+                    <span
+                      className="eyebrow"
+                      style={{ color: item.accent }}
+                    >
+                      — {item.tag}
+                    </span>
+                  )}
+                </div>
+                <div className="text-5xl mb-8">{item.emoji}</div>
+                <h3 className="text-2xl sm:text-3xl mb-3 text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.02em' }}>
+                  {item.label}
+                </h3>
+                <p className="text-sm sm:text-base text-text-secondary leading-relaxed max-w-md">{item.desc}</p>
+                <div className="mt-8 flex items-center gap-3">
+                  <span
+                    className="h-px flex-1 transition-all duration-500 group-hover:opacity-100"
+                    style={{ background: item.accent, opacity: 0.25 }}
+                  />
+                  <span className="text-sm transition-transform duration-500 group-hover:translate-x-1" style={{ color: item.accent }}>
+                    开始 →
+                  </span>
                 </div>
               </Link>
             ))}
@@ -204,37 +252,43 @@ export default function HomeContent() {
       </section>
 
       {/* ── Universe Hub — 按风格浏览 ── */}
-      <section className="py-16 px-6 border-t border-border-subtle">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8 animate-fade-up">
-            <span className="section-label block mb-2">Style Universes</span>
-            <h2 className="section-headline text-2xl sm:text-3xl">
-              选一个风格宇宙
+      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-12 animate-fade-up">
+            <span className="serial-number text-xs mr-3">04</span>
+            <span className="eyebrow">Style universes</span>
+            <h2 className="section-headline text-3xl sm:text-4xl mt-3">
+              选一个<span className="editorial-italic">风格宇宙</span>
             </h2>
-            <p className="display-tagline text-text-secondary mt-2 text-base">
-              每个宇宙有独立的视觉、题目和人格翻译
+            <p className="display-tagline text-text-secondary mt-4 text-base sm:text-lg max-w-xl">
+              每个宇宙有独立的视觉、题目和人格翻译——像走进不同的美术馆展厅。
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-px" style={{ backgroundColor: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
             {STYLE_UNIVERSES.map((u, i) => (
               <Link
                 key={u.id}
                 href={u.landingPath}
                 prefetch={false}
-                className="animate-fade-up group block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-md transition-all p-5 text-center"
-                style={{ animationDelay: `${i * 50}ms` }}
+                className="animate-fade-up group relative block p-6 sm:p-8 transition-colors duration-500"
+                style={{ backgroundColor: 'var(--color-bg-elevated)', animationDelay: `${i * 50}ms` }}
               >
+                <span className="serial-number text-[10px] absolute top-3 right-4">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
                 <span
-                  className="inline-flex items-center justify-center w-12 h-12 rounded-xl text-2xl mb-3"
-                  style={{ background: `${u.accent}12` }}
+                  className="inline-flex items-center justify-center w-12 h-12 text-2xl mb-6 transition-transform duration-500 group-hover:scale-110 origin-left"
+                  style={{ background: `${u.accent}10`, borderRadius: 'var(--radius-soft)' }}
                 >
                   {u.emoji || '🧪'}
                 </span>
-                <h3 className="font-semibold text-text-primary text-sm mb-1">{u.name}</h3>
-                <div
-                  className="mt-3 h-0.5 rounded-full mx-auto w-12 opacity-20 group-hover:opacity-60 transition-opacity"
-                  style={{ background: u.accent }}
+                <h3 className="text-base text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
+                  {u.name}
+                </h3>
+                <span
+                  className="mt-6 block h-px w-8 transition-all duration-500 group-hover:w-16"
+                  style={{ background: u.accent, opacity: 0.5 }}
                 />
               </Link>
             ))}
@@ -242,22 +296,25 @@ export default function HomeContent() {
 
           {/* UGC Universes */}
           {UGC_CARDS.length > 0 && (
-            <div className="mt-8">
-              <h3 className="text-sm font-medium text-text-muted mb-3 flex items-center gap-2">
-                <span className="text-pink-400">✨</span>
-                创作者主题
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {UGC_CARDS.map((u, i) => (
+            <div className="mt-16">
+              <div className="flex items-center gap-4 mb-6">
+                <span className="editorial-mark" style={{ color: 'var(--color-gold)' }}>✦</span>
+                <h3 className="eyebrow" style={{ color: 'var(--color-gold)' }}>Creator editions</h3>
+                <span className="editorial-rule flex-1" />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {UGC_CARDS.map((u) => (
                   <Link
                     key={u.id}
                     href={u.landingPath}
                     prefetch={false}
-                    className="group block rounded-2xl border border-dashed border-border bg-bg-elevated/60 hover:shadow-md transition-all p-4 text-center"
-                    style={{ animationDelay: `${i * 50}ms` }}
+                    className="card-editorial group block p-6 text-left"
+                    style={{ borderStyle: 'dashed' }}
                   >
-                    <span className="text-2xl mb-2 block">{u.emoji || '🧪'}</span>
-                    <h3 className="font-medium text-text-primary text-sm">{u.name}</h3>
+                    <span className="text-2xl mb-3 block">{u.emoji || '🧪'}</span>
+                    <h3 className="text-sm text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}>
+                      {u.name}
+                    </h3>
                   </Link>
                 ))}
               </div>
@@ -270,204 +327,220 @@ export default function HomeContent() {
       <WtfCardBanner />
 
       {/* ── Relationship Plays — 测关系 ── */}
-      <section className="py-16 px-6 border-t border-border-subtle">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8 animate-fade-up">
-            <span className="section-label block mb-2">Relationships</span>
-            <h2 className="section-headline text-2xl sm:text-3xl">
-              和朋友一起玩
+      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-12 animate-fade-up">
+            <span className="serial-number text-xs mr-3">05</span>
+            <span className="eyebrow">Together</span>
+            <h2 className="section-headline text-3xl sm:text-4xl mt-3">
+              和朋友<span className="editorial-italic">一起玩</span>
             </h2>
-            <p className="display-tagline text-text-secondary mt-2 text-base">
-              测完自己，拉上朋友看看你们的化学反应
+            <p className="display-tagline text-text-secondary mt-4 text-base sm:text-lg max-w-xl">
+              测完自己，拉上朋友——看看你们之间发生了什么化学反应。
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-px" style={{ backgroundColor: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
             {RELATIONSHIP_PLAYS.map((item, i) => (
               <Link
                 key={item.href}
                 href={item.href}
                 prefetch={false}
-                className="animate-fade-up group block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-md transition-all p-5 text-center"
-                style={{ animationDelay: `${i * 50}ms` }}
+                className="animate-fade-up group relative block p-6 sm:p-8 transition-colors duration-500"
+                style={{ backgroundColor: 'var(--color-bg-elevated)', animationDelay: `${i * 50}ms` }}
               >
-                <div className="text-3xl mb-3">{item.emoji}</div>
-                <h3 className="font-semibold text-text-primary text-sm mb-1">{item.label}</h3>
-                <p className="text-xs text-text-muted">{item.desc}</p>
+                <span className="serial-number text-[10px] absolute top-3 right-4">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="text-3xl mb-5 transition-transform duration-500 group-hover:scale-110 origin-left">{item.emoji}</div>
+                <h3 className="text-lg text-text-primary mb-1" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
+                  {item.label}
+                </h3>
+                <p className="text-xs text-text-muted leading-relaxed">{item.desc}</p>
+                <span
+                  className="mt-4 block h-px w-6 transition-all duration-500 group-hover:w-12"
+                  style={{ background: 'var(--color-rose)', opacity: 0.5 }}
+                />
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Casual Tests — 轻松一测 ── */}
-      <section className="py-16 px-6 border-t border-border-subtle">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8 animate-fade-up">
-            <span className="section-label block mb-2">Quick Play</span>
-            <h2 className="section-headline text-2xl sm:text-3xl">
-              轻松一测
+      {/* ── Casual + Explore — 合并为二栏 editorial 目录 ── */}
+      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-16">
+          <div className="animate-fade-up">
+            <span className="serial-number text-xs mr-3">06</span>
+            <span className="eyebrow">Quick play</span>
+            <h2 className="section-headline text-3xl mt-3 mb-8">
+              轻松<span className="editorial-italic">一测</span>
             </h2>
+            <ul className="space-y-px" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+              {CASUAL_TESTS.map((item) => (
+                <li key={item.href} style={{ borderBottom: '1px solid var(--color-rule-soft)' }}>
+                  <Link
+                    href={item.href}
+                    prefetch={false}
+                    className="group flex items-center gap-5 py-5 transition-colors duration-500"
+                  >
+                    <span className="text-2xl">{item.emoji}</span>
+                    <div className="flex-1">
+                      <h3 className="text-base text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
+                        {item.label}
+                      </h3>
+                      <p className="text-xs text-text-muted mt-0.5">{item.desc}</p>
+                    </div>
+                    <span className="text-text-muted transition-transform duration-500 group-hover:translate-x-1">→</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {CASUAL_TESTS.map((item, i) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                prefetch={false}
-                className="animate-fade-up group block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-md transition-all p-5 text-center"
-                style={{ animationDelay: `${i * 50}ms` }}
-              >
-                <div className="text-3xl mb-3">{item.emoji}</div>
-                <h3 className="font-medium text-text-primary text-sm">{item.label}</h3>
-                <p className="text-xs text-text-muted mt-1">{item.desc}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Explore — 发现更多 ── */}
-      <section className="py-16 px-6 border-t border-border-subtle">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8 animate-fade-up">
-            <span className="section-label block mb-2">Explore</span>
-            <h2 className="section-headline text-2xl sm:text-3xl">
-              发现更多
+          <div className="animate-fade-up-delay-1">
+            <span className="serial-number text-xs mr-3">07</span>
+            <span className="eyebrow">Explore</span>
+            <h2 className="section-headline text-3xl mt-3 mb-8">
+              发现<span className="editorial-italic">更多</span>
             </h2>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {EXPLORE_ITEMS.map((item, i) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                prefetch={false}
-                className="animate-fade-up group block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-md transition-all p-5 text-center"
-                style={{ animationDelay: `${i * 50}ms` }}
-              >
-                <div className="text-3xl mb-3">{item.emoji}</div>
-                <h3 className="font-medium text-text-primary text-sm">{item.label}</h3>
-                <p className="text-xs text-text-muted mt-1">{item.desc}</p>
-              </Link>
-            ))}
+            <ul className="space-y-px" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+              {EXPLORE_ITEMS.map((item) => (
+                <li key={item.href} style={{ borderBottom: '1px solid var(--color-rule-soft)' }}>
+                  <Link
+                    href={item.href}
+                    prefetch={false}
+                    className="group flex items-center gap-5 py-5 transition-colors duration-500"
+                  >
+                    <span className="text-2xl">{item.emoji}</span>
+                    <div className="flex-1">
+                      <h3 className="text-base text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
+                        {item.label}
+                      </h3>
+                      <p className="text-xs text-text-muted mt-0.5">{item.desc}</p>
+                    </div>
+                    <span className="text-text-muted transition-transform duration-500 group-hover:translate-x-1">→</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
 
-      {/* ── Creator Program ── */}
-      <section className="py-16 px-6 border-t border-border-subtle">
-        <div className="max-w-4xl mx-auto">
-          <div className="rounded-2xl border border-border-subtle bg-gradient-to-r from-pink-50/60 via-white to-amber-50/40 p-6 sm:p-8 shadow-sm">
-            <div className="flex flex-col sm:flex-row items-start gap-6">
-              <div className="flex-1">
-                <span className="section-label block mb-2">Creator Beta</span>
-                <h2 className="section-headline text-xl sm:text-2xl">
-                  做你自己的人格宇宙
-                </h2>
-                <p className="display-tagline text-text-secondary mt-2 text-sm leading-relaxed">
-                  把你的内容做成可传播的人格测试。免费主题拉新，付费主题变现。
-                </p>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <Link
-                    href="/creator/"
-                    prefetch={false}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"
-                  >
-                    查看创作者计划
-                  </Link>
-                  <Link
-                    href="/creator/apply/"
-                    prefetch={false}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border-subtle text-text-secondary text-sm hover:text-text-primary hover:border-border transition-colors"
-                  >
-                    申请内测
-                  </Link>
-                </div>
-              </div>
+      {/* ── Creator Program — editorial feature ── */}
+      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="relative overflow-hidden p-10 sm:p-16" style={{ background: 'var(--color-paper-warm)', border: '1px solid var(--color-rule)' }}>
+            <div className="flex items-center gap-4 mb-8">
+              <span className="serial-number text-xs">08</span>
+              <span className="editorial-rule w-16" />
+              <span className="eyebrow" style={{ color: 'var(--color-gold)' }}>Creator beta</span>
+            </div>
+            <h2 className="editorial-display text-4xl sm:text-5xl md:text-6xl max-w-3xl mb-6">
+              做你自己的<br />
+              <span className="editorial-italic" style={{ color: 'var(--color-gold)' }}>人格宇宙</span>
+            </h2>
+            <p className="text-base sm:text-lg leading-[1.85] text-text-secondary max-w-xl">
+              把你的内容做成可传播的人格测试。<br className="hidden sm:block" />
+              免费主题拉新，付费主题变现。
+            </p>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <Link href="/creator/" prefetch={false} className="btn btn-gold">
+                查看创作者计划
+                <span className="opacity-60">→</span>
+              </Link>
+              <Link href="/creator/apply/" prefetch={false} className="btn btn-ghost">
+                申请内测
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Featured Types ── */}
-      <section className="py-16 px-6 border-t border-border-subtle">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <span className="section-label block mb-2">Types</span>
-            <h2 className="section-headline text-2xl sm:text-3xl">
-              先刷几张人设卡
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {FEATURED.map((p, i) => (
-              <div
-                key={p.slug}
-                className="animate-fade-up"
-                style={{ animationDelay: `${i * 60}ms` }}
-              >
-                <Link
-                  href={`/result/${p.slug}`}
-                  prefetch={false}
-                  className="group block rounded-2xl border border-border-subtle hover:border-border bg-bg-elevated hover:shadow-md transition-all overflow-hidden"
-                >
-                  <div
-                    className="relative w-full aspect-square flex items-center justify-center overflow-hidden"
-                    style={{ background: `linear-gradient(135deg, ${p.color}08, ${p.color}15)` }}
-                  >
-                    <NextImage
-                      src={getTypeThumbnailImage(p.slug)}
-                      alt={p.name}
-                      width={200}
-                      height={200}
-                      sizes="(max-width: 640px) 44vw, (max-width: 1024px) 28vw, 220px"
-                      className="w-[70%] h-[70%] object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="px-3.5 py-3">
-                    <span className="text-[11px] font-mono tracking-wider block mb-0.5" style={{ color: p.color }}>
-                      {p.code}
-                    </span>
-                    <span className="text-base font-medium text-text-primary">{p.name}</span>
-                    <p className="text-xs text-text-muted mt-0.5 line-clamp-1">{p.tagline}</p>
-                  </div>
-                </Link>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 text-center">
-            <Link
-              href="/types/"
-              prefetch={false}
-              className="text-sm text-text-muted hover:text-accent transition-colors"
-            >
-              查看全部 27 种 →
+      {/* ── Featured Types — 图鉴墙 ── */}
+      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-12 flex items-baseline justify-between flex-wrap gap-4">
+            <div>
+              <span className="serial-number text-xs mr-3">09</span>
+              <span className="eyebrow">The atlas</span>
+              <h2 className="section-headline text-3xl sm:text-4xl mt-3">
+                先翻几张<span className="editorial-italic">人设卡</span>
+              </h2>
+            </div>
+            <Link href="/types/" prefetch={false} className="text-sm text-text-secondary hover:text-text-primary transition-colors">
+              全部 27 种 →
             </Link>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-px" style={{ backgroundColor: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
+            {FEATURED.map((p, i) => (
+              <Link
+                key={p.slug}
+                href={`/result/${p.slug}`}
+                prefetch={false}
+                className="group relative block transition-colors duration-500 overflow-hidden"
+                style={{ backgroundColor: 'var(--color-bg-elevated)' }}
+              >
+                <span className="serial-number text-[10px] absolute top-4 left-5 z-10">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div
+                  className="relative w-full aspect-[4/5] flex items-center justify-center overflow-hidden"
+                  style={{ background: `linear-gradient(180deg, ${p.color}06, ${p.color}14)` }}
+                >
+                  <NextImage
+                    src={getTypeThumbnailImage(p.slug)}
+                    alt={p.name}
+                    width={320}
+                    height={320}
+                    sizes="(max-width: 640px) 44vw, (max-width: 1024px) 28vw, 280px"
+                    className="w-[72%] h-[72%] object-contain transition-transform duration-700 group-hover:scale-105"
+                  />
+                </div>
+                <div className="p-5" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+                  <span className="eyebrow block mb-2" style={{ color: p.color }}>
+                    {p.code}
+                  </span>
+                  <h3 className="text-lg text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.015em' }}>
+                    {p.name}
+                  </h3>
+                  <p className="text-xs text-text-muted mt-1 line-clamp-1">{p.tagline}</p>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── FAQ ── */}
-      <section className="py-16 px-6 border-t border-border-subtle">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <span className="section-label block mb-2">FAQ</span>
-            <h2 className="section-headline text-2xl sm:text-3xl">
-              常见问题
+      {/* ── FAQ — editorial Q&A ── */}
+      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="max-w-3xl mx-auto">
+          <div className="mb-12">
+            <span className="serial-number text-xs mr-3">10</span>
+            <span className="eyebrow">FAQ</span>
+            <h2 className="section-headline text-3xl sm:text-4xl mt-3">
+              常见<span className="editorial-italic">问题</span>
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {FAQS.map((item) => (
+          <div style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+            {FAQS.map((item, i) => (
               <article
                 key={item.question}
-                className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 hover:shadow-md transition-shadow"
+                className="py-8"
+                style={{ borderBottom: '1px solid var(--color-rule-soft)' }}
               >
-                <h3 className="text-base font-medium text-text-primary leading-7">{item.question}</h3>
-                <p className="text-sm text-text-secondary leading-7 mt-2">{item.answer}</p>
+                <div className="flex gap-6">
+                  <span className="serial-number text-xs pt-1 shrink-0 w-8">Q{String(i + 1).padStart(2, '0')}</span>
+                  <div className="flex-1">
+                    <h3 className="text-lg text-text-primary mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
+                      {item.question}
+                    </h3>
+                    <p className="text-sm sm:text-base text-text-secondary leading-[1.85]">{item.answer}</p>
+                  </div>
+                </div>
               </article>
             ))}
           </div>

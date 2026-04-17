@@ -21,6 +21,8 @@ import { encodeRelationshipLink, decodeRelationshipLink } from '@/lib/cpti/cpti-
 import { CptiRelationshipShareImageGenerator } from '@/components/CptiRelationshipShareImageGenerator';
 import type { CptiRelationshipShareImageGeneratorHandle } from '@/components/CptiRelationshipShareImageGenerator';
 import { ClaimAssetCard } from '@/components/ClaimAssetCard';
+import CptiPairShareCard from '@/components/CptiPairShareCard';
+import { getRelationshipRarity } from '@/lib/cpti/relationships-rarity';
 
 const emptySubscribe = () => () => {};
 
@@ -838,6 +840,32 @@ export function CptiRelationshipResult() {
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4 text-center">
             分享你们的关系鉴定
           </h2>
+
+          {/* Rarity ribbon (E-06) */}
+          <div className="mb-4 text-center">
+            {(() => {
+              const r = getRelationshipRarity(relationship.slug);
+              return (
+                <span
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono tracking-wider border"
+                  style={{ color: r.color, borderColor: r.color, background: r.bgColor }}
+                >
+                  {r.label} · 仅 {r.populationPct.toFixed(1)}% 的人是这对
+                </span>
+              );
+            })()}
+          </div>
+
+          {/* Pair share card (E-06 双人卡) */}
+          <div className="mb-5">
+            <CptiPairShareCard
+              slug={relationship.slug}
+              userCode={data.personalitySlugB.toUpperCase().slice(0, 8)}
+              partnerCode={data.personalitySlugA.toUpperCase().slice(0, 8)}
+              userName="你"
+              partnerName={data.nicknameA || 'TA'}
+            />
+          </div>
 
           <div className="space-y-3">
             <CptiRelationshipShareImageGenerator

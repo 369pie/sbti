@@ -7,6 +7,8 @@
     "dev": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && next dev --webpack",
     "dev:turbo": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && next dev",
     "build": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && node scripts/build-export.mjs",
+    "ugc:smoke-seed": "node scripts/ugc-smoke-seed.mjs",
+    "ugc:share-check": "node scripts/ugc-share-check.mjs",
     "images:thumbs": "node scripts/generate-gallery-thumbnails.mjs",
     "images:medium": "node scripts/generate-medium-images.mjs",
     "images:all": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs",

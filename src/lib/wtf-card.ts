@@ -5,6 +5,7 @@
  * Sharing works by encoding card data into URL params.
  */
 
+import { queueAssetSync } from '@/lib/assets/asset-sync';
 import { UNIVERSES, type Universe } from './universes';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -62,12 +63,16 @@ export function loadCard(): WtfCardData | null {
   }
 }
 
-export function saveCard(card: WtfCardData): void {
+export function saveCard(card: WtfCardData, options?: { skipSync?: boolean }): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(card));
   } catch {
     // storage full / private mode — fail silently
+  }
+
+  if (!options?.skipSync) {
+    queueAssetSync('wtf-card');
   }
 }
 
@@ -81,7 +86,7 @@ export function getOrCreateCard(): WtfCardData {
     createdAt: new Date().toISOString().slice(0, 10),
     results: Object.fromEntries(CARD_UNIVERSE_IDS.map(id => [id, null])),
   };
-  saveCard(fresh);
+  saveCard(fresh, { skipSync: true });
   return fresh;
 }
 

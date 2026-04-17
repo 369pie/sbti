@@ -182,7 +182,11 @@ export function Navigation() {
               <ChevronDown className={selfDD.open ? 'rotate-180' : ''} />
             </button>
             {selfDD.open && (
-              <div className="nav-dropdown left-0 w-[42rem] max-w-[calc(100vw-3rem)] p-4">
+              <div
+                className="nav-dropdown left-0 w-[42rem] max-w-[calc(100vw-3rem)] p-4"
+                onMouseEnter={selfDD.onMouseEnter}
+                onMouseLeave={selfDD.onMouseLeave}
+              >
                 <div className="grid grid-cols-[1.02fr_1.28fr] gap-4">
                   <section className="rounded-[24px] border border-[#f2dce6] bg-[linear-gradient(180deg,rgba(255,247,251,0.96),rgba(255,255,255,0.98))] p-4">
                     <div className="mb-3 flex items-start justify-between gap-3">
@@ -311,7 +315,11 @@ export function Navigation() {
               <ChevronDown className={relDD.open ? 'rotate-180' : ''} />
             </button>
             {relDD.open && (
-              <div className="nav-dropdown w-64 left-0">
+              <div
+                className="nav-dropdown w-64 left-0"
+                onMouseEnter={relDD.onMouseEnter}
+                onMouseLeave={relDD.onMouseLeave}
+              >
                 {RELATIONSHIP_ITEMS.map(item => (
                   <Link
                     key={item.href}
@@ -355,7 +363,11 @@ export function Navigation() {
               <ChevronDown className={discoverDD.open ? 'rotate-180' : ''} />
             </button>
             {discoverDD.open && (
-              <div className="nav-dropdown w-64 left-0">
+              <div
+                className="nav-dropdown w-64 left-0"
+                onMouseEnter={discoverDD.onMouseEnter}
+                onMouseLeave={discoverDD.onMouseLeave}
+              >
                 {DISCOVER_ITEMS.map(item => (
                   <Link
                     key={item.href}

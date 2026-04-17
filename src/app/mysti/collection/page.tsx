@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function MystiCollectionPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#0a0a0f]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#0B0D17]" />}>
       <MystiCollectionContent />
     </Suspense>
   );

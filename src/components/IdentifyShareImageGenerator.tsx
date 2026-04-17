@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 import { toQrDataUrl } from '@/lib/qr-code';
 import type { IdentifyPersonaType } from '@/lib/identify/personas';
 import { getIdentifyTypeImage } from '@/lib/identify/personas';
@@ -392,26 +393,29 @@ export const IdentifyShareImageGenerator = forwardRef<IdentifyShareImageGenerato
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({ resourceId: `identify:${persona.code}`, universe: 'identify' });
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const dataUrl = await renderIdentifyShareImage(persona, dimensionScores, friendName);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF1F4', 'IDENTIFY');
+        setPreviewUrl(finalUrl);
       } catch (err) {
         console.error('Failed to generate share image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [dimensionScores, friendName, generating, persona]);
+    }, [dimensionScores, friendName, generating, persona, tierCtl]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `WTF-鉴定书-${persona.code}.png`, { type: 'image/png' });
-    }, [persona.code, previewUrl]);
+      return new File([blob], `WTF-鉴定书-${persona.code}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [persona.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -434,10 +438,10 @@ export const IdentifyShareImageGenerator = forwardRef<IdentifyShareImageGenerato
         return;
       }
       const link = document.createElement('a');
-      link.download = `WTF-鉴定书-${persona.code}.png`;
+      link.download = `WTF-鉴定书-${persona.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, persona.code, previewUrl]);
+    }, [createPreviewFile, persona.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -457,6 +461,13 @@ export const IdentifyShareImageGenerator = forwardRef<IdentifyShareImageGenerato
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}

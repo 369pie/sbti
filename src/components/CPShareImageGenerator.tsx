@@ -2,6 +2,7 @@
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 import { getTypeImage } from '@/lib/personalities';
 import { MODEL_COLORS } from '@/lib/dimensions';
 import { SHARE_SITE_URL } from '@/lib/site';
@@ -422,20 +423,23 @@ export const CPShareImageGenerator = forwardRef<CPShareImageGeneratorHandle, Pro
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({ resourceId: 'cp:share', universe: 'cp' });
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const dataUrl = await renderCPShareImage(cpResult);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'CP');
+        setPreviewUrl(finalUrl);
       } catch (err) {
         console.error('Failed to generate CP share image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [cpResult, generating]);
+    }, [cpResult, generating, tierCtl]);
 
     const fileName = `SBTI-CP-${cpResult.typeA.code}x${cpResult.typeB.code}.png`;
 
@@ -487,6 +491,13 @@ export const CPShareImageGenerator = forwardRef<CPShareImageGeneratorHandle, Pro
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}

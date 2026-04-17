@@ -9,6 +9,7 @@ import { SHARE_SITE_URL } from '@/lib/site';
 import type { XptiDimensionScore } from '@/lib/xpti/scoring';
 import { resolveXptiShareCardPreset } from '@/lib/xpti/share-card-presets';
 import type { XptiShareCardPresetId } from '@/lib/xpti/share-card-presets';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 
 export interface XptiShareImageGeneratorHandle {
   generate: () => void;
@@ -515,28 +516,34 @@ export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle,
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({
+      resourceId: `xpti:${personality.code}`,
+      universe: 'xpti',
+    });
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const dataUrl = await renderXptiShareImage(personality, dimensionScores, { presetId, subTheme });
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#0D0608', 'XPTI');
+        setPreviewUrl(finalUrl);
       } catch (e) {
         console.error('Share image generation failed:', e);
       } finally {
         setGenerating(false);
       }
-    }, [dimensionScores, generating, personality, presetId, subTheme]);
+    }, [dimensionScores, generating, personality, presetId, subTheme, tierCtl]);
 
     const preset = resolveXptiShareCardPreset({ presetId, subTheme });
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `XPTI-${personality.code}.png`, { type: 'image/png' });
-    }, [personality.code, previewUrl]);
+      return new File([blob], `XPTI-${personality.code}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -555,10 +562,10 @@ export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle,
         return;
       }
       const link = document.createElement('a');
-      link.download = `XPTI-${personality.code}.png`;
+      link.download = `XPTI-${personality.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, personality.code, previewUrl]);
+    }, [createPreviewFile, personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -578,6 +585,13 @@ export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle,
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="dark"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}
@@ -618,7 +632,7 @@ export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle,
                 </svg>
               </button>
 
-              <div className="rounded-2xl overflow-hidden shadow-2xl mb-4">
+              <div className={`rounded-2xl overflow-hidden shadow-2xl mb-4 ${tierCtl.tierTokens.containerClass}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={previewUrl} alt="分享图片" className="w-full" />
               </div>

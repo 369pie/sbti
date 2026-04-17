@@ -1,7 +1,8 @@
 import type { CptiClaimSource } from './claim';
+import { getApiPath } from '@/lib/api';
 
 // Base fetch wrapper that includes credentials (cookies for Supabase auth)
-const API_BASE = '/api/cpti';
+const API_BASE = getApiPath('/cpti');
 
 let _signInPromise: Promise<void> | null = null;
 

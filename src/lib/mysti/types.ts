@@ -34,6 +34,48 @@ export interface MystiTheme {
   tarotDir: string;
 }
 
+// ── v2 Theme System (与主站品牌色彩家族对齐) ──
+export type MystiThemeV2Id = 'twilight' | 'nocturne' | 'aurora';
+
+export interface MystiThemeV2 {
+  id: MystiThemeV2Id;
+  label: string;
+  description: string;
+
+  bg: string;
+  bgGradient: [string, string];
+
+  text: string;
+  textMuted: string;
+  textSubtle: string;
+
+  /** 主强调色 — 用于 CTA、关键链接、品牌识别 */
+  accent: string;
+  accentSoft: string;
+  accentDeep: string;
+
+  /** 副强调色 — 神秘装饰、塔罗牌边框、二级强调 */
+  accentGold: string;
+  accentGoldSoft: string;
+
+  cardSurface: string;
+  cardSurfaceElevated: string;
+  cardBorder: string;
+  cardBorderStrong: string;
+  cardGlow: string;
+  cardGradient: [string, string];
+
+  divider: string;
+  dividerAccent: string;
+
+  ctaGradientFrom: string;
+  ctaGradientTo: string;
+
+  tarotDir: string;
+  /** 是否为暗色主题（影响图片/SVG 反色处理） */
+  isDark: boolean;
+}
+
 export interface MystiShareImageGeneratorHandle {
   generate: () => void;
 }

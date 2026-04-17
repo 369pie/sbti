@@ -38,7 +38,7 @@ export default function DrunkHomeContent() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/drunk/test"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-amber-500 text-white font-medium text-base hover:bg-amber-600 transition-all duration-200"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gold text-bg-elevated font-medium text-base hover:bg-gold-leaf transition-all duration-200"
               >
                 测一测你的酒后人设
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

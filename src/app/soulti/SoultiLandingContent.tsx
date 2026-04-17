@@ -129,6 +129,30 @@ export default function SoultiLandingContent() {
             >
               25 questions · different each time
             </p>
+
+            {/* ── SoulTI Universe entry points ── */}
+            <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
+              {[
+                { href: '/soulti/map/', label: '全景图谱', desc: '32 型 × 5 轴' },
+                { href: '/soulti/origin/', label: '历史原型', desc: '32 位她' },
+                { href: '/soulti/pair/', label: '双人共振', desc: '测 TA 和你' },
+                { href: '/soulti/rarity/', label: '稀有度榜', desc: '你是哪一档' },
+              ].map(link => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="block rounded-2xl border p-4 text-center transition-all hover:-translate-y-0.5"
+                  style={{ borderColor: 'rgba(139,115,85,0.2)', background: '#FDFCFA' }}
+                >
+                  <p className="text-sm mb-1" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+                    {link.label}
+                  </p>
+                  <p className="text-[10px]" style={{ fontFamily: serifFont, color: '#8a7f72' }}>
+                    {link.desc}
+                  </p>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>

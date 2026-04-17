@@ -7,6 +7,7 @@ import type { CptiPersonalityType } from '@/lib/cpti/personalities';
 import { CPTI_DIMENSIONS, CPTI_MODEL_COLORS } from '@/lib/cpti/dimensions';
 import { SHARE_SITE_URL } from '@/lib/site';
 import type { CptiDimensionScore } from '@/lib/cpti/scoring';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 
 export interface CptiShareImageGeneratorHandle {
   generate: () => void;
@@ -382,20 +383,26 @@ export const CptiShareImageGenerator = forwardRef<CptiShareImageGeneratorHandle,
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({
+      resourceId: `cpti:${personality.code}`,
+      universe: 'cpti',
+    });
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const dataUrl = await renderCptiShareImage(personality, dimensionScores);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'CPTI');
+        setPreviewUrl(finalUrl);
       } catch (err) {
         console.error('Failed to generate share image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [dimensionScores, generating, personality]);
+    }, [dimensionScores, generating, personality, tierCtl]);
 
     const handleQuickDownload = useCallback(async () => {
       if (!previewUrl) {
@@ -403,16 +410,16 @@ export const CptiShareImageGenerator = forwardRef<CptiShareImageGeneratorHandle,
         return;
       }
       const link = document.createElement('a');
-      link.download = `CPTI-${personality.code}.png`;
+      link.download = `CPTI-${personality.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [handleGenerate, personality.code, previewUrl]);
+    }, [handleGenerate, personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `CPTI-${personality.code}.png`, { type: 'image/png' });
-    }, [personality.code, previewUrl]);
+      return new File([blob], `CPTI-${personality.code}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -435,10 +442,10 @@ export const CptiShareImageGenerator = forwardRef<CptiShareImageGeneratorHandle,
         return;
       }
       const link = document.createElement('a');
-      link.download = `CPTI-${personality.code}.png`;
+      link.download = `CPTI-${personality.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, personality.code, previewUrl]);
+    }, [createPreviewFile, personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -458,6 +465,12 @@ export const CptiShareImageGenerator = forwardRef<CptiShareImageGeneratorHandle,
 
     return (
       <div className="space-y-2.5">
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+        />
         <button
           onClick={handleQuickDownload}
           disabled={generating}
@@ -513,7 +526,7 @@ export const CptiShareImageGenerator = forwardRef<CptiShareImageGeneratorHandle,
                 </svg>
               </button>
 
-              <div className="rounded-2xl overflow-hidden shadow-2xl mb-4">
+              <div className={`rounded-2xl overflow-hidden shadow-2xl mb-4 ${tierCtl.tierTokens.containerClass}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={previewUrl} alt="分享图片" className="w-full" />
               </div>

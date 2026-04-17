@@ -1,7 +1,8 @@
 import type { IdentifyDimensionScore } from '@/lib/identify/scoring';
 import type { ResultDiagnostics } from '@/lib/result-diagnostics';
+import { getApiPath } from '@/lib/api';
 
-const API_BASE = '/api/identify';
+const API_BASE = getApiPath('/identify');
 
 let ensureSessionPromise: Promise<void> | null = null;
 

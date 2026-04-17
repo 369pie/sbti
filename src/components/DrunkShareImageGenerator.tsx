@@ -7,6 +7,7 @@ import { getDrunkTypeImage } from '@/lib/drunk/personas';
 import { DRUNK_DIMENSIONS, DRUNK_MODEL_COLORS } from '@/lib/drunk/dimensions';
 import { SHARE_SITE_URL } from '@/lib/site';
 import type { DrunkDimensionScore } from '@/lib/drunk/scoring';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 
 export interface DrunkShareImageGeneratorHandle {
   generate: () => void;
@@ -374,26 +375,32 @@ export const DrunkShareImageGenerator = forwardRef<DrunkShareImageGeneratorHandl
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({
+      resourceId: `drunk:${persona.code}`,
+      universe: 'drunk',
+    });
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const dataUrl = await renderDrunkShareImage(persona, dimensionScores);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'DRUNK');
+        setPreviewUrl(finalUrl);
       } catch (err) {
         console.error('Failed to generate share image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [dimensionScores, generating, persona]);
+    }, [dimensionScores, generating, persona, tierCtl]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `DRUNK-${persona.code}.png`, { type: 'image/png' });
-    }, [persona.code, previewUrl]);
+      return new File([blob], `DRUNK-${persona.code}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [persona.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -416,10 +423,10 @@ export const DrunkShareImageGenerator = forwardRef<DrunkShareImageGeneratorHandl
         return;
       }
       const link = document.createElement('a');
-      link.download = `DRUNK-${persona.code}.png`;
+      link.download = `DRUNK-${persona.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createPreviewFile, persona.code, previewUrl]);
+    }, [createPreviewFile, persona.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -439,10 +446,17 @@ export const DrunkShareImageGenerator = forwardRef<DrunkShareImageGeneratorHandl
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}
-          className="w-full py-3.5 rounded-xl bg-amber-500 text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full py-3.5 rounded-xl bg-gold text-bg-primary font-medium text-sm hover:brightness-110 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {generating ? (
             <>
@@ -478,7 +492,7 @@ export const DrunkShareImageGenerator = forwardRef<DrunkShareImageGeneratorHandl
                 </svg>
               </button>
 
-              <div className="rounded-2xl overflow-hidden shadow-2xl mb-4">
+              <div className={`rounded-2xl overflow-hidden shadow-2xl mb-4 ${tierCtl.tierTokens.containerClass}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={previewUrl} alt="分享图片" className="w-full" />
               </div>

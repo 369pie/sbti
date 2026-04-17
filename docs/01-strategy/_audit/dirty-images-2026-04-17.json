@@ -1,0 +1,384 @@
+{
+  "generatedAt": "2026-04-17",
+  "total": 54,
+  "items": [
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/party.webp",
+      "sizeKB": 22,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/allies.webp",
+      "sizeKB": 21,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/rivals.webp",
+      "sizeKB": 21,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/plastic.webp",
+      "sizeKB": 20,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/lovers.webp",
+      "sizeKB": 18,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/mentor.webp",
+      "sizeKB": 18,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/parent.webp",
+      "sizeKB": 18,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/homies.webp",
+      "sizeKB": 17,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/rookie.webp",
+      "sizeKB": 17,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/settled.webp",
+      "sizeKB": 17,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/twins.webp",
+      "sizeKB": 17,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/united.webp",
+      "sizeKB": 17,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/weirdos.webp",
+      "sizeKB": 17,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/enemies.webp",
+      "sizeKB": 16,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/glued.webp",
+      "sizeKB": 16,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/paradox.webp",
+      "sizeKB": 16,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/sync.webp",
+      "sizeKB": 16,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/volcano.webp",
+      "sizeKB": 16,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/inmate.webp",
+      "sizeKB": 15,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/keeper.webp",
+      "sizeKB": 15,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/mirror.webp",
+      "sizeKB": 15,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/shield.webp",
+      "sizeKB": 15,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/soul.webp",
+      "sizeKB": 15,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/free.webp",
+      "sizeKB": 14,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/cpti/relationships/thumbs/iceberg.webp",
+      "sizeKB": 12,
+      "reasons": [
+        "matches composite marker /\\/relationships\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/simp.webp",
+      "sizeKB": 9,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/dior-s.webp",
+      "sizeKB": 7,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/ctrl.webp",
+      "sizeKB": 6,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/drunk.webp",
+      "sizeKB": 6,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/sexy.webp",
+      "sizeKB": 6,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/atm-er.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/boss.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/emo.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/food-ie.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/game-r.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/joke-r.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/luck-y.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/mum.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/nerd.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/party.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/rebel.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/sleep.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/talk-er.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/than-k.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/thin-k.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/woc.webp",
+      "sizeKB": 5,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/chill.webp",
+      "sizeKB": 4,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/drama.webp",
+      "sizeKB": 4,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/fake.webp",
+      "sizeKB": 4,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/love-r.webp",
+      "sizeKB": 4,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/malo.webp",
+      "sizeKB": 4,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/oh-no.webp",
+      "sizeKB": 4,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/shy.webp",
+      "sizeKB": 4,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    },
+    {
+      "path": "public/images/types/bird/cards/thumbs/solo.webp",
+      "sizeKB": 4,
+      "reasons": [
+        "matches composite marker /\\/cards\\//"
+      ]
+    }
+  ]
+}

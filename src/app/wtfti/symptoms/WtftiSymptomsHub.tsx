@@ -102,7 +102,7 @@ export function WtftiSymptomsHub() {
           <Link
             href="/wtfti/test"
             prefetch={false}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 text-white text-sm font-medium hover:brightness-110 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-rose-deep to-ember text-bg-elevated text-sm font-medium hover:brightness-110 transition-all"
           >
             去做完整测试 →
           </Link>

@@ -6,6 +6,10 @@ export type CreatorApplicationStatus =
   | 'rejected'
   | 'archived';
 
+export const CREATOR_APPLICATIONS_TABLE = 'creator_applications';
+export const CREATOR_APPLICATIONS_SCHEMA_DOC = 'src/lib/ugc/schema.sql';
+export const CREATOR_APPLICATIONS_SETUP_DOC = 'docs/05-operations/infra/creator-applications-schema.sql';
+
 export interface CreatorApplicationInput {
   name: string;
   email: string;
@@ -26,6 +30,36 @@ export interface CreatorApplicationRecord extends CreatorApplicationInput {
   createdAt: string;
   updatedAt: string;
 }
+
+export const CREATOR_APPLICATION_STATUS_META: Record<
+  CreatorApplicationStatus,
+  { label: string; description: string }
+> = {
+  new: {
+    label: '已提交',
+    description: '申请已收到，正在排队审核。',
+  },
+  contacted: {
+    label: '待沟通',
+    description: '我们准备进一步联系你确认内容方向与合作方式。',
+  },
+  qualified: {
+    label: '已通过初筛',
+    description: '基础审核已通过，正在等待最终确认与开通排期。',
+  },
+  approved: {
+    label: '已通过',
+    description: '你已经进入创作者内测名单，我们会继续发送后续开通指引。',
+  },
+  rejected: {
+    label: '暂未通过',
+    description: '本轮内测暂未通过，你可以后续补充资料后再次提交。',
+  },
+  archived: {
+    label: '已归档',
+    description: '当前申请已归档，如需继续参与可以重新提交资料。',
+  },
+};
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^[+0-9\-()\s]{6,30}$/;
@@ -78,25 +112,17 @@ export function isCreatorApplicationStatus(value: unknown): value is CreatorAppl
   return typeof value === 'string' && CREATOR_APPLICATION_STATUS_OPTIONS.includes(value as CreatorApplicationStatus);
 }
 
-export function getAdminTokenFromRequest(req: Request): string | null {
-  const headerToken = req.headers.get('x-admin-token')?.trim();
-  if (headerToken) return headerToken;
-
-  const auth = req.headers.get('authorization')?.trim();
-  if (auth?.toLowerCase().startsWith('bearer ')) {
-    const bearer = auth.slice(7).trim();
-    if (bearer) return bearer;
-  }
-
-  const url = new URL(req.url);
-  const queryToken = url.searchParams.get('token')?.trim();
-  if (queryToken) return queryToken;
-
-  return null;
+export function isCreatorApplicationsTableMissing(error: unknown): error is { code?: string } {
+  if (!error || typeof error !== 'object') return false;
+  const candidate = error as { code?: string; message?: string };
+  if (candidate.code === 'PGRST205') return true;
+  if (candidate.code === '42703' && candidate.message?.includes('creator_applications.user_id')) return true;
+  return false;
 }
 
-export function isCreatorAdminTokenValid(token: string | null): boolean {
-  const configured = process.env.CREATOR_ADMIN_TOKEN?.trim();
-  if (!configured) return false;
-  return token === configured;
+export function getCreatorApplicationsSchemaDetails(): string {
+  return (
+    `Missing table or required columns on public.${CREATOR_APPLICATIONS_TABLE}. ` +
+    `Run the latest ${CREATOR_APPLICATIONS_SCHEMA_DOC} or ${CREATOR_APPLICATIONS_SETUP_DOC} in Supabase SQL Editor.`
+  );
 }

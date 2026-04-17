@@ -4,10 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { getApiPath } from '@/lib/api';
+import { finalizeClaimedSession, stageAnonymousSourceForMerge } from '@/lib/auth/claimed-session';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { getSiteUrl } from '@/lib/site';
-
-const PENDING_SOURCE_USER_ID_KEY = 'cpti-pending-merge-source-user-id';
 
 type PageState =
   | 'checking'
@@ -35,37 +35,17 @@ export function ClaimedContent() {
   const runUpgradeFinalize = useCallback(async () => {
     setPageState('upgrading');
 
-    const upgradeRes = await fetch('/api/cpti/upgrade', {
-      method: 'POST',
-    });
-
-    const upgradeData = await upgradeRes.json().catch(() => ({}));
-    if (!upgradeRes.ok) {
-      throw new Error(upgradeData.error ?? '认领状态同步失败');
-    }
-
-    const sourceUserId =
-      typeof window !== 'undefined'
-        ? window.localStorage.getItem(PENDING_SOURCE_USER_ID_KEY)
-        : null;
-
-    if (shouldMerge && sourceUserId && sourceUserId !== upgradeData.userId) {
-      const mergeRes = await fetch('/api/cpti/merge-existing', {
+    if (shouldMerge) {
+      await finalizeClaimedSession();
+    } else {
+      const upgradeRes = await fetch(getApiPath('/cpti/upgrade'), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sourceUserId }),
       });
-      const mergeData = await mergeRes.json().catch(() => ({}));
 
-      if (!mergeRes.ok) {
-        throw new Error(mergeData.error ?? '资产合并失败');
+      const upgradeData = await upgradeRes.json().catch(() => ({}));
+      if (!upgradeRes.ok) {
+        throw new Error(upgradeData.error ?? '认领状态同步失败');
       }
-    }
-
-    if (typeof window !== 'undefined') {
-      window.localStorage.removeItem(PENDING_SOURCE_USER_ID_KEY);
     }
 
     setIsAnonymous(false);
@@ -119,7 +99,7 @@ export function ClaimedContent() {
       } = await supabase.auth.getUser();
 
       if (user?.id && typeof window !== 'undefined') {
-        window.localStorage.setItem(PENDING_SOURCE_USER_ID_KEY, user.id);
+        await stageAnonymousSourceForMerge();
       }
 
       setPageState('sending');

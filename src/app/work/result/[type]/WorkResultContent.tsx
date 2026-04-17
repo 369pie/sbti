@@ -11,6 +11,7 @@ import type { WorkDimensionScore } from '@/lib/work/scoring';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 
 type WorkShareImageGeneratorComponentType = typeof import('@/components/WorkShareImageGenerator')['WorkShareImageGenerator'];
@@ -258,6 +259,10 @@ export function WorkResultContent({ personality, dimensionScores }: Props) {
       </section>
 
       <CrossTestRecommendations currentTest="work" personalityName={personality.name} />
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <WtfiTheoryWiring universe="work" dimensionScores={dimensionScores} />
+      </section>
 
       {/* Share section */}
       <section className="max-w-2xl mx-auto px-6 pb-16">

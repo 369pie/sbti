@@ -1,10 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { useEffect, useState, useCallback } from 'react';
 import { loadCard, recordUniverseResult, CARD_UNIVERSE_IDS } from '@/lib/wtf-card';
 import { getUniverse } from '@/lib/universes';
+
+// Client-only shard section — avoid any SSR/prerender interaction by design.
+const ShardSection = dynamic(() => import('./ShardSection'), { ssr: false });
 
 // ─── Universe Switcher Teasers ───────────────────────────────────────────────
 
@@ -102,10 +106,22 @@ export function ResultClosureEngine({
   const handleSave = useCallback(() => {
     recordUniverseResult(currentUniverse, personalitySlug);
     setCardState(prev => prev ? { ...prev, lit: prev.lit + (prev.saved ? 0 : 1), saved: true } : prev);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('persona-shard:refresh'));
+    }
   }, [currentUniverse, personalitySlug]);
 
   return (
     <>
+      {/* ── 0. Persona Shard Orb (client-only via dynamic import) ── */}
+      <ShardSection
+        currentUniverse={currentUniverse}
+        personalitySlug={personalitySlug}
+        personalityName={personalityName}
+        accent={accent}
+        isXpti={isXpti}
+      />
+
       {/* ── 1. Universe Switcher ── */}
       {switcherCards.length > 0 && (
         <section className="max-w-2xl mx-auto px-6 pb-10">

@@ -130,6 +130,7 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
 
     // Record to WTF Card
     const cardUniverseId =
+      universeId ? universeId :
       isMysti ? 'mysti' :
       resultPrefix === '/wtfti/kings' ? 'kings' :
       resultPrefix === '/wtfti/delta' ? 'delta' :
@@ -152,7 +153,7 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
         window.location.href = `${basePath}${resultPrefix}/result/${encodeURIComponent(result.personality.slug)}${skinParam}`;
       }
     }, 800);
-  }, [cpPartner, isMysti, isXiuxian, resultPrefix]);
+  }, [cpPartner, isMysti, isXiuxian, resultPrefix, universeId]);
 
   const handleAnswer = useCallback((questionId: number, value: Answer) => {
     if (!currentQ) return;

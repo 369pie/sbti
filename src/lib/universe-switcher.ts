@@ -21,7 +21,7 @@ export interface UniversePreview {
   personalityName: string; // what your type is called in this universe
   path: string;           // link to result page
   isCurrentUniverse: boolean;
-  status: 'live' | 'coming-soon';
+  status: 'live' | 'coming-soon' | 'limited';
 }
 
 // Map of universe IDs to their result prefixes and personality lookups

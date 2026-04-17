@@ -1,55 +1,136 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
-  --font-mono: "SFMono-Regular", "JetBrains Mono", "Fira Code", "Cascadia Code", "Segoe UI Mono", ui-monospace, monospace;
-  --font-serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
-  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
-  --font-heading: "Avenir Next", "Segoe UI", "Helvetica Neue", "Noto Sans SC", "PingFang SC", ui-sans-serif, system-ui, sans-serif;
+  /* ─── Font families (v3 Editorial Feminine) ─────────────────────────── */
+  /* Display / hero — Chinese serif paired with English transitional serif */
+  --font-display: var(--font-cormorant), var(--font-serif-sc), "Noto Serif SC",
+    "Source Han Serif SC", "Songti SC", Georgia, serif;
+  --font-serif: var(--font-serif-sc), "Noto Serif SC", var(--font-cormorant),
+    "Source Han Serif SC", "Songti SC", Georgia, serif;
+  --font-editorial: var(--font-fraunces), var(--font-cormorant),
+    var(--font-serif-sc), Georgia, serif;
+  /* Body / UI — retain reliable Chinese sans */
+  --font-sans: var(--font-sans-sc), "Noto Sans SC", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  /* Meta / label / code */
+  --font-mono: var(--font-mono-ui), "SFMono-Regular", "JetBrains Mono",
+    "Fira Code", ui-monospace, monospace;
+  /* Heading sans kept for rare bold geometric needs */
+  --font-heading: var(--font-sans-sc), "Noto Sans SC", "PingFang SC",
+    system-ui, sans-serif;
 
-  /* Warm light palette — cream + warm neutrals */
+  /* ─── Paper palette — v3 老钱米 ───────────────────────────────────── */
   --color-bg-primary: #FAF8F5;
-  --color-bg-secondary: #F2EFEA;
-  --color-bg-tertiary: #EDE8E2;
-  --color-bg-elevated: #FFFFFF;
+  --color-bg-secondary: #F3EEE6;
+  --color-bg-tertiary: #ECE5D9;
+  --color-bg-elevated: #FFFDF9;
+  --color-paper: #FAF8F5;
+  --color-paper-deep: #F0EBE2;
+  --color-paper-warm: #F5EFE4;
 
-  --color-text-primary: #2D2A26;
-  --color-text-secondary: #6B6560;
-  --color-text-muted: #9C9590;
+  /* Ink / text */
+  --color-text-primary: #1F1A16;
+  --color-text-secondary: #5B524B;
+  --color-text-muted: #9A908A;
+  --color-ink: #1F1A16;
+  --color-ink-soft: #5B524B;
+  --color-ink-mute: #9A908A;
+  --color-stone: #857A70;
 
-  --color-border: #DDD8D1;
-  --color-border-subtle: #EDE8E2;
+  /* Rules & borders */
+  --color-border: #CFC6BB;
+  --color-border-subtle: #E3DCD1;
+  --color-rule: #CFC6BB;
+  --color-rule-soft: #E3DCD1;
 
-  /* Accent — warm rose */
-  --color-accent: #e06088;
-  --color-accent-light: #f09abc;
-  --color-accent-dim: rgba(224, 96, 136, 0.1);
+  /* Accent system v4 — Editorial Atelier (desaturated rose-clay + gold + gem) */
+  /* Rose降饱和 #D26A87 → #C07A8E (clay rose) · 女性向顶级审美分水岭 */
+  --color-accent: #C07A8E;
+  --color-accent-light: #E6D1D6;
+  --color-accent-dim: rgba(192, 122, 142, 0.10);
+  --color-rose: #C07A8E;
+  --color-rose-dust: #E6D1D6;
+  --color-rose-deep: #A85A6E;
+  --color-gold: #B8905A;
+  --color-gold-soft: #D4B58A;
+  --color-gold-leaf: #C9A676;
+  --color-ember: #8C3E3E;
+  --color-sage: #7A8A82;
+  --color-gem: #5B6E6A;
 
-  /* Model colors */
-  --color-model-self: #e5940a;
-  --color-model-emotion: #e03a55;
-  --color-model-attitude: #0ea572;
-  --color-model-action: #7c4ddb;
-  --color-model-social: #0ea5c4;
+  /* Model colors — kept but desaturated */
+  --color-model-self: #C9882A;
+  --color-model-emotion: #B85470;
+  --color-model-attitude: #3D8062;
+  --color-model-action: #6A4DBB;
+  --color-model-social: #3B8699;
+
+  /* Radius scale v3 */
+  --radius-sharp: 0px;
+  --radius-soft: 4px;
+  --radius-card: 8px;
+  --radius-pill: 9999px;
+
+  /* Space scale v3 */
+  --space-xxl: 200px;
+  --space-xl: 128px;
+  --space-l: 64px;
+  --space-m: 32px;
+  --space-s: 16px;
+  --space-xs: 8px;
+
+  /* Motion v4 — Quiet Cinema */
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-quiet: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-whisper: 230ms;
+  --dur-breath: 420ms;
+  --dur-ritual: 1200ms;
 }
 
 body {
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11", "palt";
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Paper texture (v3 signature material layer) ── */
+.paper-texture {
+  position: relative;
+}
+.paper-texture::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.10  0 0 0 0 0.08  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 240px 240px;
+}
+.paper-texture > * {
+  position: relative;
+  z-index: 2;
+}
+header.sticky {
+  z-index: 50;
 }
 
 /* Custom selection */
 ::selection {
-  background: rgba(224, 96, 136, 0.2);
-  color: #2D2A26;
+  background: rgba(210, 106, 135, 0.22);
+  color: #1F1A16;
 }
 
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: 1.5px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 /* Smooth scroll */
@@ -57,55 +138,90 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Gradient text — kept for rare decorative use */
+/* Gradient text — kept for rare decorative use (v4 clay-rose + gold-leaf) */
 .gradient-text {
-  background: linear-gradient(135deg, #e06088, #c084fc, #f472b6);
+  background: linear-gradient(135deg, #C07A8E, #B8905A, #8C3E3E);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .wtfti-gradient-text {
-  background: linear-gradient(135deg, #ff4d6d, #e06088, #c084fc);
+  background: linear-gradient(135deg, #C07A8E 0%, #A85A6E 50%, #8C3E3E 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* ── Brand typography ── */
+/* Gold-leaf text — 烫金字符, 重要数字/N°编号/一击金句 */
+.gold-leaf-text {
+  background: linear-gradient(
+    135deg,
+    #D4B58A 0%,
+    #B8905A 40%,
+    #C9A676 55%,
+    #9A7140 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 1px rgba(184, 144, 90, 0.15);
+}
 
-/* Hero brand mark: "WTF" bold geometric + "TI" elegant serif */
+/* ── Brand typography v3 ── */
+
+/* Hero brand mark: "WTF" geometric + "TI" elegant italic serif */
 .brand-wtf {
   font-family: var(--font-heading);
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.05em;
+  font-feature-settings: "ss01", "palt";
 }
 .brand-ti {
   font-family: var(--font-display);
   font-weight: 400;
   font-style: italic;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
-/* Section label — small monospace uppercase */
+/* Section label — small monospace uppercase (widened tracking) */
 .section-label {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: var(--color-stone);
 }
 
-/* Section headline — mix of heading font + tighter tracking */
+/* Section headline — now SERIF, tighter tracking, normal weight */
 .section-headline {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--color-ink);
 }
 
-/* Decorative quote / tagline — serif italic */
+/* Editorial display — the biggest moment on a page */
+.editorial-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  color: var(--color-ink);
+}
+
+/* Editorial italic (引文) */
+.editorial-italic {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.005em;
+  line-height: 1.4;
+}
+
+/* Decorative tagline — serif italic */
 .display-tagline {
   font-family: var(--font-display);
   font-style: italic;
@@ -113,18 +229,139 @@ html {
   letter-spacing: 0.01em;
 }
 
-/* Stat number — mono, tabular */
+/* Stat number — tabular editorial */
 .stat-value {
-  font-family: var(--font-heading), var(--font-mono);
+  font-family: var(--font-editorial);
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
-  letter-spacing: -0.04em;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* Serial number — 01/02/03 editorial markers */
+.serial-number {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--color-stone);
+}
+
+/* Editorial rule — the 1px horizontal divider */
+.editorial-rule {
+  display: block;
+  height: 1px;
+  background: var(--color-rule);
+  border: 0;
+  margin: 0;
+}
+.editorial-rule-soft {
+  display: block;
+  height: 1px;
+  background: var(--color-rule-soft);
+  border: 0;
+  margin: 0;
+}
+
+/* Small all-caps eyebrow */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+
+/* ── Button system v3 (three types, not one) ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.9rem 1.8rem;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-soft);
+  transition: transform 320ms var(--ease-editorial),
+    background-color 320ms var(--ease-editorial),
+    color 320ms var(--ease-editorial),
+    border-color 320ms var(--ease-editorial);
+  cursor: pointer;
+  line-height: 1;
+  white-space: nowrap;
+}
+.btn-ink {
+  background: var(--color-ink);
+  color: #FAF8F5;
+  border: 1px solid var(--color-ink);
+}
+.btn-ink:hover {
+  background: #0F0A07;
+  transform: translateY(-1px);
+}
+.btn-rose {
+  background: var(--color-rose);
+  color: #FFFFFF;
+  border: 1px solid var(--color-rose);
+}
+.btn-rose:hover {
+  background: var(--color-rose-deep);
+  border-color: var(--color-rose-deep);
+  transform: translateY(-1px);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--color-ink);
+  border: 1px solid var(--color-rule);
+}
+.btn-ghost:hover {
+  border-color: var(--color-ink);
+}
+.btn-gold {
+  background: var(--color-gold);
+  color: #FFFDF9;
+  border: 1px solid var(--color-gold);
+}
+.btn-gold:hover {
+  background: #A37D4A;
+  transform: translateY(-1px);
+}
+
+/* ── Editorial card (replaces rounded-xl shadow cards) ── */
+.card-editorial {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-rule-soft);
+  border-radius: var(--radius-card);
+  transition: background-color 360ms var(--ease-editorial),
+    border-color 360ms var(--ease-editorial),
+    transform 360ms var(--ease-editorial);
+}
+.card-editorial:hover {
+  background: var(--color-paper-warm);
+  border-color: var(--color-rule);
+}
+.card-editorial-quiet {
+  background: transparent;
+  border: 1px solid var(--color-rule-soft);
+  border-radius: var(--radius-card);
+}
+
+/* Editorial hairline divider with centered mark */
+.editorial-mark {
+  display: inline-block;
+  font-family: var(--font-editorial);
+  font-style: italic;
+  color: var(--color-stone);
+  letter-spacing: 0.5em;
 }
 
 @keyframes fade-up-in {
   from {
     opacity: 0;
-    transform: translate3d(0, 18px, 0);
+    transform: translate3d(0, 12px, 0);
   }
   to {
     opacity: 1;
@@ -137,8 +374,8 @@ html {
 .animate-fade-up-delay-2 {
   opacity: 0;
   animation-name: fade-up-in;
-  animation-duration: 560ms;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-duration: 900ms;
+  animation-timing-function: var(--ease-editorial);
   animation-fill-mode: forwards;
 }
 
@@ -156,6 +393,30 @@ html {
   .animate-fade-up-delay-2 {
     opacity: 1;
     animation: none;
+  }
+}
+
+/* ── Museum drawer / modal motion ── */
+@keyframes museum-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes museum-slide-up {
+  from { opacity: 0; transform: translate3d(0, 24px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+.animate-fade-in {
+  animation: museum-fade-in 240ms var(--ease-editorial) both;
+}
+.animate-slide-up {
+  animation: museum-slide-up 360ms var(--ease-editorial) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -194,11 +455,20 @@ html {
 }
 
 .nav-dropdown {
-  @apply absolute top-full mt-3 rounded-[28px] border border-border-subtle bg-bg-elevated shadow-lg backdrop-blur-sm;
+  @apply absolute top-full z-50 rounded-[28px] border border-border-subtle bg-bg-elevated shadow-lg backdrop-blur-sm;
   box-shadow:
     0 24px 60px rgba(45, 42, 38, 0.12),
     0 8px 20px rgba(45, 42, 38, 0.05);
   animation: nav-dropdown-in 150ms ease-out;
+}
+
+.nav-dropdown::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -12px;
+  height: 12px;
 }
 
 .nav-dropdown-item {
@@ -265,6 +535,163 @@ html {
   
   --color-border: rgba(163,82,110,0.3) !important;
   --color-border-subtle: rgba(163,82,110,0.15) !important;
+}
+
+/* ── L2 Universe Skins ───────────────────────────────────────────────
+ * 每个 .{universe}-theme 只覆盖颜色 token，骨架（字体/间距/动效）继承 L1。
+ * 详见 docs/04-design-growth/design/universe-style-charter.md
+ * ────────────────────────────────────────────────────────────────── */
+
+/* WTFTI · 风 (Feng) — cyberpunk 故障扫描 */
+.feng-cyber-theme {
+  --color-bg-primary: #050505 !important;
+  --color-bg-secondary: #0D0D0E !important;
+  --color-bg-tertiary: #1A1A1C !important;
+  --color-bg-elevated: rgba(20,20,22,0.85) !important;
+
+  --color-text-primary: #F2F2F4 !important;
+  --color-text-secondary: #B5B5BA !important;
+  --color-text-muted: #6E6E74 !important;
+
+  --color-border: rgba(255,255,255,0.16) !important;
+  --color-border-subtle: rgba(255,255,255,0.08) !important;
+
+  --color-accent: #FF3A55 !important;
+  --color-accent-light: rgba(255,58,85,0.18) !important;
+  --color-accent-dim: rgba(255,58,85,0.10) !important;
+}
+
+/* Hogti · 暖琥珀小幸运 */
+.hogti-warmth-theme {
+  --color-bg-primary: #2A1E0F !important;
+  --color-bg-secondary: #3A2A18 !important;
+  --color-bg-tertiary: #4A3622 !important;
+  --color-bg-elevated: rgba(58,42,24,0.82) !important;
+
+  --color-text-primary: #FBE9C7 !important;
+  --color-text-secondary: #E2C99B !important;
+  --color-text-muted: #A8916A !important;
+
+  --color-border: rgba(251,233,199,0.22) !important;
+  --color-border-subtle: rgba(251,233,199,0.10) !important;
+
+  --color-accent: #F2B85A !important;
+  --color-accent-light: rgba(242,184,90,0.22) !important;
+  --color-accent-dim: rgba(242,184,90,0.12) !important;
+}
+
+/* Mysti · 苍白圣痕 (pale) — CSS fallback for non-React contexts */
+.mysti-pale-theme {
+  --color-bg-primary: #F7F4EF !important;
+  --color-bg-secondary: #EDE8E0 !important;
+  --color-bg-tertiary: #E0D9CC !important;
+  --color-bg-elevated: #FFFFFF !important;
+
+  --color-text-primary: #2D2424 !important;
+  --color-text-secondary: #7A6E6E !important;
+  --color-text-muted: #A89A98 !important;
+
+  --color-border: rgba(168,92,100,0.30) !important;
+  --color-border-subtle: rgba(168,92,100,0.15) !important;
+
+  --color-accent: #A85C64 !important;
+  --color-accent-light: rgba(168,92,100,0.18) !important;
+}
+
+/* Mysti · 星夜秘典 (celestial) — CSS fallback */
+.mysti-celestial-theme {
+  --color-bg-primary: #0B0D17 !important;
+  --color-bg-secondary: #12152B !important;
+  --color-bg-tertiary: #1B1F3A !important;
+  --color-bg-elevated: rgba(18,21,43,0.85) !important;
+
+  --color-text-primary: #F3EFE6 !important;
+  --color-text-secondary: #A7B0C8 !important;
+  --color-text-muted: #6E7591 !important;
+
+  --color-border: rgba(201,168,108,0.45) !important;
+  --color-border-subtle: rgba(201,168,108,0.20) !important;
+
+  --color-accent: #C9A86C !important;
+  --color-accent-light: rgba(201,168,108,0.22) !important;
+}
+
+/* ── L3 Share-Card Tier Mixins ───────────────────────────────────────
+ * 仅作为 ShareImageGenerator 渲染时的 React DOM 预览/CTA 容器装饰；
+ * Canvas 内部的 token 由 SHARE_CARD_TIER (src/lib/share-card-tiers.ts) 提供。
+ * 详见 docs/01-strategy/visual-unification-and-tiered-share-cards-2026-04-18.md
+ * ────────────────────────────────────────────────────────────────── */
+.share-card-plus {
+  position: relative;
+  background:
+    linear-gradient(135deg, rgba(184,144,90,0.06), rgba(192,122,142,0.04)),
+    var(--color-paper);
+  border: 1px solid rgba(184,144,90,0.35);
+  box-shadow:
+    0 0 0 1px rgba(184,144,90,0.12) inset,
+    0 12px 40px -16px rgba(184,144,90,0.32);
+}
+.share-card-plus::after {
+  content: 'PLUS';
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--color-gold);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.share-card-atelier {
+  position: relative;
+  background:
+    radial-gradient(120% 80% at 30% 0%, rgba(201,166,118,0.10), transparent 60%),
+    linear-gradient(165deg, rgba(91,110,106,0.05), rgba(192,122,142,0.04)),
+    var(--color-paper-warm);
+  border: 1px solid rgba(184,144,90,0.55);
+  box-shadow:
+    0 0 0 1px rgba(184,144,90,0.18) inset,
+    0 0 0 6px var(--color-paper-warm),
+    0 0 0 7px rgba(184,144,90,0.40),
+    0 24px 60px -22px rgba(91,110,106,0.40);
+}
+.share-card-atelier::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(184,144,90,0.28);
+  pointer-events: none;
+  border-radius: inherit;
+}
+.share-card-atelier::after {
+  content: 'N° ATELIER';
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  color: var(--color-gold-leaf);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+/* tier-aware unlock CTA 按钮（ShareImageGenerator 容器外的"解锁"按钮） */
+.tier-cta-plus {
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-leaf));
+  color: var(--color-bg-elevated);
+  font-family: var(--font-editorial);
+  letter-spacing: 0.06em;
+}
+.tier-cta-atelier {
+  background: linear-gradient(135deg, var(--color-rose-deep), var(--color-gold));
+  color: var(--color-bg-elevated);
+  font-family: var(--font-editorial);
+  letter-spacing: 0.10em;
+  box-shadow: 0 10px 28px -10px rgba(168,90,110,0.50);
 }
 
 /* Gallery card collection styles - feminine elegant aesthetic */
@@ -840,3 +1267,245 @@ html {
   0% { opacity: 0.6; }
   100% { opacity: 1; }
 }
+
+/* ============================================================
+   v4 "Editorial Atelier" — 顶级女性向母版系统
+   ============================================================ */
+
+/* ── N° 编号 (刊号) — mono small caps, 整站统一的"版次语言" ── */
+.atelier-numero {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.15em;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+.atelier-numero::before {
+  content: "N°";
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  margin-right: 0.15em;
+  color: var(--color-gold);
+}
+
+/* ── Masthead (杂志报头) — 首页/结果页顶部刊名排版 ── */
+.atelier-masthead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+.atelier-masthead > span + span::before {
+  content: "｜";
+  margin-right: 1.25rem;
+  color: var(--color-rule);
+  font-style: normal;
+}
+
+/* ── Gold-leaf hairline with center mark — "── ◈ ──" ── */
+.atelier-rule-gold {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: var(--color-gold);
+  font-family: var(--font-editorial);
+  font-style: italic;
+}
+.atelier-rule-gold::before,
+.atelier-rule-gold::after {
+  content: "";
+  flex: 0 1 64px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-gold) 50%,
+    transparent 100%
+  );
+}
+
+/* ── Printing dot pattern — 模拟印刷网点, 叠在纸底上 ── */
+.printing-dot {
+  position: relative;
+}
+.printing-dot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    currentColor 0.5px,
+    transparent 1.5px
+  );
+  background-size: 6px 6px;
+  mix-blend-mode: multiply;
+}
+
+/* ── Ink bleed — headline 底下的暖棕色微阴影 (模拟油墨晕) ── */
+.ink-bleed {
+  text-shadow: 0 0.5px 0 rgba(31, 26, 22, 0.08);
+}
+
+/* ── Editorial ghost button — 1px 描边, hover 时描边"生长" ── */
+.btn-atelier {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1.6rem;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-ink);
+  background: transparent;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-soft);
+  overflow: hidden;
+  transition: color var(--dur-breath) var(--ease-editorial),
+    border-color var(--dur-breath) var(--ease-editorial);
+  cursor: pointer;
+}
+.btn-atelier::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: var(--color-ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur-breath) var(--ease-editorial);
+}
+.btn-atelier:hover {
+  border-color: var(--color-ink);
+}
+.btn-atelier:hover::before {
+  transform: scaleX(1);
+}
+.btn-atelier-gold {
+  color: var(--color-gold);
+  border-color: color-mix(in srgb, var(--color-gold) 40%, transparent);
+}
+.btn-atelier-gold::before {
+  background: var(--color-gold);
+}
+.btn-atelier-gold:hover {
+  color: var(--color-gold);
+  border-color: var(--color-gold);
+}
+
+/* ── Ex-libris stamp 藏书票盖章 — 结果揭晓仪式 ── */
+@keyframes atelier-stamp-in {
+  0% {
+    opacity: 0;
+    transform: rotate(-14deg) scale(1.35);
+  }
+  60% {
+    opacity: 0.85;
+    transform: rotate(-6deg) scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-6deg) scale(1);
+  }
+}
+.atelier-stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-ember);
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+  transform: rotate(-6deg);
+  opacity: 0.85;
+  filter: drop-shadow(0 1px 0 rgba(140, 62, 62, 0.1));
+}
+.atelier-stamp-animate {
+  animation: atelier-stamp-in var(--dur-ritual) var(--ease-editorial) both;
+}
+
+/* ── Editorial page-turn — 路由过场, clip-path 向上揭开 ── */
+@keyframes atelier-page-turn {
+  from {
+    clip-path: inset(100% 0 0 0);
+    opacity: 0;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+.atelier-page-turn {
+  animation: atelier-page-turn var(--dur-breath) var(--ease-editorial) both;
+}
+
+/* ── Nocturne (Mysti 深夜绒) 补充层 ── */
+.nocturne-halation {
+  position: relative;
+}
+.nocturne-halation::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    rgba(212, 181, 122, 0.06) 0%,
+    transparent 55%
+  );
+  mix-blend-mode: screen;
+}
+
+/* ── Film grain (Mysti 层 5) ── */
+@keyframes nocturne-grain-shift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(-1%, 1%, 0); }
+  50% { transform: translate3d(1%, -1%, 0); }
+  75% { transform: translate3d(-1%, -1%, 0); }
+}
+.nocturne-grain {
+  position: relative;
+}
+.nocturne-grain::before {
+  content: "";
+  position: absolute;
+  inset: -4%;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.94  0 0 0 0 0.82  0 0 0 0 0.58  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+  background-size: 200px 200px;
+  animation: nocturne-grain-shift 3s steps(4) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atelier-stamp-animate,
+  .atelier-page-turn,
+  .nocturne-grain::before {
+    animation: none;
+  }
+}
+

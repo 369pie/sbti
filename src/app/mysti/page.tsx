@@ -1,29 +1,70 @@
 'use client';
-import { useState, useEffect, Suspense } from 'react';
+
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { WTFTI_PERSONALITIES, getWtftiPersonality } from '@/lib/wtfti-personalities';
 import { getMystiTarotData } from '@/lib/mysti/tarot-mapping';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
+import { useMystiTheme } from '@/components/MystiThemeProvider';
+import { captureCreatorReferral } from '@/lib/mysti/creator-referral';
+
+type FlowStep = 'invite' | 'shuffle' | 'choose';
 
 function MystiLandingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { theme } = useMystiTheme();
   const [selectedSlug, setSelectedSlug] = useState<string>('');
+  const [step, setStep] = useState<FlowStep>('invite');
+  const [pickedCardIdx, setPickedCardIdx] = useState<number | null>(null);
+  const [showSelfPicker, setShowSelfPicker] = useState(false);
 
-  // Partner slug from URL (the person who shared)
   const partnerSlug = searchParams.get('slug') || '';
+  const refCode = searchParams.get('ref') || '';
   const partnerPersonality = partnerSlug ? getWtftiPersonality(partnerSlug) : undefined;
   const partnerData = partnerPersonality ? getMystiTarotData(partnerPersonality.slug) : null;
 
-  // Track return landing flow
+  // 创作者推荐链接埋点
+  useEffect(() => {
+    if (refCode) captureCreatorReferral(refCode);
+  }, [refCode]);
+
   useEffect(() => {
     if (partnerSlug && partnerPersonality) {
       trackMystiEvent('mysti_return_landing', { partnerSlug });
     }
   }, [partnerSlug, partnerPersonality]);
 
-  const handleStart = () => {
+  // 入口仪式：洗牌 → 选牌 → 跳转
+  const handleShuffle = (mode: 'single' | 'random') => {
+    if (mode === 'random') {
+      const idx1 = Math.floor(Math.random() * WTFTI_PERSONALITIES.length);
+      let idx2 = Math.floor(Math.random() * (WTFTI_PERSONALITIES.length - 1));
+      if (idx2 >= idx1) idx2 += 1;
+      const p1 = WTFTI_PERSONALITIES[idx1];
+      const p2 = WTFTI_PERSONALITIES[idx2];
+      router.push(`/mysti/result/${p1.slug}?partner=${p2.slug}&ritual=1`);
+      return;
+    }
+    setStep('shuffle');
+    window.setTimeout(() => setStep('choose'), 2500);
+  };
+
+  const handleCardPick = (idx: number) => {
+    setPickedCardIdx(idx);
+    const slug =
+      WTFTI_PERSONALITIES[(Date.now() + idx * 7) % WTFTI_PERSONALITIES.length].slug;
+    window.setTimeout(() => {
+      const url = partnerSlug
+        ? `/mysti/result/${slug}?partner=${partnerSlug}&ritual=1`
+        : `/mysti/result/${slug}?ritual=1`;
+      router.push(url);
+    }, 800);
+  };
+
+  const handleKnownStart = () => {
     if (!selectedSlug) return;
     if (partnerSlug && partnerPersonality) {
       trackMystiEvent('mysti_return_complete', { selectedSlug, partnerSlug });
@@ -34,178 +75,421 @@ function MystiLandingContent() {
     router.push(url);
   };
 
-  const handleRandom = () => {
-    const idx1 = Math.floor(Math.random() * WTFTI_PERSONALITIES.length);
-    let idx2 = Math.floor(Math.random() * (WTFTI_PERSONALITIES.length - 1));
-    if (idx2 >= idx1) idx2 += 1;
-    const p1 = WTFTI_PERSONALITIES[idx1];
-    const p2 = WTFTI_PERSONALITIES[idx2];
-    router.push(`/mysti/result/${p1.slug}?partner=${p2.slug}`);
-  };
+  const bgStyle = useMemo(
+    () => ({
+      background: `linear-gradient(180deg, ${theme.bgGradient[0]} 0%, ${theme.bgGradient[1]} 100%)`,
+      color: theme.text,
+    }),
+    [theme],
+  );
 
+  // ─── 渲染：洗牌动画 ───
+  if (step === 'shuffle') {
+    return (
+      <div
+        className="min-h-screen flex flex-col items-center justify-center px-5 relative overflow-hidden"
+        style={bgStyle}
+      >
+        <div className="relative h-[280px] w-[200px]">
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute inset-0 rounded-2xl border-2"
+              style={{
+                background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentDeep})`,
+                borderColor: theme.accentGold,
+                boxShadow: `0 0 40px ${theme.cardGlow}`,
+              }}
+              initial={{ rotate: 0, x: 0, y: 0, opacity: 0 }}
+              animate={{
+                rotate: [0, (i - 3) * 8, (i - 3) * 14, 0],
+                x: [0, (i - 3) * 24, (i - 3) * 38, 0],
+                y: [0, -10, 8, 0],
+                opacity: [0, 1, 1, 1],
+              }}
+              transition={{
+                duration: 2.4,
+                ease: 'easeInOut',
+                delay: i * 0.04,
+              }}
+            >
+              <div
+                className="absolute inset-3 rounded-xl border flex items-center justify-center"
+                style={{ borderColor: theme.accentGold, background: 'transparent' }}
+              >
+                <span
+                  className="text-3xl"
+                  style={{ color: theme.accentGold, fontFamily: 'var(--font-display)' }}
+                >
+                  ✦
+                </span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+        <motion.p
+          className="mt-12 text-base tracking-[0.18em]"
+          style={{ color: theme.textMuted, fontFamily: 'var(--font-serif)' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          宇宙正在为你洗牌……
+        </motion.p>
+      </div>
+    );
+  }
+
+  // ─── 渲染：选牌（3 张背面） ───
+  if (step === 'choose') {
+    return (
+      <div
+        className="min-h-screen flex flex-col items-center justify-center px-5 relative overflow-hidden"
+        style={bgStyle}
+      >
+        <motion.h2
+          className="text-xl mb-2 tracking-wider"
+          style={{ color: theme.text, fontFamily: 'var(--font-display)' }}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          选择一张属于你的牌
+        </motion.h2>
+        <motion.p
+          className="text-sm mb-10"
+          style={{ color: theme.textMuted }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          相信第一直觉
+        </motion.p>
+
+        <div className="flex gap-4 sm:gap-6">
+          {[0, 1, 2].map(idx => (
+            <motion.button
+              key={idx}
+              type="button"
+              onClick={() => handleCardPick(idx)}
+              disabled={pickedCardIdx !== null}
+              className="relative h-[220px] w-[140px] sm:h-[260px] sm:w-[170px] rounded-2xl border-2 overflow-hidden focus:outline-none disabled:opacity-50"
+              style={{
+                background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentDeep})`,
+                borderColor: theme.accentGold,
+                boxShadow: `0 0 40px ${theme.cardGlow}`,
+              }}
+              initial={{ opacity: 0, y: 30, rotate: (idx - 1) * 6 }}
+              animate={{
+                opacity: 1,
+                y: pickedCardIdx === idx ? -40 : 0,
+                rotate: pickedCardIdx === idx ? 0 : (idx - 1) * 6,
+                scale: pickedCardIdx === idx ? 1.08 : 1,
+              }}
+              transition={{ delay: idx * 0.1, duration: 0.5 }}
+              whileHover={pickedCardIdx === null ? { y: -12, scale: 1.04 } : undefined}
+              whileTap={pickedCardIdx === null ? { scale: 0.96 } : undefined}
+            >
+              <div
+                className="absolute inset-3 rounded-xl border flex flex-col items-center justify-center"
+                style={{ borderColor: theme.accentGold }}
+              >
+                <span
+                  className="text-5xl mb-2"
+                  style={{ color: theme.accentGold, fontFamily: 'var(--font-display)' }}
+                >
+                  ✦
+                </span>
+                <span
+                  className="text-xs tracking-[0.3em]"
+                  style={{ color: theme.accentGoldSoft }}
+                >
+                  WTFTI
+                </span>
+              </div>
+            </motion.button>
+          ))}
+        </div>
+
+        {pickedCardIdx !== null && (
+          <motion.p
+            className="mt-10 text-sm"
+            style={{ color: theme.accentGold, fontFamily: 'var(--font-serif)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            ✦ 翻开你的灵魂 ✦
+          </motion.p>
+        )}
+      </div>
+    );
+  }
+
+  // ─── 默认：邀请页（含合盘回流模式） ───
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-5 py-10"
-      style={{ background: 'linear-gradient(180deg, #0B0D17 0%, #12152B 100%)' }}
+      className="min-h-screen flex items-start sm:items-center justify-center px-5 py-10 relative overflow-hidden"
+      style={bgStyle}
     >
-      <div className="w-full max-w-md">
+      {/* 装饰：背景星点 */}
+      <div className="pointer-events-none absolute inset-0 opacity-30">
+        {[...Array(20)].map((_, i) => (
+          <span
+            key={i}
+            className="absolute text-xs"
+            style={{
+              left: `${(i * 53) % 100}%`,
+              top: `${(i * 37) % 100}%`,
+              color: theme.accentGold,
+            }}
+          >
+            ✦
+          </span>
+        ))}
+      </div>
+
+      <div className="w-full max-w-md relative">
+        {/* Hero */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold mb-2" style={{ color: '#F3EFE6' }}>
-            WTFTI <span style={{ color: '#C9A86C' }}>·</span> 灵鉴
+          <p
+            className="text-[11px] tracking-[0.4em] uppercase mb-3"
+            style={{ color: theme.accentGold }}
+          >
+            WTFTI · MYSTI
+          </p>
+          <h1
+            className="text-4xl sm:text-5xl mb-3"
+            style={{ color: theme.text, fontFamily: 'var(--font-display)', fontWeight: 400 }}
+          >
+            灵鉴
           </h1>
-          <p className="text-sm" style={{ color: '#A7B0C8' }}>
-            用塔罗重新翻译你的人格
+          <p
+            className="text-sm sm:text-base italic"
+            style={{ color: theme.textMuted, fontFamily: 'var(--font-serif)' }}
+          >
+            用 22 张大阿卡纳，翻译你灵魂的频率
           </p>
         </div>
 
-        {/* Return flow: partner card preview */}
+        {/* 合盘回流模式 */}
         {partnerPersonality && partnerData && (
-          <div
-            className="rounded-2xl border p-5 mb-5 text-center"
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl border-2 p-5 mb-6 text-center backdrop-blur-md"
             style={{
-              background: 'rgba(18,21,43,0.8)',
-              borderColor: 'rgba(201,168,108,0.35)',
-              boxShadow: '0 0 40px rgba(123,97,255,0.12)',
+              background: theme.cardSurface,
+              borderColor: theme.cardBorderStrong,
+              boxShadow: `0 12px 40px ${theme.cardGlow}`,
             }}
           >
-            <div className="text-xs tracking-[0.2em] uppercase mb-2" style={{ color: '#C9A86C' }}>
+            <div
+              className="text-[11px] tracking-[0.3em] uppercase mb-3"
+              style={{ color: theme.accentGold }}
+            >
               TA 的灵魂牌
             </div>
-            <div className="text-4xl font-serif mb-1" style={{ color: '#C9A86C' }}>
+            <div
+              className="text-5xl mb-2"
+              style={{ color: theme.accentGold, fontFamily: 'var(--font-display)' }}
+            >
               {partnerData.majorArcana.name.slice(0, 1)}
             </div>
             <div className="text-2xl mb-1">{partnerPersonality.emoji}</div>
-            <div className="text-base font-semibold mb-1" style={{ color: '#F3EFE6' }}>
+            <div
+              className="text-base mb-1"
+              style={{ color: theme.text, fontFamily: 'var(--font-serif)' }}
+            >
               {partnerData.majorArcana.name}
             </div>
             <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
-              <span className="font-mono text-sm" style={{ color: '#A7B0C8' }}>{partnerPersonality.code}</span>
-              <span style={{ color: '#A7B0C8' }}>·</span>
-              <span className="text-sm" style={{ color: '#F3EFE6' }}>{partnerPersonality.wtftiName}</span>
+              <span
+                className="text-sm"
+                style={{ color: theme.textMuted, fontFamily: 'var(--font-mono)' }}
+              >
+                {partnerPersonality.code}
+              </span>
+              <span style={{ color: theme.textSubtle }}>·</span>
+              <span className="text-sm" style={{ color: theme.text }}>
+                {partnerPersonality.wtftiName}
+              </span>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-1.5">
-              {partnerData.majorArcana.keywords.slice(0, 3).map((kw, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-0.5 rounded-full text-[11px] border"
-                  style={{
-                    borderColor: 'rgba(201,168,108,0.35)',
-                    background: 'rgba(201,168,108,0.22)',
-                    color: '#C9A86C',
-                  }}
-                >
-                  {kw}
-                </span>
-              ))}
-            </div>
-          </div>
+            <p
+              className="text-sm italic mt-3"
+              style={{ color: theme.accentGold, fontFamily: 'var(--font-serif)' }}
+            >
+              想知道你们的灵魂共振吗？
+            </p>
+          </motion.div>
         )}
 
+        {/* 主仪式 CTA — 卡牌堆视觉 */}
         <div className="space-y-4">
-          {/* Selection area */}
-          <div
-            className="rounded-xl px-4 py-3 border"
-            style={{ background: 'rgba(18,21,43,0.8)', borderColor: 'rgba(201,168,108,0.35)' }}
+          <button
+            type="button"
+            onClick={() => handleShuffle('single')}
+            className="group relative w-full rounded-2xl py-7 px-5 text-center overflow-hidden border transition-all hover:scale-[1.02] active:scale-[0.99]"
+            style={{
+              background: `linear-gradient(135deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`,
+              borderColor: theme.accentGold,
+              boxShadow: `0 12px 40px ${theme.cardGlow}`,
+            }}
           >
-            <label className="block text-xs mb-1.5" style={{ color: '#C9A86C' }}>
-              {partnerPersonality ? '你是哪张牌？' : '你的人格'}
-            </label>
-            <select
-              value={selectedSlug}
-              onChange={e => setSelectedSlug(e.target.value)}
-              className="w-full bg-transparent outline-none cursor-pointer text-sm"
-              style={{ color: '#F3EFE6' }}
-            >
-              <option value="" style={{ background: '#12152B' }}>
-                {partnerPersonality ? '选择你的灵魂牌' : '请选择你的 WTFTI 人格'}
-              </option>
-              {WTFTI_PERSONALITIES.map(p => (
-                <option key={p.slug} value={p.slug} style={{ background: '#12152B' }}>
-                  {p.emoji} {p.wtftiName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {!partnerPersonality && (
-            <div
-              className="rounded-xl px-4 py-3 border"
-              style={{ background: 'rgba(18,21,43,0.8)', borderColor: 'rgba(201,168,108,0.35)' }}
-            >
-              <label className="block text-xs mb-1.5" style={{ color: '#C9A86C' }}>
-                对方人格 / 单人留空
-              </label>
-              <select
-                value=""
-                onChange={e => {
-                  if (e.target.value) {
-                    router.push(`/mysti/result/${selectedSlug}?partner=${e.target.value}`);
-                  }
-                }}
-                className="w-full bg-transparent outline-none cursor-pointer text-sm"
-                style={{ color: '#F3EFE6' }}
+            <span className="absolute top-2 left-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              ✦
+            </span>
+            <span className="absolute bottom-2 right-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              ✦
+            </span>
+            <div className="relative">
+              <div
+                className="text-base mb-1 text-white tracking-wide"
+                style={{ fontFamily: 'var(--font-serif)' }}
               >
-                <option value="" style={{ background: '#12152B' }}>单人解读</option>
+                {partnerPersonality ? '✦ 为我们的合盘洗牌' : '✦ 为我洗牌'}
+              </div>
+              <div className="text-xs text-white/70">
+                {partnerPersonality ? '抽出你的灵魂牌，自动配对合盘' : '塔罗仪式 · 大约 30 秒'}
+              </div>
+            </div>
+          </button>
+
+          {/* 已知人格直选 — 折叠式次级 */}
+          <details
+            className="rounded-xl border"
+            style={{ borderColor: theme.cardBorder }}
+            onToggle={e => setShowSelfPicker((e.target as HTMLDetailsElement).open)}
+          >
+            <summary
+              className="cursor-pointer px-4 py-3 text-xs tracking-wider list-none flex items-center justify-between"
+              style={{ color: theme.textMuted }}
+            >
+              <span>我已经知道我的人格</span>
+              <span style={{ color: theme.accentGold }}>{showSelfPicker ? '−' : '+'}</span>
+            </summary>
+            <div className="px-4 pb-4 space-y-3">
+              <select
+                value={selectedSlug}
+                onChange={e => setSelectedSlug(e.target.value)}
+                className="w-full bg-transparent outline-none cursor-pointer text-sm rounded-lg border px-3 py-2"
+                style={{
+                  color: theme.text,
+                  borderColor: theme.cardBorder,
+                }}
+              >
+                <option value="" style={{ background: theme.cardSurface }}>
+                  选择你的 WTFTI 人格
+                </option>
                 {WTFTI_PERSONALITIES.map(p => (
-                  <option key={p.slug} value={p.slug} style={{ background: '#12152B' }}>
+                  <option key={p.slug} value={p.slug} style={{ background: theme.cardSurface }}>
                     {p.emoji} {p.wtftiName}
                   </option>
                 ))}
               </select>
+              <button
+                onClick={handleKnownStart}
+                disabled={!selectedSlug}
+                className="w-full py-2.5 rounded-lg text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{
+                  background: theme.accentSoft,
+                  color: theme.accent,
+                  borderWidth: 1,
+                  borderStyle: 'solid',
+                  borderColor: theme.accent,
+                }}
+              >
+                直接进入解读
+              </button>
             </div>
-          )}
+          </details>
 
-          {/* Primary CTA */}
-          <button
-            onClick={handleStart}
-            disabled={!selectedSlug}
-            className="w-full py-3.5 rounded-xl text-white font-medium text-sm hover:brightness-110 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ background: 'linear-gradient(90deg, #7B61FF, #C9A86C)' }}
-          >
-            {partnerPersonality ? '✦ 开始合盘' : '🔮 开始解读'}
-          </button>
-
-          {/* Secondary CTA */}
           <Link
             href="/wtfti/test/?mode=mysti"
-            className="block w-full py-3 rounded-xl border text-sm font-medium text-center hover:bg-white/5 transition-all"
-            style={{ borderColor: 'rgba(123,97,255,0.45)', color: '#B8B0FF' }}
+            className="block w-full py-3 rounded-xl text-sm font-medium text-center transition-all hover:opacity-80"
+            style={{
+              borderWidth: 1,
+              borderStyle: 'solid',
+              borderColor: theme.dividerAccent,
+              color: theme.text,
+              background: 'transparent',
+            }}
           >
-            🃏 还没测过？开始测试
+            🃏 还没测过？先测 WTFTI 人格
           </Link>
         </div>
 
-        {/* Tertiary actions - compact row */}
         {!partnerPersonality && (
-          <div className="mt-5 flex items-center gap-2.5">
+          <div className="mt-6 grid grid-cols-3 gap-2.5">
             <button
-              onClick={handleRandom}
-              className="flex-1 py-2.5 rounded-lg border text-xs font-medium hover:bg-white/5 transition-all"
-              style={{ borderColor: 'rgba(201,168,108,0.3)', color: '#C9A86C' }}
+              onClick={() => handleShuffle('random')}
+              className="py-2.5 rounded-lg text-xs font-medium transition-all hover:bg-white/5"
+              style={{
+                borderWidth: 1,
+                borderStyle: 'solid',
+                borderColor: theme.cardBorder,
+                color: theme.accentGold,
+              }}
             >
-              🎲 随机
+              🎲 随机合盘
             </button>
             <Link
               href="/mysti/daily/"
-              className="flex-1 py-2.5 rounded-lg border text-xs font-medium text-center hover:bg-white/5 transition-all"
-              style={{ borderColor: 'rgba(201,168,108,0.3)', color: '#C9A86C' }}
+              className="py-2.5 rounded-lg text-xs font-medium text-center transition-all hover:bg-white/5"
+              style={{
+                borderWidth: 1,
+                borderStyle: 'solid',
+                borderColor: theme.cardBorder,
+                color: theme.accent,
+              }}
             >
               ✦ 每日一牌
             </Link>
             <Link
               href="/mysti/gacha/"
-              className="flex-1 py-2.5 rounded-lg border text-xs font-medium text-center hover:bg-white/5 transition-all"
-              style={{ borderColor: 'rgba(123,97,255,0.3)', color: '#B8B0FF' }}
+              className="py-2.5 rounded-lg text-xs font-medium text-center transition-all hover:bg-white/5"
+              style={{
+                borderWidth: 1,
+                borderStyle: 'solid',
+                borderColor: theme.cardBorder,
+                color: theme.accentGold,
+              }}
             >
               🎴 抽卡
             </Link>
           </div>
         )}
 
-        <p className="text-center text-[11px] mt-6" style={{ color: 'rgba(167,176,200,0.5)' }}>
+        {/* W3/W5/W6 入口 */}
+        <div className="mt-3 grid grid-cols-4 gap-2">
+          {[
+            { href: '/mysti/archive/', emoji: '📜', label: '关系档案' },
+            { href: '/mysti/mood/', emoji: '🌗', label: '今日心情' },
+            { href: '/mysti/monthly/', emoji: '🌙', label: '灵魂月报' },
+            { href: '/mysti/gift/', emoji: '🎁', label: '礼品卡' },
+          ].map(item => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="py-2 rounded-lg text-[11px] text-center transition-all hover:bg-white/5"
+              style={{
+                borderWidth: 1,
+                borderStyle: 'solid',
+                borderColor: theme.divider,
+                color: theme.textMuted,
+              }}
+            >
+              <div className="text-base leading-none mb-0.5">{item.emoji}</div>
+              {item.label}
+            </Link>
+          ))}
+        </div>
+
+        <p
+          className="text-center text-[11px] mt-7 italic"
+          style={{ color: theme.textSubtle, fontFamily: 'var(--font-serif)' }}
+        >
           {partnerPersonality
-            ? '测试你的灵魂牌，解锁双人合盘解读'
-            : '选择两个人格，探索你们的灵魂绑定'}
+            ? '抽出你的牌，看见你们的灵魂频率'
+            : '29 种人格 · 22 张大阿卡纳 · 11 种关系原型'}
         </p>
       </div>
     </div>
@@ -214,7 +498,18 @@ function MystiLandingContent() {
 
 export default function MystiLandingPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(180deg, #0B0D17 0%, #12152B 100%)' }}><div className="text-sm" style={{ color: '#A7B0C8' }}>加载中…</div></div>}>
+    <Suspense
+      fallback={
+        <div
+          className="min-h-screen flex items-center justify-center"
+          style={{ background: 'linear-gradient(180deg, #1a1530 0%, #231A3A 100%)' }}
+        >
+          <div className="text-sm" style={{ color: '#B8AEC2' }}>
+            ✦ 加载中
+          </div>
+        </div>
+      }
+    >
       <MystiLandingContent />
     </Suspense>
   );

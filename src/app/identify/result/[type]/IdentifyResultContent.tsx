@@ -14,8 +14,10 @@ import { useCallback, useMemo, useRef, useState, useEffect, useSyncExternalStore
 import { identifyApi, type IdentifyPreviewResponse } from '@/lib/identify/api';
 import { getSiteUrl, SHARE_SITE_URL } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { Glyph } from '@/components/Glyph';
 
 const emptySubscribe = () => () => {};
 
@@ -220,64 +222,102 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
 
   return (
     <div className="min-h-screen">
-      {/* Hero — 鉴定书 Header */}
-      <section className="relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[500px] pointer-events-none"
-          style={{ background: `radial-gradient(ellipse, ${persona.color}12, transparent 70%)` }} />
-
-        <div className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center relative">
+      {/* Hero — Editorial magazine certificate */}
+      <section className="relative">
+        <div className="max-w-5xl mx-auto px-6 sm:px-10 pt-16 sm:pt-24 pb-16 sm:pb-20 relative">
           <button onClick={() => shareRef.current?.generate()}
-            className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-pink-400 transition-all cursor-pointer"
+            className="absolute top-16 right-6 sm:right-10 p-2.5 text-text-muted hover:text-text-primary transition-colors cursor-pointer"
+            style={{ border: '1px solid var(--color-rule)' }}
             title="生成鉴定书图片">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
             </svg>
           </button>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-pink-500/20 bg-pink-500/5 text-xs text-pink-400 mb-6">
-              🔍 WTF 好友鉴定书
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}>
+            {/* Masthead eyebrow */}
+            <div className="flex items-center gap-4 mb-10">
+              <span className="serial-number text-sm">Issue 04</span>
+              <span className="editorial-rule flex-1 max-w-[80px]" />
+              <span className="eyebrow">Friend Identifier · 鉴定书</span>
             </div>
 
-            {friendName && (
-              <p className="text-text-muted text-sm mb-4">被鉴定人：<span className="text-text-primary font-medium">{friendName}</span></p>
-            )}
-
-            {fromName && (
-              <p className="text-text-muted text-sm mb-4">鉴定方：<span className="text-text-primary font-medium">{fromName}</span></p>
-            )}
-
-            {saveState !== 'idle' && !sharedAssessmentToken && (
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border-subtle bg-bg-secondary/60 text-xs text-text-muted mb-5">
-                {saveState === 'saving' && '正在保存到灵鉴历史…'}
-                {saveState === 'saved' && '已保存到灵鉴历史'}
-                {saveState === 'error' && '保存失败，但不影响当前查看'}
+            {/* Byline */}
+            {(friendName || fromName) && (
+              <div className="mb-10 flex flex-wrap gap-x-10 gap-y-2 text-sm">
+                {friendName && (
+                  <div>
+                    <span className="eyebrow mr-2">Subject</span>
+                    <span className="text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}>{friendName}</span>
+                  </div>
+                )}
+                {fromName && (
+                  <div>
+                    <span className="eyebrow mr-2">By</span>
+                    <span className="text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}>{fromName}</span>
+                  </div>
+                )}
               </div>
             )}
 
-            <PersonaAvatar
-              persona={persona}
-              priority
-              sizes="(min-width: 640px) 192px, 160px"
-              className="relative w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-6 rounded-2xl overflow-hidden"
-              style={{ background: `${persona.color}15` }}
-            />
+            {saveState !== 'idle' && !sharedAssessmentToken && (
+              <div className="inline-block eyebrow mb-6" style={{ color: 'var(--color-rose-deep)' }}>
+                {saveState === 'saving' && '· Saving to archive …'}
+                {saveState === 'saved' && '· Archived'}
+                {saveState === 'error' && '· Archive failed (still viewable)'}
+              </div>
+            )}
 
-            <div className="text-sm font-mono tracking-[0.3em] uppercase mb-2" style={{ color: persona.color }}>
-              {persona.code}
+            {/* Split layout — portrait + type */}
+            <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] gap-10 md:gap-16 items-center">
+              <div className="flex justify-center md:justify-start">
+                <PersonaAvatar
+                  persona={persona}
+                  priority
+                  sizes="(min-width: 768px) 320px, 240px"
+                  className="relative w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 overflow-hidden"
+                  style={{ background: `${persona.color}10`, border: '1px solid var(--color-rule)' }}
+                />
+              </div>
+
+              <div>
+                <div
+                  className="serial-number text-sm mb-5"
+                  style={{ color: persona.color, letterSpacing: '0.32em' }}
+                >
+                  {persona.code}
+                </div>
+                <h1 className="editorial-display text-5xl sm:text-6xl md:text-7xl leading-[0.95] mb-6">
+                  {persona.name}
+                </h1>
+                <hr className="editorial-rule w-16 mb-6" />
+                <p
+                  className="text-lg sm:text-xl leading-[1.6] text-text-secondary italic max-w-md"
+                  style={{ fontFamily: 'var(--font-editorial)' }}
+                >
+                  「{persona.tagline}」
+                </p>
+              </div>
             </div>
-            <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mb-4">{persona.name}</h1>
-            <p className="text-xl text-text-secondary max-w-md mx-auto">{persona.tagline}</p>
           </motion.div>
         </div>
       </section>
 
-      {/* Verdict — 鉴定评语 */}
-      <section className="max-w-2xl mx-auto px-6 pb-12">
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
-          className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 sm:p-8">
-          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">鉴定评语</h2>
-          <p className="text-text-secondary leading-[1.8] text-base">{persona.verdict}</p>
+      {/* Verdict — 鉴定评语 editorial card */}
+      <section className="max-w-3xl mx-auto px-6 sm:px-10 pb-16" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="pt-12">
+          <div className="flex items-center gap-4 mb-8">
+            <span className="serial-number text-xs">§ 01</span>
+            <span className="editorial-rule flex-1 max-w-[60px]" />
+            <span className="eyebrow">Verdict · 鉴定评语</span>
+          </div>
+          <p
+            className="text-text-primary leading-[1.85] text-lg sm:text-xl"
+            style={{ fontFamily: 'var(--font-editorial)', fontWeight: 400 }}
+          >
+            {persona.verdict}
+          </p>
         </motion.div>
       </section>
 
@@ -428,6 +468,10 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
 
       <CrossTestRecommendations currentTest="identify" personalityName={displayName} />
 
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <WtfiTheoryWiring universe="identify" dimensionScores={dimensionScores} />
+      </section>
+
       {/* Share section */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 0.5 }}>
@@ -436,7 +480,14 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
             <IdentifyShareImageGenerator ref={shareRef} persona={persona} dimensionScores={activeDimensionScores} friendName={friendName} />
             <button onClick={copyShareText}
               className="w-full py-3 rounded-xl border border-pink-500/20 bg-pink-500/5 text-sm text-pink-400 hover:bg-pink-500/10 transition-all cursor-pointer">
-              {textCopied ? '已复制分享文案 ✓' : '📋 复制分享文案'}
+              {textCopied ? (
+                '已复制分享文案 ✓'
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  <Glyph name="copy" size={14} />
+                  <span>复制分享文案</span>
+                </span>
+              )}
             </button>
             <div className="flex gap-3">
               <button onClick={copyLink}

@@ -2,6 +2,7 @@
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
+import { useShareTier, ShareTierPicker } from '@/lib/use-share-tier';
 import type { WtftiPersonality } from '@/lib/wtfti-personalities';
 import { getWtftiTypeImage } from '@/lib/wtfti-personalities';
 import { SHARE_SITE_URL } from '@/lib/site';
@@ -295,26 +296,29 @@ export const SymptomsShareImageGenerator = forwardRef<SymptomsShareImageHandle, 
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({ resourceId: `symptoms:${personality.code}`, universe: 'symptoms' });
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const url = await renderSymptomsCard(personality, hitCount, totalSymptoms, checkedIndexes);
-        setPreviewUrl(url);
+        const finalUrl = await tierCtl.applyOverlay(url, '#FFF1F4', 'WTF');
+        setPreviewUrl(finalUrl);
       } catch (err) {
         console.error('Failed to generate symptoms card:', err);
       } finally {
         setGenerating(false);
       }
-    }, [checkedIndexes, generating, hitCount, personality, totalSymptoms]);
+    }, [checkedIndexes, generating, hitCount, personality, totalSymptoms, tierCtl]);
 
     const createFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `WTF-症状-${personality.code}.png`, { type: 'image/png' });
-    }, [personality.code, previewUrl]);
+      return new File([blob], `WTF-症状-${personality.code}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -337,10 +341,10 @@ export const SymptomsShareImageGenerator = forwardRef<SymptomsShareImageHandle, 
         return;
       }
       const link = document.createElement('a');
-      link.download = `WTF-症状-${personality.code}.png`;
+      link.download = `WTF-症状-${personality.code}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [createFile, personality.code, previewUrl]);
+    }, [createFile, personality.code, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;
@@ -360,6 +364,13 @@ export const SymptomsShareImageGenerator = forwardRef<SymptomsShareImageHandle, 
 
     return (
       <div>
+        <ShareTierPicker
+          tier={tierCtl.tier}
+          setTier={tierCtl.setTier}
+          tierUnlocked={tierCtl.tierUnlocked}
+          variant="light"
+          className="mb-3"
+        />
         <button
           onClick={handleGenerate}
           disabled={generating}

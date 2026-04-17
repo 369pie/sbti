@@ -2,6 +2,7 @@
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
+import { useShareTier } from '@/lib/use-share-tier';
 import { SHARE_SITE_URL } from '@/lib/site';
 import {
   encodeCardData, getLitCount, getTotalCount, CARD_UNIVERSE_IDS,
@@ -289,26 +290,29 @@ export const WtfCardShareImageGenerator = forwardRef<WtfCardShareImageGeneratorH
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const tierCtl = useShareTier({ resourceId: 'wtf-card:share', universe: 'wtf-card' });
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
+      if (await tierCtl.ensurePaid()) return;
       setGenerating(true);
       setSaveHint(null);
       try {
         const dataUrl = await renderCardImage(card);
-        setPreviewUrl(dataUrl);
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'WTF');
+        setPreviewUrl(finalUrl);
       } catch (err) {
         console.error('Failed to generate WTF Card image:', err);
       } finally {
         setGenerating(false);
       }
-    }, [card, generating]);
+    }, [card, generating, tierCtl]);
 
     const createFile = useCallback(async () => {
       if (!previewUrl) return null;
       const blob = await (await fetch(previewUrl)).blob();
-      return new File([blob], `WTF-Card-${card.id}.png`, { type: 'image/png' });
-    }, [card.id, previewUrl]);
+      return new File([blob], `WTF-Card-${card.id}${tierCtl.fileSuffix}.png`, { type: 'image/png' });
+    }, [card.id, previewUrl, tierCtl.fileSuffix]);
 
     const handleDownload = useCallback(async () => {
       if (!previewUrl) return;
@@ -331,10 +335,10 @@ export const WtfCardShareImageGenerator = forwardRef<WtfCardShareImageGeneratorH
         return;
       }
       const link = document.createElement('a');
-      link.download = `WTF-Card-${card.id}.png`;
+      link.download = `WTF-Card-${card.id}${tierCtl.fileSuffix}.png`;
       link.href = previewUrl;
       link.click();
-    }, [card.id, createFile, previewUrl]);
+    }, [card.id, createFile, previewUrl, tierCtl.fileSuffix]);
 
     const handleShare = useCallback(async () => {
       if (!previewUrl) return;

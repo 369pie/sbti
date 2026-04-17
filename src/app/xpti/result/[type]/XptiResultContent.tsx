@@ -19,6 +19,7 @@ import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
+import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 
 interface Props {
   personality: XptiPersonalityType;
@@ -358,6 +359,10 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
       </section>
 
       <CrossTestRecommendations currentTest="xpti" personalityName={personality.name} variant="xpti" />
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <WtfiTheoryWiring universe="xpti" variant="dark" />
+      </section>
 
       {/* Share section */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
