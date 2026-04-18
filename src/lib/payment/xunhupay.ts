@@ -40,7 +40,11 @@ export interface CreatePaymentParams {
   /** 用户取消支付后的业务回跳地址 */
   callbackUrl?: string;
   /** 'wechat' | 'alipay' */
-  paymentType?: XunhupayPaymentChannel;
+  paymentType: XunhupayPaymentChannel;
+  /** 发起支付请求的客户端 UA，用于判断微信 H5 WAP 模式 */
+  userAgent?: string;
+  /** 站点名称，供 WAP 场景展示 */
+  siteName?: string;
 }
 
 export interface CreatePaymentResult {
@@ -128,13 +132,40 @@ export function hasAnyXunhupayConfig(): boolean {
   );
 }
 
+const DEFAULT_XUNHUPAY_API_BASE = 'https://api.xunhupay.com';
+const BACKUP_XUNHUPAY_API_BASE = 'https://api.dpweixin.com';
+
+function isLikelyMobileBrowser(userAgent?: string): boolean {
+  if (!userAgent) return false;
+  return /android.+mobile|iphone|ipod|ipad|iemobile|mobile|phone|windows ce|wap/i.test(
+    userAgent,
+  );
+}
+
+function buildApiBaseCandidates(apiBase?: string): string[] {
+  const candidates = [apiBase, DEFAULT_XUNHUPAY_API_BASE, BACKUP_XUNHUPAY_API_BASE]
+    .filter((value): value is string => Boolean(value))
+    .map(value => value.replace(/\/$/, ''));
+  return [...new Set(candidates)];
+}
+
+function isRetryableXunhupayError(message: string): boolean {
+  return (
+    message === 'xunhupay_invalid_response' ||
+    message.startsWith('xunhupay_http_') ||
+    message.startsWith('xunhupay_request_failed')
+  );
+}
+
 export async function createXunhupayOrder(
   cfg: XunhupayConfig,
   params: CreatePaymentParams,
 ): Promise<CreatePaymentResult> {
+  const channel = params.paymentType;
   const payload: Record<string, string> = {
     version: '1.1',
     appid: cfg.appid,
+    plugins: channel,
     trade_order_id: params.tradeOrderId,
     total_fee: params.totalFee.toFixed(2),
     title: params.title,
@@ -145,60 +176,86 @@ export async function createXunhupayOrder(
   };
   if (params.attach) payload.attach = params.attach.slice(0, 256);
   if (params.callbackUrl) payload.callback_url = params.callbackUrl;
-  if (cfg.source === 'shared' && params.paymentType === 'wechat') {
+
+  if (channel === 'wechat' && isLikelyMobileBrowser(params.userAgent)) {
     payload.type = 'WAP';
+    try {
+      const origin = new URL(params.returnUrl).origin;
+      payload.wap_url = origin;
+      payload.wap_name = (params.siteName || new URL(origin).host).slice(0, 32);
+    } catch {
+      payload.wap_name = (params.siteName || 'WTFTI').slice(0, 32);
+    }
   }
-  // 独立渠道配置时由各自 appid/appsecret 决定商户，不再强行用 type 分流。
+  // `plugins` 需明确标识支付渠道；微信移动端还要附带 WAP 参数。
 
   payload.hash = signXunhupay(payload, cfg.appsecret);
 
-  const endpoint =
-    params.paymentType === 'alipay'
-      ? `${cfg.apiBase ?? 'https://api.xunhupay.com'}/payment/do.html`
-      : `${cfg.apiBase ?? 'https://api.xunhupay.com'}/payment/do.html`;
+  let lastError: Error | null = null;
 
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams(payload).toString(),
-  });
+  for (const apiBase of buildApiBaseCandidates(cfg.apiBase)) {
+    const endpoint = `${apiBase}/payment/do.html`;
 
-  const raw = await res.text();
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(payload).toString(),
+      });
 
-  if (!res.ok) {
-    throw new Error(`xunhupay_http_${res.status}`);
+      const raw = await res.text();
+
+      if (!res.ok) {
+        throw new Error(`xunhupay_http_${res.status}`);
+      }
+
+      let json: {
+        errcode: number;
+        errmsg: string;
+        url?: string;
+        url_qrcode?: string;
+        oderno?: string;
+        openid?: string;
+      };
+
+      try {
+        json = JSON.parse(raw) as {
+          errcode: number;
+          errmsg: string;
+          url?: string;
+          url_qrcode?: string;
+          oderno?: string;
+          openid?: string;
+        };
+      } catch {
+        throw new Error('xunhupay_invalid_response');
+      }
+
+      if (json.errcode !== 0 || !json.url) {
+        throw new Error(`xunhupay_${json.errcode}_${json.errmsg}`);
+      }
+
+      return {
+        url: json.url,
+        qrcode: json.url_qrcode,
+        orderId: json.oderno ?? json.openid ?? params.tradeOrderId,
+        errcode: json.errcode,
+        errmsg: json.errmsg,
+      };
+    } catch (error) {
+      const normalized =
+        error instanceof Error
+          ? error.message.startsWith('xunhupay_')
+            ? error
+            : new Error(`xunhupay_request_failed:${error.message}`)
+          : new Error('xunhupay_request_failed');
+
+      lastError = normalized;
+      if (!isRetryableXunhupayError(normalized.message)) {
+        throw normalized;
+      }
+    }
   }
 
-  let json: {
-    errcode: number;
-    errmsg: string;
-    url?: string;
-    url_qrcode?: string;
-    oderno?: string;
-    openid?: string;
-  };
-
-  try {
-    json = JSON.parse(raw) as {
-      errcode: number;
-      errmsg: string;
-      url?: string;
-      url_qrcode?: string;
-      oderno?: string;
-      openid?: string;
-    };
-  } catch {
-    throw new Error('xunhupay_invalid_response');
-  }
-
-  if (json.errcode !== 0 || !json.url) {
-    throw new Error(`xunhupay_${json.errcode}_${json.errmsg}`);
-  }
-  return {
-    url: json.url,
-    qrcode: json.url_qrcode,
-    orderId: json.oderno ?? json.openid ?? params.tradeOrderId,
-    errcode: json.errcode,
-    errmsg: json.errmsg,
-  };
+  throw lastError ?? new Error('xunhupay_request_failed');
 }

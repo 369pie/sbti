@@ -159,6 +159,8 @@ export async function POST(req: NextRequest) {
   const tradeOrderId = buildTradeOrderId();
 
   const origin = req.nextUrl.origin;
+  const siteName = req.nextUrl.hostname;
+  const userAgent = req.headers.get('user-agent') ?? undefined;
   const notifyUrl = `${origin}/api/mysti/payment/notify?channel=${paymentType}&sku=${encodeURIComponent(sku)}`;
   const returnUrl = `${origin}/mysti/payment/return?orderId=${encodeURIComponent(tradeOrderId)}`;
   const callbackUrl = fitXunhupayUrl(`${origin}${redirect}`);
@@ -214,6 +216,8 @@ export async function POST(req: NextRequest) {
       totalFee: meta.price,
       title: meta.label,
       paymentType,
+      userAgent,
+      siteName,
       notifyUrl,
       returnUrl,
       callbackUrl,
@@ -231,6 +235,16 @@ export async function POST(req: NextRequest) {
       qrcode: order.qrcode,
     });
   } catch (err) {
+    console.error('[mysti-payment-create] create failed', {
+      tradeOrderId,
+      sku,
+      paymentType,
+      origin,
+      notifyUrlLength: notifyUrl.length,
+      returnUrlLength: returnUrl.length,
+      callbackUrlLength: callbackUrl?.length ?? 0,
+      error: err instanceof Error ? err.message : String(err),
+    });
     try {
       await updateMystiOrderStatus(tradeOrderId, 'failed');
     } catch {
