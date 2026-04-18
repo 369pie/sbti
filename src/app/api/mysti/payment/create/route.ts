@@ -10,6 +10,7 @@ import {
   readXunhupayConfig,
   type XunhupayPaymentChannel,
 } from '@/lib/payment/xunhupay';
+import { getPaymentAvailabilityStatus, getPaymentBlockedPayload } from '@/lib/payment/availability';
 import { isMystiPaymentStubMode } from '@/lib/mysti/payment-mode';
 import {
   createPendingMystiOrder,
@@ -116,6 +117,11 @@ export async function POST(req: NextRequest) {
     body = (await req.json()) as CreateBody;
   } catch {
     return NextResponse.json({ error: 'invalid_json' }, { status: 400 });
+  }
+
+  const paymentAvailability = getPaymentAvailabilityStatus();
+  if (paymentAvailability.blocked) {
+    return NextResponse.json(getPaymentBlockedPayload(), { status: 403 });
   }
 
   // Rate-limit early so abusive clients can't drive Xunhupay round-trips.

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getPaymentAvailabilityStatus, getPaymentBlockedPayload } from '@/lib/payment/availability';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { recordSimulatedPurchase } from '@/lib/ugc/earnings';
@@ -15,6 +16,11 @@ import { recordSimulatedPurchase } from '@/lib/ugc/earnings';
 type Params = { params: Promise<{ id: string }> };
 
 export async function POST(request: Request, { params }: Params) {
+  const paymentAvailability = getPaymentAvailabilityStatus();
+  if (paymentAvailability.blocked) {
+    return NextResponse.json(getPaymentBlockedPayload(), { status: 403 });
+  }
+
   const { id: universeId } = await params;
   const supabase = await createServerSupabaseClient();
   const adminSupabase = createAdminSupabaseClient();

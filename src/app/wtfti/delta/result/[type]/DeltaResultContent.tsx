@@ -37,7 +37,7 @@ export function DeltaResultContent({ deltaPersonality: p, dimensionScores }: Pro
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<DeltaShareImageHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, DeltaShareImageGenerator);
 
   const shareUrl = getSiteUrl(`/wtfti/delta/result/${p.slug}/`);
 

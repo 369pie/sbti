@@ -93,7 +93,7 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
     typeof crypto !== 'undefined' ? crypto.randomUUID() : `identify-${Date.now()}`,
   );
   const shareRef = useRef<IdentifyShareImageGeneratorHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, IdentifyShareImageGenerator);
 
   useEffect(() => {
     let cancelled = false;

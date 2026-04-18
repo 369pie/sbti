@@ -17,6 +17,7 @@ import {
   type GiftCard,
 } from '@/lib/mysti/gift-card';
 import { recordUnlock, SKU_PRICES } from '@/lib/mysti/unlock';
+import { getPaymentAvailabilityStatus } from '@/lib/payment/availability';
 import { getActiveReferralCode } from '@/lib/mysti/creator-referral';
 import { getOrCreateDeviceId } from '@/lib/mysti/device';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
@@ -190,6 +191,12 @@ function BuyTab({ onPurchased, presetGiftSku }: { onPurchased: (card: GiftCard) 
   const meta = SKU_PRICES[bundleSku];
 
   const handlePurchase = async () => {
+    const paymentAvailability = getPaymentAvailabilityStatus();
+    if (paymentAvailability.blocked) {
+      setError(paymentAvailability.message);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {

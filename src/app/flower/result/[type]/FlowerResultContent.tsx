@@ -36,7 +36,7 @@ export function FlowerResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<FlowerShareImageGeneratorHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, FlowerShareImageGenerator);
 
   const shareUrl = getSiteUrl(`/flower/result/${personality.slug}/`);
 

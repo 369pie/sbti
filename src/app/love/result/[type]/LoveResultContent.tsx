@@ -29,7 +29,7 @@ export function LoveResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<LoveShareImageGeneratorHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, LoveShareImageGenerator);
 
   const shareUrl = getSiteUrl(`/love/result/${personality.slug}/`);
 

@@ -35,7 +35,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<XptiShareImageGeneratorHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, XptiShareImageGenerator);
 
   const shareUrl = getSiteUrl(`/xpti/result/${personality.slug}/`);
 

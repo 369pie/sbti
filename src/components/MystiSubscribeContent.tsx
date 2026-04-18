@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useMystiTheme } from '@/components/MystiThemeProvider';
 import { SKU_PRICES, type SubscriptionSku } from '@/lib/mysti/unlock';
+import { getPaymentAvailabilityStatus } from '@/lib/payment/availability';
 import {
   daysUntilExpiry,
   getActiveSubscription,
@@ -97,6 +98,12 @@ function SubscribeInner() {
 
   const checkout = useCallback(
     async (sku: SubscriptionSku) => {
+      const paymentAvailability = getPaymentAvailabilityStatus();
+      if (paymentAvailability.blocked) {
+        setError(paymentAvailability.message);
+        return;
+      }
+
       setLoading(sku);
       setError(null);
       try {

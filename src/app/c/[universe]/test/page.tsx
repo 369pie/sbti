@@ -1,15 +1,24 @@
 import type { Metadata } from 'next';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { unstable_cache } from 'next/cache';
 import { fetchPublishedUniverse, toFlexAxes, toFlexQuestions, toFlexPersonalities } from '@/lib/ugc/db';
 import { CreatorQuiz } from '@/components/CreatorQuiz';
 import { notFound } from 'next/navigation';
+import { createPublicServerSupabaseClient } from '@/lib/supabase/server-public';
 
 type Params = { params: Promise<{ universe: string }> };
 
+const loadPublishedCreatorUniverse = unstable_cache(
+  async (slug: string) => {
+    const supabase = createPublicServerSupabaseClient();
+    return fetchPublishedUniverse(supabase, slug);
+  },
+  ['creator-public-test-page-v1'],
+  { revalidate: 300 },
+);
+
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { universe: slug } = await params;
-  const supabase = await createServerSupabaseClient();
-  const bundle = await fetchPublishedUniverse(supabase, slug);
+  const bundle = await loadPublishedCreatorUniverse(slug);
 
   if (!bundle) return { title: '测试不存在' };
 
@@ -25,8 +34,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function CreatorTestPage({ params }: Params) {
   const { universe: slug } = await params;
-  const supabase = await createServerSupabaseClient();
-  const bundle = await fetchPublishedUniverse(supabase, slug);
+  const bundle = await loadPublishedCreatorUniverse(slug);
 
   if (!bundle) notFound();
 

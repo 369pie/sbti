@@ -36,7 +36,7 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<DrunkShareImageGeneratorHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, DrunkShareImageGenerator);
 
   const shareUrl = getSiteUrl(`/drunk/result/${persona.slug}/`);
   const sessionResult = useMemo(() => {

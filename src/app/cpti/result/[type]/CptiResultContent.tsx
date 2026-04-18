@@ -43,7 +43,7 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
   const [heroImageMode, setHeroImageMode] = useState<'thumb' | 'medium' | 'full' | 'emoji'>('medium');
   const [otherImageModes, setOtherImageModes] = useState<Record<string, 'thumb' | 'full' | 'emoji'>>({});
   const shareRef = useRef<CptiShareImageGeneratorHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, CptiShareImageGenerator);
 
   const shareUrl = getSiteUrl(`/cpti/result/${personality.slug}/`);
   const heroImageSrc = heroImageMode === 'full'

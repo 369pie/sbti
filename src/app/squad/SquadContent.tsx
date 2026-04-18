@@ -458,7 +458,7 @@ function SquadResultDisplay({
 export default function SquadContent() {
   const searchParams = useSearchParams();
   const shareRef = useRef<SquadShareImageGeneratorHandle>(null);
-  const { mounted: shareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, SquadShareImageGenerator);
 
   // Try to restore from URL params
   const restored = useMemo(() => decodeSquadParams(searchParams), [searchParams]);

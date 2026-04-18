@@ -38,7 +38,7 @@ export function BirdResultContent({ birdPersonality: p, dimensionScores }: Props
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<BirdShareImageHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, BirdShareImageGenerator);
 
   const shareUrl = getSiteUrl(`/bird/result/${p.slug}/`);
 

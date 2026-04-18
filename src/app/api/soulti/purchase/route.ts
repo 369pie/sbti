@@ -10,6 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getPaymentAvailabilityStatus, getPaymentBlockedPayload } from '@/lib/payment/availability';
 
 interface PurchaseRequestBody {
   slug?: string;
@@ -33,6 +34,11 @@ export async function POST(req: NextRequest) {
   const slug = typeof body.slug === 'string' ? body.slug.slice(0, 40) : '';
   if (!slug || !(sku in SKU_CONFIG)) {
     return NextResponse.json({ error: 'invalid_params' }, { status: 400 });
+  }
+
+  const paymentAvailability = getPaymentAvailabilityStatus();
+  if (paymentAvailability.blocked) {
+    return NextResponse.json(getPaymentBlockedPayload(), { status: 403 });
   }
 
   const config = SKU_CONFIG[sku];

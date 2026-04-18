@@ -41,7 +41,7 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
   const [textCopied, setTextCopied] = useState(false);
   const [heroImageFailed, setHeroImageFailed] = useState(false);
   const shareRef = useRef<SoultiShareImageGeneratorHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, SoultiShareImageGenerator);
   const [activeMirror, setActiveMirror] = useState<'day' | 'night' | 'dream'>('day');
   const { isAuthenticated } = useAuth();
 

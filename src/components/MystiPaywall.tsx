@@ -10,6 +10,7 @@ import {
   SKU_PRICES,
   type MystiSku,
 } from '@/lib/mysti/unlock';
+import { getPaymentAvailabilityStatus } from '@/lib/payment/availability';
 import {
   isSubscriber,
   passCoversSingleSku,
@@ -118,6 +119,12 @@ export function MystiPaywall({
   }, [sku, resourceId]);
 
   const handlePurchase = useCallback(async () => {
+    const paymentAvailability = getPaymentAvailabilityStatus();
+    if (paymentAvailability.blocked) {
+      setError(paymentAvailability.message);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     initiatedRef.current = true;

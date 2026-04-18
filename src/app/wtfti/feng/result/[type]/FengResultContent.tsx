@@ -247,7 +247,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<FengShareImageHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, FengShareImageGenerator);
 
   const shareUrl = getSiteUrl(`/wtfti/feng/result/${p.slug}/`);
 

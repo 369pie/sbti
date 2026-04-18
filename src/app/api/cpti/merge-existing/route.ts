@@ -9,6 +9,7 @@ import {
   mergeAssetPayload,
   type SyncedAssetKey,
 } from '@/lib/assets/asset-contract';
+import { getAssetStateRowId } from '@/lib/assets/asset-server';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 
@@ -80,7 +81,7 @@ async function upsertMergedAssetState(
   };
 
   if (rowId) {
-    await adminClient
+    const { error } = await adminClient
       .from('user_module_results')
       .update({
         module_kind: ASSET_MODULE_KINDS[assetKey],
@@ -95,23 +96,41 @@ async function upsertMergedAssetState(
         expires_at: null,
       })
       .eq('id', rowId);
+
+    if (error) {
+      throw error;
+    }
+
     return;
   }
 
-  await adminClient
+  const { error } = await adminClient
     .from('user_module_results')
-    .insert({
-      user_id: userId,
-      module_kind: ASSET_MODULE_KINDS[assetKey],
-      module_id: ASSET_MODULE_IDS[assetKey],
-      result_slug: 'asset_state_v1',
-      comparability_group: 'asset_sync',
-      source_version: 'asset-sync-v1',
-      source_payload: nextPayload,
-      is_current: true,
-      is_ephemeral: false,
-      observed_at: nowIso,
-    });
+    .upsert(
+      {
+        id: getAssetStateRowId(userId, assetKey),
+        user_id: userId,
+        module_kind: ASSET_MODULE_KINDS[assetKey],
+        module_id: ASSET_MODULE_IDS[assetKey],
+        result_slug: 'asset_state_v1',
+        comparability_group: 'asset_sync',
+        source_version: 'asset-sync-v1',
+        source_payload: nextPayload,
+        is_current: true,
+        is_ephemeral: false,
+        observed_at: nowIso,
+        updated_at: nowIso,
+        expires_at: null,
+      },
+      {
+        onConflict: 'id',
+        ignoreDuplicates: false,
+      },
+    );
+
+  if (error) {
+    throw error;
+  }
 }
 
 export async function POST(request: Request) {

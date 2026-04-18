@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { unstable_cache } from 'next/cache';
 import { notFound } from 'next/navigation';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { getSiteUrl } from '@/lib/site';
+import { createPublicServerSupabaseClient } from '@/lib/supabase/server-public';
 import { ProfileShareButton } from './ProfileShareButton';
 
 type PageProps = {
@@ -79,82 +80,86 @@ function getLatestUniverse(universes: CreatorUniverseCard[]) {
   }, null);
 }
 
-async function loadCreatorProfile(id: string) {
-  const supabase = await createServerSupabaseClient();
+const loadCreatorProfile = unstable_cache(
+  async (id: string) => {
+    const supabase = createPublicServerSupabaseClient();
 
-  const [creatorResult, universesResult, recommendedResult] = await Promise.all([
-    supabase
-      .from('creators')
-      .select('id, name, avatar_url, social_link, bio, is_verified, created_at')
-      .eq('id', id)
-      .maybeSingle(),
-    supabase
-      .from('creator_universes')
-      .select('id, slug, name, emoji, description, primary_color, total_tests, total_shares, published_at')
-      .eq('creator_id', id)
-      .eq('status', 'published')
-      .order('total_tests', { ascending: false }),
-    supabase
-      .from('creator_universes')
-      .select('id, slug, name, emoji, description, primary_color, total_tests, total_shares, published_at, creators(id, name, is_verified)')
-      .neq('creator_id', id)
-      .eq('status', 'published')
-      .order('total_tests', { ascending: false })
-      .limit(4),
-  ]);
+    const [creatorResult, universesResult, recommendedResult] = await Promise.all([
+      supabase
+        .from('creators')
+        .select('id, name, avatar_url, social_link, bio, is_verified, created_at')
+        .eq('id', id)
+        .maybeSingle(),
+      supabase
+        .from('creator_universes')
+        .select('id, slug, name, emoji, description, primary_color, total_tests, total_shares, published_at')
+        .eq('creator_id', id)
+        .eq('status', 'published')
+        .order('total_tests', { ascending: false }),
+      supabase
+        .from('creator_universes')
+        .select('id, slug, name, emoji, description, primary_color, total_tests, total_shares, published_at, creators(id, name, is_verified)')
+        .neq('creator_id', id)
+        .eq('status', 'published')
+        .order('total_tests', { ascending: false })
+        .limit(4),
+    ]);
 
-  if (creatorResult.error || !creatorResult.data) return null;
+    if (creatorResult.error || !creatorResult.data) return null;
 
-  const creator = creatorResult.data;
-  const universes = (universesResult.data ?? []) as CreatorUniverseCard[];
-  const featuredUniverse = universes[0] ?? null;
-  const latestUniverse = getLatestUniverse(universes);
+    const creator = creatorResult.data;
+    const universes = (universesResult.data ?? []) as CreatorUniverseCard[];
+    const featuredUniverse = universes[0] ?? null;
+    const latestUniverse = getLatestUniverse(universes);
 
-  const totals = universes.reduce(
-    (acc, universe) => {
-      acc.totalTests += universe.total_tests as number;
-      acc.totalShares += universe.total_shares as number;
-      return acc;
-    },
-    { totalTests: 0, totalShares: 0 },
-  );
+    const totals = universes.reduce(
+      (acc, universe) => {
+        acc.totalTests += universe.total_tests as number;
+        acc.totalShares += universe.total_shares as number;
+        return acc;
+      },
+      { totalTests: 0, totalShares: 0 },
+    );
 
-  const shareRate = totals.totalTests > 0
-    ? Number(((totals.totalShares / totals.totalTests) * 100).toFixed(1))
-    : 0;
+    const shareRate = totals.totalTests > 0
+      ? Number(((totals.totalShares / totals.totalTests) * 100).toFixed(1))
+      : 0;
 
-  const recommendations = ((recommendedResult.data ?? []) as Array<CreatorUniverseCard & { creators?: unknown }>)
-    .map((item) => ({
-      id: item.id,
-      slug: item.slug,
-      name: item.name,
-      emoji: item.emoji,
-      description: item.description,
-      primary_color: item.primary_color,
-      total_tests: item.total_tests,
-      total_shares: item.total_shares,
-      published_at: item.published_at,
-      creator: normalizeLinkedCreator(item.creators),
-    }))
-    .filter((item) => item.creator?.id);
+    const recommendations = ((recommendedResult.data ?? []) as Array<CreatorUniverseCard & { creators?: unknown }>)
+      .map((item) => ({
+        id: item.id,
+        slug: item.slug,
+        name: item.name,
+        emoji: item.emoji,
+        description: item.description,
+        primary_color: item.primary_color,
+        total_tests: item.total_tests,
+        total_shares: item.total_shares,
+        published_at: item.published_at,
+        creator: normalizeLinkedCreator(item.creators),
+      }))
+      .filter((item) => item.creator?.id);
 
-  return {
-    creator,
-    universes,
-    featuredUniverse,
-    latestUniverse,
-    recommendations,
-    shareRate,
-    joinedLabel: formatJoinLabel(creator.created_at),
-    identityTags: buildIdentityTags({
-      isVerified: creator.is_verified,
-      universeCount: universes.length,
-      totalTests: totals.totalTests,
+    return {
+      creator,
+      universes,
+      featuredUniverse,
+      latestUniverse,
+      recommendations,
       shareRate,
-    }),
-    ...totals,
-  };
-}
+      joinedLabel: formatJoinLabel(creator.created_at),
+      identityTags: buildIdentityTags({
+        isVerified: creator.is_verified,
+        universeCount: universes.length,
+        totalTests: totals.totalTests,
+        shareRate,
+      }),
+      ...totals,
+    };
+  },
+  ['creator-public-profile-page-v1'],
+  { revalidate: 300 },
+);
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;

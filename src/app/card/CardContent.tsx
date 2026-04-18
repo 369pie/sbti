@@ -864,7 +864,7 @@ export function CardContent() {
   }, [isAuthenticated, displayName]);
 
   const shareRef = useRef<WtfCardShareImageGeneratorHandle>(null);
-  const { mounted: shareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, WtfCardShareImageGenerator);
   const theirCard = useMemo(() => {
     if (typeof window === 'undefined' || !theirEncoded) {
       return null;

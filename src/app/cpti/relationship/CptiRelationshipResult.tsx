@@ -82,7 +82,7 @@ export function CptiRelationshipResult() {
   const [aImageMode, setAImageMode] = useState<'full' | 'thumb' | 'emoji'>('thumb');
   const [bImageMode, setBImageMode] = useState<'full' | 'thumb' | 'emoji'>('thumb');
   const shareRef = useRef<CptiRelationshipShareImageGeneratorHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, CptiRelationshipShareImageGenerator);
 
   const { data, backendData, fromLink } = useMemo(() => {
     if (!mounted) {

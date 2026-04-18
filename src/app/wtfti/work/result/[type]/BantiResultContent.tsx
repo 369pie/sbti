@@ -38,7 +38,7 @@ export function BantiResultContent({ bantiPersonality: p, dimensionScores }: Pro
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<BantiShareImageHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, BantiShareImageGenerator);
 
   const shareUrl = getSiteUrl(`/wtfti/work/result/${p.slug}/`);
 

@@ -165,7 +165,7 @@ function ZodiacPicker({
 
 function ComboResultDisplay({ result }: { result: ComboResult }) {
   const shareRef = useRef<ComboShareImageGeneratorHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, ComboShareImageGenerator);
   const [copied, setCopied] = useState(false);
   const comboImageSrc = getComboPersonalityMediumImage(result.comboPersonality.code);
   const comboImageFallbackSrc = getComboPersonalityImage(result.comboPersonality.code);

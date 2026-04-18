@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { User } from '@supabase/supabase-js';
 
-import { loadAssetStateMap } from '@/lib/assets/asset-server';
+import { getAssetStateRowId, loadAssetStateMap } from '@/lib/assets/asset-server';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/supabase/with-auth';
 import {
@@ -33,19 +33,8 @@ function json(body: unknown, init?: ResponseInit) {
 async function upsertAssetState(user: User, assetKey: SyncedAssetKey, payload: unknown) {
   const adminClient = createAdminSupabaseClient();
   const moduleId = ASSET_MODULE_IDS[assetKey];
+  const rowId = getAssetStateRowId(user.id, assetKey);
   const nowIso = new Date().toISOString();
-
-  const { data: existingRow, error: existingRowError } = await adminClient
-    .from('user_module_results')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('module_id', moduleId)
-    .eq('is_current', true)
-    .maybeSingle();
-
-  if (existingRowError) {
-    throw existingRowError;
-  }
 
   const nextPayload = {
     assetKey,
@@ -53,43 +42,70 @@ async function upsertAssetState(user: User, assetKey: SyncedAssetKey, payload: u
     state: payload,
   };
 
-  if (existingRow?.id) {
-    const { error } = await adminClient
+  const updatePayload = {
+    module_kind: ASSET_MODULE_KINDS[assetKey],
+    result_slug: 'asset_state_v1',
+    comparability_group: 'asset_sync',
+    source_version: 'asset-sync-v1',
+    source_payload: nextPayload,
+    observed_at: nowIso,
+    updated_at: nowIso,
+    is_current: true,
+    is_ephemeral: false,
+    expires_at: null,
+  };
+
+  const updateExisting = async () => {
+    const { data, error } = await adminClient
       .from('user_module_results')
-      .update({
-        module_kind: ASSET_MODULE_KINDS[assetKey],
-        result_slug: 'asset_state_v1',
-        comparability_group: 'asset_sync',
-        source_version: 'asset-sync-v1',
-        source_payload: nextPayload,
-        observed_at: nowIso,
-        updated_at: nowIso,
-        is_current: true,
-        is_ephemeral: false,
-        expires_at: null,
-      })
-      .eq('id', existingRow.id);
+      .update(updatePayload)
+      .eq('user_id', user.id)
+      .eq('module_id', moduleId)
+      .eq('is_current', true)
+      .is('expires_at', null)
+      .select('id')
+      .limit(1);
 
     if (error) {
       throw error;
     }
+
+    return Array.isArray(data) && data.length > 0;
+  };
+
+  if (await updateExisting()) {
     return;
   }
 
   const { error } = await adminClient
     .from('user_module_results')
-    .insert({
-      user_id: user.id,
-      module_kind: ASSET_MODULE_KINDS[assetKey],
-      module_id: moduleId,
-      result_slug: 'asset_state_v1',
-      comparability_group: 'asset_sync',
-      source_version: 'asset-sync-v1',
-      source_payload: nextPayload,
-      is_current: true,
-      is_ephemeral: false,
-      observed_at: nowIso,
-    });
+    .upsert(
+      {
+        id: rowId,
+        user_id: user.id,
+        module_kind: ASSET_MODULE_KINDS[assetKey],
+        module_id: moduleId,
+        result_slug: 'asset_state_v1',
+        comparability_group: 'asset_sync',
+        source_version: 'asset-sync-v1',
+        source_payload: nextPayload,
+        is_current: true,
+        is_ephemeral: false,
+        observed_at: nowIso,
+        updated_at: nowIso,
+        expires_at: null,
+      },
+      {
+        onConflict: 'id',
+        ignoreDuplicates: false,
+      },
+    );
+
+  if (error?.code === '23505') {
+    if (await updateExisting()) {
+      return;
+    }
+  }
 
   if (error) {
     throw error;

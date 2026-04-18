@@ -21,6 +21,7 @@ import {
 } from '@/lib/share-card-tiers';
 import { isUnlocked, SKU_PRICES, type MystiSku } from '@/lib/mysti/unlock';
 import { readApiJson } from '@/lib/api';
+import { getPaymentAvailabilityStatus } from '@/lib/payment/availability';
 
 const TIER_TO_SKU: Record<Exclude<ShareCardTier, 'free'>, MystiSku> = {
   plus: 'share-plus',
@@ -72,6 +73,15 @@ export function useShareTier({
 
   const ensurePaid = useCallback(async (): Promise<boolean> => {
     if (tier === 'free' || tierUnlocked(tier)) return false;
+
+    const paymentAvailability = getPaymentAvailabilityStatus();
+    if (paymentAvailability.blocked) {
+      if (typeof window !== 'undefined' && paymentAvailability.message) {
+        window.alert(paymentAvailability.message);
+      }
+      return true;
+    }
+
     const sku = TIER_TO_SKU[tier as 'plus' | 'atelier'];
     try {
       const res = await fetch('/api/mysti/payment/create', {
@@ -84,12 +94,21 @@ export function useShareTier({
           redirect: typeof window !== 'undefined' ? window.location.pathname : '/',
         }),
       });
-      const data = await readApiJson<{ url?: string }>(res);
+      const data = await readApiJson<{
+        url?: string;
+        error?: string;
+        message?: string;
+      }>(res);
       if (data.url && typeof window !== 'undefined') {
         window.location.href = data.url;
+      } else if (typeof window !== 'undefined') {
+        window.alert(data.message || data.error || '支付下单失败，请稍后再试。');
       }
     } catch (e) {
       console.error('[useShareTier] payment create failed:', e);
+      if (typeof window !== 'undefined') {
+        window.alert(e instanceof Error ? e.message : '支付下单失败，请稍后再试。');
+      }
     }
     return true;
   }, [tier, tierUnlocked, resourceId]);

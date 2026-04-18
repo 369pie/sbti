@@ -127,7 +127,7 @@ export function CPResultContent() {
   const slugA = searchParams.get('a');
   const slugB = searchParams.get('b');
   const shareRef = useRef<CPShareImageGeneratorHandle>(null);
-  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, CPShareImageGenerator);
   const [cpLinkCopied, setCpLinkCopied] = useState(false);
 
   const copyCPResultLink = useCallback(() => {

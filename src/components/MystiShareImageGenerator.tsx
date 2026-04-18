@@ -11,6 +11,7 @@ import { getMystiTarotData } from '@/lib/mysti/tarot-mapping';
 import { getDualInterpretation } from '@/lib/mysti/dual-interpretation';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 import { readApiJson } from '@/lib/api';
+import { getPaymentAvailabilityStatus } from '@/lib/payment/availability';
 import {
   SHARE_CARD_TIERS,
   SHARE_CARD_TIER_LABEL,
@@ -839,6 +840,12 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
       if (generating) return;
       // Gating: 付费档位未解锁 → 直接调起支付（同 MystiPaywall 流程）
       if (tier !== 'free' && !tierUnlocked(tier)) {
+        const paymentAvailability = getPaymentAvailabilityStatus();
+        if (paymentAvailability.blocked) {
+          setSaveHint(paymentAvailability.message);
+          return;
+        }
+
         const sku = TIER_TO_SKU[tier as 'plus' | 'atelier'];
         trackMystiEvent('mysti_share_tier_unlock_click', { tier, sku, resourceId });
         try {

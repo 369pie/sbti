@@ -6,6 +6,10 @@ interface GenerateHandle {
   generate?: (...args: unknown[]) => unknown;
 }
 
+interface PreloadableDynamicComponent {
+  preload?: () => Promise<unknown>;
+}
+
 /**
  * Lazy-mount-on-intent for `*ShareImageGenerator` components.
  *
@@ -20,7 +24,7 @@ interface GenerateHandle {
  * ```tsx
  * const shareRef = useRef<MyHandle>(null);
  * const { mounted, ensureMounted, triggerGenerate } =
- *   useDeferredShareGenerate(shareRef);
+ *   useDeferredShareGenerate(shareRef, MyShareGenerator);
  *
  * <button
  *   onPointerEnter={ensureMounted} // warm chunk on hover/touch
@@ -35,10 +39,66 @@ interface GenerateHandle {
  */
 export function useDeferredShareGenerate<H extends GenerateHandle>(
   ref: RefObject<H | null>,
+  preloadable?: unknown,
 ) {
   const [mounted, setMounted] = useState(false);
   const pendingRef = useRef(false);
   const lastTickRef = useRef(0);
+  const prewarmStartedRef = useRef(false);
+
+  const prewarmChunk = useCallback(() => {
+    if (prewarmStartedRef.current) return;
+    prewarmStartedRef.current = true;
+    const preloadCandidate = preloadable as PreloadableDynamicComponent | undefined;
+
+    try {
+      void preloadCandidate?.preload?.();
+    } catch {
+      // swallow — best-effort warmup only
+    }
+  }, [preloadable]);
+
+  useEffect(() => {
+    if (!preloadable || mounted) return;
+    if (typeof window === 'undefined' || document.visibilityState === 'hidden') return;
+
+    const connection = navigator as Navigator & {
+      connection?: {
+        effectiveType?: string;
+        saveData?: boolean;
+      };
+    };
+
+    if (connection.connection?.saveData) return;
+
+    const effectiveType = connection.connection?.effectiveType;
+    if (effectiveType === 'slow-2g' || effectiveType === '2g') return;
+
+    let cancelled = false;
+    const run = () => {
+      if (cancelled) return;
+      prewarmChunk();
+    };
+
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout?: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+
+    if (typeof idleWindow.requestIdleCallback === 'function') {
+      const handle = idleWindow.requestIdleCallback(run, { timeout: 2500 });
+      return () => {
+        cancelled = true;
+        idleWindow.cancelIdleCallback?.(handle);
+      };
+    }
+
+    const timeout = window.setTimeout(run, 1200);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+    };
+  }, [mounted, preloadable, prewarmChunk]);
 
   // Drain any pending generate() once the component finishes mounting.
   useEffect(() => {
@@ -75,8 +135,9 @@ export function useDeferredShareGenerate<H extends GenerateHandle>(
   }, [mounted, ref]);
 
   const ensureMounted = useCallback(() => {
+    prewarmChunk();
     setMounted((v) => v || true);
-  }, []);
+  }, [prewarmChunk]);
 
   const triggerGenerate = useCallback(() => {
     // Debounce double-fires (e.g. pointer + click on touch devices).
@@ -86,6 +147,7 @@ export function useDeferredShareGenerate<H extends GenerateHandle>(
       lastTickRef.current = now;
     }
 
+    prewarmChunk();
     pendingRef.current = true;
     if (mounted) {
       const handle = ref.current;
@@ -102,7 +164,7 @@ export function useDeferredShareGenerate<H extends GenerateHandle>(
       return;
     }
     setMounted(true);
-  }, [mounted, ref]);
+  }, [mounted, prewarmChunk, ref]);
 
   return { mounted, ensureMounted, triggerGenerate };
 }
