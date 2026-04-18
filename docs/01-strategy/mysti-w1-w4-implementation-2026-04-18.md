@@ -78,17 +78,20 @@ XUNHUPAY_WECHAT_APP_SECRET=xxx
 XUNHUPAY_ALIPAY_APP_ID=xxx
 XUNHUPAY_ALIPAY_APP_SECRET=xxx
 
-# 可选：渠道级 API base（通常不需要改）
-XUNHUPAY_WECHAT_API_BASE=https://api.xunhupay.com
-XUNHUPAY_ALIPAY_API_BASE=https://api.xunhupay.com
+# 可选：渠道级 API base（当前默认即备用平台；只有变更时才需要显式配置）
+XUNHUPAY_WECHAT_API_BASE=https://api.dpweixin.com
+XUNHUPAY_ALIPAY_API_BASE=https://api.dpweixin.com
 
 # 兼容旧版：若仍使用同一商户同时承接两个渠道，可只配共享 env
 XUNHUPAY_APP_ID=xxx
 XUNHUPAY_APP_SECRET=xxx
 
 # 可选：全局 API base fallback
-XUNHUPAY_API_BASE=https://api.xunhupay.com
+XUNHUPAY_API_BASE=https://api.dpweixin.com
 ```
+
+> 当前线上签约平台使用虎皮椒备用网关：`https://api.dpweixin.com/payment/do.html`。
+> 代码默认会优先命中该平台；如未来接口迁移，再通过 `XUNHUPAY_*_API_BASE` 或 `XUNHUPAY_API_BASE` 覆盖即可。
 
 > `notify_url` / `return_url` 不再通过 env 固定配置，而是在创建订单时由具体业务动态生成：
 > - `notify_url`：`/api/mysti/payment/notify?channel=wechat|alipay&sku=...`

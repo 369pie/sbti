@@ -18,7 +18,7 @@ export interface XunhupayConfig {
   channel: XunhupayPaymentChannel;
   appid: string;
   appsecret: string;
-  /** 接口域名，默认官方 */
+  /** 接口域名，默认使用当前签约平台（现为 dpweixin 备用平台） */
   apiBase?: string;
   appidEnvKey: string;
   appsecretEnvKey: string;
@@ -185,7 +185,7 @@ function readSharedConfig(
     channel,
     appid: appid.value,
     appsecret: appsecret.value,
-    apiBase: apiBase.value || 'https://api.xunhupay.com',
+    apiBase: apiBase.value || DEFAULT_XUNHUPAY_API_BASE,
     appidEnvKey: appid.key,
     appsecretEnvKey: appsecret.key,
     apiBaseEnvKey: apiBase.key,
@@ -223,7 +223,7 @@ export function readXunhupayConfig(
       apiBase:
         apiBase.value ||
         readSharedConfig(channel)?.apiBase ||
-        'https://api.xunhupay.com',
+        DEFAULT_XUNHUPAY_API_BASE,
       appidEnvKey: appid.key,
       appsecretEnvKey: appsecret.key,
       apiBaseEnvKey: apiBase.key,
@@ -250,8 +250,8 @@ export function hasAnyXunhupayConfig(): boolean {
   );
 }
 
-const DEFAULT_XUNHUPAY_API_BASE = 'https://api.xunhupay.com';
-const BACKUP_XUNHUPAY_API_BASE = 'https://api.dpweixin.com';
+const DEFAULT_XUNHUPAY_API_BASE = 'https://api.dpweixin.com';
+const SECONDARY_XUNHUPAY_API_BASE = 'https://api.xunhupay.com';
 
 function isLikelyMobileBrowser(userAgent?: string): boolean {
   if (!userAgent) return false;
@@ -261,7 +261,7 @@ function isLikelyMobileBrowser(userAgent?: string): boolean {
 }
 
 function buildApiBaseCandidates(apiBase?: string): string[] {
-  const candidates = [apiBase, DEFAULT_XUNHUPAY_API_BASE, BACKUP_XUNHUPAY_API_BASE]
+  const candidates = [apiBase, DEFAULT_XUNHUPAY_API_BASE, SECONDARY_XUNHUPAY_API_BASE]
     .filter((value): value is string => Boolean(value))
     .map(value => value.replace(/\/$/, ''));
   return [...new Set(candidates)];
