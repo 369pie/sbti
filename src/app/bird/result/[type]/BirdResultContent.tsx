@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useCallback, useRef, useState, useEffect } from 'react';
@@ -8,7 +10,10 @@ import { BIRD_PERSONALITIES, getBirdTypeImage } from '@/lib/bird/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
 import { markCollected } from '@/lib/mysti/collection';
-import { BirdShareImageGenerator } from '@/components/BirdShareImageGenerator';
+const BirdShareImageGenerator = dynamic(
+  () => import('@/components/BirdShareImageGenerator').then((m) => m.BirdShareImageGenerator),
+  { ssr: false },
+);
 import type { BirdShareImageHandle } from '@/components/BirdShareImageGenerator';
 import { BirdTypeArt } from '@/components/BirdTypeArt';
 import { UniverseResultBar } from '@/components/UniverseResultBar';

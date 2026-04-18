@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useCallback, useRef, useState, useEffect } from 'react';
@@ -8,7 +10,10 @@ import { FENG_PERSONALITIES, getFengTypeImage } from '@/lib/feng/personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
 import { markCollected } from '@/lib/mysti/collection';
-import { FengShareImageGenerator } from '@/components/FengShareImageGenerator';
+const FengShareImageGenerator = dynamic(
+  () => import('@/components/FengShareImageGenerator').then((m) => m.FengShareImageGenerator),
+  { ssr: false },
+);
 import type { FengShareImageHandle } from '@/components/FengShareImageGenerator';
 import { UniverseSwitcher } from '@/components/UniverseSwitcher';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';

@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { useSearchParams } from 'next/navigation';
@@ -8,7 +10,10 @@ import { IDENTIFY_DIMENSIONS, IDENTIFY_MODEL_NAMES, IDENTIFY_MODEL_COLORS } from
 import type { IdentifyPersonaType } from '@/lib/identify/personas';
 import { getIdentifyTypeImage, getIdentifyTypeThumbnailImage, getIdentifyTypeMediumImage } from '@/lib/identify/personas';
 import type { IdentifyDimensionScore } from '@/lib/identify/scoring';
-import { IdentifyShareImageGenerator } from '@/components/IdentifyShareImageGenerator';
+const IdentifyShareImageGenerator = dynamic(
+  () => import('@/components/IdentifyShareImageGenerator').then((m) => m.IdentifyShareImageGenerator),
+  { ssr: false },
+);
 import type { IdentifyShareImageGeneratorHandle } from '@/components/IdentifyShareImageGenerator';
 import { useCallback, useMemo, useRef, useState, useEffect, useSyncExternalStore } from 'react';
 import { identifyApi, type IdentifyPreviewResponse } from '@/lib/identify/api';

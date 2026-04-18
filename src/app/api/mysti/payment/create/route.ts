@@ -9,13 +9,15 @@ import {
   readXunhupayConfig,
   type XunhupayPaymentChannel,
 } from '@/lib/payment/xunhupay';
+import { isMystiPaymentStubMode } from '@/lib/mysti/payment-mode';
 import {
   createPendingMystiOrder,
   updateMystiOrderStatus,
   type MystiOrderAttach,
 } from '@/lib/mysti/payment-store';
-import { SKU_PRICES, type MystiSku } from '@/lib/mysti/unlock';
+import { ALL_SKUS, SKU_PRICES, isSubscriptionSku, type MystiSku } from '@/lib/mysti/unlock';
 import { GIFT_CARD_OPTIONS, type GiftCardGiftSku } from '@/lib/mysti/gift-card';
+import { maybeCleanup, rateLimit, resolveRateLimitKey } from '@/lib/perf/rate-limit';
 
 interface CreateBody {
   sku?: MystiSku;
@@ -23,6 +25,8 @@ interface CreateBody {
   paymentType?: XunhupayPaymentChannel;
   /** 创作者推荐码（可选） */
   ref?: string;
+  /** 设备识别，用于跨设备订阅与购买历史查询 */
+  deviceId?: string;
   /** 支付成功后业务回跳路径，例如 /mysti/monthly/ */
   redirect?: string;
   /** 礼品卡等业务扩展字段 */
@@ -34,14 +38,11 @@ interface CreateBody {
   };
 }
 
-const VALID_SKUS = new Set<MystiSku>([
-  'soul-letter',
-  'dual-report',
-  'monthly-report',
-  'gift-card',
-  'share-plus',
-  'share-atelier',
-]);
+const VALID_SKUS = new Set<MystiSku>(ALL_SKUS);
+
+function isPaymentChannel(value: unknown): value is XunhupayPaymentChannel {
+  return value === 'wechat' || value === 'alipay';
+}
 
 function safeRedirectPath(input: string | undefined): string {
   if (!input || !input.startsWith('/')) return '/mysti/';
@@ -78,12 +79,38 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid_json' }, { status: 400 });
   }
 
+  // Rate-limit early so abusive clients can't drive Xunhupay round-trips.
+  // 5 create attempts per device+IP per 10s window is well above any honest
+  // user flow (paywall debounces clicks).
+  maybeCleanup();
+  const rl = rateLimit(
+    `mysti:create:${resolveRateLimitKey(req, body.deviceId)}`,
+    { limit: 5, windowMs: 10_000 },
+  );
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'rate_limited', retryAfterMs: rl.resetMs },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(Math.ceil(rl.resetMs / 1000)) },
+      },
+    );
+  }
+
   const sku = body.sku;
-  const resourceId = (body.resourceId ?? '').slice(0, 64);
+  // 订阅类 SKU 没有 resourceId 概念，统一兜底为 'subscription'
+  const incomingResource = (body.resourceId ?? '').slice(0, 64);
+  const resourceId =
+    incomingResource || (sku && isSubscriptionSku(sku) ? 'subscription' : '');
+  if (body.paymentType && !isPaymentChannel(body.paymentType)) {
+    return NextResponse.json({ error: 'invalid_payment_type' }, { status: 400 });
+  }
   const paymentType = body.paymentType ?? 'wechat';
   const ref = (body.ref ?? '').slice(0, 32);
+  const deviceId = (body.deviceId ?? '').slice(0, 64) || undefined;
   const redirect = safeRedirectPath(body.redirect);
   const metadata = sanitizeGiftMetadata(body.metadata);
+  const allowStub = isMystiPaymentStubMode();
 
   if (!sku || !VALID_SKUS.has(sku) || !resourceId) {
     return NextResponse.json({ error: 'invalid_params' }, { status: 400 });
@@ -100,8 +127,18 @@ export async function POST(req: NextRequest) {
   const returnUrl = `${origin}/mysti/payment/return?channel=${paymentType}&sku=${encodeURIComponent(sku)}&resourceId=${encodeURIComponent(resourceId)}&redirect=${encodeURIComponent(redirect)}`;
   const callbackUrl = `${origin}${redirect}`;
 
-  // Stub 模式（未配置当前支付渠道 env） — 返回伪 URL，便于前端开发
+  // Stub 模式仅用于本地/开发；生产环境缺配置时必须 fail closed。
   if (!cfg) {
+    if (!allowStub) {
+      return NextResponse.json(
+        {
+          error: 'payment_channel_unavailable',
+          paymentType,
+        },
+        { status: 503 },
+      );
+    }
+
     return NextResponse.json({
       stub: true,
       orderId: tradeOrderId,
@@ -131,6 +168,7 @@ export async function POST(req: NextRequest) {
       amountCents: Math.round(meta.price * 100),
       redirectPath: redirect,
       referralCode: ref || undefined,
+      deviceId,
       attachJson,
     });
 

@@ -303,10 +303,11 @@ CREATE POLICY personalities_public_read ON public.creator_personalities
     universe_id IN (SELECT id FROM public.creator_universes WHERE status = 'published')
   );
 
--- Test results: anyone can insert, creators can read their own universe's results
+-- Test results: only controlled server writes, creators can read their own universe's results
 DROP POLICY IF EXISTS results_insert ON public.creator_test_results;
-CREATE POLICY results_insert ON public.creator_test_results
-  FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS results_service_insert ON public.creator_test_results;
+CREATE POLICY results_service_insert ON public.creator_test_results
+  FOR INSERT TO service_role WITH CHECK (true);
 
 DROP POLICY IF EXISTS results_read_own ON public.creator_test_results;
 CREATE POLICY results_read_own ON public.creator_test_results
@@ -350,7 +351,7 @@ BEGIN
   SET total_tests = COALESCE(total_tests, 0) + 1
   WHERE id = universe_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 CREATE OR REPLACE FUNCTION public.increment_universe_shares(universe_id UUID)
 RETURNS VOID AS $$
@@ -359,7 +360,15 @@ BEGIN
   SET total_shares = COALESCE(total_shares, 0) + 1
   WHERE id = universe_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+REVOKE EXECUTE ON FUNCTION public.increment_universe_tests(UUID) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.increment_universe_shares(UUID) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.increment_universe_tests(UUID) TO service_role;
+GRANT EXECUTE ON FUNCTION public.increment_universe_shares(UUID) TO service_role;
+
+REVOKE INSERT, UPDATE, DELETE ON TABLE public.creator_test_results FROM PUBLIC, anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.creator_test_results TO service_role;
 
 -- ─── 9. Orders (simulated purchases) ────────────────────────────────────────
 
@@ -376,7 +385,8 @@ CREATE TABLE IF NOT EXISTS public.creator_orders (
   status TEXT NOT NULL DEFAULT 'confirmed'
     CHECK (status IN ('confirmed', 'refunded', 'disputed')),
   refund_reason TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_orders_universe ON public.creator_orders(universe_id);
@@ -426,16 +436,20 @@ ALTER TABLE public.creator_orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.creator_earnings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.creator_settlements ENABLE ROW LEVEL SECURITY;
 
--- Orders: anyone can insert (simulated purchase), creators read own
+-- Orders: only controlled server writes, creators read own
 DROP POLICY IF EXISTS orders_insert ON public.creator_orders;
-CREATE POLICY orders_insert ON public.creator_orders
-  FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS orders_service_insert ON public.creator_orders;
+CREATE POLICY orders_service_insert ON public.creator_orders
+  FOR INSERT TO service_role WITH CHECK (true);
 
 DROP POLICY IF EXISTS orders_read_own ON public.creator_orders;
 CREATE POLICY orders_read_own ON public.creator_orders
   FOR SELECT USING (
     creator_id IN (SELECT id FROM public.creators WHERE user_id = auth.uid())
   );
+
+REVOKE INSERT, UPDATE, DELETE ON TABLE public.creator_orders FROM PUBLIC, anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.creator_orders TO service_role;
 
 -- Earnings: creators read own
 DROP POLICY IF EXISTS earnings_read_own ON public.creator_earnings;

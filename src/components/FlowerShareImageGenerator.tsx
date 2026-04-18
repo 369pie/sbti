@@ -173,11 +173,11 @@ async function renderFlowerShareImage(personality: FlowerPersonalityType, dimens
   ctx.textBaseline = 'top';
 
   // ========== Color system ==========
-  const BG = '#FFFAF5';
-  const DARK = '#2D2820';
-  const MED = '#7B7068';
-  const LIGHT = '#B0A89E';
-  const DIV = '#E8E0D8';
+  const BG = '#FAF8F5';
+  const DARK = '#1F1A16';
+  const MED = '#5B524B';
+  const LIGHT = '#9A908A';
+  const DIV = '#E3DCD1';
 
   // Fill full oversized background
   ctx.fillStyle = BG;

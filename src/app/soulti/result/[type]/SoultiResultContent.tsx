@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
@@ -9,7 +11,10 @@ import type { SoultiPersonalityType } from '@/lib/soulti/personalities';
 import type { SoultiDimensionScore } from '@/lib/soulti/scoring';
 import type { SoultiLayeredResult } from '@/lib/soulti/scoring';
 import { calculateTearRate } from '@/lib/soulti/scoring';
-import { SoultiShareImageGenerator } from '@/components/SoultiShareImageGenerator';
+const SoultiShareImageGenerator = dynamic(
+  () => import('@/components/SoultiShareImageGenerator').then((m) => m.SoultiShareImageGenerator),
+  { ssr: false },
+);
 import type { SoultiShareImageGeneratorHandle } from '@/components/SoultiShareImageGenerator';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';

@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
@@ -10,7 +12,10 @@ import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
 import { markCollected } from '@/lib/mysti/collection';
 import { DeltaTypeArt } from '@/components/DeltaTypeArt';
-import { DeltaShareImageGenerator } from '@/components/DeltaShareImageGenerator';
+const DeltaShareImageGenerator = dynamic(
+  () => import('@/components/DeltaShareImageGenerator').then((m) => m.DeltaShareImageGenerator),
+  { ssr: false },
+);
 import type { DeltaShareImageHandle } from '@/components/DeltaShareImageGenerator';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { WtfCardCTA } from '@/components/WtfCardCTA';

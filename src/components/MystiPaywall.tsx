@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMystiTheme } from '@/components/MystiThemeProvider';
 import {
@@ -9,7 +10,13 @@ import {
   SKU_PRICES,
   type MystiSku,
 } from '@/lib/mysti/unlock';
+import {
+  isSubscriber,
+  passCoversSingleSku,
+  passDiscountForSku,
+} from '@/lib/mysti/subscription';
 import { getActiveReferralCode } from '@/lib/mysti/creator-referral';
+import { getOrCreateDeviceId } from '@/lib/mysti/device';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 
 interface Props {
@@ -31,27 +38,114 @@ export function MystiPaywall({
   children,
 }: Props) {
   const { theme } = useMystiTheme();
-  const [unlocked, setUnlocked] = useState<boolean>(() => isUnlocked(sku, resourceId));
+  const [unlocked, setUnlocked] = useState<boolean>(() =>
+    isUnlocked(sku, resourceId),
+  );
+  const [hasPass, setHasPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [paymentType, setPaymentType] = useState<'wechat' | 'alipay'>('wechat');
 
   const meta = SKU_PRICES[sku];
+  const passCovers = passCoversSingleSku(sku);
+  const passDiscount = passDiscountForSku(sku);
+  const discountedPrice = +(meta.price * (1 - passDiscount)).toFixed(2);
+
+  // 订阅会员权益：hydrate 后检查
+  useEffect(() => {
+    const subscribed = isSubscriber();
+    setHasPass(subscribed);
+    if (subscribed && passCovers && !unlocked) {
+      setUnlocked(true);
+      try {
+        trackMystiEvent('mysti_paywall_pass_unlocked', { sku, resourceId });
+      } catch {
+        /* noop */
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 首次看到 paywall
+  useEffect(() => {
+    if (!unlocked) {
+      try {
+        trackMystiEvent('mysti_paywall_view', { sku, resourceId });
+      } catch {
+        /* noop */
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sku, resourceId]);
+
+  // 离开 / 切走但未购买 → dismiss（用于 paywall 漏斗的流失节点）
+  // 用 ref 跟踪 initiate / unlocked 的最终状态，避免把"已点购买"也算成 dismiss
+  const initiatedRef = useRef(false);
+  const dismissedRef = useRef(false);
+  const unlockedRef = useRef(unlocked);
+  useEffect(() => {
+    unlockedRef.current = unlocked;
+  }, [unlocked]);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const fireDismiss = (reason: 'unmount' | 'visibility' | 'pagehide') => {
+      if (unlockedRef.current || initiatedRef.current || dismissedRef.current) return;
+      dismissedRef.current = true;
+      try {
+        trackMystiEvent('mysti_paywall_dismiss', { sku, resourceId, reason });
+      } catch {
+        /* noop */
+      }
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        fireDismiss('visibility');
+      }
+    };
+    const onPageHide = () => fireDismiss('pagehide');
+
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', onPageHide);
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', onPageHide);
+      fireDismiss('unmount');
+    };
+  }, [sku, resourceId]);
 
   const handlePurchase = useCallback(async () => {
     setLoading(true);
     setError(null);
-    // event placeholder（analytics events 需在 trackMystiEvent 中注册类型）
+    initiatedRef.current = true;
+    try {
+      trackMystiEvent('mysti_paywall_initiate', {
+        sku,
+        resourceId,
+        paymentType,
+      });
+    } catch {
+      /* noop */
+    }
     try {
       const ref = getActiveReferralCode() || undefined;
-      const redirect =
-        typeof window !== 'undefined'
-          ? `${window.location.pathname}${window.location.search}`
-          : '/mysti/';
+      const deviceId = getOrCreateDeviceId() || undefined;
+      const redirect = (() => {
+        if (typeof window === 'undefined') return '/mysti/';
+        const pathname = window.location.pathname;
+        const search = window.location.search;
+        // 把 ?unlocked={sku} 拼进回跳，这样支付完成回到原页面时
+        // 可被对应组件（如 MystiShareImageGenerator）感知并自动呈现已解锁内容。
+        if (search.includes('unlocked=')) return `${pathname}${search}`;
+        const sep = search ? '&' : '?';
+        return `${pathname}${search}${sep}unlocked=${encodeURIComponent(sku)}`;
+      })();
       const res = await fetch('/api/mysti/payment/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sku, resourceId, paymentType, ref, redirect }),
+        body: JSON.stringify({ sku, resourceId, paymentType, ref, deviceId, redirect }),
       });
       const data = (await res.json()) as {
         url?: string;
@@ -63,7 +157,6 @@ export function MystiPaywall({
         throw new Error(data.error || 'create_failed');
       }
 
-      // Stub 模式：直接走假成功
       if (data.stub) {
         const verify = await fetch(
           `/api/mysti/payment/verify?orderId=${encodeURIComponent(data.orderId)}&stub=1`,
@@ -79,17 +172,18 @@ export function MystiPaywall({
           });
           setUnlocked(true);
           try {
-            trackMystiEvent('mysti_test_complete', {
-              kind: 'paywall_unlock_stub',
+            trackMystiEvent('mysti_paywall_success', {
               sku,
               resourceId,
+              stub: true,
             });
-          } catch {/* noop */}
+          } catch {
+            /* noop */
+          }
           return;
         }
       }
 
-      // Live 模式：跳到虎皮椒
       window.location.href = data.url;
     } catch (e) {
       setError(String(e));
@@ -102,9 +196,10 @@ export function MystiPaywall({
     return <>{children}</>;
   }
 
+  const finalPrice = passDiscount > 0 && hasPass ? discountedPrice : meta.price;
+
   return (
     <div className="relative">
-      {/* 模糊预览 */}
       <div
         className="relative rounded-2xl overflow-hidden"
         style={{
@@ -122,7 +217,6 @@ export function MystiPaywall({
           {preview}
         </div>
 
-        {/* 解锁覆盖层 */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -133,7 +227,10 @@ export function MystiPaywall({
         >
           <div
             className="text-5xl mb-3"
-            style={{ color: theme.accentGold, fontFamily: 'var(--font-display)' }}
+            style={{
+              color: theme.accentGold,
+              fontFamily: 'var(--font-display)',
+            }}
           >
             ✦
           </div>
@@ -144,13 +241,50 @@ export function MystiPaywall({
             {lockedTitle}
           </h3>
           <p
-            className="text-sm mb-5"
-            style={{ color: theme.textMuted, fontFamily: 'var(--font-serif)' }}
+            className="text-sm mb-1"
+            style={{
+              color: theme.textMuted,
+              fontFamily: 'var(--font-serif)',
+            }}
           >
-            {meta.label} · ¥{meta.price.toFixed(1)}
+            {meta.label}
           </p>
 
-          {/* 支付方式 */}
+          {passDiscount > 0 ? (
+            <p className="text-xs mb-5" style={{ color: theme.textSubtle }}>
+              <s>¥{meta.price.toFixed(1)}</s>{' '}
+              <span style={{ color: theme.accentGold }}>
+                会员价 ¥{discountedPrice.toFixed(1)}
+              </span>
+              {!hasPass && (
+                <>
+                  {' · '}
+                  <Link
+                    href={`/mysti/subscribe/?from=${encodeURIComponent(sku)}`}
+                    className="underline"
+                    style={{ color: theme.accent }}
+                    onClick={() => {
+                      try {
+                        trackMystiEvent('mysti_subscribe_view', {
+                          source: 'paywall',
+                          sku,
+                        });
+                      } catch {
+                        /* noop */
+                      }
+                    }}
+                  >
+                    以后全部 7 折
+                  </Link>
+                </>
+              )}
+            </p>
+          ) : (
+            <p className="text-sm mb-5" style={{ color: theme.textMuted }}>
+              ¥{meta.price.toFixed(1)}
+            </p>
+          )}
+
           <div className="flex gap-2 mb-4">
             {(['wechat', 'alipay'] as const).map(p => (
               <button
@@ -184,8 +318,32 @@ export function MystiPaywall({
               boxShadow: `0 8px 24px ${theme.cardGlow}`,
             }}
           >
-            {loading ? '正在创建订单…' : `✦ 解锁 · ¥${meta.price.toFixed(1)}`}
+            {loading
+              ? '正在创建订单…'
+              : `✦ 解锁 · ¥${finalPrice.toFixed(1)}`}
           </button>
+
+          {!hasPass && (passCovers || passDiscount > 0) && (
+            <Link
+              href={`/mysti/subscribe/?from=${encodeURIComponent(sku)}`}
+              onClick={() => {
+                try {
+                  trackMystiEvent('mysti_subscribe_view', {
+                    source: 'paywall_upsell',
+                    sku,
+                  });
+                } catch {
+                  /* noop */
+                }
+              }}
+              className="mt-3 text-[11px] underline opacity-80 hover:opacity-100"
+              style={{ color: theme.accent }}
+            >
+              {passCovers
+                ? '¥ 19 开通月度通行证 · 本 SKU 免费 + 以后全 7 折'
+                : '¥ 19 开通月度通行证 · 以后全 7 折'}
+            </Link>
+          )}
 
           <AnimatePresence>
             {error && (
@@ -201,10 +359,7 @@ export function MystiPaywall({
             )}
           </AnimatePresence>
 
-          <p
-            className="mt-4 text-[11px]"
-            style={{ color: theme.textSubtle }}
-          >
+          <p className="mt-4 text-[11px]" style={{ color: theme.textSubtle }}>
             一次性付费 · 终身解锁 · 支持微信 / 支付宝
           </p>
         </motion.div>

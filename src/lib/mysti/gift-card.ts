@@ -11,14 +11,22 @@
  * 注：localStorage 现在只是 UI cache，不再是礼品卡事实来源。
  */
 
-import type { MystiSku } from './unlock';
-
 const STORAGE_KEY = 'mysti-gift-cards';
+
+/** 受赠内容 SKU —— 仅允许「可作为礼物送出」的单次内容 */
+export type GiftCardGiftSku =
+  | 'soul-letter'
+  | 'dual-report'
+  | 'monthly-report'
+  | 'share-atelier';
+
+/** 礼品卡订单 SKU（决定贺卡形态/价位） */
+export type GiftOrderSku = 'gift-card' | 'festival-gift-card' | 'besties-bundle';
 
 export interface GiftCard {
   code: string;
-  /** 受赠 SKU — 当前 MVP 仅 soul-letter / dual-report / monthly-report */
-  giftSku: Exclude<MystiSku, 'gift-card'>;
+  /** 受赠 SKU */
+  giftSku: GiftCardGiftSku;
   resourceId?: string; // soul-letter 时为人格 slug，可在赠送时由收赠人选择
   fromName?: string;
   toName?: string;
@@ -29,8 +37,6 @@ export interface GiftCard {
   redeemedAt?: number;
   redeemedResourceId?: string;
 }
-
-export type GiftCardGiftSku = GiftCard['giftSku'];
 
 function load(): GiftCard[] {
   if (typeof window === 'undefined') return [];
@@ -127,7 +133,7 @@ export function redeemGiftCard(
 }
 
 export const GIFT_CARD_OPTIONS: Array<{
-  giftSku: Exclude<MystiSku, 'gift-card'>;
+  giftSku: GiftCardGiftSku;
   label: string;
   description: string;
   emoji: string;
@@ -150,4 +156,119 @@ export const GIFT_CARD_OPTIONS: Array<{
     description: '一整月的灵魂轨迹',
     emoji: '🌙',
   },
+  {
+    giftSku: 'share-atelier',
+    label: 'N° 藏品分享卡',
+    description: '送一张编号独特的收藏分享卡',
+    emoji: '✨',
+  },
 ];
+
+/**
+ * 礼品卡套装：决定收赠人收到的「贺卡感」与价位档。
+ * 底层都走支付订单 SKU（gift-card / festival-gift-card / besties-bundle）。
+ */
+export interface GiftBundleOption {
+  orderSku: GiftOrderSku;
+  defaultGiftSku: GiftCardGiftSku;
+  badge: string;
+  label: string;
+  description: string;
+  emoji: string;
+  scenes: string[];
+}
+
+export const GIFT_BUNDLES: GiftBundleOption[] = [
+  {
+    orderSku: 'gift-card',
+    defaultGiftSku: 'soul-letter',
+    badge: '经典礼物',
+    label: '灵魂礼品卡 · 三选一',
+    description: '灵魂信 / 双人合盘 / 月报 任选一项，附自定义贺卡',
+    emoji: '🎁',
+    scenes: ['日常送礼', '闺蜜生日', '谢谢你'],
+  },
+  {
+    orderSku: 'festival-gift-card',
+    defaultGiftSku: 'soul-letter',
+    badge: '节日限定',
+    label: '节日限定礼品卡',
+    description: '七夕 / 圣诞 / 生日 / 求职 限定主题贺卡 + 藏品卡 N°',
+    emoji: '🌸',
+    scenes: ['七夕', '圣诞', '生日', '求职加油'],
+  },
+  {
+    orderSku: 'besties-bundle',
+    defaultGiftSku: 'dual-report',
+    badge: '闺蜜套装',
+    label: '闺蜜对箱',
+    description: '双人合盘报告 + 双人 Plus 分享卡 + 手写贺卡',
+    emoji: '👯',
+    scenes: ['闺蜜', '姐妹', '互送'],
+  },
+];
+
+/**
+ * 节日主题预设：用于「节日限定礼品卡」套装上的主题选择，
+ * 决定贺卡封面、问候语、配色调性。
+ */
+export interface FestivalTheme {
+  id: string;
+  label: string;
+  emoji: string;
+  defaultGreeting: string;
+  /** Tailwind-friendly hex tokens; UI 决定如何用 */
+  accentHex: string;
+  /** 适用 orderSku（默认仅 festival-gift-card） */
+  orderSku?: GiftOrderSku;
+}
+
+export const FESTIVAL_THEMES: FestivalTheme[] = [
+  {
+    id: 'qixi',
+    label: '七夕 · 灵魂双星',
+    emoji: '🌌',
+    defaultGreeting: '愿我们的灵魂在银河两端互相照亮。',
+    accentHex: '#E8B4D6',
+  },
+  {
+    id: 'christmas',
+    label: '圣诞 · 暖夜之礼',
+    emoji: '🎄',
+    defaultGreeting: '把这一份灵魂的暖意，寄给岁末的你。',
+    accentHex: '#D4A574',
+  },
+  {
+    id: 'birthday',
+    label: '生日 · 灵魂年轮',
+    emoji: '🕯️',
+    defaultGreeting: '又添一圈灵魂年轮，愿你认得自己更深。',
+    accentHex: '#F5C6A5',
+  },
+  {
+    id: 'job-luck',
+    label: '求职加油 · 灵魂护身符',
+    emoji: '🛡️',
+    defaultGreeting: '愿这张牌成为你下一程的护身符。',
+    accentHex: '#A8C8D4',
+  },
+  {
+    id: 'graduation',
+    label: '毕业 · 灵魂启程',
+    emoji: '🎓',
+    defaultGreeting: '完成一段，启程下一段，灵魂记得这一刻。',
+    accentHex: '#B8B0FF',
+  },
+  {
+    id: 'farewell',
+    label: '告别 · 灵魂送别',
+    emoji: '🍃',
+    defaultGreeting: '路途虽分，灵魂同频。',
+    accentHex: '#C8C0DC',
+  },
+];
+
+export function findFestivalTheme(id?: string): FestivalTheme | null {
+  if (!id) return null;
+  return FESTIVAL_THEMES.find(t => t.id === id) ?? null;
+}

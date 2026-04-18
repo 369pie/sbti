@@ -13,214 +13,168 @@ const MODELS: { key: CptiModelType; label: string }[] = [
 
 const FEATURED = CPTI_PERSONALITY_TYPES;
 
+const MODES = [
+  { n: '01', title: '查看我的 CP 角色', desc: '20 题快测，立即拿到属于你的 CP 角色身份卡。' },
+  { n: '02', title: '邀请 ta 一起测', desc: '生成专属配对链接，ta 完成 12 题后解锁你们的关系类型。' },
+  { n: '03', title: '帮 ta 答题（他评）', desc: '收到邀请后以观察者视角作答，鉴定你们之间的关系。' },
+];
+
+const EXPLORE = [
+  { href: '/card/', label: '我的关系图鉴', desc: '查看已收集的 CP 关系，点亮你的关系宇宙。' },
+  { href: '/cpti/leaderboard/', label: '关系排行榜', desc: '看看谁是当周收集最多关系类型的玩家。' },
+  { href: '/cpti/join/', label: '输入配对码', desc: '用 ta 发来的代码加入配对，解锁新的关系。' },
+];
+
 export default function CptiHomeContent() {
   return (
-    <div className="min-h-screen">
-      {/* Hero */}
+    <div className="min-h-screen" style={{ background: 'var(--color-paper)' }}>
+      {/* ── Hero ─────────────────────────────────────────── */}
       <section className="relative overflow-hidden">
-        <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
+        <div className="max-w-5xl mx-auto px-6 sm:px-10 pt-16 sm:pt-28 pb-16 sm:pb-24">
           <div className="animate-fade-up">
-            <span className="inline-block text-xs font-mono tracking-[0.25em] text-text-muted mb-6 uppercase">
-              Couple Personality Type Indicator
-            </span>
+            <div className="flex items-center gap-4 mb-10">
+              <span className="serial-number text-sm">Issue · CPTI</span>
+              <span className="editorial-rule flex-1 max-w-[80px]" />
+              <span className="eyebrow">Couple Personality Type Indicator</span>
+            </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
-              你在关系里
-              <br />
-              <span className="bg-gradient-to-r from-rose-400 via-pink-400 to-fuchsia-400 bg-clip-text text-transparent">扮演什么角色</span>
+            <h1 className="mb-8 leading-[0.95]">
+              <span className="brand-wtf block text-[26vw] sm:text-[12rem] md:text-[14rem]" style={{ color: 'var(--color-rose-deep)' }}>
+                CP<span className="brand-ti text-[18vw] sm:text-[8rem] md:text-[9rem] ml-2" style={{ color: 'var(--color-ink)' }}>ti</span>
+              </span>
             </h1>
 
-            <p className="text-text-secondary text-lg sm:text-xl leading-relaxed max-w-xl mx-auto mb-10">
-              5 个关系维度 · 16 种CP角色 · 25 种关系类型
-              <br />
-              三分钟测出你在关系里的角色，邀请ta配对解锁关系图鉴。
-            </p>
+            <div className="max-w-2xl">
+              <p className="editorial-display text-3xl sm:text-5xl md:text-6xl mb-6">
+                你在关系里
+                <br />
+                <span className="editorial-italic" style={{ color: 'var(--color-rose-deep)' }}>扮演什么角色？</span>
+              </p>
+              <hr className="editorial-rule w-24 mb-6" />
+              <p className="text-base sm:text-lg leading-[1.8] text-text-secondary max-w-xl">
+                5 个关系维度 · 16 种 CP 角色 · 25 种关系类型。
+                <br className="hidden sm:block" />
+                3 分钟测出你在关系里的角色，邀请 ta 配对解锁你们的关系图鉴。
+              </p>
+            </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/cpti/test"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-rose-500 text-white font-medium text-base hover:bg-rose-600 transition-all duration-200"
-              >
-                开始测试
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
+            <div className="mt-10 sm:mt-14 flex flex-wrap items-center gap-3 sm:gap-4">
+              <Link href="/cpti/test/" prefetch={false} className="btn btn-rose">
+                开始测试 <span className="opacity-70">→</span>
               </Link>
-              <Link
-                href="/"
-                prefetch={false}
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:border-border hover:bg-bg-secondary/50 transition-all duration-200 text-base"
-              >
-                ← 返回 WTFTI
+              <Link href="/cpti/join/" prefetch={false} className="btn btn-ghost">
+                输入配对码
+              </Link>
+              <Link href="/" prefetch={false} className="eyebrow ml-1 hover:text-text-primary transition-colors">
+                ← 返回 WTFti
               </Link>
             </div>
           </div>
-
-          {/* Stats */}
-          <div className="mt-16 grid grid-cols-4 gap-px bg-border-subtle rounded-2xl overflow-hidden animate-fade-up-delay-1">
-            {[
-              { value: '5 维', label: '关系维度' },
-              { value: '16 种', label: 'CP角色' },
-              { value: '25 种', label: '关系类型' },
-              { value: '3 分钟', label: '完成测试' },
-            ].map(stat => (
-              <div key={stat.label} className="bg-bg-secondary/60 px-4 py-6 text-center">
-                <div className="text-2xl font-semibold text-text-primary font-mono tracking-tight">{stat.value}</div>
-                <div className="text-xs text-text-muted mt-1">{stat.label}</div>
-              </div>
-            ))}
-          </div>
         </div>
+        <hr className="editorial-rule-soft max-w-5xl mx-6 sm:mx-auto" />
       </section>
 
-      {/* Signal Card */}
-      <section className="py-12 px-6">
-        <div className="max-w-2xl mx-auto">
-          <div className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 sm:p-8 text-center animate-fade-up">
-            <p className="text-sm text-text-muted mb-3">和其他测试有什么不一样？</p>
-            <div className="grid grid-cols-2 gap-4 text-left text-sm">
-              <div className="p-3 rounded-xl bg-bg-secondary/50">
-                <div className="text-text-muted text-xs mb-1">MBTI / SBTI</div>
-                <div className="text-text-primary font-medium">测你是什么人</div>
-              </div>
-              <div className="p-3 rounded-xl bg-bg-secondary/50">
-                <div className="text-text-muted text-xs mb-1">XPTI</div>
-                <div className="text-text-primary font-medium">测你爱什么人</div>
-              </div>
-              <div className="p-3 rounded-xl bg-bg-secondary/50">
-                <div className="text-text-muted text-xs mb-1">LPTI</div>
-                <div className="text-text-primary font-medium">测你的恋爱性格</div>
-              </div>
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-                <div className="text-rose-400 text-xs mb-1">CPTI ✦ New</div>
-                <div className="text-text-primary font-medium">测你在关系里的角色</div>
-              </div>
+      {/* ── Stats ──────────────────────────────────────── */}
+      <section className="px-6 sm:px-10">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4" style={{ borderBottom: '1px solid var(--color-rule-soft)' }}>
+          {[
+            { value: '5', label: '关系维度' },
+            { value: '16', label: 'CP 角色' },
+            { value: '25', label: '关系类型' },
+            { value: '3 min', label: '完成测试' },
+          ].map((stat, idx) => (
+            <div key={stat.label} className="py-8 sm:py-10 text-center" style={{ borderLeft: idx > 0 ? '1px solid var(--color-rule-soft)' : 'none' }}>
+              <div className="stat-value text-3xl sm:text-5xl text-text-primary leading-none">{stat.value}</div>
+              <div className="eyebrow mt-3">{stat.label}</div>
             </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* Three modes */}
-      <section className="py-12 px-6">
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-8 animate-fade-up">
-            <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Three Modes</span>
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">三种玩法</h2>
+      {/* ── Compare ─────────────────────── */}
+      <section className="py-16 sm:py-24 px-6 sm:px-10">
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-10 sm:mb-14 animate-fade-up">
+            <span className="serial-number text-xs mr-3">02</span>
+            <span className="eyebrow">What is CPTI</span>
+            <h2 className="section-headline text-2xl sm:text-4xl mt-3">
+              它和别的测试，<br className="sm:hidden" />
+              <span className="editorial-italic" style={{ color: 'var(--color-rose-deep)' }}>不一样在哪</span>
+            </h2>
           </div>
 
-          <div className="grid gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
             {[
-              {
-                emoji: '🪞', title: '查看我的CP角色', desc: '做完20题，立即获得你的CP角色鉴定。',
-                color: '#e11d48', bgColor: 'rgba(225,29,72,0.06)',
-              },
-              {
-                emoji: '💌', title: '邀请ta一起测', desc: '测完后生成邀请链接，ta做完配对题后解锁关系类型。',
-                color: '#ec4899', bgColor: 'rgba(236,72,153,0.06)',
-              },
-              {
-                emoji: '👀', title: '帮ta答题（他评模式）', desc: '收到邀请后，以观察者视角回答12道题，鉴定你们的关系。',
-                color: '#a855f7', bgColor: 'rgba(168,85,247,0.06)',
-              },
-            ].map((mode, i) => (
-              <div
-                key={mode.title}
-                className="animate-fade-up flex items-center gap-4 p-4 rounded-xl border border-border-subtle bg-bg-elevated shadow-sm"
-                style={{ animationDelay: `${i * 80}ms` }}
-              >
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-                  style={{ background: mode.bgColor }}
-                >
-                  {mode.emoji}
-                </div>
-                <div>
-                  <div className="text-sm font-medium text-text-primary">{mode.title}</div>
-                  <div className="text-xs text-text-muted mt-0.5">{mode.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* More features */}
-      <section className="py-12 px-6">
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-8 animate-fade-up">
-            <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Explore</span>
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">探索更多</h2>
-          </div>
-
-          <div className="grid gap-3">
-            {[
-              {
-                emoji: '📖', title: '我的关系图鉴', desc: '查看已收集的所有CP关系类型，点亮你的关系宇宙。',
-                href: '/card', color: '#ec4899', bgColor: 'rgba(236,72,153,0.06)',
-              },
-              {
-                emoji: '🏆', title: '排行榜', desc: '看看谁的关系类型收集最多，谁是最活跃的CP猎人。',
-                href: '/cpti/leaderboard', color: '#f59e0b', bgColor: 'rgba(245,158,11,0.06)',
-              },
-              {
-                emoji: '🔗', title: '输入配对码', desc: '收到邀请码？输入即可配对，解锁新的关系类型。',
-                href: '/cpti/join', color: '#a855f7', bgColor: 'rgba(168,85,247,0.06)',
-              },
+              { tag: 'MBTI / SBTI', body: '测你是什么人' },
+              { tag: 'XPTI', body: '测你爱什么人' },
+              { tag: 'LPTI', body: '测你的恋爱性格' },
+              { tag: 'CPTI', body: '测你在关系里的角色', highlight: true },
             ].map((item, i) => (
-              <Link
-                key={item.title}
-                href={item.href}
-                className="animate-fade-up flex items-center gap-4 p-4 rounded-xl border border-border-subtle bg-bg-elevated shadow-sm hover:shadow-md hover:border-border transition-all"
-                style={{ animationDelay: `${i * 80}ms` }}
-              >
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-                  style={{ background: item.bgColor }}
-                >
-                  {item.emoji}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-text-primary">{item.title}</div>
-                  <div className="text-xs text-text-muted mt-0.5">{item.desc}</div>
-                </div>
-                <svg className="w-4 h-4 text-text-muted flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
+              <div key={item.tag} className="p-6 sm:p-8 relative" style={{ background: item.highlight ? 'linear-gradient(180deg, var(--color-paper-warm) 0%, var(--color-bg-elevated) 100%)' : 'var(--color-bg-elevated)' }}>
+                <span className="serial-number text-xs block mb-6">N°0{i + 1}</span>
+                <span className="eyebrow block mb-3" style={{ color: item.highlight ? 'var(--color-rose-deep)' : undefined }}>
+                  {item.tag}{item.highlight && <span className="ml-2">✦ New</span>}
+                </span>
+                <p className="text-base sm:text-lg leading-snug" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, color: 'var(--color-ink)' }}>
+                  {item.body}
+                </p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 5 Dimensions */}
-      <section className="py-20 px-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="mb-12 animate-fade-up">
-            <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Dimensions</span>
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">五个关系切面</h2>
+      {/* ── Modes ──────────────────────── */}
+      <section className="py-16 sm:py-24 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-10 sm:mb-14 animate-fade-up">
+            <span className="serial-number text-xs mr-3">03</span>
+            <span className="eyebrow">Three modes</span>
+            <h2 className="section-headline text-2xl sm:text-4xl mt-3">三种玩法</h2>
+            <p className="display-tagline text-text-secondary mt-4 text-base sm:text-lg max-w-xl">
+              单测、合测、他评——同一份维度模型，三种叙事角度。
+            </p>
           </div>
 
-          <div className="grid gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px" style={{ background: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
+            {MODES.map((m, i) => (
+              <div key={m.title} className="p-7 sm:p-10 animate-fade-up" style={{ background: 'var(--color-bg-elevated)', animationDelay: `${i * 60}ms` }}>
+                <span className="serial-number text-xs block mb-8" style={{ color: 'var(--color-rose-deep)' }}>N°{m.n}</span>
+                <h3 className="text-xl sm:text-2xl text-text-primary mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
+                  {m.title}
+                </h3>
+                <p className="text-sm sm:text-base text-text-secondary leading-relaxed">{m.desc}</p>
+                <span className="block mt-8 h-px w-10" style={{ background: 'var(--color-rose-deep)', opacity: 0.5 }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 5 Dimensions ──────────────── */}
+      <section className="py-16 sm:py-24 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-10 sm:mb-14 animate-fade-up">
+            <span className="serial-number text-xs mr-3">04</span>
+            <span className="eyebrow">Five dimensions</span>
+            <h2 className="section-headline text-2xl sm:text-4xl mt-3">
+              五个<span className="editorial-italic">关系切面</span>
+            </h2>
+          </div>
+
+          <div className="grid gap-px" style={{ background: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
             {MODELS.map((m, i) => {
               const color = CPTI_MODEL_COLORS[m.key];
               return (
-                <div
-                  key={m.key}
-                  className="animate-fade-up flex items-center gap-4 p-4 rounded-xl border border-border-subtle bg-bg-elevated shadow-sm hover:shadow-md transition-shadow"
-                  style={{ animationDelay: `${i * 80}ms` }}
-                >
-                  <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-mono font-semibold flex-shrink-0"
-                    style={{ background: color.bg, color: color.base }}
-                  >
-                    {m.key[0].toUpperCase()}
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium" style={{ color: color.base }}>
+                <div key={m.key} className="flex items-center gap-6 sm:gap-8 px-5 sm:px-8 py-6 sm:py-7 animate-fade-up" style={{ background: 'var(--color-bg-elevated)', animationDelay: `${i * 60}ms` }}>
+                  <span className="serial-number text-base sm:text-lg flex-shrink-0 w-10" style={{ color: color.base }}>0{i + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-base sm:text-lg leading-snug" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, color: 'var(--color-ink)' }}>
                       {CPTI_MODEL_NAMES[m.key]}
                     </div>
-                    <div className="text-xs text-text-muted mt-0.5">{m.label}</div>
+                    <div className="text-xs sm:text-sm text-text-muted mt-1">{m.label}</div>
                   </div>
+                  <span className="hidden sm:block h-px w-12 flex-shrink-0" style={{ background: color.base, opacity: 0.6 }} />
                 </div>
               );
             })}
@@ -228,55 +182,80 @@ export default function CptiHomeContent() {
         </div>
       </section>
 
-      {/* Featured types */}
-      <section className="py-20 px-6 border-t border-border-subtle">
-        <div className="max-w-3xl mx-auto">
-          <div className="mb-12 animate-fade-up">
-            <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Roles</span>
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">16 种CP角色</h2>
+      {/* ── 16 Roles ────────────────── */}
+      <section className="py-16 sm:py-24 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-10 sm:mb-14 animate-fade-up">
+            <span className="serial-number text-xs mr-3">05</span>
+            <span className="eyebrow">Roles gallery</span>
+            <h2 className="section-headline text-2xl sm:text-4xl mt-3">
+              16 种 <span className="editorial-italic">CP 角色</span>
+            </h2>
+            <p className="display-tagline text-text-secondary mt-4 text-base sm:text-lg max-w-xl">
+              每个角色都是一种关系叙事——你最像哪一个？
+            </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-px" style={{ background: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
             {FEATURED.map((p, i) => (
-              <div
-                key={p.slug}
-                className="animate-fade-up"
-                style={{ animationDelay: `${i * 60}ms` }}
-              >
-                <Link
-                  href={`/cpti/result/${p.slug}`}
-                  prefetch={false}
-                  className="block p-4 sm:p-5 rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm text-center hover:shadow-md hover:border-border transition-all"
-                >
-                  <div
-                    className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl"
-                    style={{ background: `${p.color}15` }}
-                  >
-                    {p.emoji}
-                  </div>
-                  <div className="text-lg font-mono tracking-[0.08em] leading-none mb-2" style={{ color: p.color }}>
-                    {p.code}
-                  </div>
-                  <div className="text-base font-medium text-text-primary">{p.name}</div>
-                  <p className="text-xs text-text-muted mt-1.5 line-clamp-1">{p.tagline}</p>
-                </Link>
-              </div>
+              <Link key={p.slug} href={`/cpti/result/${p.slug}/`} prefetch={false} className="group block p-5 sm:p-7 transition-colors duration-500 animate-fade-up" style={{ background: 'var(--color-bg-elevated)', animationDelay: `${i * 40}ms` }}>
+                <div className="flex items-start justify-between mb-6">
+                  <span className="serial-number text-[10px]">N°{String(i + 1).padStart(2, '0')}</span>
+                  <span className="text-xs font-mono tracking-wider" style={{ color: p.color }}>{p.code}</span>
+                </div>
+                <div className="text-4xl sm:text-5xl mb-5 transition-transform duration-500 group-hover:scale-105 origin-left">{p.emoji}</div>
+                <div className="text-base sm:text-lg leading-tight text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
+                  {p.name}
+                </div>
+                <p className="text-xs text-text-muted mt-2 line-clamp-2 leading-relaxed">{p.tagline}</p>
+                <span className="block mt-5 h-px transition-all duration-500 group-hover:w-12" style={{ background: p.color, width: 8, opacity: 0.6 }} />
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 px-6">
-        <div className="max-w-md mx-auto text-center">
-          <p className="text-text-muted text-sm mb-6">准备好了吗？</p>
-          <Link
-            href="/cpti/test"
-            className="inline-flex items-center gap-2 px-10 py-4 rounded-xl bg-rose-500 text-white font-medium text-lg hover:brightness-110 transition-all duration-200 shadow-[0_0_40px_rgba(225,29,72,0.2)]"
-          >
-            测测你的CP角色
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
+      {/* ── Explore ─────────────── */}
+      <section className="py-16 sm:py-24 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-10 sm:mb-14 animate-fade-up">
+            <span className="serial-number text-xs mr-3">06</span>
+            <span className="eyebrow">Explore</span>
+            <h2 className="section-headline text-2xl sm:text-4xl mt-3">探索更多</h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px" style={{ background: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
+            {EXPLORE.map((item, i) => (
+              <Link key={item.href} href={item.href} prefetch={false} className="group p-7 sm:p-10 animate-fade-up transition-colors duration-500" style={{ background: 'var(--color-bg-elevated)', animationDelay: `${i * 60}ms` }}>
+                <span className="serial-number text-xs block mb-8">N°0{i + 1}</span>
+                <h3 className="text-lg sm:text-xl mb-3 text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}>
+                  {item.label}
+                </h3>
+                <p className="text-sm text-text-secondary leading-relaxed">{item.desc}</p>
+                <div className="mt-8 flex items-center gap-3">
+                  <span className="h-px flex-1" style={{ background: 'var(--color-rose-deep)', opacity: 0.3 }} />
+                  <span className="text-sm transition-transform duration-500 group-hover:translate-x-1" style={{ color: 'var(--color-rose-deep)' }}>进入 →</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Final CTA ──────────────── */}
+      <section className="py-20 sm:py-32 px-6 sm:px-10 text-center" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="max-w-2xl mx-auto">
+          <span className="serial-number text-xs mr-3">07</span>
+          <span className="eyebrow">Ready</span>
+          <h2 className="editorial-display text-3xl sm:text-5xl md:text-6xl mt-6 mb-4">
+            准备好测一下了吗？
+          </h2>
+          <p className="text-base sm:text-lg text-text-secondary mb-10 leading-[1.8]">
+            一份关于关系的人格图鉴，<br className="sm:hidden" />送给正在认真谈一段感情的你。
+          </p>
+          <hr className="editorial-rule w-16 mx-auto mb-10" />
+          <Link href="/cpti/test/" prefetch={false} className="btn btn-rose">
+            测测你的 CP 角色 <span className="opacity-70">→</span>
           </Link>
         </div>
       </section>

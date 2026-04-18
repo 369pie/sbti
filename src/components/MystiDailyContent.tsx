@@ -1,13 +1,19 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { MYSTI_THEMES } from '@/lib/mysti/themes';
 import type { MystiTheme, MystiShareImageGeneratorHandle } from '@/lib/mysti/types';
-import { getDailyCard, formatDateCN, type DailyCardInterpretation } from '@/lib/mysti/daily-card';
-import { MystiDailyShareImageGenerator } from '@/components/MystiDailyShareImageGenerator';
+import { getDailyCard, getDailyCardIndex, getRandomBonusCard, formatDateCN, type DailyCardInterpretation } from '@/lib/mysti/daily-card';
+const MystiDailyShareImageGenerator = dynamic(
+  () => import('@/components/MystiDailyShareImageGenerator').then((m) => m.MystiDailyShareImageGenerator),
+  { ssr: false },
+);
 import { trackMystiEvent } from '@/lib/mysti/analytics';
+import { isSubscriber } from '@/lib/mysti/subscription';
 
 const THEME_STORAGE_KEY = 'mysti-theme-preference';
 
@@ -20,6 +26,19 @@ export function MystiDailyContent() {
     return 'celestial';
   });
   const [dailyCard, setDailyCard] = useState<DailyCardInterpretation | null>(null);
+  const [bonusCard, setBonusCard] = useState<DailyCardInterpretation | null>(null);
+  const [bonusUsedToday, setBonusUsedToday] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return window.localStorage.getItem('mysti-bonus-pull-date') === new Date().toDateString();
+    } catch {
+      return false;
+    }
+  });
+  const subscriber = useMemo<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return isSubscriber();
+  }, []);
   const [mounted, setMounted] = useState(false);
   const shareRef = useRef<MystiShareImageGeneratorHandle>(null);
 
@@ -28,6 +47,19 @@ export function MystiDailyContent() {
     setMounted(true);
     trackMystiEvent('mysti_daily_view');
   }, []);
+
+  const pullBonusCard = useCallback(() => {
+    if (!subscriber || bonusUsedToday) return;
+    const card = getRandomBonusCard(getDailyCardIndex());
+    setBonusCard(card);
+    setBonusUsedToday(true);
+    try {
+      window.localStorage.setItem('mysti-bonus-pull-date', new Date().toDateString());
+      trackMystiEvent('mysti_daily_bonus_pull', { arcana: card.arcanaName });
+    } catch {
+      /* swallow */
+    }
+  }, [subscriber, bonusUsedToday]);
 
   const toggleTheme = useCallback(() => {
     setThemeId(prev => {
@@ -224,6 +256,53 @@ export function MystiDailyContent() {
               {dailyCard.luckyNumber}
             </div>
           </div>
+        </motion.div>
+
+        {/* Subscriber-only bonus pull */}
+        <motion.div
+          initial={mounted ? { opacity: 0, y: 16 } : false}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.42 }}
+          className="rounded-2xl border p-5 mb-6 text-center"
+          style={{ borderColor: theme.cardBorder, background: `${theme.cardSurface}40` }}
+        >
+          {subscriber ? (
+            bonusCard ? (
+              <div>
+                <div className="text-xs tracking-[0.2em] uppercase mb-2" style={{ color: theme.accent }}>
+                  会员加抽 · {bonusCard.arcanaNameCN}
+                </div>
+                <p className="text-sm" style={{ color: theme.text }}>
+                  {bonusCard.dailyReading}
+                </p>
+                <p className="text-xs mt-3" style={{ color: theme.textMuted }}>
+                  今日已使用加抽 · 明日 0 点重置
+                </p>
+              </div>
+            ) : (
+              <button
+                onClick={pullBonusCard}
+                disabled={bonusUsedToday}
+                className="px-5 py-2.5 rounded-full text-sm font-medium transition-all hover:brightness-110 disabled:opacity-50"
+                style={{ background: `linear-gradient(90deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`, color: '#fff' }}
+              >
+                {bonusUsedToday ? '今日已加抽过' : '🎴 通行证特权 · 再翻一张'}
+              </button>
+            )
+          ) : (
+            <div>
+              <p className="text-xs" style={{ color: theme.textMuted }}>
+                通行证会员每天可额外翻一张牌
+              </p>
+              <Link
+                href="/mysti/subscribe/?from=daily_bonus"
+                className="inline-flex mt-3 px-4 py-2 rounded-full text-xs border transition-all hover:opacity-80"
+                style={{ borderColor: theme.cardBorder, color: theme.accent }}
+              >
+                了解通行证 →
+              </Link>
+            </div>
+          )}
         </motion.div>
 
         {/* Share CTA */}

@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -21,7 +22,10 @@ import {
 import { getUniverse } from '@/lib/universes';
 import { resolvePersonality } from '@/lib/personality-resolver';
 import { SHARE_SITE_URL } from '@/lib/site';
-import { WtfCardShareImageGenerator } from '@/components/WtfCardShareImageGenerator';
+const WtfCardShareImageGenerator = dynamic(
+  () => import('@/components/WtfCardShareImageGenerator').then((m) => m.WtfCardShareImageGenerator),
+  { ssr: false },
+);
 import type { WtfCardShareImageGeneratorHandle } from '@/components/WtfCardShareImageGenerator';
 import { IdentifyHistoryPanel } from '@/components/IdentifyHistoryPanel';
 import {

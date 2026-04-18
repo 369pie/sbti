@@ -37,6 +37,12 @@ const SOURCE_FILE = path.join(AUDIT_DIR, 'sbti-source-questions.json');
 const OUT_FILE = path.join(AUDIT_DIR, 'sbti-overlap-2026-04-18.md');
 const SRC_DIR = path.join(ROOT, 'src/lib');
 
+// 这些文件本身就是 SBTI 原题库（或其镜像），不应被纳入"站内被审"集；否则会自匹配 1.0。
+// 路径相对 ROOT。
+const EXCLUDE_FROM_INTERNAL = new Set([
+  'src/lib/questions.ts', // 原 SBTI 标准入口 90 题（也是种子来源）
+]);
+
 const args = process.argv.slice(2);
 const threshold = parseFloat(args[args.indexOf('--threshold') + 1]) || 0.3;
 
@@ -123,6 +129,8 @@ async function collectInternal() {
   const files = await walk(SRC_DIR);
   const all = [];
   for (const f of files) {
+    const rel = path.relative(ROOT, f);
+    if (EXCLUDE_FROM_INTERNAL.has(rel)) continue;
     const src = await readFile(f, 'utf8');
     all.push(...extractQuestions(src, f));
   }

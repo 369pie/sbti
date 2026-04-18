@@ -37,5 +37,7 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.increment_universe_tests(UUID) TO anon, authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.increment_universe_shares(UUID) TO anon, authenticated, service_role;
+REVOKE EXECUTE ON FUNCTION public.increment_universe_tests(UUID) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.increment_universe_shares(UUID) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.increment_universe_tests(UUID) TO service_role;
+GRANT EXECUTE ON FUNCTION public.increment_universe_shares(UUID) TO service_role;

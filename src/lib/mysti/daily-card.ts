@@ -248,3 +248,15 @@ export function getDailyCard(date?: Date): DailyCardInterpretation {
   const index = getDailyCardIndex(date);
   return DAILY_CARDS[index];
 }
+
+/**
+ * Pick a random card EXCLUDING the deterministic daily one.
+ * Used by subscriber-only "再翻一张" feature.
+ */
+export function getRandomBonusCard(excludeIndex?: number): DailyCardInterpretation {
+  const skip = excludeIndex ?? getDailyCardIndex();
+  if (DAILY_CARDS.length <= 1) return DAILY_CARDS[0];
+  let pick = Math.floor(Math.random() * DAILY_CARDS.length);
+  if (pick === skip) pick = (pick + 1) % DAILY_CARDS.length;
+  return DAILY_CARDS[pick];
+}

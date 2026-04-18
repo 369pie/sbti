@@ -1,8 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import type { User } from '@supabase/supabase-js';
-import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import type { User, SupabaseClient } from '@supabase/supabase-js';
 import { getUserDisplayName } from '@/lib/supabase/auth';
 
 interface AuthState {
@@ -22,11 +21,33 @@ const AuthContext = createContext<AuthState>({
   refresh: async () => {},
 });
 
+/**
+ * Schedule work after first paint without blocking initial bundle.
+ * Falls back to a short timeout where requestIdleCallback is unavailable
+ * (Safari).
+ */
+function scheduleIdle(cb: () => void): () => void {
+  if (typeof window === 'undefined') return () => {};
+  const ric =
+    (window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout?: number }) => number })
+      .requestIdleCallback;
+  const cic =
+    (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback;
+  if (typeof ric === 'function') {
+    const handle = ric(cb, { timeout: 1500 });
+    return () => cic?.(handle);
+  }
+  const handle = window.setTimeout(cb, 200);
+  return () => window.clearTimeout(handle);
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const supabase = useMemo(() => createBrowserSupabaseClient(), []);
+  // Start NOT-loading so anonymous-friendly pages render their full UI
+  // immediately. We flip to `loading: true` only while the supabase client
+  // is being lazy-loaded so callers that gate on auth can wait if they want.
+  const [loading, setLoading] = useState(false);
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
   const hydratedUserIdRef = useRef<string | null>(null);
   const hydratingUserIdRef = useRef<string | null>(null);
   const hydrationPromiseRef = useRef<Promise<void> | null>(null);
@@ -83,6 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const refresh = useCallback(async () => {
+    if (!supabase) return;
     try {
       const { data: { user: u } } = await supabase.auth.getUser();
       setUser(u);
@@ -100,7 +122,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [hydrateSignedInState, resetHydrationState, supabase]);
 
+  // Lazy-load supabase client after first paint so anonymous pages don't pay
+  // the ~70 KB gzip cost of @supabase/supabase-js on initial bundle.
   useEffect(() => {
+    if (supabase) return;
+    let cancelled = false;
+    const cancel = scheduleIdle(() => {
+      setLoading(true);
+      import('@/lib/supabase/client')
+        .then(({ createBrowserSupabaseClient }) => {
+          if (cancelled) return;
+          setSupabase(createBrowserSupabaseClient());
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setLoading(false);
+        });
+    });
+    return () => {
+      cancelled = true;
+      cancel();
+    };
+  }, [supabase]);
+
+  useEffect(() => {
+    if (!supabase) return;
     // Initial load
     refresh();
 

@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,8 +30,10 @@ import {
   type GachaRarity,
   type GachaVariant,
 } from '@/lib/mysti/gacha';
-import { MystiGachaShareImageGenerator } from '@/components/MystiGachaShareImageGenerator';
-
+const MystiGachaShareImageGenerator = dynamic(
+  () => import('@/components/MystiGachaShareImageGenerator').then((m) => m.MystiGachaShareImageGenerator),
+  { ssr: false },
+);
 const THEME_STORAGE_KEY = 'mysti-theme-preference';
 
 export function MystiGachaContent() {

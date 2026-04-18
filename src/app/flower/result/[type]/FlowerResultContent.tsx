@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
@@ -7,7 +9,10 @@ import { FLOWER_DIMENSIONS, FLOWER_MODEL_NAMES, FLOWER_MODEL_COLORS } from '@/li
 import { FLOWER_PERSONALITY_TYPES, getFlowerRarity, getFlowerTypeImage, getFlowerTypeThumbnailImage, getFlowerTypeMediumImage } from '@/lib/flower/personalities';
 import type { FlowerPersonalityType } from '@/lib/flower/personalities';
 import type { FlowerDimensionScore } from '@/lib/flower/scoring';
-import { FlowerShareImageGenerator } from '@/components/FlowerShareImageGenerator';
+const FlowerShareImageGenerator = dynamic(
+  () => import('@/components/FlowerShareImageGenerator').then((m) => m.FlowerShareImageGenerator),
+  { ssr: false },
+);
 import type { FlowerShareImageGeneratorHandle } from '@/components/FlowerShareImageGenerator';
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';

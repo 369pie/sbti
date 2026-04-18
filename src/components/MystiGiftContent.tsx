@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMystiTheme } from '@/components/MystiThemeProvider';
 import {
+  GIFT_BUNDLES,
+  FESTIVAL_THEMES,
   GIFT_CARD_OPTIONS,
   createGiftCard,
   getGiftCardByCode,
@@ -16,6 +18,7 @@ import {
 } from '@/lib/mysti/gift-card';
 import { recordUnlock, SKU_PRICES } from '@/lib/mysti/unlock';
 import { getActiveReferralCode } from '@/lib/mysti/creator-referral';
+import { getOrCreateDeviceId } from '@/lib/mysti/device';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 
 type Tab = 'buy' | 'mine' | 'redeem';
@@ -26,6 +29,7 @@ export function MystiGiftContent() {
   const searchParams = useSearchParams();
   const initialCode = searchParams.get('code') ?? '';
   const issuedCode = searchParams.get('issued') ?? '';
+  const presetGiftSku = searchParams.get('preset') ?? '';
   const [tab, setTab] = useState<Tab>(issuedCode ? 'mine' : initialCode ? 'redeem' : 'buy');
   const [hydrated, setHydrated] = useState(false);
   const [cards, setCards] = useState<GiftCard[]>([]);
@@ -131,7 +135,7 @@ export function MystiGiftContent() {
           </div>
         )}
 
-        {hydrated && tab === 'buy' && <BuyTab onPurchased={card => {
+        {hydrated && tab === 'buy' && <BuyTab presetGiftSku={presetGiftSku} onPurchased={card => {
           setCards(getGiftCards());
           setIssuedCard(card);
         }} />}
@@ -152,38 +156,44 @@ export function MystiGiftContent() {
 
 // ────────────────────────────── BUY ──────────────────────────────
 
-function BuyTab({ onPurchased }: { onPurchased: (card: GiftCard) => void }) {
+function BuyTab({ onPurchased, presetGiftSku }: { onPurchased: (card: GiftCard) => void; presetGiftSku?: string }) {
   const { theme } = useMystiTheme();
-  const [pickedSku, setPickedSku] = useState<(typeof GIFT_CARD_OPTIONS)[number]['giftSku']>(
-    'soul-letter',
-  );
+  const [bundleSku, setBundleSku] =
+    useState<(typeof GIFT_BUNDLES)[number]['orderSku']>('gift-card');
+  const [pickedSku, setPickedSku] = useState<(typeof GIFT_CARD_OPTIONS)[number]['giftSku']>(() => {
+    const valid = GIFT_CARD_OPTIONS.find(o => o.giftSku === presetGiftSku);
+    return (valid?.giftSku ?? 'soul-letter') as (typeof GIFT_CARD_OPTIONS)[number]['giftSku'];
+  });
   const [fromName, setFromName] = useState('');
   const [toName, setToName] = useState('');
   const [message, setMessage] = useState('');
   const [paymentType, setPaymentType] = useState<'wechat' | 'alipay'>('wechat');
+  const [festivalThemeId, setFestivalThemeId] = useState<string>('qixi');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [issuedCard, setIssuedCard] = useState<GiftCard | null>(null);
 
-  const meta = SKU_PRICES['gift-card'];
+  const meta = SKU_PRICES[bundleSku];
 
   const handlePurchase = async () => {
     setLoading(true);
     setError(null);
     try {
       const ref = getActiveReferralCode() || undefined;
+      const deviceId = getOrCreateDeviceId() || undefined;
       // resourceId = gift-<random>，唯一标识本张卡的支付订单
       const giftId = `gift-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
       const res = await fetch('/api/mysti/payment/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sku: 'gift-card',
+          sku: bundleSku,
           resourceId: giftId,
           paymentType,
           ref,
+          deviceId,
           redirect: '/mysti/gift/',
-          metadata: { giftSku: pickedSku, fromName, toName, message },
+          metadata: { giftSku: pickedSku, fromName, toName, message, festivalThemeId: bundleSku === 'festival-gift-card' ? festivalThemeId : undefined },
         }),
       });
       const data = (await res.json()) as {
@@ -205,7 +215,7 @@ function BuyTab({ onPurchased }: { onPurchased: (card: GiftCard) => void }) {
           message: message || undefined,
         });
         recordUnlock({
-          sku: 'gift-card',
+          sku: bundleSku,
           resourceId: giftId,
           orderId: data.orderId,
           unlockedAt: Date.now(),
@@ -244,6 +254,49 @@ function BuyTab({ onPurchased }: { onPurchased: (card: GiftCard) => void }) {
       }}
     >
       <div className="text-xs tracking-[0.16em] uppercase mb-4" style={{ color: theme.accent }}>
+        Step 0 · 选择礼物形态
+      </div>
+      <div className="grid sm:grid-cols-3 gap-2 mb-6">
+        {GIFT_BUNDLES.map(bundle => {
+          const active = bundleSku === bundle.orderSku;
+          const price = SKU_PRICES[bundle.orderSku].price;
+          return (
+            <button
+              key={bundle.orderSku}
+              onClick={() => setBundleSku(bundle.orderSku)}
+              className="rounded-xl p-4 text-left transition-all"
+              style={{
+                background: active ? theme.accentSoft : 'transparent',
+                borderWidth: active ? 2 : 1,
+                borderStyle: 'solid',
+                borderColor: active ? theme.accentGold : theme.cardBorder,
+                color: theme.text,
+              }}
+            >
+              <div className="flex items-baseline justify-between">
+                <span className="text-2xl">{bundle.emoji}</span>
+                <span className="text-xs" style={{ color: theme.accentGold }}>
+                  ¥{price}
+                </span>
+              </div>
+              <div
+                className="text-[10px] tracking-[0.18em] uppercase mt-1"
+                style={{ color: theme.textMuted }}
+              >
+                {bundle.badge}
+              </div>
+              <div className="text-sm font-medium mt-1" style={{ fontFamily: 'var(--font-display)' }}>
+                {bundle.label}
+              </div>
+              <div className="text-[11px] mt-1" style={{ color: theme.textMuted }}>
+                {bundle.description}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="text-xs tracking-[0.16em] uppercase mb-4" style={{ color: theme.accent }}>
         Step 1 · 选择礼物内容
       </div>
       <div className="grid sm:grid-cols-3 gap-2 mb-6">
@@ -273,6 +326,44 @@ function BuyTab({ onPurchased }: { onPurchased: (card: GiftCard) => void }) {
           );
         })}
       </div>
+
+      {bundleSku === 'festival-gift-card' && (
+        <>
+          <div className="text-xs tracking-[0.16em] uppercase mb-4" style={{ color: theme.accent }}>
+            Step 1.5 · 节日主题
+          </div>
+          <div className="grid sm:grid-cols-3 gap-2 mb-6">
+            {FESTIVAL_THEMES.map(ft => {
+              const active = festivalThemeId === ft.id;
+              return (
+                <button
+                  key={ft.id}
+                  onClick={() => {
+                    setFestivalThemeId(ft.id);
+                    if (!message) setMessage(ft.defaultGreeting);
+                  }}
+                  className="rounded-xl p-3 text-left transition-all"
+                  style={{
+                    background: active ? theme.accentSoft : 'transparent',
+                    borderWidth: active ? 2 : 1,
+                    borderStyle: 'solid',
+                    borderColor: active ? ft.accentHex : theme.cardBorder,
+                    color: theme.text,
+                  }}
+                >
+                  <div className="text-2xl">{ft.emoji}</div>
+                  <div className="text-xs font-medium mt-1" style={{ color: theme.text }}>
+                    {ft.label}
+                  </div>
+                  <div className="text-[10px] mt-1 opacity-70" style={{ color: theme.textMuted }}>
+                    {ft.defaultGreeting}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       <div className="text-xs tracking-[0.16em] uppercase mb-4" style={{ color: theme.accent }}>
         Step 2 · 自定义贺卡

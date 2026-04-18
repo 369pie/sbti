@@ -79,7 +79,7 @@ export function useShareTier({
         body: JSON.stringify({
           sku,
           resourceId,
-          paymentType: 'wxpay',
+          paymentType: 'wechat',
           redirect: typeof window !== 'undefined' ? window.location.pathname : '/',
         }),
       });

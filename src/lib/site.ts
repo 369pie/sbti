@@ -3,6 +3,12 @@ const LEGACY_SITE_HOSTS = ['369pie.github.io'];
 const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const rawSiteBasePath = process.env.NEXT_PUBLIC_SITE_BASE_PATH ?? '';
 const configuredSiteOrigin = process.env.NEXT_PUBLIC_SITE_ORIGIN?.trim() ?? '';
+/**
+ * 分享场景（QR / 卡片底部链接 / OG）始终使用对外可达的公开 origin，
+ * 不受 NEXT_PUBLIC_SITE_ORIGIN（开发常指向 localhost）影响。
+ * 如有 staging 需求，可显式覆盖 NEXT_PUBLIC_PUBLIC_SHARE_ORIGIN。
+ */
+const configuredPublicShareOrigin = process.env.NEXT_PUBLIC_PUBLIC_SHARE_ORIGIN?.trim() ?? '';
 
 function normalizeBasePath(value: string): string {
   if (!value || value === '/') return '';
@@ -14,7 +20,10 @@ export const basePath = normalizeBasePath(rawBasePath);
 export const siteBasePath = normalizeBasePath(rawSiteBasePath);
 export const isLegacyPagesBuild = basePath.length > 0;
 
-const normalizedShareSiteOrigin = (configuredSiteOrigin || DEFAULT_SHARE_SITE_ORIGIN).replace(/\/$/, '');
+const normalizedShareSiteOrigin = (
+  configuredPublicShareOrigin || DEFAULT_SHARE_SITE_ORIGIN
+).replace(/\/$/, '');
+const normalizedInternalSiteOrigin = (configuredSiteOrigin || DEFAULT_SHARE_SITE_ORIGIN).replace(/\/$/, '');
 
 function withNormalizedBasePath(path: string, normalizedBasePath: string): string {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
@@ -32,7 +41,7 @@ export function withSiteBasePath(path: string): string {
 }
 
 export function getSiteOrigin(): string {
-  return normalizedShareSiteOrigin;
+  return normalizedInternalSiteOrigin;
 }
 
 export function getSiteUrl(path = '/'): string {

@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QUESTIONS, DEFAULT_OPTIONS, shuffleQuestions } from '@/lib/questions';
 import type { AnswerOption } from '@/lib/questions';
+import { STANDARD_QUESTIONS_V2 } from '@/lib/wtfi/standard-questions-v2';
 import { calculateResult } from '@/lib/scoring';
 import type { Answer } from '@/lib/scoring';
 import { MODEL_NAMES, MODEL_COLORS } from '@/lib/dimensions';
@@ -60,7 +61,12 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
   const modelNames = isXiuxian ? XIUXIAN_MODEL_NAMES : MODEL_NAMES;
   const modelColors = isXiuxian ? XIUXIAN_MODEL_COLORS : MODEL_COLORS;
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
-  const [questions] = useState(() => shuffleQuestions(QUESTIONS, 3));
+  // 标准入口题数瘦身：原 perDimension=3（15 维 × 3 = 45 题 + drink trigger）→ 2 即 31 题，
+  // 与 banti / bird / wtfti 等宇宙体感对齐，~2 分钟可完成。维度覆盖通过 sampleQuestionsByDimension 保留。
+  // ?bank=v2 切换到 clean-room 重写题库（场景投射式，规避 SBTI 句式），用于 A/B 体感与法律风险下线。
+  const useV2Bank = searchParams.get('bank') === 'v2';
+  const sourceBank = useV2Bank ? STANDARD_QUESTIONS_V2 : QUESTIONS;
+  const [questions] = useState(() => shuffleQuestions(sourceBank, 2));
   const drinkBranch = useMemo(() => QUESTIONS.filter(q => q.isDrinkBranch), []);
 
   const [currentIndex, setCurrentIndex] = useState(0);

@@ -1,5 +1,8 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+import NextImage from 'next/image';
+
 import { useCallback, useRef, useState, useSyncExternalStore, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -10,14 +13,19 @@ import { MYSTI_THEMES } from '@/lib/mysti/themes';
 import type { MystiTheme, MystiShareImageGeneratorHandle } from '@/lib/mysti/types';
 import { getMystiTarotData } from '@/lib/mysti/tarot-mapping';
 import { getDualInterpretation } from '@/lib/mysti/dual-interpretation';
-import { MystiShareImageGenerator } from '@/components/MystiShareImageGenerator';
+const MystiShareImageGenerator = dynamic(
+  () => import('@/components/MystiShareImageGenerator').then((m) => m.MystiShareImageGenerator),
+  { ssr: false },
+);
 import { UniverseSwitcher } from '@/components/UniverseSwitcher';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { MystiSoulLetterSection } from '@/components/MystiSoulLetterSection';
+import { SendAsGiftCTA } from '@/components/SendAsGiftCTA';
 import { Typewriter } from '@/components/Typewriter';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 import { markCollected } from '@/lib/mysti/collection';
 import { recordDualPair } from '@/lib/mysti/dual-archive';
+import { withBasePath } from '@/lib/site';
 
 interface Props {
   wtftiPersonality: WtftiPersonality;
@@ -29,6 +37,8 @@ export function MystiResultContent({ wtftiPersonality }: Props) {
   const searchParams = useSearchParams();
   const partnerSlug = searchParams.get('partner');
   const partnerPersonality = partnerSlug ? getWtftiPersonality(partnerSlug) : undefined;
+  // 仪式模式：来自洗牌→选牌的入口（?ritual=1），需要用户主动翻牌
+  const ritualMode = searchParams.get('ritual') === '1';
 
   // Mark as collected on mount
   useEffect(() => {
@@ -146,6 +156,7 @@ export function MystiResultContent({ wtftiPersonality }: Props) {
             theme={theme}
             mounted={mounted}
             shareRef={shareRef}
+            ritualMode={ritualMode}
           />
         ) : partnerData ? (
           <DualModeContent
@@ -156,6 +167,7 @@ export function MystiResultContent({ wtftiPersonality }: Props) {
             theme={theme}
             mounted={mounted}
             shareRef={shareRef}
+            ritualMode={ritualMode}
           />
         ) : (
           <SingleModeContent
@@ -164,6 +176,7 @@ export function MystiResultContent({ wtftiPersonality }: Props) {
             theme={theme}
             mounted={mounted}
             shareRef={shareRef}
+            ritualMode={ritualMode}
           />
         )}
       </main>
@@ -177,13 +190,18 @@ function SingleModeContent({
   theme,
   mounted,
   shareRef,
+  ritualMode = false,
 }: {
   personality: WtftiPersonality;
   data: { majorArcana: { name: string; keywords: string[] }; shadowArcana: { name: string; keywords: string[] }; tagline: string; reading?: string; shadowReading?: string; whyThisCard?: string };
   theme: MystiTheme;
   mounted: boolean;
   shareRef: React.RefObject<MystiShareImageGeneratorHandle | null>;
+  ritualMode?: boolean;
 }) {
+  const [cardImageFailed, setCardImageFailed] = useState(false);
+  const tarotImageSrc = withBasePath(`/images/mysti/tarot/${theme.tarotDir}${personality.slug}.png`);
+
   return (
     <>
       {/* Header */}
@@ -203,7 +221,13 @@ function SingleModeContent({
       </motion.div>
 
       {/* Tarot card with 3D flip */}
-      <FlipCard theme={theme} mounted={mounted} delay={0.1} className="mx-auto w-[200px] sm:w-[280px] mb-6">
+      <FlipCard
+        theme={theme}
+        mounted={mounted}
+        delay={0.1}
+        interactive={ritualMode}
+        className="mx-auto w-[200px] sm:w-[280px] mb-6"
+      >
         <div
           className="aspect-[2/3] rounded-2xl border flex flex-col items-center justify-center p-4 relative overflow-hidden"
           style={{
@@ -213,10 +237,23 @@ function SingleModeContent({
           }}
         >
           <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)` }} />
-          <div className="text-5xl sm:text-7xl font-serif mb-3" style={{ color: theme.accent }}>
-            {data.majorArcana.name.slice(0, 1)}
-          </div>
-          <div className="text-xl sm:text-2xl">{personality.emoji}</div>
+          {!cardImageFailed ? (
+            <NextImage
+              src={tarotImageSrc}
+              alt={`${data.majorArcana.name} · ${personality.wtftiName}`}
+              fill
+              sizes="(max-width: 640px) 200px, 280px"
+              className="object-contain p-3"
+              onError={() => setCardImageFailed(true)}
+            />
+          ) : (
+            <>
+              <div className="text-5xl sm:text-7xl font-serif mb-3" style={{ color: theme.accent }}>
+                {data.majorArcana.name.slice(0, 1)}
+              </div>
+              <div className="text-xl sm:text-2xl">{personality.emoji}</div>
+            </>
+          )}
           <div className="absolute bottom-3 text-[9px] sm:text-[10px] tracking-widest uppercase" style={{ color: theme.textMuted }}>
             {personality.code}
           </div>
@@ -341,6 +378,16 @@ function SingleModeContent({
         slug={personality.slug}
         displayName={personality.wtftiName}
       />
+
+      {/* Send as gift CTA */}
+      <div className="mt-6">
+        <SendAsGiftCTA
+          source="mysti_result"
+          giftSku="soul-letter"
+          label={`把 ${personality.wtftiName} 的灵魂信送给 TA`}
+          description="同款主题贺卡 · 微信 / 支付宝 · 仅 ¥39.9 起"
+        />
+      </div>
 
       {/* Cross-universe exploration */}
       <motion.div
@@ -492,6 +539,7 @@ function DualModeContent({
   theme,
   mounted,
   shareRef,
+  ritualMode = false,
 }: {
   personality: WtftiPersonality;
   data: { majorArcana: { name: string; keywords: string[] }; shadowArcana: { name: string; keywords: string[] }; tagline: string; reading?: string; shadowReading?: string; whyThisCard?: string };
@@ -500,6 +548,7 @@ function DualModeContent({
   theme: MystiTheme;
   mounted: boolean;
   shareRef: React.RefObject<MystiShareImageGeneratorHandle | null>;
+  ritualMode?: boolean;
 }) {
   return (
     <>
@@ -526,8 +575,8 @@ function DualModeContent({
         transition={{ duration: 0.6, delay: 0.1 }}
         className="grid grid-cols-2 gap-4 sm:gap-6 mb-8"
       >
-        <TarotMiniCard personality={personality} arcana={data.majorArcana} theme={theme} />
-        <TarotMiniCard personality={partner} arcana={partnerData.majorArcana} theme={theme} />
+        <TarotMiniCard personality={personality} arcana={data.majorArcana} theme={theme} interactive={ritualMode} />
+        <TarotMiniCard personality={partner} arcana={partnerData.majorArcana} theme={theme} interactive={ritualMode} />
       </motion.div>
 
       {/* Badges */}
@@ -813,13 +862,18 @@ function TarotMiniCard({
   personality,
   arcana,
   theme,
+  interactive = false,
 }: {
   personality: WtftiPersonality;
   arcana: { name: string };
   theme: MystiTheme;
+  interactive?: boolean;
 }) {
+  const [cardImageFailed, setCardImageFailed] = useState(false);
+  const tarotImageSrc = withBasePath(`/images/mysti/tarot/${theme.tarotDir}${personality.slug}.png`);
+
   return (
-    <FlipCard theme={theme} mounted={true} delay={0.15} compact>
+    <FlipCard theme={theme} mounted={true} delay={0.15} compact interactive={interactive}>
       <div
         className="aspect-[2/3] rounded-xl border flex flex-col items-center justify-center p-4 relative overflow-hidden"
         style={{
@@ -829,10 +883,23 @@ function TarotMiniCard({
         }}
       >
         <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)` }} />
-        <div className="text-4xl sm:text-5xl font-serif mb-2" style={{ color: theme.accent }}>
-          {arcana.name.slice(0, 1)}
-        </div>
-        <div className="text-xl">{personality.emoji}</div>
+        {!cardImageFailed ? (
+          <NextImage
+            src={tarotImageSrc}
+            alt={`${arcana.name} · ${personality.wtftiName}`}
+            fill
+            sizes="(max-width: 640px) 180px, 220px"
+            className="object-contain p-2"
+            onError={() => setCardImageFailed(true)}
+          />
+        ) : (
+          <>
+            <div className="text-4xl sm:text-5xl font-serif mb-2" style={{ color: theme.accent }}>
+              {arcana.name.slice(0, 1)}
+            </div>
+            <div className="text-xl">{personality.emoji}</div>
+          </>
+        )}
         <div className="absolute bottom-3 text-[10px] tracking-widest uppercase" style={{ color: theme.textMuted }}>
           {personality.code}
         </div>
@@ -911,32 +978,68 @@ interface FlipCardProps {
   delay?: number;
   compact?: boolean;
   className?: string;
+  /**
+   * 仪式模式：不自动翻牌，等用户 hover/click 主动揭晓。
+   * 用于洗牌→选牌后的「翻开仪式」。
+   */
+  interactive?: boolean;
   children: React.ReactNode;
 }
 
-function FlipCard({ theme, mounted, delay = 0, compact = false, className = '', children }: FlipCardProps) {
+function FlipCard({ theme, mounted, delay = 0, compact = false, className = '', interactive = false, children }: FlipCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showGlow, setShowGlow] = useState(false);
 
   useEffect(() => {
     if (!mounted) return;
+    if (interactive) {
+      // 仪式模式：等待用户主动翻牌
+      return;
+    }
     const flipTimer = setTimeout(() => setIsFlipped(true), delay * 1000);
     const glowTimer = setTimeout(() => setShowGlow(true), delay * 1000 + 900);
     return () => {
       clearTimeout(flipTimer);
       clearTimeout(glowTimer);
     };
-  }, [mounted, delay]);
+  }, [mounted, delay, interactive]);
+
+  // 用户揭晓后再点光晕
+  useEffect(() => {
+    if (!isFlipped || showGlow) return;
+    const t = setTimeout(() => setShowGlow(true), 900);
+    return () => clearTimeout(t);
+  }, [isFlipped, showGlow]);
+
+  const reveal = useCallback(() => {
+    if (interactive && !isFlipped) {
+      setIsFlipped(true);
+    }
+  }, [interactive, isFlipped]);
 
   const perspective = compact ? 800 : 1000;
   const borderRadius = compact ? '0.75rem' : '1rem';
+  const showHint = interactive && !isFlipped;
 
   return (
-    <div className={className} style={{ perspective: `${perspective}px` }}>
+    <div
+      className={className}
+      style={{ perspective: `${perspective}px`, position: 'relative' }}
+      onMouseEnter={reveal}
+      onClick={reveal}
+      onTouchStart={reveal}
+      role={showHint ? 'button' : undefined}
+      tabIndex={showHint ? 0 : undefined}
+      onKeyDown={showHint ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); reveal(); } } : undefined}
+      aria-label={showHint ? '翻开你的塔罗牌' : undefined}
+    >
       <motion.div
-        initial={mounted ? { rotateY: 180, opacity: 0 } : false}
+        initial={mounted ? { rotateY: 0, opacity: 0 } : false}
         animate={{
-          rotateY: isFlipped ? 0 : 180,
+          // 视觉布局：back 无旋转、front 自身 rotateY(180deg)。
+          // 因此父容器在 0° 时 back 面朝镜头（front 被 backfaceVisibility:hidden 遮住），
+          // 父容器旋到 180° 时 front 面朝镜头（back 被 backface 遮住）。
+          rotateY: isFlipped ? 180 : 0,
           opacity: 1,
           scale: isFlipped ? (showGlow ? 1 : 1.03) : 1,
         }}
@@ -944,6 +1047,7 @@ function FlipCard({ theme, mounted, delay = 0, compact = false, className = '', 
           duration: 0.9,
           ease: [0.22, 1, 0.36, 1],
         }}
+        className="aspect-[2/3] w-full relative"
         style={{
           transformStyle: 'preserve-3d',
           borderRadius,
@@ -957,11 +1061,11 @@ function FlipCard({ theme, mounted, delay = 0, compact = false, className = '', 
         <div
           style={{
             backfaceVisibility: 'hidden',
-            position: isFlipped ? 'absolute' : 'relative',
+            WebkitBackfaceVisibility: 'hidden',
+            position: 'absolute',
             inset: 0,
             borderRadius,
             overflow: 'hidden',
-            opacity: isFlipped ? 0 : 1,
             pointerEvents: isFlipped ? 'none' : 'auto',
           }}
         >
@@ -972,16 +1076,35 @@ function FlipCard({ theme, mounted, delay = 0, compact = false, className = '', 
         <div
           style={{
             backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
+            position: 'absolute',
+            inset: 0,
             borderRadius,
             overflow: 'hidden',
-            opacity: isFlipped ? 1 : 0,
             pointerEvents: isFlipped ? 'auto' : 'none',
           }}
         >
           {children}
         </div>
       </motion.div>
+
+      {/* 仪式模式：未翻牌时浮层提示 */}
+      {showHint && (
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: [0.55, 1, 0.55], y: 0 }}
+          transition={{ opacity: { duration: 2.2, repeat: Infinity, ease: 'easeInOut' }, y: { duration: 0.5 } }}
+          className="pointer-events-none absolute left-1/2 -translate-x-1/2 text-[10px] sm:text-xs tracking-[0.3em] uppercase select-none"
+          style={{
+            color: theme.accent,
+            bottom: compact ? -22 : -28,
+            textShadow: `0 0 12px ${theme.cardGlow}`,
+          }}
+        >
+          ✦ 轻触翻开 ✦
+        </motion.div>
+      )}
     </div>
   );
 }

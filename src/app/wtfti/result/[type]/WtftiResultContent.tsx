@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import NextImage from 'next/image';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { WtftiPersonality } from '@/lib/wtfti-personalities';
@@ -9,8 +10,11 @@ import { markCollected } from '@/lib/mysti/collection';
 import { WTFTI_PERSONALITIES, getWtftiTypeImage, getWtftiTypeThumbnailImage, getWtftiTypeMediumImage } from '@/lib/wtfti-personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
-import { WtftiShareImageGenerator } from '@/components/WtftiShareImageGenerator';
 import type { WtftiShareImageHandle } from '@/components/WtftiShareImageGenerator';
+const WtftiShareImageGenerator = dynamic(
+  () => import('@/components/WtftiShareImageGenerator').then((m) => m.WtftiShareImageGenerator),
+  { ssr: false },
+);
 import { UniverseSwitcher } from '@/components/UniverseSwitcher';
 import { CrossUniverseCTA } from '@/components/CrossUniverseCTA';
 import { WtfCardCTA } from '@/components/WtfCardCTA';

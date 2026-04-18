@@ -1,4 +1,4 @@
-export type XptiShareCardPresetId = 'xpti-core' | 'xpti-noir';
+export type XptiShareCardPresetId = 'xpti-core' | 'xpti-noir' | 'xpti-editorial';
 
 export interface XptiShareCardPreset {
   id: XptiShareCardPresetId;
@@ -64,12 +64,32 @@ const PRESETS: Record<XptiShareCardPresetId, XptiShareCardPreset> = {
     warmGlow: '#C89878',
     shimmer: '#F0DDD0',
   },
+  // Editorial paper — cream bg + ink text, matches v3 老钱米 系统
+  'xpti-editorial': {
+    id: 'xpti-editorial',
+    background: '#FAF8F5',
+    backgroundDeep: '#F0EBE2',
+    textStrong: '#1F1A16',
+    textBody: '#5B524B',
+    textMuted: '#9A908A',
+    divider: '#CFC6BB',
+    headerTone: '#5B524B',
+    panelSurface: '#FFFDF9',
+    panelStrokeAlpha: 0.18,
+    dataSurface: '#F5EFE4',
+    ctaGradientFrom: '#A85A6E',
+    ctaGradientTo: '#8C3E55',
+    modalPrimary: '#A85A6E',
+    warmGlow: '#C9A57A',
+    shimmer: '#F5E6D8',
+  },
 };
 
 const SUBTHEME_TO_PRESET: Record<string, XptiShareCardPresetId> = {
-  default: 'xpti-core',
+  default: 'xpti-editorial',
   core: 'xpti-core',
   noir: 'xpti-noir',
+  editorial: 'xpti-editorial',
 };
 
 export function resolveXptiShareCardPreset(options?: {
@@ -78,5 +98,5 @@ export function resolveXptiShareCardPreset(options?: {
 }): XptiShareCardPreset {
   if (options?.presetId) return PRESETS[options.presetId];
   const mapped = options?.subTheme ? SUBTHEME_TO_PRESET[options.subTheme] : undefined;
-  return PRESETS[mapped ?? 'xpti-core'];
+  return PRESETS[mapped ?? 'xpti-editorial'];
 }

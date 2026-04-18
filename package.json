@@ -7,6 +7,9 @@
     "dev": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && next dev --webpack",
     "dev:turbo": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && next dev",
     "build": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && node scripts/build-export.mjs",
+    "build:analyze": "ANALYZE=true node scripts/generate-gallery-thumbnails.mjs && ANALYZE=true node scripts/generate-medium-images.mjs && ANALYZE=true node scripts/build-export.mjs",
+    "db:schema-smoke": "node scripts/check-supabase-schema.mjs",
+    "perf:lighthouse": "node scripts/perf-lighthouse.mjs",
     "ugc:smoke-seed": "node scripts/ugc-smoke-seed.mjs",
     "ugc:share-check": "node scripts/ugc-share-check.mjs",
     "images:thumbs": "node scripts/generate-gallery-thumbnails.mjs",
@@ -31,6 +34,7 @@
     "recharts": "^3.8.1"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.4",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/qrcode": "^1.5.6",

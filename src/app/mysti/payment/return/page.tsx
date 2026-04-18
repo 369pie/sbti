@@ -2,9 +2,11 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { recordUnlock, type MystiSku } from '@/lib/mysti/unlock';
+import { recordUnlock, isSubscriptionSku, type MystiSku } from '@/lib/mysti/unlock';
 import { useMystiTheme } from '@/components/MystiThemeProvider';
-import { upsertGiftCard } from '@/lib/mysti/gift-card';
+import { upsertGiftCard, type GiftCardGiftSku } from '@/lib/mysti/gift-card';
+import { recordSubscription, syncSubscriptionFromServer } from '@/lib/mysti/subscription';
+import { trackMystiEvent } from '@/lib/mysti/analytics';
 
 function wait(ms: number) {
   return new Promise(resolve => window.setTimeout(resolve, ms));
@@ -39,9 +41,15 @@ function ReturnContent() {
             paid?: boolean;
             pending?: boolean;
             token?: string;
+            subscription?: {
+              sku: MystiSku;
+              startsAt: number;
+              expiresAt: number;
+              status: string;
+            } | null;
             giftCard?: {
               code: string;
-              giftSku: Exclude<MystiSku, 'gift-card'>;
+              giftSku: GiftCardGiftSku;
               fromName?: string;
               toName?: string;
               message?: string;
@@ -55,16 +63,50 @@ function ReturnContent() {
           if (cancelled) return;
 
           if (data.paid) {
-            recordUnlock({
-              sku,
-              resourceId,
-              orderId,
-              unlockedAt: Date.now(),
-              token: data.token,
-            });
+            // 订阅类——另外记录到会员仓储
+            if (isSubscriptionSku(sku)) {
+              const serverSub = data.subscription;
+              recordSubscription({
+                sku,
+                orderId,
+                startAt: serverSub?.startsAt ?? Date.now(),
+                expiresAt: serverSub?.expiresAt,
+                token: data.token,
+              });
+              // Cross-device cache refresh
+              syncSubscriptionFromServer({ force: true }).catch(() => {});
+              try {
+                trackMystiEvent('mysti_subscribe_success', { sku, orderId });
+              } catch {
+                /* noop */
+              }
+            } else {
+              recordUnlock({
+                sku,
+                resourceId,
+                orderId,
+                unlockedAt: Date.now(),
+                token: data.token,
+              });
+              try {
+                trackMystiEvent('mysti_paywall_success', { sku, resourceId, orderId });
+              } catch {
+                /* noop */
+              }
+            }
 
-            if (sku === 'gift-card' && data.giftCard?.code) {
+            if (
+              (sku === 'gift-card' ||
+                sku === 'festival-gift-card' ||
+                sku === 'besties-bundle') &&
+              data.giftCard?.code
+            ) {
               upsertGiftCard(data.giftCard);
+              try {
+                trackMystiEvent('mysti_gift_purchase_success', { sku, code: data.giftCard.code });
+              } catch {
+                /* noop */
+              }
               setStatus('paid');
               window.setTimeout(
                 () => router.replace(`/mysti/gift/?issued=${encodeURIComponent(data.giftCard!.code)}`),

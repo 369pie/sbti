@@ -9,13 +9,15 @@
  * - love-r ：恋爱脑 / 无限浪漫 — 小红书核心高消费人群
  * - nerd   ：理性自洽 — 反差付费惊喜（"原来连我也被看见"）
  *
- * 内容结构（每封信 5 段）：
- *   1. open       — 一句直接戳中灵魂的开场
- *   2. shadow     — 你的阴影面（被压抑的部分）
- *   3. neuro      — 神经递质 × 行为机制
- *   4. heal       — 修复处方（3 件具体的事）
- *   5. resonance  — 灵魂共振历史人物 / 角色
- *   6. closing    — 写给"你"的告别句
+ * 内容结构（每封信 7 段，对应 5+ 屏阅读节奏）：
+ *   1. open           — 一句直接戳中灵魂的开场
+ *   2. shadow         — 你的阴影面（被压抑的部分）
+ *   3. neuro          — 神经递质 × 行为机制
+ *   4. heal           — 修复处方（3 件具体的事）
+ *   5. resonance      — 灵魂共振历史人物 / 角色
+ *   6. personalLetter — 「为你写的信」拟人段落，用 {name} 插入用户名
+ *   7. ritual         — 收尾仪式（一段微仪式 + 3 步动作）
+ *   8. closing        — 写给"你"的告别句
  */
 
 import type { WtftiPersonality } from '@/lib/wtfti-personalities';
@@ -29,6 +31,18 @@ export interface SoulLetter {
   neuro: string;
   heal: string[];
   resonance: { name: string; reason: string };
+  /**
+   * 「为你写的信」段落（≥ 200 字）。
+   * 使用 `{name}` 占位符，渲染时由组件替换为用户的 displayName。
+   * 这是支撑 ¥9.9 单点付费的核心情感杠杆——每位用户感觉信是为 TA 一个人写的。
+   */
+  personalLetter: string;
+  /** 微仪式收尾：让用户读完后真的"做一件事"，避免读完即忘 */
+  ritual: {
+    title: string;
+    intro: string;
+    steps: string[];
+  };
   closing: string;
 }
 

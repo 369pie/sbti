@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import { useState, useCallback, useRef, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -17,7 +19,10 @@ import {
 } from '@/lib/squad';
 import type { SquadMember, SquadAnalysis } from '@/lib/squad';
 import { getSiteUrl } from '@/lib/site';
-import { SquadShareImageGenerator } from '@/components/SquadShareImageGenerator';
+const SquadShareImageGenerator = dynamic(
+  () => import('@/components/SquadShareImageGenerator').then((m) => m.SquadShareImageGenerator),
+  { ssr: false },
+);
 import type { SquadShareImageGeneratorHandle } from '@/components/SquadShareImageGenerator';
 
 // ─── Step indicator ──────────────────────────────────────

@@ -189,10 +189,10 @@ WTFTI 提供一个会跟着场景变化的、
 #### Wave 1 · 立理论（W18-W19, 4 周）
 - [x] **E1 · 白皮书 v1**：[`wtfti-theory-whitepaper-v1-prose-2026-04-18.md`](./wtfti-theory-whitepaper-v1-prose-2026-04-18.md) 全 §1-§9 + 附录 A/B/C 成稿
 - [x] **E2 · W-T-F-I 4 维度命名 + 学术对应**：代码落地于 [`src/lib/wtfi/axes.ts`](../../src/lib/wtfi/axes.ts)、[`src/lib/wtfi/scoring.ts`](../../src/lib/wtfi/scoring.ts)（含 30 题样本、12 原型池、tanh 软裁剪计分）；内测路由 [`/test/wtfi-preview/`](../../src/app/test/wtfi-preview/page.tsx) 已可跑通
-- [ ] **E5 · 理论锚点卡片**：每个宇宙首页 + 结果页加上"此宇宙激活的情境维度是…"（sidecar helper 已提供，见 [`src/lib/wtfi/projection.ts`](../../src/lib/wtfi/projection.ts) `getUniversePresentation()` / `projectClassicResult()`，待 UI 接通）
+- [x] **E5 · 理论锚点卡片**：每个宇宙首页 + 结果页加上"此宇宙激活的情境维度是…"（已通过 [`src/components/WtfiTheoryWiring.tsx`](../../src/components/WtfiTheoryWiring.tsx) 接入 12+ 老宇宙结果页，含 banti / xiuxian / drunk / daily / love / work / soulti / identify / flower / xpti / kings / fanrenti / feng；helper 见 [`src/lib/wtfi/projection.ts`](../../src/lib/wtfi/projection.ts)）
 
 #### Wave 2 · 换骨架（W20-W22, 6 周）
-- [ ] **E3 · 标准宇宙 90 题 clean-room 重写**（场景投射式题型，详见 §5.3）
+- [~] **E3 · 标准宇宙 90 题 clean-room 重写**（场景投射式题型，详见 §5.3）—— v2 池 50 题已落地（[`src/lib/wtfi/standard-questions-v2.ts`](../../src/lib/wtfi/standard-questions-v2.ts)，15/15 维度 ≥ 3 题/维），通过 [`Quiz.tsx`](../../src/components/Quiz.tsx) 的 `?bank=v2` 切换可即时 A/B；spec → [`wtfti-standard-rewrite-spec-2026-04-18.md`](./wtfti-standard-rewrite-spec-2026-04-18.md)。剩余：默认池切换 + 老 v1 归档（PR-3）+ CI audit 钩子。同时已把标准入口 [`Quiz.tsx`](../../src/components/Quiz.tsx) 抽样从 `perDimension=3`（46 题）压到 `2`（31 题），UX 即时改善。
 - [ ] **E8 · "复古 SBTI 宇宙"**：把现有 27 型独立成一个"经典宇宙"皮肤（既保留老用户体验，也把 SBTI 风格降级为多宇宙之一，而非默认）
 - [x] 维度别名映射层（旧 S1/E1/A1 → 新 W-T-F-I）：[`src/lib/wtfi/dimension-alias.ts`](../../src/lib/wtfi/dimension-alias.ts) 已提供 `projectLegacyToWtfi()` / `projectWtfiToLegacyLevels()` 双向投影
 

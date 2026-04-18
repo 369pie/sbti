@@ -11,6 +11,12 @@ interface Props {
   displayName: string;
 }
 
+/** 把 `{name}` 占位符替换为真实显示名；空名兜底为「你」。 */
+function personalize(text: string, name: string): string {
+  const safe = (name || '').trim() || '你';
+  return text.replace(/\{name\}/g, safe);
+}
+
 /**
  * 灵魂信完整 UI（含 Paywall）
  * 没有写过的型 → 显示"敬请期待 + 邀请投票"占位
@@ -181,6 +187,58 @@ export function MystiSoulLetterSection({ slug, displayName }: Props) {
         </div>
       </div>
 
+      <h4
+        className="text-xs tracking-[0.2em] uppercase mb-3"
+        style={{ color: theme.accentGold }}
+      >
+        ✎ 为你写的信
+      </h4>
+      <div
+        className="rounded-2xl p-5 mb-6"
+        style={{
+          background: theme.cardSurface,
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: theme.cardBorder,
+          color: theme.text,
+        }}
+      >
+        {personalize(letter.personalLetter, displayName)
+          .split('\n\n')
+          .map((para, i) => (
+            <p
+              key={i}
+              className="text-base leading-loose mb-4 last:mb-0"
+              style={{ fontFamily: 'var(--font-serif)' }}
+            >
+              {para}
+            </p>
+          ))}
+      </div>
+
+      <h4
+        className="text-xs tracking-[0.2em] uppercase mb-2"
+        style={{ color: theme.accentGold }}
+      >
+        ✦ {letter.ritual.title}
+      </h4>
+      <p
+        className="text-sm leading-relaxed mb-3"
+        style={{ color: theme.textMuted, fontFamily: 'var(--font-serif)' }}
+      >
+        {letter.ritual.intro}
+      </p>
+      <ol
+        className="list-decimal pl-5 space-y-2 mb-6"
+        style={{ color: theme.text, fontFamily: 'var(--font-serif)' }}
+      >
+        {letter.ritual.steps.map((step, i) => (
+          <li key={i} className="leading-loose">
+            {personalize(step, displayName)}
+          </li>
+        ))}
+      </ol>
+
       <p
         className="text-base leading-loose italic mt-4 pt-4"
         style={{
@@ -189,7 +247,11 @@ export function MystiSoulLetterSection({ slug, displayName }: Props) {
           color: theme.accentGold,
         }}
       >
-        {letter.closing}
+        {letter.closing.split('\n\n').map((para, i) => (
+          <span key={i} className={i > 0 ? 'block mt-3 not-italic text-sm opacity-80' : ''}>
+            {para}
+          </span>
+        ))}
       </p>
     </motion.article>
   );

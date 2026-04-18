@@ -24,8 +24,8 @@ const SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
 
-const DARK = '#1A2340';
-const MED = '#5A6580';
+const DARK = '#1F1A16';
+const MED = '#5B524B';
 
 const imageCache = new Map<string, Promise<HTMLImageElement>>();
 
@@ -189,7 +189,7 @@ async function renderBirdShareImage(p: BirdPersonality, imgUrl?: string) {
   ctx.textBaseline = 'top';
 
   const accent = p.color;
-  const bg = '#F5F8FF';
+  const bg = '#FAF8F5';
 
   // ─── 1. 背景 ───
   ctx.fillStyle = bg;

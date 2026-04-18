@@ -173,11 +173,11 @@ async function renderLoveShareImage(personality: LovePersonalityType, dimensionS
   ctx.scale(CARD_SCALE, CARD_SCALE);
   ctx.textBaseline = 'top';
 
-  const BG = '#FFF9F2';
-  const DARK = '#2D2A26';
-  const MED = '#6B6560';
-  const LIGHT = '#B0A89E';
-  const DIV = '#e8e0d6';
+  const BG = '#FAF8F5';
+  const DARK = '#1F1A16';
+  const MED = '#5B524B';
+  const LIGHT = '#9A908A';
+  const DIV = '#E3DCD1';
 
   ctx.fillStyle = BG;
   ctx.fillRect(0, 0, CARD_WIDTH, MAX_H);

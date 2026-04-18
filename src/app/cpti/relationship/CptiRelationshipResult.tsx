@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import { useSyncExternalStore, useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -18,10 +20,14 @@ import type { CptiDimensionScore } from '@/lib/cpti/scoring';
 import { getCptiPersonalityBySlug, getCptiTypeImage, getCptiTypeThumbnailImage } from '@/lib/cpti/personalities';
 import { getSiteUrl } from '@/lib/site';
 import { encodeRelationshipLink, decodeRelationshipLink } from '@/lib/cpti/cpti-relationship-link';
-import { CptiRelationshipShareImageGenerator } from '@/components/CptiRelationshipShareImageGenerator';
+const CptiRelationshipShareImageGenerator = dynamic(
+  () => import('@/components/CptiRelationshipShareImageGenerator').then((m) => m.CptiRelationshipShareImageGenerator),
+  { ssr: false },
+);
 import type { CptiRelationshipShareImageGeneratorHandle } from '@/components/CptiRelationshipShareImageGenerator';
 import { ClaimAssetCard } from '@/components/ClaimAssetCard';
 import CptiPairShareCard from '@/components/CptiPairShareCard';
+import { SendAsGiftCTA } from '@/components/SendAsGiftCTA';
 import { getRelationshipRarity } from '@/lib/cpti/relationships-rarity';
 
 const emptySubscribe = () => () => {};
@@ -864,6 +870,16 @@ export function CptiRelationshipResult() {
               partnerCode={data.personalitySlugA.toUpperCase().slice(0, 8)}
               userName="你"
               partnerName={data.nicknameA || 'TA'}
+            />
+          </div>
+
+          {/* Send as gift CTA — pair / dual report bundle */}
+          <div className="mb-5">
+            <SendAsGiftCTA
+              source="cpti_pair_result"
+              giftSku="dual-report"
+              label={`把这份合盘报告送给 ${data.nicknameA || 'TA'}`}
+              description="双人灵魂深度报告 · 附手写贺卡 · ¥69 起"
             />
           </div>
 

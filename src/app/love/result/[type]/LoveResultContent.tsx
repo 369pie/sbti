@@ -1,10 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { LovePersonalityAvatar } from '@/components/LovePersonalityAvatar';
-import { LoveShareImageGenerator } from '@/components/LoveShareImageGenerator';
 import type { LoveShareImageGeneratorHandle } from '@/components/LoveShareImageGenerator';
+const LoveShareImageGenerator = dynamic(
+  () => import('@/components/LoveShareImageGenerator').then((m) => m.LoveShareImageGenerator),
+  { ssr: false },
+);
 import { LOVE_DIMENSIONS, LOVE_MODEL_NAMES, LOVE_MODEL_COLORS } from '@/lib/love/dimensions';
 import { LOVE_PERSONALITY_TYPES, getLoveRarity } from '@/lib/love/personalities';
 import type { LovePersonalityType } from '@/lib/love/personalities';

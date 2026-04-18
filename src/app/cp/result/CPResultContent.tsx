@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import NextImage from 'next/image';
@@ -9,7 +11,10 @@ import { MODEL_COLORS } from '@/lib/dimensions';
 import { calculateCP, getTierColor, getTierEmoji } from '@/lib/cp-matching';
 import type { CPResult, DimensionComparison } from '@/lib/cp-matching';
 import { useRef, useState, useCallback } from 'react';
-import { CPShareImageGenerator } from '@/components/CPShareImageGenerator';
+const CPShareImageGenerator = dynamic(
+  () => import('@/components/CPShareImageGenerator').then((m) => m.CPShareImageGenerator),
+  { ssr: false },
+);
 import type { CPShareImageGeneratorHandle } from '@/components/CPShareImageGenerator';
 import { getSiteUrl } from '@/lib/site';
 

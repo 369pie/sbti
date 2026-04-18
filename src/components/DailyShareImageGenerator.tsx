@@ -147,11 +147,11 @@ function drawDivider(ctx: CanvasRenderingContext2D, y: number, color: string) {
 }
 
 async function renderDailyShareImage(status: DailyStatusType, dimensionScores: DailyDimensionScore[]) {
-  const BG = '#FFF9F2';
-  const DARK = '#2d2236';
-  const MED = '#6b6380';
-  const LIGHT = '#A8A0B0';
-  const DIV = '#e8e0d6';
+  const BG = '#FAF8F5';
+  const DARK = '#1F1A16';
+  const MED = '#5B524B';
+  const LIGHT = '#9A908A';
+  const DIV = '#E3DCD1';
 
   const [qrImage, charImage] = await Promise.all([
     toQrDataUrl(DAILY_SHARE_URL, {

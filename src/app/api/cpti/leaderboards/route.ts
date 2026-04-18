@@ -85,12 +85,20 @@ export async function GET(req: NextRequest) {
       // Non-fatal — continue with entries
     }
 
-    return NextResponse.json({
-      type,
-      entries,
-      myRank,
-      total: count ?? entries.length,
-    });
+    // myRank depends on the signed-in user; only the global slice is cacheable.
+    const cacheHeader = userId
+      ? 'private, no-store'
+      : 'public, max-age=0, s-maxage=60, stale-while-revalidate=300';
+
+    return NextResponse.json(
+      {
+        type,
+        entries,
+        myRank,
+        total: count ?? entries.length,
+      },
+      { headers: { 'Cache-Control': cacheHeader } },
+    );
   } catch (error) {
     console.error('[cpti/leaderboards GET] Unexpected error:', error);
     return NextResponse.json(

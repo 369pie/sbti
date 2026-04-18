@@ -229,7 +229,7 @@ async function renderXptiShareImage(
   ctx.shadowColor = 'rgba(0,0,0,0.45)';
   ctx.shadowBlur = 1;
   ctx.shadowOffsetY = 0;
-  fillRoundedRect(ctx, avatarX, y, avatarW, avatarH, 24, '#0F080C');
+  fillRoundedRect(ctx, avatarX, y, avatarW, avatarH, 24, preset.dataSurface);
   ctx.restore();
 
   // Inner surface with inset top highlight (glass/metal effect)
@@ -521,6 +521,8 @@ export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle,
       universe: 'xpti',
     });
 
+    const preset = resolveXptiShareCardPreset({ presetId, subTheme });
+
     const handleGenerate = useCallback(async () => {
       if (generating) return;
       if (await tierCtl.ensurePaid()) return;
@@ -528,16 +530,14 @@ export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle,
       setSaveHint(null);
       try {
         const dataUrl = await renderXptiShareImage(personality, dimensionScores, { presetId, subTheme });
-        const finalUrl = await tierCtl.applyOverlay(dataUrl, '#0D0608', 'XPTI');
+        const finalUrl = await tierCtl.applyOverlay(dataUrl, preset.background, 'XPTI');
         setPreviewUrl(finalUrl);
       } catch (e) {
         console.error('Share image generation failed:', e);
       } finally {
         setGenerating(false);
       }
-    }, [dimensionScores, generating, personality, presetId, subTheme, tierCtl]);
-
-    const preset = resolveXptiShareCardPreset({ presetId, subTheme });
+    }, [dimensionScores, generating, personality, presetId, subTheme, tierCtl, preset.background]);
 
     const createPreviewFile = useCallback(async () => {
       if (!previewUrl) return null;

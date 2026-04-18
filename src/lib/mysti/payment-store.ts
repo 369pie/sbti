@@ -44,6 +44,7 @@ export interface MystiOrderRow {
   notify_payload: JsonValue | null;
   paid_at: string | null;
   verified_at: string | null;
+  device_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -72,6 +73,7 @@ export interface CreateMystiOrderInput {
   amountCents: number;
   redirectPath?: string;
   referralCode?: string;
+  deviceId?: string;
   attachJson?: MystiOrderAttach;
 }
 
@@ -81,8 +83,14 @@ const VALID_ORDER_SKUS = new Set<MystiSku>([
   'dual-report',
   'monthly-report',
   'gift-card',
+  'festival-gift-card',
+  'besties-bundle',
   'share-plus',
   'share-atelier',
+  'monthly-pass',
+  'quarterly-pass',
+  'yearly-pass',
+  'creator-pass',
 ]);
 
 function admin() {
@@ -187,6 +195,7 @@ export async function createPendingMystiOrder(
       status: 'pending',
       redirect_path: input.redirectPath ?? null,
       referral_code: input.referralCode ?? null,
+      device_id: input.deviceId ?? null,
       attach_json: sanitizeAttach(input.attachJson),
     })
     .select('*')
@@ -316,7 +325,13 @@ export async function markMystiOrderVerified(orderId: string): Promise<void> {
 export async function ensureGiftCardIssued(
   order: MystiOrderRow,
 ): Promise<GiftCard | null> {
-  if (order.sku !== 'gift-card') return null;
+  if (
+    order.sku !== 'gift-card' &&
+    order.sku !== 'festival-gift-card' &&
+    order.sku !== 'besties-bundle'
+  ) {
+    return null;
+  }
 
   const client = admin();
   const { data: existing, error: existingError } = await client
@@ -429,4 +444,144 @@ export async function redeemGiftCard(args: {
   }
 
   return toClientGiftCard(data as MystiGiftCardRow);
+}
+// ─────────────────────────── Subscriptions ───────────────────────────
+
+export interface MystiSubscriptionRow {
+  id: string;
+  device_id: string;
+  sku: MystiSku;
+  starts_at: string;
+  expires_at: string;
+  status: 'active' | 'expired' | 'cancelled';
+  source_order_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ServerSubscription {
+  sku: MystiSku;
+  startsAt: number;
+  expiresAt: number;
+  status: 'active' | 'expired' | 'cancelled';
+}
+
+const SUBSCRIPTION_DAYS: Record<string, number> = {
+  'monthly-pass': 30,
+  'quarterly-pass': 92,
+  'yearly-pass': 365,
+  'creator-pass': 30,
+};
+
+function toServerSubscription(row: MystiSubscriptionRow): ServerSubscription {
+  return {
+    sku: row.sku,
+    startsAt: Date.parse(row.starts_at),
+    expiresAt: Date.parse(row.expires_at),
+    status: row.status,
+  };
+}
+
+/**
+ * Find the latest active subscription window for a device.
+ * Returns null when none exists or when expires_at is in the past.
+ */
+export async function findActiveSubscriptionByDevice(
+  deviceId: string,
+): Promise<ServerSubscription | null> {
+  if (!deviceId) return null;
+  const nowIso = new Date().toISOString();
+  const { data, error } = await admin()
+    .from('mysti_subscriptions')
+    .select('*')
+    .eq('device_id', deviceId)
+    .eq('status', 'active')
+    .gt('expires_at', nowIso)
+    .order('expires_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) {
+    throw new Error(`mysti_subscription_lookup_failed:${error.message}`);
+  }
+  return data ? toServerSubscription(data as MystiSubscriptionRow) : null;
+}
+
+/**
+ * Issue / extend a subscription for a paid order.
+ * - If an active row exists for the same device, extend its expires_at by SUBSCRIPTION_DAYS[sku].
+ * - Otherwise insert a new row starting now.
+ * Idempotent on source_order_id.
+ */
+export async function ensureSubscriptionFromOrder(
+  order: MystiOrderRow,
+): Promise<ServerSubscription | null> {
+  if (!SUBSCRIPTION_DAYS[order.sku]) return null;
+  if (!order.device_id) return null;
+
+  const client = admin();
+
+  // Idempotency: look for an existing row issued from this order.
+  const { data: existing, error: existingError } = await client
+    .from('mysti_subscriptions')
+    .select('*')
+    .eq('source_order_id', order.id)
+    .maybeSingle();
+  if (existingError) {
+    throw new Error(`mysti_subscription_lookup_failed:${existingError.message}`);
+  }
+  if (existing) return toServerSubscription(existing as MystiSubscriptionRow);
+
+  const days = SUBSCRIPTION_DAYS[order.sku];
+  const now = new Date();
+
+  // If an active sub already exists for this device, extend it.
+  const { data: active } = await client
+    .from('mysti_subscriptions')
+    .select('*')
+    .eq('device_id', order.device_id)
+    .eq('status', 'active')
+    .gt('expires_at', now.toISOString())
+    .order('expires_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (active) {
+    const base = new Date((active as MystiSubscriptionRow).expires_at);
+    const newExpiry = new Date(base.getTime() + days * 86400_000);
+    const { data: updated, error: updateError } = await client
+      .from('mysti_subscriptions')
+      .update({
+        expires_at: newExpiry.toISOString(),
+        updated_at: now.toISOString(),
+      })
+      .eq('id', (active as MystiSubscriptionRow).id)
+      .select('*')
+      .single();
+    if (updateError || !updated) {
+      throw new Error(
+        `mysti_subscription_extend_failed:${updateError?.message ?? 'unknown'}`,
+      );
+    }
+    return toServerSubscription(updated as MystiSubscriptionRow);
+  }
+
+  const expiresAt = new Date(now.getTime() + days * 86400_000);
+  const { data, error } = await client
+    .from('mysti_subscriptions')
+    .insert({
+      device_id: order.device_id,
+      sku: order.sku,
+      starts_at: now.toISOString(),
+      expires_at: expiresAt.toISOString(),
+      source_order_id: order.id,
+      status: 'active',
+    })
+    .select('*')
+    .single();
+  if (error || !data) {
+    throw new Error(
+      `mysti_subscription_insert_failed:${error?.message ?? 'unknown'}`,
+    );
+  }
+  return toServerSubscription(data as MystiSubscriptionRow);
 }

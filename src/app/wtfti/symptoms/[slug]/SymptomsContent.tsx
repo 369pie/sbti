@@ -1,11 +1,16 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCallback, useRef, useState } from 'react';
 import type { WtftiPersonality } from '@/lib/wtfti-personalities';
 import { WTFTI_PERSONALITIES, getWtftiTypeImage } from '@/lib/wtfti-personalities';
-import { SymptomsShareImageGenerator } from '@/components/SymptomsShareImageGenerator';
+const SymptomsShareImageGenerator = dynamic(
+  () => import('@/components/SymptomsShareImageGenerator').then((m) => m.SymptomsShareImageGenerator),
+  { ssr: false },
+);
 import type { SymptomsShareImageHandle } from '@/components/SymptomsShareImageGenerator';
 import { getSymptomsHeat } from '@/lib/symptoms-heat';
 

@@ -2,7 +2,7 @@
 
 import { useCallback, useImperativeHandle, useState, forwardRef } from 'react';
 import { toQrDataUrl } from '@/lib/qr-code';
-import { getSoultiRarity, getSoultiResonance, getSoultiPersonalityBySlug } from '@/lib/soulti/personalities';
+import { getSoultiRarity, getSoultiResonance, getSoultiPersonalityBySlug, getSoultiTypeMediumImage } from '@/lib/soulti/personalities';
 import type { SoultiPersonalityType } from '@/lib/soulti/personalities';
 import { SOULTI_DIMENSIONS, SOULTI_MODEL_COLORS } from '@/lib/soulti/dimensions';
 import { SHARE_SITE_URL } from '@/lib/site';
@@ -147,11 +147,12 @@ async function renderSoultiShareImage(personality: SoultiPersonalityType, dimens
   const qrImage = await toQrDataUrl(SOULTI_SHARE_URL, {
     width: 200, margin: 1, color: { dark: '#000000', light: '#ffffffff' }, errorCorrectionLevel: 'M',
   }).then(url => getCachedImage(url)).catch(() => null);
+  const portraitImage = await getCachedImage(getSoultiTypeMediumImage(personality.slug)).catch(() => null);
 
-  const BG = '#FDFAF6';
-  const DARK = '#2D2A26';
-  const MED = '#7A6E65';
-  const LIGHT = '#B0A89E';
+  const BG = '#FAF8F5';
+  const DARK = '#1F1A16';
+  const MED = '#5B524B';
+  const LIGHT = '#9A908A';
   const DIV_COLOR = hexToRgba(personality.color, 0.15);
 
   // ── Render to oversized canvas, then crop to actual content height ──
@@ -198,7 +199,25 @@ async function renderSoultiShareImage(personality: SoultiPersonalityType, dimens
   ctx.fillStyle = personality.color;
   ctx.font = `42px ${FONT_SERIF}`;
   ctx.fillText(spacedCode, CARD_WIDTH / 2, y);
-  y += 52;
+  y += 64;
+
+  // ─── PORTRAIT ───
+  const portraitSize = 164;
+  const portraitX = (CARD_WIDTH - portraitSize) / 2;
+  fillRoundedRect(ctx, portraitX, y, portraitSize, portraitSize, 16, hexToRgba(personality.color, 0.08));
+  strokeRoundedRect(ctx, portraitX, y, portraitSize, portraitSize, 16, hexToRgba(personality.color, 0.22));
+  if (portraitImage) {
+    ctx.save();
+    roundRectPath(ctx, portraitX, y, portraitSize, portraitSize, 16);
+    ctx.clip();
+    drawImageContain(ctx, portraitImage, portraitX + 10, y + 10, portraitSize - 20, portraitSize - 20);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = personality.color;
+    ctx.font = `56px ${FONT_SERIF}`;
+    ctx.fillText(personality.emoji, CARD_WIDTH / 2, y + 48);
+  }
+  y += portraitSize + 18;
 
   ctx.fillStyle = hexToRgba(LIGHT, 0.6);
   ctx.font = `italic 10px ${FONT_SERIF}`;
@@ -209,7 +228,7 @@ async function renderSoultiShareImage(personality: SoultiPersonalityType, dimens
   ctx.fillStyle = DARK;
   ctx.font = `28px ${FONT_SERIF}`;
   ctx.fillText(personality.name, CARD_WIDTH / 2, y);
-  y += 38;
+  y += 34;
 
   // Rarity pill
   const rarityText = `${rarity.tier === 'legendary' ? '✦ ' : rarity.tier === 'epic' ? '◆ ' : ''}${rarity.label} · ${rarity.populationPct}%`;
@@ -219,7 +238,7 @@ async function renderSoultiShareImage(personality: SoultiPersonalityType, dimens
   fillRoundedRect(ctx, rarityX, y, rarityW, 24, 12, hexToRgba(rarity.color, 0.1));
   ctx.fillStyle = rarity.color;
   ctx.fillText(rarityText, CARD_WIDTH / 2, y + 6);
-  y += 42;
+  y += 36;
 
   // Divider
   drawDivider(ctx, y, DIV_COLOR);

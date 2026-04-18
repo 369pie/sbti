@@ -1,12 +1,17 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { DAILY_DIMENSIONS, DAILY_MODEL_NAMES, DAILY_MODEL_COLORS } from '@/lib/daily/dimensions';
 import { DAILY_STATUS_TYPES } from '@/lib/daily/statuses';
 import type { DailyStatusType } from '@/lib/daily/statuses';
 import type { DailyDimensionScore } from '@/lib/daily/scoring';
-import { DailyShareImageGenerator } from '@/components/DailyShareImageGenerator';
+const DailyShareImageGenerator = dynamic(
+  () => import('@/components/DailyShareImageGenerator').then((m) => m.DailyShareImageGenerator),
+  { ssr: false },
+);
 import type { DailyShareImageGeneratorHandle } from '@/components/DailyShareImageGenerator';
 import { DailyStatusAvatar } from '@/components/DailyStatusAvatar';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';

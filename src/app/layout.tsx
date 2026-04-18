@@ -10,9 +10,12 @@ import { FollowMeInline } from '@/components/FollowMeLinks';
 import { getLegacyRedirectScript, getSiteLabel, getSiteOrigin, getSiteUrl, isLegacyPagesBuild } from "@/lib/site";
 
 // ─── Typography system v3: Editorial Feminine ──────────────────────────────
+// Weights trimmed 2026-04-18 perf pass: CJK families (Noto Serif/Sans SC) are
+// the heaviest assets on this site, so we keep only the weights actually
+// referenced by globals.css + components.
 const notoSerifSC = Noto_Serif_SC({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "700"],
   display: "swap",
   variable: "--font-serif-sc",
   preload: false,
@@ -20,7 +23,7 @@ const notoSerifSC = Noto_Serif_SC({
 
 const notoSansSC = Noto_Sans_SC({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "700"],
   display: "swap",
   variable: "--font-sans-sc",
   preload: false,
@@ -28,23 +31,22 @@ const notoSansSC = Noto_Sans_SC({
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  weight: ["400", "600"],
   display: "swap",
   variable: "--font-cormorant",
 });
 
 const fraunces = Fraunces({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  weight: ["400", "600"],
+  style: ["italic"],
   display: "swap",
   variable: "--font-fraunces",
 });
 
 const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400"],
   display: "swap",
   variable: "--font-mono-ui",
 });

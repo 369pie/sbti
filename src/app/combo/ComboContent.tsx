@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import NextImage from 'next/image';
@@ -11,7 +13,10 @@ import {
   generateCombo, getComboPersonalityImage, getComboPersonalityThumbnailImage, getComboPersonalityMediumImage,
 } from '@/lib/combo';
 import type { ComboResult } from '@/lib/combo';
-import { ComboShareImageGenerator } from '@/components/ComboShareImageGenerator';
+const ComboShareImageGenerator = dynamic(
+  () => import('@/components/ComboShareImageGenerator').then((m) => m.ComboShareImageGenerator),
+  { ssr: false },
+);
 import type { ComboShareImageGeneratorHandle } from '@/components/ComboShareImageGenerator';
 
 // ─── Step indicator ──────────────────────────────────────

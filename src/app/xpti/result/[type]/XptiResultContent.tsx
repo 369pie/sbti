@@ -2,13 +2,17 @@
 
 import Link from 'next/link';
 import NextImage from 'next/image';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { XPTI_DIMENSIONS, XPTI_MODEL_NAMES, XPTI_MODEL_COLORS } from '@/lib/xpti/dimensions';
 import { XPTI_PERSONALITY_TYPES, getXptiRarity, getXptiTypeThumbnailImage, getXptiTypeMediumImage } from '@/lib/xpti/personalities';
 import type { XptiPersonalityType } from '@/lib/xpti/personalities';
 import type { XptiDimensionScore } from '@/lib/xpti/scoring';
-import { XptiShareImageGenerator } from '@/components/XptiShareImageGenerator';
 import type { XptiShareImageGeneratorHandle } from '@/components/XptiShareImageGenerator';
+const XptiShareImageGenerator = dynamic(
+  () => import('@/components/XptiShareImageGenerator').then((m) => m.XptiShareImageGenerator),
+  { ssr: false },
+);
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
@@ -111,7 +115,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
   const radarPolygon = radarNodes.map((n) => `${n.valueX},${n.valueY}`).join(' ');
 
   return (
-    <div className="min-h-screen text-[#F3E8EB]" style={{ background: '#0D0608' }}>
+    <div className="min-h-screen text-text-primary">
       {/* Hero section */}
       <section className="relative overflow-hidden">
         <div
@@ -125,7 +129,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
           {/* Share button */}
           <button
             onClick={() => shareRef.current?.generate()}
-            className="absolute top-16 right-6 p-2.5 rounded-xl border border-[#A3526E]/20 bg-[#20181A]/60 hover:bg-[#20181A] text-[#A38A90] hover:text-[#E6CDD5] transition-all cursor-pointer"
+            className="absolute top-6 right-6 p-2.5 rounded-full border border-rule-soft bg-bg-elevated hover:bg-paper-deep text-text-muted hover:text-text-primary transition-all cursor-pointer"
             title="生成分享图片"
             aria-label="生成分享图片"
           >
@@ -139,14 +143,18 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#A3526E]/20 bg-[#20181A]/60 text-xs text-[#A38A90] mb-6">
-              XPTI 亲密偏好结果
+            {/* Eyebrow */}
+            <div className="inline-flex items-center gap-2 mb-6 max-w-[70%] sm:max-w-none">
+              <span className="block h-px w-6" style={{ background: personality.color, opacity: 0.6 }} aria-hidden />
+              <span className="text-[10px] tracking-[0.4em] uppercase text-text-muted whitespace-nowrap">
+                XPTI · Result
+              </span>
+              <span className="block h-px w-6" style={{ background: personality.color, opacity: 0.6 }} aria-hidden />
             </div>
 
             {/* Hero character image */}
             <div
-              className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mx-auto mb-8 rounded-[2rem] overflow-hidden flex items-center justify-center"
+              className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mx-auto mb-8 rounded-[2rem] overflow-hidden flex items-center justify-center"
               style={{
                 background: `linear-gradient(135deg, ${personality.color}08 0%, ${personality.color}1a 100%)`,
                 boxShadow: `0 24px 80px -24px ${personality.color}45, inset 0 0 0 1px ${personality.color}20`,
@@ -164,21 +172,30 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
               />
             </div>
 
-            {/* Number + Code */}
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <span className="text-xs font-mono text-[#A38A90] tracking-wider">{personality.number}</span>
+            {/* Number + Code (serial-number editorial) */}
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <span className="font-mono text-[10px] tracking-[0.4em] uppercase text-text-muted">
+                № {personality.number}
+              </span>
+              <span className="block w-px h-3 bg-[#A3526E]/40" aria-hidden />
               <span
-                className="text-sm font-mono tracking-[0.3em] uppercase"
+                className="font-mono text-xs tracking-[0.42em] uppercase"
                 style={{ color: personality.color }}
               >
                 {personality.code}
               </span>
             </div>
 
-            {/* Name */}
-            <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mb-4">
+            {/* Name (editorial display serif) */}
+            <h1
+              className="text-4xl sm:text-5xl md:text-6xl tracking-tight mb-4 leading-[1.05]"
+              style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}
+            >
               {personality.name}
             </h1>
+
+            {/* Editorial rule */}
+            <div className="mx-auto mb-5 h-px w-12" style={{ background: personality.color, opacity: 0.5 }} aria-hidden />
 
             {/* Rarity */}
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -190,13 +207,16 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
                 {rarity.tier === 'epic' && '◆ '}
                 {rarity.label}
               </span>
-              <span className="text-xs text-[#A38A90]">
+              <span className="text-xs text-text-muted">
                 仅 {rarity.populationPct}% 的测试者是此人格
               </span>
             </div>
 
             {/* Tagline */}
-            <p className="text-xl text-[#D4C5C9] max-w-md mx-auto">
+            <p
+              className="text-xl text-text-secondary max-w-md mx-auto"
+              style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 400 }}
+            >
               {personality.tagline}
             </p>
 
@@ -229,12 +249,12 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
           {parsedSections.map((sec, i) => (
             <div
               key={sec.title}
-              className="rounded-2xl border border-[#A3526E]/20 bg-[#1A0C11] backdrop-blur-xl shadow-sm p-6 sm:p-8"
+              className="rounded-2xl border border-rule-soft bg-bg-elevated backdrop-blur-xl shadow-sm p-6 sm:p-8"
             >
-              <h2 className="text-sm font-mono tracking-wider text-[#A38A90] uppercase mb-4">
+              <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
                 {sec.title}
               </h2>
-              <div className="text-[#D4C5C9] leading-[1.8] text-base whitespace-pre-line">
+              <div className="text-text-secondary leading-[1.8] text-base whitespace-pre-line">
                 {sec.content}
               </div>
             </div>
@@ -249,10 +269,10 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
         >
-          <h2 className="text-sm font-mono tracking-wider text-[#A38A90] uppercase mb-6">
+          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
             {personality.code} 的九维雷达图
           </h2>
-          <div className="rounded-2xl border border-[#A3526E]/20 bg-[#1A0C11] backdrop-blur-xl shadow-sm p-6 sm:p-8">
+          <div className="rounded-2xl border border-rule-soft bg-bg-elevated backdrop-blur-xl shadow-sm p-6 sm:p-8">
             <div className="flex justify-center">
               <svg
                 viewBox={`0 0 ${radarSize} ${radarSize}`}
@@ -274,7 +294,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
                       key={level}
                       points={points}
                       fill="none"
-                      stroke="rgba(163, 82, 110, 0.18)"
+                      stroke="rgba(31, 26, 22, 0.14)"
                       strokeWidth="1"
                     />
                   );
@@ -287,7 +307,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
                     y1={radarCenter}
                     x2={n.axisX}
                     y2={n.axisY}
-                    stroke="rgba(163, 82, 110, 0.14)"
+                    stroke="rgba(31, 26, 22, 0.10)"
                     strokeWidth="1"
                   />
                 ))}
@@ -309,7 +329,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
                     cy={n.valueY}
                     r="3.5"
                     fill={personality.color}
-                    stroke="#0D0608"
+                    stroke="var(--color-paper)"
                     strokeWidth="1.5"
                   />
                 ))}
@@ -319,7 +339,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
                     <text
                       x={n.labelX}
                       y={n.labelY - 6}
-                      fill="#E6CDD5"
+                      fill="var(--color-ink)"
                       fontSize="11"
                       letterSpacing="0.3"
                       textAnchor={n.textAnchor}
@@ -329,7 +349,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
                     <text
                       x={n.labelX}
                       y={n.labelY + 9}
-                      fill="#A38A90"
+                      fill="var(--color-ink-mute)"
                       fontSize="10"
                       textAnchor={n.textAnchor}
                     >
@@ -344,12 +364,12 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
               {radarNodes.map((n) => {
                 const color = XPTI_MODEL_COLORS[n.dim.model];
                 return (
-                  <div key={`legend-${n.dim.id}`} className="rounded-lg border border-[#A3526E]/20 bg-[#20181A]/60 px-3 py-2">
+                  <div key={`legend-${n.dim.id}`} className="rounded-lg border border-rule-soft bg-bg-elevated px-3 py-2">
                     <div className="flex items-center justify-between text-xs mb-1">
                       <span className="font-mono" style={{ color: color.base }}>{n.dim.id}</span>
-                      <span className="text-[#A38A90]">{n.dim.poleLowLabel} · {n.dim.poleHighLabel}</span>
+                      <span className="text-text-muted">{n.dim.poleLowLabel} · {n.dim.poleHighLabel}</span>
                     </div>
-                    <p className="text-xs text-[#D4C5C9]">{n.dim.levels[n.score.level]}</p>
+                    <p className="text-xs text-text-secondary">{n.dim.levels[n.score.level]}</p>
                   </div>
                 );
               })}
@@ -361,7 +381,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
       <CrossTestRecommendations currentTest="xpti" personalityName={personality.name} variant="xpti" />
 
       <section className="max-w-2xl mx-auto px-6 pb-8">
-        <WtfiTheoryWiring universe="xpti" variant="dark" />
+        <WtfiTheoryWiring universe="xpti" variant="light" />
       </section>
 
       {/* Share section */}
@@ -371,16 +391,16 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
         >
-          <h2 className="text-sm font-mono tracking-wider text-[#A38A90] uppercase mb-4 text-center">
+          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4 text-center">
             发给闺蜜/恋人测测
           </h2>
 
           <div className="space-y-3">
-            <XptiShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} presetId="xpti-core" />
+            <XptiShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} presetId="xpti-editorial" />
 
             <button
               onClick={copyShareText}
-              className="w-full py-3 rounded-xl border border-[#A3526E]/20 bg-[#A3526E]/10 text-sm text-[#D4C5C9] hover:bg-[#A3526E]/15 transition-all cursor-pointer"
+              className="w-full py-3 rounded-xl border border-rule-soft bg-bg-elevated text-sm text-text-secondary hover:bg-bg-elevated transition-all cursor-pointer"
             >
               {textCopied ? '已复制分享文案 ✓' : '📋 复制分享文案'}
             </button>
@@ -388,13 +408,13 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
             <div className="flex gap-3">
               <button
                 onClick={copyLink}
-                className="flex-1 py-3 rounded-xl border border-[#A3526E]/20 text-sm text-[#D4C5C9] hover:text-[#F3E8EB] hover:bg-[#20181A]/50 transition-all cursor-pointer"
+                className="flex-1 py-3 rounded-xl border border-rule-soft text-sm text-text-secondary hover:text-text-primary hover:bg-bg-elevated/50 transition-all cursor-pointer"
               >
                 {copied ? '已复制 ✓' : '复制链接'}
               </button>
               <button
                 onClick={quickShare}
-                className="flex-1 py-3 rounded-xl border border-[#A3526E]/20 text-sm text-[#D4C5C9] hover:bg-[#A3526E]/15 transition-all cursor-pointer flex items-center justify-center gap-2"
+                className="flex-1 py-3 rounded-xl border border-rule-soft text-sm text-text-secondary hover:bg-bg-elevated transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -403,7 +423,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
               </button>
               <Link
                 href="/xpti/test"
-                className="flex-1 py-3 rounded-xl border border-[#A3526E]/20 text-sm text-[#D4C5C9] hover:text-[#F3E8EB] hover:bg-[#20181A]/50 transition-all text-center"
+                className="flex-1 py-3 rounded-xl border border-rule-soft text-sm text-text-secondary hover:text-text-primary hover:bg-bg-elevated/50 transition-all text-center"
               >
                 重新测试
               </Link>
@@ -414,7 +434,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
 
       {/* Other types */}
       <section className="max-w-3xl mx-auto px-6 pb-24">
-        <h2 className="text-sm font-mono tracking-wider text-[#A38A90] uppercase mb-6">
+        <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-6">
           还可以看看其他关系原型
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -422,13 +442,13 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
             <Link
               key={p.slug}
               href={`/xpti/result/${p.slug}`}
-              className="group rounded-xl border border-[#A3526E]/20 hover:border-[#A3526E]/35 bg-[#1A0C11]/60 hover:bg-[#20181A]/70 transition-all p-4 text-center"
+              className="group rounded-xl border border-rule-soft hover:border-rule bg-bg-elevated/60 hover:bg-bg-elevated transition-all p-4 text-center"
             >
               <div className="text-2xl mb-2">{p.emoji}</div>
               <span className="text-xs font-mono tracking-wider block mb-1" style={{ color: p.color }}>
                 {p.code}
               </span>
-              <span className="text-sm font-medium text-[#F3E8EB]">{p.name}</span>
+              <span className="text-sm font-medium text-text-primary">{p.name}</span>
             </Link>
           ))}
         </div>

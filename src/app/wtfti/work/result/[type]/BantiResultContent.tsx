@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import NextImage from 'next/image';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { useCallback, useRef, useState, useEffect } from 'react';
 import type { BantiPersonality } from '@/lib/banti/personalities';
@@ -9,8 +10,11 @@ import { BANTI_PERSONALITIES, getBantiTypeImage } from '@/lib/banti/personalitie
 import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
 import { markCollected } from '@/lib/mysti/collection';
-import { BantiShareImageGenerator } from '@/components/BantiShareImageGenerator';
 import type { BantiShareImageHandle } from '@/components/BantiShareImageGenerator';
+const BantiShareImageGenerator = dynamic(
+  () => import('@/components/BantiShareImageGenerator').then((m) => m.BantiShareImageGenerator),
+  { ssr: false },
+);
 import { BantiTypeArt } from '@/components/BantiTypeArt';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { WtfCardCTA } from '@/components/WtfCardCTA';

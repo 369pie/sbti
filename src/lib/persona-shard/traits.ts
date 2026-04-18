@@ -110,8 +110,8 @@ function deriveFromHash(seed: number): { voice: ShardVoice; pace: ShardPace; ene
   const energies: ShardEnergy[] = ['radiant', 'inward', 'flickering'];
   return {
     voice: voices[seed % voices.length],
-    pace: paces[(seed >> 3) % paces.length],
-    energy: energies[(seed >> 7) % energies.length],
+    pace: paces[(seed >>> 3) % paces.length],
+    energy: energies[(seed >>> 7) % energies.length],
   };
 }
 
@@ -133,13 +133,13 @@ export function deriveShardTraits(universeId: string, slug: string): ShardTraits
 
   const keywords: [string, string, string] = [
     voicePool[seed % voicePool.length],
-    pacePool[(seed >> 5) % pacePool.length],
-    energyPool[(seed >> 11) % energyPool.length],
+    pacePool[(seed >>> 5) % pacePool.length],
+    energyPool[(seed >>> 11) % energyPool.length],
   ];
 
   // Aura / tempo — deterministic within a comfortable range
-  const aura = 0.35 + ((seed >> 2) % 100) / 100 * 0.45;   // 0.35 – 0.80
-  const tempo = 0.7 + ((seed >> 9) % 100) / 100 * 0.8;    // 0.70 – 1.50
+  const aura = 0.35 + ((seed >>> 2) % 100) / 100 * 0.45;   // 0.35 – 0.80
+  const tempo = 0.7 + ((seed >>> 9) % 100) / 100 * 0.8;    // 0.70 – 1.50
 
   return {
     voice: base.voice,

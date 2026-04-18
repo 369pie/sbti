@@ -611,6 +611,10 @@ to authenticated
 using (auth.uid() = actor_user_id or auth.uid() = subject_user_id)
 with check (auth.uid() = actor_user_id or auth.uid() = subject_user_id);
 
+revoke all on table public.identify_assessments from public, anon, authenticated;
+grant select, update on table public.identify_assessments to authenticated;
+grant select, insert, update, delete on table public.identify_assessments to service_role;
+
 drop policy if exists "cpti_profile_snapshots_select_own" on public.cpti_profile_snapshots;
 create policy "cpti_profile_snapshots_select_own"
 on public.cpti_profile_snapshots

@@ -61,6 +61,8 @@ const RELATIONSHIP_ITEMS = [
 const DISCOVER_ITEMS = [
   { href: '/card/', label: 'WTF Card', emoji: '🃏', desc: '你的多宇宙人格档案' },
   { href: '/mysti/', label: '灵鉴 Mysti', emoji: '🔮', desc: '塔罗 × 人格牌' },
+  { href: '/mysti/gift/', label: '灵魂礼物', emoji: '🎁', desc: '送 TA 一份灵魂内容' },
+  { href: '/mysti/subscribe/', label: '灵魂通行证', emoji: '🎟️', desc: '¥19/月 全权益' },
   { href: '/types/', label: '人设图鉴', emoji: '📖', desc: '全部人格类型一览' },
   { href: '/combo/', label: '人格拼盘', emoji: '🧩', desc: 'SBTI × MBTI × 星座' },
   { href: '/share-templates/', label: '小红书文案', emoji: '📕', desc: '现成分享模板' },

@@ -24,8 +24,8 @@ const SCALE = 2;
 const FONT_SANS = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 const FONT_MONO = '"SF Mono", "Roboto Mono", ui-monospace, monospace';
 
-const DARK = '#2D2A26';
-const MED = '#6B6560';
+const DARK = '#1F1A16';
+const MED = '#5B524B';
 
 const imageCache = new Map<string, Promise<HTMLImageElement>>();
 

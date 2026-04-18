@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -13,7 +15,10 @@ import {
 } from '@/lib/first-look/archetypes';
 import { loadFirstLookResult } from '@/lib/first-look/session';
 import { trackFirstLook } from '@/lib/first-look/analytics';
-import { FirstLookShareImageGenerator } from '@/components/FirstLookShareImageGenerator';
+const FirstLookShareImageGenerator = dynamic(
+  () => import('@/components/FirstLookShareImageGenerator').then((m) => m.FirstLookShareImageGenerator),
+  { ssr: false },
+);
 import type { FirstLookShareImageGeneratorHandle } from '@/components/FirstLookShareImageGenerator';
 import { getLiveUniverses } from '@/lib/universes';
 import { withBasePath } from '@/lib/site';

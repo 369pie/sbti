@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { recordSimulatedPurchase } from '@/lib/ugc/earnings';
 
@@ -16,6 +17,7 @@ type Params = { params: Promise<{ id: string }> };
 export async function POST(request: Request, { params }: Params) {
   const { id: universeId } = await params;
   const supabase = await createServerSupabaseClient();
+  const adminSupabase = createAdminSupabaseClient();
 
   // Load universe (public, no auth needed for purchase)
   const { data: universe } = await supabase
@@ -48,7 +50,7 @@ export async function POST(request: Request, { params }: Params) {
   // Get buyer user (optional — anonymous purchases allowed)
   const { data: { user } } = await supabase.auth.getUser();
 
-  const order = await recordSimulatedPurchase(supabase, {
+  const order = await recordSimulatedPurchase(adminSupabase, {
     universeId,
     creatorId: creator.id as string,
     creatorTier: creator.tier as string,

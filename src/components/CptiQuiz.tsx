@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
-
-import { motion, AnimatePresence } from 'framer-motion';
 import { CPTI_QUESTIONS, CPTI_DEFAULT_OPTIONS, shuffleCptiQuestions } from '@/lib/cpti/questions';
 import type { CptiAnswerOption } from '@/lib/cpti/questions';
 import { CPTI_PEER_QUESTIONS, shuffleCptiPeerQuestions } from '@/lib/cpti/peer-questions';
@@ -17,6 +15,10 @@ import { CPTI_MODEL_NAMES, CPTI_MODEL_COLORS } from '@/lib/cpti/dimensions';
 import { basePath } from '@/lib/site';
 import { recordUniverseResult, recordRelationship } from '@/lib/wtf-card';
 import { cptiApi } from '@/lib/cpti/cpti-api';
+import { QuizShell, QuestionTitle, QuizOptions, QuizOption } from '@/components/QuizShell';
+
+/** CPTI 主调：枯玫瑰，与品牌 rose 同根。 */
+const CPTI_ACCENT = 'var(--color-rose-deep)';
 
 const emptySubscribe = () => () => {};
 
@@ -76,7 +78,6 @@ export function CptiQuiz({
   const currentQ = questions[currentIndex];
   const currentQuestionId = currentQ?.id ?? null;
   const total = questions.length;
-  const progress = ((currentIndex) / total) * 100;
 
   const modelColor = currentQ ? CPTI_MODEL_COLORS[currentQ.model] : CPTI_MODEL_COLORS.power;
 
@@ -358,160 +359,70 @@ export function CptiQuiz({
   // ── Phase: Quiz (answering questions) ──
   if (!currentQ) {
     return (
-      <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center">
-        <div className="w-5 h-5 rounded-full border-2 border-accent border-t-transparent animate-spin" />
+      <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center" style={{ background: 'var(--color-paper)' }}>
+        <div className="w-5 h-5 rounded-full border-2 animate-spin" style={{ borderColor: 'var(--color-rose-deep)', borderTopColor: 'transparent' }} />
       </div>
     );
   }
 
-  return (
-    <div className="min-h-[calc(100vh-3.5rem)] flex flex-col">
-      {/* Mode banners */}
-      {isPeerMode && inviteData && (
-        <div className="bg-rose-500/5 border-b border-rose-500/10 px-6 py-3 text-center">
-          <p className="text-sm text-rose-400">
-            💌 {inviteData.nickname || '对方'}想知道你们是什么关系 · 请以观察者视角回答
-          </p>
-        </div>
-      )}
-      {isStealthMode && (
-        <div className="bg-purple-500/5 border-b border-purple-500/10 px-6 py-3 text-center">
-          <p className="text-sm text-purple-400">
-            🔮 偷偷测CP感 · 根据你对{targetNickname || 'TA'}的了解来回答
-          </p>
-        </div>
-      )}
+  const dimensionLabel = CPTI_MODEL_NAMES[currentQ.model];
+  const accent = modelColor.base ?? CPTI_ACCENT;
+  const eyebrow = isPeerMode ? 'CPTI · Peer' : isStealthMode ? 'CPTI · Stealth' : 'CPTI · Couple';
+  const finishingLabel = (isPeerMode || isStealthMode) ? '正在生成你们的关系类型' : '正在生成你的 CP 角色';
 
-      {/* Progress */}
-      <div className="px-6 pt-6 pb-2 max-w-2xl mx-auto w-full">
-        <div className="flex items-center justify-between text-xs text-text-muted mb-3">
-          <span className="font-mono tracking-wider">
-            {currentIndex + 1} / {total}
-          </span>
-          <span style={{ color: modelColor.base }}>
-            {CPTI_MODEL_NAMES[currentQ.model]}
-          </span>
-        </div>
-
-        <div className="h-[3px] bg-border-subtle rounded-full overflow-hidden">
-          <motion.div
-            className="h-full rounded-full"
-            style={{ background: `linear-gradient(90deg, ${modelColor.base}, ${modelColor.light})` }}
-            initial={false}
-            animate={{ width: `${Math.min(progress, 100)}%` }}
-            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-          />
-        </div>
+  // Mode banner — kept above QuizShell so progress bar stays the first thing in view
+  const banner = isPeerMode && inviteData ? (
+    <div className="px-6 pt-3 max-w-2xl mx-auto w-full">
+      <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-2.5 text-center">
+        <p className="text-xs sm:text-sm" style={{ color: 'var(--color-rose-deep)' }}>
+          💌 {inviteData.nickname || '对方'}想知道你们是什么关系 · 请以观察者视角回答
+        </p>
       </div>
-
-      {/* Question area */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-12">
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.div
-            key={currentQ.id}
-            custom={direction}
-            initial={{ opacity: 0, x: direction * 60, filter: 'blur(4px)' }}
-            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, x: direction * -60, filter: 'blur(4px)' }}
-            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-            className="w-full max-w-2xl"
-          >
-            {/* Dimension badge */}
-            <div className="flex justify-center mb-8">
-              <span
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono tracking-wider"
-                style={{
-                  background: modelColor.bg,
-                  color: modelColor.base,
-                  border: `1px solid ${modelColor.bg}`,
-                }}
-              >
-                {currentQ.dimension}
-              </span>
-            </div>
-
-            {/* Question text */}
-            <h2 className="text-2xl sm:text-3xl font-medium text-center leading-relaxed tracking-tight mb-12">
-              {currentQ.text}
-            </h2>
-
-            {/* Answer buttons */}
-            <div className="flex flex-col gap-3 max-w-md mx-auto">
-              {(currentQ.options ?? CPTI_DEFAULT_OPTIONS).map((opt: CptiAnswerOption) => {
-                const selected = answers.get(currentQ.id) === opt.value;
-                return (
-                  <motion.button
-                    key={opt.key}
-                    onClick={() => handleAnswer(currentQ.id, opt.value as Answer)}
-                    disabled={isFinishing}
-                    whileTap={{ scale: 0.98 }}
-                    className={`group relative w-full py-4 px-6 rounded-xl text-left transition-all duration-200 cursor-pointer ${
-                      selected
-                        ? 'bg-bg-elevated border-2 shadow-sm'
-                        : 'bg-bg-elevated border border-border-subtle hover:border-border hover:shadow-sm'
-                    } disabled:cursor-not-allowed disabled:opacity-80`}
-                    style={selected ? { borderColor: modelColor.base } : undefined}
-                  >
-                    <div className="flex items-center gap-4">
-                      <span
-                        className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-mono transition-colors"
-                        style={
-                          selected
-                            ? { background: modelColor.base, color: '#FFFFFF' }
-                            : { background: '#EDE8E2', color: '#9C9590' }
-                        }
-                      >
-                        {opt.key}
-                      </span>
-                      <span className={`text-base ${selected ? 'text-text-primary' : 'text-text-secondary group-hover:text-text-primary'} transition-colors`}>
-                        {opt.label}
-                      </span>
-                    </div>
-                    {selected && (
-                      <motion.div
-                        layoutId="cpti-selected-ring"
-                        className="absolute inset-0 rounded-2xl"
-                        style={{ boxShadow: `0 0 12px ${modelColor.bg}` }}
-                        transition={{ duration: 0.2 }}
-                      />
-                    )}
-                  </motion.button>
-                );
-              })}
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Navigation */}
-        <div className="mt-8 flex items-center gap-4">
-          {currentIndex > 0 && (
-            <button
-              onClick={handleBack}
-              className="text-sm text-text-muted hover:text-text-secondary transition-colors px-4 py-2 cursor-pointer"
-            >
-              ← 上一题
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Finishing overlay */}
-      <AnimatePresence>
-        {isFinishing && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 z-50 bg-bg-primary flex items-center justify-center"
-          >
-            <div className="text-center">
-              <div className="w-8 h-8 border-2 border-rose-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-text-muted text-sm">
-                {(isPeerMode || isStealthMode) ? '正在生成你们的关系类型…' : '正在生成你的CP角色…'}
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
+  ) : isStealthMode ? (
+    <div className="px-6 pt-3 max-w-2xl mx-auto w-full">
+      <div className="rounded-md border px-4 py-2.5 text-center" style={{ borderColor: '#E5DDF1', background: '#F6F1FB' }}>
+        <p className="text-xs sm:text-sm" style={{ color: '#6B4796' }}>
+          🔮 偷偷测 CP 感 · 根据你对{targetNickname || 'TA'}的了解来回答
+        </p>
+      </div>
+    </div>
+  ) : null;
+
+  return (
+    <>
+      {banner}
+      <QuizShell
+        currentIndex={currentIndex}
+        total={total}
+        direction={direction as 1 | -1}
+        onBack={handleBack}
+        accent={accent}
+        eyebrow={eyebrow}
+        dimensionLabel={dimensionLabel}
+        footerLabel="WTFti · CPTI · 关系类型图鉴"
+        finishing={isFinishing}
+        finishingLabel={finishingLabel}
+      >
+        <QuestionTitle>{currentQ.text}</QuestionTitle>
+
+        <QuizOptions>
+          {(currentQ.options ?? CPTI_DEFAULT_OPTIONS).map((opt: CptiAnswerOption) => {
+            const selected = answers.get(currentQ.id) === opt.value;
+            return (
+              <QuizOption
+                key={opt.key}
+                marker={opt.key}
+                label={opt.label}
+                selected={selected}
+                disabled={isFinishing}
+                accent={accent}
+                onSelect={() => handleAnswer(currentQ.id, opt.value as Answer)}
+              />
+            );
+          })}
+        </QuizOptions>
+      </QuizShell>
+    </>
   );
 }

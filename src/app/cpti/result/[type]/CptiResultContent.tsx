@@ -1,9 +1,14 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
-import { CptiShareImageGenerator } from '@/components/CptiShareImageGenerator';
+const CptiShareImageGenerator = dynamic(
+  () => import('@/components/CptiShareImageGenerator').then((m) => m.CptiShareImageGenerator),
+  { ssr: false },
+);
 import type { CptiShareImageGeneratorHandle } from '@/components/CptiShareImageGenerator';
 import { CPTI_DIMENSIONS, CPTI_MODEL_NAMES, CPTI_MODEL_COLORS } from '@/lib/cpti/dimensions';
 import {
@@ -129,9 +134,13 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border-subtle bg-bg-secondary/60 text-xs text-text-muted mb-6">
-              CP角色鉴定结果
+            {/* Eyebrow */}
+            <div className="inline-flex items-center gap-2 mb-6 max-w-[70%] sm:max-w-none">
+              <span className="block h-px w-6" style={{ background: personality.color, opacity: 0.5 }} aria-hidden />
+              <span className="text-[10px] tracking-[0.4em] uppercase text-text-muted whitespace-nowrap">
+                CPTI · Result
+              </span>
+              <span className="block h-px w-6" style={{ background: personality.color, opacity: 0.5 }} aria-hidden />
             </div>
 
             {/* Hero image */}
@@ -147,7 +156,7 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
               </div>
             ) : (
               <div
-                className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mx-auto mb-8 rounded-[2rem] overflow-hidden flex items-center justify-center"
+                className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 mx-auto mb-8 rounded-[2rem] overflow-hidden flex items-center justify-center"
                 style={{
                   background: `linear-gradient(135deg, ${personality.color}08 0%, ${personality.color}1a 100%)`,
                   boxShadow: `0 24px 80px -24px ${personality.color}45, inset 0 0 0 1px ${personality.color}20`,
@@ -167,18 +176,26 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
               </div>
             )}
 
-            {/* Code */}
-            <div
-              className="text-sm font-mono tracking-[0.3em] uppercase mb-2"
-              style={{ color: personality.color }}
-            >
-              {personality.code}
+            {/* Code (editorial serial) */}
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <span
+                className="font-mono text-xs tracking-[0.42em] uppercase"
+                style={{ color: personality.color }}
+              >
+                {personality.code}
+              </span>
             </div>
 
-            {/* Name */}
-            <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mb-4">
+            {/* Name (editorial display serif) */}
+            <h1
+              className="text-4xl sm:text-5xl md:text-6xl tracking-tight mb-4 leading-[1.05]"
+              style={{ fontFamily: 'var(--font-display)', fontWeight: 500, color: 'var(--color-ink)' }}
+            >
               {personality.name}
             </h1>
+
+            {/* Editorial rule */}
+            <div className="mx-auto mb-5 h-px w-12" style={{ background: personality.color, opacity: 0.5 }} aria-hidden />
 
             {/* Rarity + population badge */}
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -195,8 +212,11 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
               </span>
             </div>
 
-            {/* Tagline */}
-            <p className="text-xl text-text-secondary max-w-md mx-auto">
+            {/* Tagline (editorial italic) */}
+            <p
+              className="text-xl text-text-secondary max-w-md mx-auto"
+              style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontWeight: 400 }}
+            >
               {personality.tagline}
             </p>
           </motion.div>

@@ -31,6 +31,33 @@ type DimensionBarsComponentType = typeof import('@/components/DimensionChart')['
 type ShareImageGeneratorComponentType = typeof import('@/components/ShareImageGenerator')['ShareImageGenerator'];
 
 const emptySubscribe = () => () => {};
+const SKIN_QUERY_CHANGE_EVENT = 'sbti:skin-query-change';
+
+function subscribeToSkinQuery(onStoreChange: () => void): () => void {
+  if (typeof window === 'undefined') {
+    return () => {};
+  }
+
+  window.addEventListener('popstate', onStoreChange);
+  window.addEventListener(SKIN_QUERY_CHANGE_EVENT, onStoreChange);
+
+  return () => {
+    window.removeEventListener('popstate', onStoreChange);
+    window.removeEventListener(SKIN_QUERY_CHANGE_EVENT, onStoreChange);
+  };
+}
+
+function getSkinQuerySnapshot(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  return new URLSearchParams(window.location.search).get('skin') === 'xiuxian';
+}
+
+function getSkinQueryServerSnapshot(): boolean {
+  return false;
+}
 
 interface Props {
   personality: PersonalityType;
@@ -40,6 +67,7 @@ interface Props {
 export function ResultContent({ personality, dimensionScores }: Props) {
   const isLaunchOnly = Boolean(personality.isLaunchOnly);
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const hasXiuxianQuery = useSyncExternalStore(subscribeToSkinQuery, getSkinQuerySnapshot, getSkinQueryServerSnapshot);
   const [copied, setCopied] = useState(false);
   const [cpCopied, setCpCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
@@ -49,13 +77,6 @@ export function ResultContent({ personality, dimensionScores }: Props) {
   const [DimensionBarsComponent, setDimensionBarsComponent] = useState<DimensionBarsComponentType | null>(null);
   const [ShareImageGeneratorComponent, setShareImageGeneratorComponent] = useState<ShareImageGeneratorComponentType | null>(null);
   const [pendingShareGeneration, setPendingShareGeneration] = useState(false);
-  const [isXiuxian, setIsXiuxian] = useState(() => {
-    if (typeof window === 'undefined') {
-      return isLaunchOnly;
-    }
-    const querySkin = new URLSearchParams(window.location.search).get('skin') === 'xiuxian';
-    return querySkin || isLaunchOnly;
-  });
   const shareRef = useRef<ShareImageGeneratorHandle>(null);
   const chartSectionRef = useRef<HTMLElement | null>(null);
   const shareSectionRef = useRef<HTMLElement | null>(null);
@@ -67,8 +88,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
       return;
     }
 
-    const next = !isXiuxian;
-    setIsXiuxian(next);
+    const next = !hasXiuxianQuery;
     const url = new URL(window.location.href);
     if (next) {
       url.searchParams.set('skin', 'xiuxian');
@@ -76,9 +96,10 @@ export function ResultContent({ personality, dimensionScores }: Props) {
       url.searchParams.delete('skin');
     }
     window.history.replaceState({}, '', url.toString());
-  }, [isLaunchOnly, isXiuxian]);
+    window.dispatchEvent(new Event(SKIN_QUERY_CHANGE_EVENT));
+  }, [hasXiuxianQuery, isLaunchOnly]);
 
-  const showXiuxian = isXiuxian || isLaunchOnly;
+  const showXiuxian = hasXiuxianQuery || isLaunchOnly;
   const xiuxianSkin = showXiuxian ? getXiuxianSkin(personality.slug) : undefined;
   const displayColor = xiuxianSkin?.color ?? personality.color;
   const displayName = xiuxianSkin?.displayName ?? personality.name;
@@ -564,7 +585,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
                 ref={shareRef}
                 personality={personality}
                 dimensionScores={activeDimensionScores}
-                isXiuxian={isXiuxian}
+                isXiuxian={showXiuxian}
               />
             ) : (
               <div className="flex items-center justify-center gap-2 rounded-xl border border-border-subtle bg-bg-elevated px-4 py-3.5 text-sm text-text-muted">
@@ -597,7 +618,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
                 快速分享
               </button>
               <Link
-                href={isXiuxian ? '/test?skin=xiuxian' : '/test'}
+                href={showXiuxian ? '/test?skin=xiuxian' : '/test'}
                 className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all text-center"
               >
                 重新测试
@@ -609,7 +630,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
 
       {/* Cross-universe exploration */}
       <section className="max-w-3xl mx-auto px-6 pb-8">
-        <UniverseResultBar slug={personality.slug} current={isXiuxian ? 'xiuxian' : 'standard'} />
+        <UniverseResultBar slug={personality.slug} current={showXiuxian ? 'xiuxian' : 'standard'} />
       </section>
 
       <FollowMeCard />
@@ -654,7 +675,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
         </div>
         <div className="mt-6 text-center">
           <Link href={`/types${skinQuery}`} className="text-sm text-text-muted hover:text-accent transition-colors">
-            查看全部 {isXiuxian ? xiuxianGalleryCount : PERSONALITY_TYPES.length} 种 →
+            查看全部 {showXiuxian ? xiuxianGalleryCount : PERSONALITY_TYPES.length} 种 →
           </Link>
         </div>
       </section>

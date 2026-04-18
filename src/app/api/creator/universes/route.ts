@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { getStarterTemplate, seedUniverseFromStarterTemplate } from '@/lib/ugc/starter-templates';
 
-/** GET /api/creator/universes — list my universes */
-export async function GET() {
+/** GET /api/creator/universes — list my universes (paginated) */
+export async function GET(request: Request) {
   const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -21,13 +21,30 @@ export async function GET() {
     return NextResponse.json({ error: 'Creator not found' }, { status: 404 });
   }
 
+  const url = new URL(request.url);
+  const limit = Math.min(
+    Math.max(parseInt(url.searchParams.get('limit') ?? '50', 10) || 50, 1),
+    100,
+  );
+  const offset = Math.max(
+    parseInt(url.searchParams.get('offset') ?? '0', 10) || 0,
+    0,
+  );
+
   const { data: universes } = await supabase
     .from('creator_universes')
     .select('*')
     .eq('creator_id', creator.id)
-    .order('updated_at', { ascending: false });
+    .order('updated_at', { ascending: false })
+    .range(offset, offset + limit - 1);
 
-  return NextResponse.json({ universes: universes ?? [] });
+  return NextResponse.json(
+    {
+      universes: universes ?? [],
+      pagination: { limit, offset, count: universes?.length ?? 0 },
+    },
+    { headers: { 'Cache-Control': 'private, max-age=10' } },
+  );
 }
 
 /** POST /api/creator/universes — create a universe */

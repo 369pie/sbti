@@ -142,11 +142,11 @@ async function renderIdentifyShareImage(
   dimensionScores: IdentifyDimensionScore[],
   friendName: string,
 ) {
-  const BG = '#FFF5F7';          // pink-tinted cream
-  const DARK = '#2d2236';
-  const MED = '#6b6380';
-  const LIGHT = '#A8A0B0';
-  const DIV = '#f0dde4';
+  const BG = '#FAF8F5';          // pink-tinted cream
+  const DARK = '#1F1A16';
+  const MED = '#5B524B';
+  const LIGHT = '#9A908A';
+  const DIV = '#E3DCD1';
   const ACCENT = '#ec4899';      // pink accent
 
   const displayName = friendName || 'ta';

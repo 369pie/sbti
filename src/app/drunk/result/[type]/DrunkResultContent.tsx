@@ -1,12 +1,17 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { DRUNK_DIMENSIONS, DRUNK_MODEL_NAMES, DRUNK_MODEL_COLORS } from '@/lib/drunk/dimensions';
 import { DRUNK_PERSONA_TYPES } from '@/lib/drunk/personas';
 import type { DrunkPersonaType } from '@/lib/drunk/personas';
 import type { DrunkDimensionScore } from '@/lib/drunk/scoring';
-import { DrunkShareImageGenerator } from '@/components/DrunkShareImageGenerator';
+const DrunkShareImageGenerator = dynamic(
+  () => import('@/components/DrunkShareImageGenerator').then((m) => m.DrunkShareImageGenerator),
+  { ssr: false },
+);
 import type { DrunkShareImageGeneratorHandle } from '@/components/DrunkShareImageGenerator';
 import { DrunkPersonaAvatar } from '@/components/DrunkPersonaAvatar';
 import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from 'react';

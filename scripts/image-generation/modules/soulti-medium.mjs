@@ -1,118 +1,205 @@
-// ─── SoulTI · 32 自然原型 medium 图鉴 ───
-// 「以万物为镜」—— 32 个自然/矿物/植物原型，对应 Editorial Atelier 老钱米品牌
-// 纯 text2img 模式（低价渠道），输出到 public/images/types/soulti/medium/{slug}.png
-// 由 src/lib/soulti/personalities.ts 的 getSoultiTypeMediumImage 直接消费
+/**
+ * SoulTI · 32 自然原型 medium 图鉴（古籍博物笔记风）
+ *
+ * 视觉 DNA：与 mysti-tarot v2 同源（manuscript 古籍），但形态是「自然标本图鉴」：
+ *  - 米黄羊皮纸底 + 纸纹 + 少量做旧斑点
+ *  - 主体：自然意象本体（涌泉/冰川/萤火…），手绘 + 上色，饱和度上半档
+ *  - 周围漂浮 2-3 个象征小物，每个配手写英文标签
+ *  - 顶部：编号牌（#01/#02 …）+ 中英文双标（SPRING · 涌泉）
+ *  - 底部：tagline 短句卡（中文 tagline）
+ *  - 边角：手写小注释、装饰花纹边框
+ *  - 不带塔罗罗马数字（自然图鉴 ≠ 塔罗）
+ *
+ * 输出: public/images/types/soulti/medium/{slug}.png
+ *
+ * 跑法（低价渠道）:
+ *   RUNNINGHUB_TEXT2IMG_ENDPOINT=/rhart-image-n-g31-flash/text-to-image \
+ *     node scripts/generate-type-images.mjs soulti-medium
+ */
 
-const SOULTI_STYLE_SUFFIX =
-  '一张高级感人格图鉴方形封面，构图居中、单一主体、留白克制。' +
-  '老钱米色信纸底（cream paper #FAF8F5 → #F2ECE4 自然渐变），' +
-  '主体使用编辑画报式（editorial illustration）+ 微观自然摄影感的混合质感：' +
-  '材质真实可触（水珠/冰晶/矿石/植物纤维/苔藓/树皮纹理等真实质地），' +
-  '光线柔和、带一点博物馆冷光，主体边缘点缀极少量金箔点（gold leaf #C9A676）作为奢华注脚。' +
-  '配色以该原型自身固有色为主，玫瑰陶土 (#C07A8E) 与金箔 (#C9A676) 仅作微小装饰口音。' +
-  '整体气质：克制、内向、灵性、像 Aesop / Le Labo / 故宫文创 联合出品的人格图鉴。' +
-  '纯净背景无文字、无标签、无水印、无 UI 元素、无人脸、无品牌 logo。' +
-  '—— negative prompt: text, typography, letters, words, Chinese characters, English, numbers, caption, label, watermark, logo, ' +
-  'human face, multiple subjects, busy background, neon, cyberpunk, anime cell-shading, low-poly, paper craft, kitsch, oversaturated, vaporwave.';
+const STYLE_BASE =
+  'medieval botanical encyclopedia plate, illuminated manuscript style natural specimen illustration, ' +
+  'aged parchment cream background with subtle paper grain, ink spots and faint stains, ' +
+  'fine ink line drawing combined with painted color washes, ' +
+  'rich saturated palette with vintage botanical encyclopedia warmth, ' +
+  'hand-drawn ornamental border frame with delicate corner motifs, ' +
+  'in the style of Codex Seraphinianus meets Audubon nature plates, ' +
+  'museum-quality square 1:1 composition';
 
-function soulti(slug, name, color, conceptZh) {
-  return {
-    slug,
-    prompt:
-      `一个名为「${name}」的自然原型人格图鉴。主色调 ${color}。${conceptZh}` +
-      SOULTI_STYLE_SUFFIX,
-  };
+const TEXT_INSTRUCTION = (number, enName, zhName, tagline) =>
+  `top center inside an oval cartouche: catalog number "${number}" rendered crisp in elegant serif. ` +
+  `directly below the cartouche: bilingual title "${enName} · ${zhName}" rendered crisp in clean serif. ` +
+  `bottom center inside a small ribbon banner: Chinese tagline "${tagline}" rendered crisp. ` +
+  `additional tiny handwritten labels in fine cursive next to each symbolic item. ` +
+  `small illegible scribble notes in side margins for atmosphere. ` +
+  `make ALL text sharp and readable, no garbled characters`;
+
+function buildPrompt({ number, enName, zhName, tagline, subject, symbols, accent }) {
+  const symbolList = symbols
+    .map((s) => `a small ${s.icon} labeled "${s.label}"`)
+    .join(', ');
+  return [
+    STYLE_BASE + '.',
+    `central subject: ${subject}.`,
+    `surrounding the subject, floating: ${symbolList}.`,
+    `accent color: ${accent}.`,
+    TEXT_INSTRUCTION(number, enName, zhName, tagline) + '.',
+    'no other large text, no watermark, no logo.',
+  ].join(' ');
 }
 
-const soultiMediumModule = {
-  displayName: 'SoulTI · 32 自然原型 medium 图鉴',
+// ─────────────────── 32 自然原型 ───────────────────
+const SOULTI_DATA = [
+  { slug: 'spring', n: '#01', en: 'SPRING', zh: '涌泉', tag: '涌向世界，也涌出新的自己',
+    subject: 'a clear spring of water bubbling up from a moss-covered stone basin, fresh droplets catching light, gentle ripples spreading outward',
+    symbols: [{ icon: 'water droplet', label: 'DROP' }, { icon: 'fern frond', label: 'FERN' }, { icon: 'small fish', label: 'KOI' }],
+    accent: 'fresh emerald green and silvery turquoise' },
+  { slug: 'glacier', n: '#02', en: 'GLACIER', zh: '冰川', tag: '涌向世界，然后凝固成山',
+    subject: 'a massive cracked blue glacier rising from dark sea, internal cyan light glowing from deep crevasses, floating ice fragments below',
+    symbols: [{ icon: 'snowflake', label: 'SNOW' }, { icon: 'fossilized shell', label: 'AGE' }, { icon: 'compass', label: 'NORTH' }],
+    accent: 'arctic ice blue and pale silver' },
+  { slug: 'firefly', n: '#03', en: 'FIREFLY', zh: '萤火', tag: '明灭之间，长出了新的光',
+    subject: 'a single firefly suspended in midair on a deep blue summer night, bioluminescent abdomen glowing warm gold, delicate translucent wings',
+    symbols: [{ icon: 'candle flame', label: 'FLAME' }, { icon: 'lotus leaf', label: 'LEAF' }, { icon: 'tiny lantern', label: 'LIGHT' }],
+    accent: 'warm gold and deep night indigo' },
+  { slug: 'amber', n: '#04', en: 'AMBER', zh: '琥珀', tag: '明灭之间，凝固了最好的瞬间',
+    subject: 'a translucent honey-amber teardrop containing a perfectly preserved ancient insect with detailed wings, light shining through from behind',
+    symbols: [{ icon: 'pine resin drip', label: 'RESIN' }, { icon: 'fossil leaf', label: 'FOSSIL' }, { icon: 'hourglass', label: 'TIME' }],
+    accent: 'rich honey gold and warm caramel' },
+  { slug: 'sprout', n: '#05', en: 'SPROUT', zh: '新芽', tag: '温柔地切开，然后长出来',
+    subject: 'a tender green sprout pushing through a crack in dark soil, two delicate cotyledons unfurling, single dewdrop on the leaf tip',
+    symbols: [{ icon: 'seed', label: 'SEED' }, { icon: 'cracked shell', label: 'BREAK' }, { icon: 'sun ray', label: 'LIGHT' }],
+    accent: 'tender spring green and warm earth brown' },
+  { slug: 'obsidian', n: '#06', en: 'OBSIDIAN', zh: '黑曜石', tag: '温柔地切开，然后变得更锋利',
+    subject: 'a polished obsidian arrowhead with razor-sharp edges, mirror-black surface reflecting starlight, resting on dark velvet',
+    symbols: [{ icon: 'volcano cone', label: 'VOLCANO' }, { icon: 'arrowhead', label: 'BLADE' }, { icon: 'black mirror', label: 'MIRROR' }],
+    accent: 'deep obsidian black and metallic silver gleam' },
+  { slug: 'rainbow', n: '#07', en: 'RAINBOW', zh: '虹', tag: '折射了所有光，然后长出自己的颜色',
+    subject: 'a vivid rainbow arc rising from misty hills, each color band richly saturated, gentle rain drizzling on one side with sun on the other',
+    symbols: [{ icon: 'water prism', label: 'PRISM' }, { icon: 'cloud', label: 'CLOUD' }, { icon: 'rain droplet', label: 'RAIN' }],
+    accent: 'full spectrum chromatic with cream parchment' },
+  { slug: 'geode', n: '#08', en: 'GEODE', zh: '晶洞', tag: '折射了所有光，然后在暗处结晶',
+    subject: 'a cracked-open geode revealing a cavern of brilliant amethyst purple crystals inside dull rocky exterior, internal glow visible',
+    symbols: [{ icon: 'pickaxe', label: 'PICKAXE' }, { icon: 'crystal cluster', label: 'CRYSTAL' }, { icon: 'eye', label: 'INNER' }],
+    accent: 'deep amethyst purple and warm rock ochre' },
+  { slug: 'dandelion', n: '#09', en: 'DANDELION', zh: '蒲公英', tag: '你的飞翔会在某处生根',
+    subject: 'a dandelion clock mid-puff, dozens of tiny seed parachutes drifting away on a soft breeze, single bare stem remaining',
+    symbols: [{ icon: 'wind swirl', label: 'WIND' }, { icon: 'seed parachute', label: 'SEED' }, { icon: 'compass rose', label: 'DRIFT' }],
+    accent: 'warm cream white and golden meadow' },
+  { slug: 'fossil', n: '#10', en: 'FOSSIL', zh: '化石', tag: '你的飞翔凝固成永恒的印记',
+    subject: 'a perfectly preserved ammonite spiral fossil embedded in a slab of cream sandstone, fine geometric ridges catching shadow',
+    symbols: [{ icon: 'magnifying glass', label: 'STUDY' }, { icon: 'feather imprint', label: 'IMPRINT' }, { icon: 'hourglass', label: 'AGE' }],
+    accent: 'warm sandstone beige and deep umber' },
+  { slug: 'dew', n: '#11', en: 'DEW', zh: '露', tag: '你在，但你选择化开',
+    subject: 'a single perfect spherical dewdrop balanced on the edge of a curved green leaf, refracting the entire morning landscape inside it',
+    symbols: [{ icon: 'morning sun', label: 'DAWN' }, { icon: 'spider web strand', label: 'WEB' }, { icon: 'small petal', label: 'PETAL' }],
+    accent: 'pale dawn pink and crystal clear' },
+  { slug: 'frost', n: '#12', en: 'FROST', zh: '霜', tag: '你在，但你选择凝住',
+    subject: 'intricate fractal frost crystals spreading across a window pane, geometric ice patterns radiating from a central point',
+    symbols: [{ icon: 'snowflake', label: 'CRYSTAL' }, { icon: 'pine needle', label: 'PINE' }, { icon: 'still moon', label: 'MOON' }],
+    accent: 'icy white and pale steel blue' },
+  { slug: 'coral', n: '#13', en: 'CORAL', zh: '珊瑚', tag: '你只为自己抛锚，然后长成礁石',
+    subject: 'a vibrant coral reef cluster in jewel-tone pink and orange, growing on an underwater rock with small fish darting around',
+    symbols: [{ icon: 'sea anchor', label: 'ANCHOR' }, { icon: 'starfish', label: 'STAR' }, { icon: 'pearl shell', label: 'SHELL' }],
+    accent: 'coral pink and deep sea teal' },
+  { slug: 'stalactite', n: '#14', en: 'STALACTITE', zh: '钟乳石', tag: '你只为自己抛锚，然后凝成洞穴',
+    subject: 'long pointed stalactites hanging from a dark cavern ceiling, mineral water droplets forming at their tips, soft inner glow',
+    symbols: [{ icon: 'water droplet', label: 'DROP' }, { icon: 'cave bat', label: 'BAT' }, { icon: 'glowing crystal', label: 'GLOW' }],
+    accent: 'mineral cream and deep cavern bronze' },
+  { slug: 'mountainspring', n: '#15', en: 'MOUNTAIN SPRING', zh: '山泉', tag: '空旷的山谷里，你长出了水声',
+    subject: 'a clear mountain spring cascading down mossy rocks in an empty pine valley, gentle white foam, single deer drinking from below',
+    symbols: [{ icon: 'pine tree', label: 'PINE' }, { icon: 'stone', label: 'ROCK' }, { icon: 'crane bird', label: 'CRANE' }],
+    accent: 'fresh moss green and clear stream silver' },
+  { slug: 'vein', n: '#16', en: 'VEIN', zh: '矿脉', tag: '空旷的山谷里，你凝固成了地层',
+    subject: 'a cross-section view of underground rock strata revealing veins of glittering gold ore running through dark stone',
+    symbols: [{ icon: 'gold nugget', label: 'GOLD' }, { icon: 'pickaxe', label: 'MINE' }, { icon: 'pendulum', label: 'DOWSE' }],
+    accent: 'metallic gold and deep stone gray' },
+  { slug: 'mycelium', n: '#17', en: 'MYCELIUM', zh: '菌丝', tag: '你在看不见的地方连接一切',
+    subject: 'a network of glowing white mycelium threads spreading through dark forest soil beneath a single mushroom cap visible above',
+    symbols: [{ icon: 'mushroom cap', label: 'FRUIT' }, { icon: 'tree root', label: 'ROOT' }, { icon: 'web node', label: 'NETWORK' }],
+    accent: 'glowing pearl white and deep forest brown' },
+  { slug: 'rings', n: '#18', en: 'RINGS', zh: '树轮', tag: '你在看不见的地方记录一切',
+    subject: 'a clean cross-section of an ancient tree trunk revealing concentric growth rings, each ring meticulously rendered with subtle color variation',
+    symbols: [{ icon: 'measuring caliper', label: 'MEASURE' }, { icon: 'pencil', label: 'RECORD' }, { icon: 'oak leaf', label: 'LEAF' }],
+    accent: 'warm wood brown and aged amber' },
+  { slug: 'bamboo', n: '#19', en: 'BAMBOO SHOOT', zh: '竹笋', tag: '还没发芽，但已经准备好爆发',
+    subject: 'a young bamboo shoot pushing up powerfully through dark earth, segmented form already strong, surrounded by mature bamboo grove silhouettes',
+    symbols: [{ icon: 'bamboo node', label: 'NODE' }, { icon: 'panda paw print', label: 'TRACK' }, { icon: 'ink brush', label: 'BRUSH' }],
+    accent: 'bright bamboo green and warm earth' },
+  { slug: 'pearl', n: '#20', en: 'PEARL', zh: '珍珠', tag: '还没发芽，但已经在暗处凝成宝石',
+    subject: 'a single luminous pearl resting inside an open oyster shell, soft iridescent glow on its surface, deep blue water around',
+    symbols: [{ icon: 'oyster shell', label: 'SHELL' }, { icon: 'sea wave', label: 'WAVE' }, { icon: 'small fish', label: 'FISH' }],
+    accent: 'iridescent pearl white and deep ocean blue' },
+  { slug: 'lake', n: '#21', en: 'LAKE', zh: '湖面', tag: '你是别人认识自己的方式，也是自己的',
+    subject: 'a perfectly still mountain lake reflecting the sky and surrounding mountains like a flawless mirror, single white crane standing at the shore',
+    symbols: [{ icon: 'lotus flower', label: 'LOTUS' }, { icon: 'small boat', label: 'BOAT' }, { icon: 'mirror', label: 'MIRROR' }],
+    accent: 'still mirror silver and soft mountain blue' },
+  { slug: 'basalt', n: '#22', en: 'BASALT', zh: '玄武岩', tag: '你是别人认识自己的方式，坚硬如石',
+    subject: 'hexagonal columnar basalt formations rising from a coastline, dark volcanic rock pillars in geometric perfection, sea waves crashing at base',
+    symbols: [{ icon: 'volcano', label: 'VOLCANO' }, { icon: 'sea wave', label: 'WAVE' }, { icon: 'compass', label: 'NORTH' }],
+    accent: 'deep volcanic black and ocean steel blue' },
+  { slug: 'butterfly', n: '#23', en: 'BUTTERFLY', zh: '蝶', tag: '破茧的方式是长出翅膀',
+    subject: 'a luminescent butterfly emerging from a translucent chrysalis, wings half unfurled showing intricate patterns, soft morning light',
+    symbols: [{ icon: 'chrysalis', label: 'COCOON' }, { icon: 'flower', label: 'NECTAR' }, { icon: 'wind swirl', label: 'WIND' }],
+    accent: 'iridescent peach and pale lavender' },
+  { slug: 'shale', n: '#24', en: 'SHALE', zh: '千层岩', tag: '破不破，都已经是一部书了',
+    subject: 'horizontal layered shale rock cliff, each thin sediment band a different earthy color, like pages of an ancient book',
+    symbols: [{ icon: 'open book', label: 'BOOK' }, { icon: 'feather imprint', label: 'PAGE' }, { icon: 'pen nib', label: 'NIB' }],
+    accent: 'layered earth tones from sienna to slate' },
+  { slug: 'soil', n: '#25', en: 'SOIL', zh: '泥土', tag: '溶解在每段关系里，然后长出花',
+    subject: 'a cross-section view of fertile dark soil with various roots intertwining, a vibrant flower blooming from the surface above',
+    symbols: [{ icon: 'earthworm', label: 'WORM' }, { icon: 'flower bud', label: 'BLOOM' }, { icon: 'tree root', label: 'ROOT' }],
+    accent: 'rich loam brown and bright bloom pink' },
+  { slug: 'rocksalt', n: '#26', en: 'ROCK SALT', zh: '岩盐', tag: '溶解在每段关系里，最终凝成晶体',
+    subject: 'a cluster of perfectly cubic transparent rock salt crystals stacked together, soft pink himalayan tones, salt mine background',
+    symbols: [{ icon: 'salt grain', label: 'GRAIN' }, { icon: 'water droplet', label: 'BRINE' }, { icon: 'crystal cube', label: 'CUBE' }],
+    accent: 'himalayan pink and warm salt cream' },
+  { slug: 'petal', n: '#27', en: 'PETAL', zh: '落花', tag: '开不开你说了算，落下去也能生根',
+    subject: 'a single fallen pink peony petal floating on the surface of clear water, ripples spreading from where it landed',
+    symbols: [{ icon: 'water ripple', label: 'RIPPLE' }, { icon: 'flower stem', label: 'STEM' }, { icon: 'butterfly', label: 'BUTTERFLY' }],
+    accent: 'soft peony pink and clear water silver' },
+  { slug: 'driedflower', n: '#28', en: 'DRIED FLOWER', zh: '干花', tag: '开不开你说了算，凋谢了也依然美丽',
+    subject: 'a beautifully preserved bouquet of dried lavender and wheat tied with a satin ribbon, hung upside down against parchment',
+    symbols: [{ icon: 'satin ribbon', label: 'RIBBON' }, { icon: 'pressed leaf', label: 'PRESS' }, { icon: 'bottle', label: 'JAR' }],
+    accent: 'dusty mauve and warm wheat gold' },
+  { slug: 'hotspring', n: '#29', en: 'HOTSPRING', zh: '地热', tag: '水面平静，地底涌出热泉',
+    subject: 'a tranquil natural hot spring with rising steam vapor, surrounded by snowy rocks, a single Japanese macaque relaxing in the water',
+    symbols: [{ icon: 'steam swirl', label: 'STEAM' }, { icon: 'volcano', label: 'GEO' }, { icon: 'snowflake', label: 'SNOW' }],
+    accent: 'warm steam white and deep volcanic teal' },
+  { slug: 'darkriver', n: '#30', en: 'DARK RIVER', zh: '暗河', tag: '水面平静，水下凝成了永不枯竭的暗河',
+    subject: 'a hidden underground river flowing through a deep dark cavern, only single shaft of light hitting the water surface from above',
+    symbols: [{ icon: 'cave entrance', label: 'CAVE' }, { icon: 'compass', label: 'COMPASS' }, { icon: 'small fish', label: 'FISH' }],
+    accent: 'deep cavern black and luminous teal water' },
+  { slug: 'aurora', n: '#31', en: 'AURORA', zh: '极光', tag: '你的距离感长出了最温柔的光',
+    subject: 'shimmering green and purple aurora borealis dancing across a starry arctic sky above a still frozen lake, mountains silhouetted below',
+    symbols: [{ icon: 'star', label: 'STAR' }, { icon: 'pine silhouette', label: 'PINE' }, { icon: 'compass north', label: 'NORTH' }],
+    accent: 'aurora green and twilight purple' },
+  { slug: 'starcore', n: '#32', en: 'STAR CORE', zh: '星核', tag: '你的距离感凝固成了最坚硬的核心',
+    subject: 'a brilliant white-hot star core cross-section diagram, concentric layers of fusion glowing through, set against deep cosmic black',
+    symbols: [{ icon: 'small planet', label: 'ORBIT' }, { icon: 'ring of fire', label: 'CORONA' }, { icon: 'iron atom', label: 'IRON' }],
+    accent: 'incandescent white-gold and cosmic indigo' },
+];
+
+const types = SOULTI_DATA.map((item) => ({
+  slug: item.slug,
+  prompt: buildPrompt({
+    number: item.n,
+    enName: item.en,
+    zhName: item.zh,
+    tagline: item.tag,
+    subject: item.subject,
+    symbols: item.symbols,
+    accent: item.accent,
+  }),
+}));
+
+export default {
+  displayName: 'SoulTI · 32 古籍博物笔记图鉴',
   seriesLabel: 'SoulTI 灵魂图鉴',
-  outputPrefix: 'soulti-medium', // 实际不使用，因为有 outputSubdir
-  outputSubdir: 'soulti/medium',
+  outputPrefix: 'soulti-medium',
+  seriesTone: '中世纪手抄本 + 博物自然标本，米黄羊皮纸 + 自然主体 + 象征物 + 中英双标 + tagline 卡',
   text2imgMode: true,
   aspectRatio: '1:1',
-  seriesTone: '老钱米信纸底 + 自然原型 + 极少量金箔 + 编辑画报式克制美学。',
-  types: [
-    // ─── T·R 涌+根 ───
-    soulti('spring',     '涌泉',     '#5b8a72',
-      '一汪从青苔石缝中涌出的山泉清水，水面泛起细密的涟漪与气泡，水珠在阳光下折射微光，周围是湿润的深绿苔藓和几片落叶。整体气质温柔持续、向外流淌。'),
-    soulti('glacier',    '冰川',     '#5b8a72',
-      '一座微缩的极地冰川截面，深蓝绿色冰层中嵌着古老的气泡，冰面有缓慢移动的裂痕，底部融化出一汪清水。冷峻、坚固、缓慢流动。'),
-    soulti('firefly',    '萤火',     '#b07850',
-      '一只停在指尖将熄未熄的萤火虫，腹部发出温暖的暖橙金色微光，背景是深蓝的夜，几粒残余的光点在空气中飘散。明灭、脆弱、却温热。'),
-    soulti('amber',      '琥珀',     '#b07850',
-      '一块半透明的金棕色琥珀，内部凝固着一片远古的银杏叶或一只完整的小昆虫，光线从琥珀内部透出，带着千年凝结的温暖。'),
-
-    // ─── T·R 涌+根 (B 界) ───
-    soulti('sprout',     '新芽',     '#6b7b8a',
-      '一颗刚刚破土而出的嫩绿色新芽，两片嫩叶撑开一片湿润泥土，根部带着新鲜土壤颗粒，底部一道清晰的裂缝代表"温柔切开"。'),
-    soulti('obsidian',   '黑曜石',   '#6b7b8a',
-      '一块抛光的黑曜石，断面呈贝壳状有锋利反光，主体漆黑深沉、边缘极薄处透出深绿色，置于浅灰岩石板上。锋利、沉静、火山诞生的玻璃。'),
-    soulti('rainbow',    '虹',       '#8a6b8a',
-      '一道在水雾中悬浮的微型彩虹，七色光谱在透明水珠雾气中折射，背景是深紫到柔粉的暮色渐变。轻盈、折射所有光、然后长出自己的颜色。'),
-    soulti('geode',      '晶洞',     '#8a6b8a',
-      '一颗剖开的紫晶晶洞，外壳粗糙的灰岩，内部密集生长着尖锐的紫水晶柱，光线从晶簇深处反射出梦幻的紫光。在暗处结晶。'),
-
-    // ─── T·W 涌+围 ───
-    soulti('dandelion',  '蒲公英',   '#5a7a8a',
-      '一株完整成熟的蒲公英绒球，无数细小白色绒毛在微风中将散未散，几粒种子已经飞起。背景是清晨柔光中的草地虚化。轻盈、自由、终将生根。'),
-    soulti('fossil',     '化石',     '#5a7a8a',
-      '一块灰白色石板上凝固着一片远古蕨类或一只三叶虫的精细化石印记，纹理清晰、岁月斑驳。飞翔被凝固成永恒。'),
-    soulti('dew',        '露',       '#8a8a9a',
-      '一滴清晨悬挂在嫩绿叶尖的露珠，球形完整、晶莹透明，内部折射出整个微缩世界，下方叶脉清晰可见。短暂存在、选择化开。'),
-    soulti('frost',      '霜',       '#8a8a9a',
-      '一片覆盖着细密六角形霜晶的灰绿色枯叶，霜花呈完美的几何分形，冷光蓝灰调。安静、凝固、晶体般的存在。'),
-
-    // ─── T·W 涌+围 (B 界) ───
-    soulti('coral',      '珊瑚',     '#6a7a6a',
-      '一簇生长在深蓝海底的桃粉色软珊瑚，触手般的分支舒展开，质地有真实有机生物纹理，旁边几条小鱼虚化游过。只为自己抛锚的礁石。'),
-    soulti('stalactite', '钟乳石',   '#6a7a6a',
-      '一组暗洞穴中悬挂的米白色钟乳石，水滴正从尖端滴落，洞顶滴出的矿物结晶纹理千年累积。地下、缓慢、凝成自己的洞穴。'),
-    soulti('mountainspring','山泉', '#7a7080',
-      '空旷山谷中，一道从青灰岩石缝中渗出的细窄水流，岩面湿润、苔痕深绿，水声仿佛可闻。在空旷中长出水声。'),
-    soulti('vein',       '矿脉',     '#7a7080',
-      '一块剖开的灰青色岩石截面，内部蜿蜒着一道金铜色矿脉纹路，金属光泽在暗处微微闪烁。沉睡地层、凝固的时间。'),
-
-    // ─── S·R 守+根 ───
-    soulti('mycelium',   '菌丝',     '#7a6b55',
-      '潮湿森林落叶层之下，一张白色细密的菌丝网络蔓延开，几只不同颜色的小蘑菇从地表冒出，菌丝在暗处连接万物。看不见的连接者。'),
-    soulti('rings',      '树轮',     '#7a6b55',
-      '一段被锯开的古树横切面，密集的年轮一圈圈向外扩散，深浅交替记录着百年时光，部分纹理因火灾或干旱有疤痕。沉默的记录者。'),
-    soulti('bamboo',     '竹笋',     '#8a7a5a',
-      '一颗刚出土的暖棕色竹笋，外壳层层包裹尚未展开，旁边是几片早春落叶与湿润泥土。蓄势待发、还没爆发。'),
-    soulti('pearl',      '珍珠',     '#8a7a5a',
-      '一颗在剖开的贝壳中安静的米白色珍珠，贝壳内壁泛着虹彩珍珠母光泽，外壳粗糙海蚀痕。在暗处凝成宝石。'),
-
-    // ─── S·R 守+围 ───
-    soulti('lake',       '湖面',     '#7a8a8a',
-      '一片清晨高山湖面，水面如镜倒映着远山与几片云，水面只有一两道极轻的涟漪。它是别人认识自己的方式。'),
-    soulti('basalt',     '玄武岩',   '#7a8a8a',
-      '一组海岸边的六棱柱状玄武岩柱群，深灰色多孔火山岩质地，远处海浪拍打。坚硬如石、沉默矗立。'),
-    soulti('butterfly',  '蝶',       '#8a7a7a',
-      '一只刚刚破茧而出的蝴蝶，翅膀仍湿润舒展，停在残破的茧壳旁，旁边一片青绿叶片。破茧后的长出翅膀。'),
-    soulti('shale',      '千层岩',   '#8a7a7a',
-      '一块风化的暖灰色千层页岩，可清晰看到亿万年沉积形成的层理，每一层薄如纸页，像一本石头写成的书。'),
-
-    // ─── S·W 守+围 + 关系组 ───
-    soulti('soil',       '泥土',     '#9a8a7a',
-      '一捧新鲜湿润的深棕色腐殖土，几条蚯蚓与一株刚生根的小苗，土壤颗粒分明真实。溶解在关系里、长出花。'),
-    soulti('rocksalt',   '岩盐',     '#9a8a7a',
-      '一块剖开的粉橙色喜马拉雅岩盐，内部矿物结晶呈细密几何纹理，置于深色石板上，背光时透出暖光。溶解后凝成晶体。'),
-    soulti('petal',      '落花',     '#b08a7a',
-      '几片刚刚飘落的暖粉樱花花瓣，散落在湿润的青苔石阶上，旁有一两滴雨水。开落都自己说了算、落下也能生根。'),
-    soulti('driedflower','干花',     '#b08a7a',
-      '一束倒挂风干的暖紫色干玫瑰，花瓣颜色沉淀成博物感的酒红，绑着粗麻绳，背景是米色亚麻布。凋谢仍然美丽。'),
-
-    // ─── 终章四张 ───
-    soulti('hotspring',  '地热',     '#5a6a7a',
-      '一汪山间温泉的水面冒着轻柔白色蒸汽，水面平静却深处涌动，岸边几块温润岩石。表面平静、地底翻涌。'),
-    soulti('darkriver',  '暗河',     '#5a6a7a',
-      '一条流淌在地下溶洞中的深蓝色暗河，水面如镜、上方是钟乳石的剪影，远处只有一束微弱光透入。永不枯竭的暗河。'),
-    soulti('aurora',     '极光',     '#6a6a80',
-      '北极夜空中流动的极光，柔和的青绿与玫瑰粉色光带在深蓝星空中波动，地平线是被雪覆盖的远山剪影。距离感长出最温柔的光。'),
-    soulti('starcore',   '星核',     '#6a6a80',
-      '一颗悬浮在深空中的星核——铁灰色致密金属球，表面有古老的撞击纹路，背景是星云与几缕宇宙尘埃。最坚硬的核心。'),
-  ],
+  outputSubdir: 'soulti/medium',
+  types,
 };
-
-export default soultiMediumModule;

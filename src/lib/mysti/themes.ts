@@ -17,7 +17,7 @@ export const MYSTI_THEMES: Record<MystiTheme['id'], MystiTheme> = {
     gradientCard: ['#12152B', '#0F1122'],
     ctaGradientFrom: '#7B61FF',
     ctaGradientTo: '#C9A86C',
-    tarotDir: '',
+    tarotDir: 'v2/',
   },
   pale: {
     id: 'pale',
@@ -35,6 +35,6 @@ export const MYSTI_THEMES: Record<MystiTheme['id'], MystiTheme> = {
     gradientCard: ['#FFFFFF', '#F7F4EF'],
     ctaGradientFrom: '#A85C64',
     ctaGradientTo: '#5E716A',
-    tarotDir: 'pale/',
+    tarotDir: 'v2/',
   },
 };

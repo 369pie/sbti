@@ -57,9 +57,8 @@ export const MYSTI_THEMES_V2: Record<MystiThemeV2Id, MystiThemeV2> = {
     ctaGradientTo: '#A85A6E',
 
     // 塔罗牌资源目录
-    // TODO[mysti-v2-images]: v2/ 资源生成完成后改为 'v2/' 切换到人格化塔罗卡
-    // 生成命令: node scripts/generate-type-images.mjs mysti-tarot
-    tarotDir: '',
+    // v2/ = 古籍博物笔记风 29 张人格化塔罗（2026-04-18 上线）
+    tarotDir: 'v2/',
     isDark: true,
   },
 
@@ -99,8 +98,8 @@ export const MYSTI_THEMES_V2: Record<MystiThemeV2Id, MystiThemeV2> = {
     ctaGradientFrom: '#C9A676',
     ctaGradientTo: '#8B7AD9',
 
-    // TODO[mysti-v2-images]: v2/ 资源生成完成后改为 'v2/'
-    tarotDir: '',
+    // v2/ = 古籍博物笔记风 29 张人格化塔罗（2026-04-18 上线）
+    tarotDir: 'v2/',
     isDark: true,
   },
 
@@ -140,7 +139,7 @@ export const MYSTI_THEMES_V2: Record<MystiThemeV2Id, MystiThemeV2> = {
     ctaGradientFrom: '#C07A8E',
     ctaGradientTo: '#A85A6E',
 
-    tarotDir: 'pale/',
+    tarotDir: 'v2/',
     isDark: false,
   },
 };

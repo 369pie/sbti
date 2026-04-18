@@ -18,5 +18,13 @@ export async function GET(request: Request) {
   const supabase = await createServerSupabaseClient();
   const entries = await fetchLeaderboard(supabase, limit);
 
-  return NextResponse.json({ entries });
+  return NextResponse.json(
+    { entries },
+    {
+      headers: {
+        'Cache-Control':
+          'public, max-age=0, s-maxage=60, stale-while-revalidate=300',
+      },
+    },
+  );
 }

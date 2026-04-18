@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import Link from 'next/link';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
@@ -10,7 +12,10 @@ import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
 import { markCollected } from '@/lib/mysti/collection';
 import { KingsTypeArt } from '@/components/KingsTypeArt';
-import { KingsShareImageGenerator } from '@/components/KingsShareImageGenerator';
+const KingsShareImageGenerator = dynamic(
+  () => import('@/components/KingsShareImageGenerator').then((m) => m.KingsShareImageGenerator),
+  { ssr: false },
+);
 import type { KingsShareImageHandle } from '@/components/KingsShareImageGenerator';
 import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
