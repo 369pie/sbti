@@ -14,6 +14,7 @@ import {
 import { getActiveReferralCode } from '@/lib/mysti/creator-referral';
 import { getOrCreateDeviceId } from '@/lib/mysti/device';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
+import { readApiJson } from '@/lib/api';
 
 interface TierDef {
   sku: SubscriptionSku;
@@ -122,18 +123,19 @@ function SubscribeInner() {
             redirect,
           }),
         });
-        const data = (await res.json()) as {
+        const data = await readApiJson<{
           url?: string;
           orderId?: string;
           stub?: boolean;
           error?: string;
-        };
+          message?: string;
+        }>(res);
         if (!res.ok || !data.url) {
-          throw new Error(data.error || 'create_failed');
+          throw new Error(data.message || data.error || 'create_failed');
         }
         window.location.href = data.url;
       } catch (e) {
-        setError(String(e));
+        setError(e instanceof Error ? e.message : String(e));
       } finally {
         setLoading(null);
       }

@@ -20,6 +20,7 @@ import {
   type ShareCardTier,
 } from '@/lib/share-card-tiers';
 import { isUnlocked, SKU_PRICES, type MystiSku } from '@/lib/mysti/unlock';
+import { readApiJson } from '@/lib/api';
 
 const TIER_TO_SKU: Record<Exclude<ShareCardTier, 'free'>, MystiSku> = {
   plus: 'share-plus',
@@ -83,7 +84,7 @@ export function useShareTier({
           redirect: typeof window !== 'undefined' ? window.location.pathname : '/',
         }),
       });
-      const data = (await res.json()) as { url?: string };
+      const data = await readApiJson<{ url?: string }>(res);
       if (data.url && typeof window !== 'undefined') {
         window.location.href = data.url;
       }

@@ -163,23 +163,41 @@ export async function createXunhupayOrder(
     body: new URLSearchParams(payload).toString(),
   });
 
+  const raw = await res.text();
+
   if (!res.ok) {
     throw new Error(`xunhupay_http_${res.status}`);
   }
-  const json = (await res.json()) as {
+
+  let json: {
     errcode: number;
     errmsg: string;
     url?: string;
     url_qrcode?: string;
     oderno?: string;
+    openid?: string;
   };
+
+  try {
+    json = JSON.parse(raw) as {
+      errcode: number;
+      errmsg: string;
+      url?: string;
+      url_qrcode?: string;
+      oderno?: string;
+      openid?: string;
+    };
+  } catch {
+    throw new Error('xunhupay_invalid_response');
+  }
+
   if (json.errcode !== 0 || !json.url) {
     throw new Error(`xunhupay_${json.errcode}_${json.errmsg}`);
   }
   return {
     url: json.url,
     qrcode: json.url_qrcode,
-    orderId: json.oderno ?? params.tradeOrderId,
+    orderId: json.oderno ?? json.openid ?? params.tradeOrderId,
     errcode: json.errcode,
     errmsg: json.errmsg,
   };

@@ -13,6 +13,8 @@ import {
   ensureGiftCardIssued,
   ensureSubscriptionFromOrder,
   findMystiOrder,
+  getMystiOrderRedirectPath,
+  getMystiOrderSku,
   markMystiOrderVerified,
 } from '@/lib/mysti/payment-store';
 import { maybeCleanup, rateLimit, resolveRateLimitKey } from '@/lib/perf/rate-limit';
@@ -88,6 +90,9 @@ export async function GET(req: NextRequest) {
         pending: order.status === 'pending',
         orderId,
         orderStatus: order.status,
+        sku: getMystiOrderSku(order),
+        resourceId: order.resource_id,
+        redirect: getMystiOrderRedirectPath(order),
         stub: false,
       });
     }
@@ -101,6 +106,9 @@ export async function GET(req: NextRequest) {
       pending: false,
       orderId,
       orderStatus: order.status,
+      sku: getMystiOrderSku(order),
+      resourceId: order.resource_id,
+      redirect: getMystiOrderRedirectPath(order),
       token: `mysti_${order.id}`,
       stub: false,
       giftCard,

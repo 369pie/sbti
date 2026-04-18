@@ -50,6 +50,44 @@ function safeRedirectPath(input: string | undefined): string {
   return input.slice(0, 200);
 }
 
+function buildTradeOrderId(): string {
+  return `my_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function fitXunhupayUrl(url: string): string | undefined {
+  return url.length <= 128 ? url : undefined;
+}
+
+function classifyCreateError(error: unknown): {
+  error: string;
+  message: string;
+  status: number;
+} {
+  const message = error instanceof Error ? error.message : String(error);
+
+  if (message.includes('xunhupay_')) {
+    return {
+      error: 'payment_provider_unavailable',
+      message: '支付渠道暂时不可用，请稍后再试。',
+      status: 500,
+    };
+  }
+
+  if (message.includes('mysti_order_insert_failed')) {
+    return {
+      error: 'payment_store_unavailable',
+      message: '支付订单初始化失败，请稍后再试。',
+      status: 500,
+    };
+  }
+
+  return {
+    error: 'create_failed',
+    message: '支付创建失败，请稍后再试。',
+    status: 500,
+  };
+}
+
 function sanitizeGiftMetadata(input: CreateBody['metadata']): CreateBody['metadata'] | undefined {
   if (!input) return undefined;
   const validGiftSkus = new Set(GIFT_CARD_OPTIONS.map(option => option.giftSku));
@@ -118,14 +156,12 @@ export async function POST(req: NextRequest) {
 
   const cfg = readXunhupayConfig(paymentType);
   const meta = SKU_PRICES[sku];
-  const tradeOrderId = `my_${sku}_${Date.now().toString(36)}_${Math.random()
-    .toString(36)
-    .slice(2, 8)}`;
+  const tradeOrderId = buildTradeOrderId();
 
   const origin = req.nextUrl.origin;
   const notifyUrl = `${origin}/api/mysti/payment/notify?channel=${paymentType}&sku=${encodeURIComponent(sku)}`;
-  const returnUrl = `${origin}/mysti/payment/return?channel=${paymentType}&sku=${encodeURIComponent(sku)}&resourceId=${encodeURIComponent(resourceId)}&redirect=${encodeURIComponent(redirect)}`;
-  const callbackUrl = `${origin}${redirect}`;
+  const returnUrl = `${origin}/mysti/payment/return?orderId=${encodeURIComponent(tradeOrderId)}`;
+  const callbackUrl = fitXunhupayUrl(`${origin}${redirect}`);
 
   // Stub 模式仅用于本地/开发；生产环境缺配置时必须 fail closed。
   if (!cfg) {
@@ -155,6 +191,7 @@ export async function POST(req: NextRequest) {
     resourceId,
     ref: ref || undefined,
     redirect,
+    deviceId,
     ...(metadata ? { metadata } : {}),
   };
 
@@ -180,7 +217,7 @@ export async function POST(req: NextRequest) {
       notifyUrl,
       returnUrl,
       callbackUrl,
-      attach: JSON.stringify({ sku, resourceId, ref, redirect }).slice(0, 256),
+      attach: JSON.stringify({ sku, resourceId, ref, redirect, deviceId }).slice(0, 256),
     });
 
     return NextResponse.json({
@@ -199,9 +236,16 @@ export async function POST(req: NextRequest) {
     } catch {
       // noop
     }
+    const classified = classifyCreateError(err);
     return NextResponse.json(
-      { error: 'create_failed', message: String(err) },
-      { status: 502 },
+      {
+        error: classified.error,
+        message: classified.message,
+        ...(process.env.NODE_ENV !== 'production' && err instanceof Error
+          ? { debug: err.message }
+          : {}),
+      },
+      { status: classified.status },
     );
   }
 }

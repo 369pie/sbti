@@ -18,6 +18,7 @@ import {
 import { getActiveReferralCode } from '@/lib/mysti/creator-referral';
 import { getOrCreateDeviceId } from '@/lib/mysti/device';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
+import { readApiJson } from '@/lib/api';
 
 interface Props {
   sku: MystiSku;
@@ -147,14 +148,15 @@ export function MystiPaywall({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sku, resourceId, paymentType, ref, deviceId, redirect }),
       });
-      const data = (await res.json()) as {
+      const data = await readApiJson<{
         url?: string;
         orderId?: string;
         stub?: boolean;
         error?: string;
-      };
+        message?: string;
+      }>(res);
       if (!res.ok || !data.url || !data.orderId) {
-        throw new Error(data.error || 'create_failed');
+        throw new Error(data.message || data.error || 'create_failed');
       }
 
       if (data.stub) {
@@ -186,7 +188,7 @@ export function MystiPaywall({
 
       window.location.href = data.url;
     } catch (e) {
-      setError(String(e));
+      setError(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(false);
     }

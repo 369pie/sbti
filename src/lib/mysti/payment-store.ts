@@ -19,6 +19,7 @@ export interface MystiOrderAttach {
   resourceId?: string;
   ref?: string;
   redirect?: string;
+  deviceId?: string;
   metadata?: {
     giftSku?: GiftCardGiftSku;
     fromName?: string;
@@ -93,6 +94,22 @@ const VALID_ORDER_SKUS = new Set<MystiSku>([
   'creator-pass',
 ]);
 
+const LEGACY_ORDER_SKU_FALLBACK: Partial<Record<MystiSku, MystiSku>> = {
+  'festival-gift-card': 'gift-card',
+  'besties-bundle': 'gift-card',
+  'monthly-pass': 'monthly-report',
+  'quarterly-pass': 'monthly-report',
+  'yearly-pass': 'monthly-report',
+  'creator-pass': 'monthly-report',
+};
+
+interface SupabaseErrorLike {
+  code?: string;
+  message?: string;
+  details?: string;
+  hint?: string;
+}
+
 function admin() {
   return createAdminSupabaseClient();
 }
@@ -127,6 +144,7 @@ function sanitizeAttach(input: MystiOrderAttach | null | undefined): MystiOrderA
   const resourceId = sanitizeText(input.resourceId, 64);
   const ref = sanitizeText(input.ref, 32);
   const redirect = sanitizeText(input.redirect, 200);
+  const deviceId = sanitizeText(input.deviceId, 64);
 
   const metadata = input.metadata
     ? {
@@ -142,7 +160,72 @@ function sanitizeAttach(input: MystiOrderAttach | null | undefined): MystiOrderA
     ...(resourceId ? { resourceId } : {}),
     ...(ref ? { ref } : {}),
     ...(redirect ? { redirect } : {}),
+    ...(deviceId ? { deviceId } : {}),
     ...(metadata ? { metadata } : {}),
+  };
+}
+
+function isSupabaseErrorLike(error: unknown): error is SupabaseErrorLike {
+  return !!error && typeof error === 'object';
+}
+
+function isMissingColumnError(error: unknown, column: string): boolean {
+  if (!isSupabaseErrorLike(error)) return false;
+  const message = `${error.message ?? ''} ${error.details ?? ''} ${error.hint ?? ''}`;
+  return error.code === '42703' && message.includes(column);
+}
+
+function isMissingTableError(error: unknown, table: string): boolean {
+  if (!isSupabaseErrorLike(error)) return false;
+  const message = `${error.message ?? ''} ${error.details ?? ''} ${error.hint ?? ''}`;
+  return error.code === '42P01' && message.includes(table);
+}
+
+function isLegacySkuConstraintError(error: unknown): boolean {
+  if (!isSupabaseErrorLike(error)) return false;
+  const message = `${error.message ?? ''} ${error.details ?? ''} ${error.hint ?? ''}`;
+  return error.code === '23514' && message.includes('mysti_orders_sku_check');
+}
+
+function getLegacyStoredSku(sku: MystiSku): MystiSku | null {
+  return LEGACY_ORDER_SKU_FALLBACK[sku] ?? null;
+}
+
+function getAttachObject(
+  value: JsonValue | null | undefined,
+): MystiOrderAttach | null {
+  return sanitizeAttach(asObject(value) as MystiOrderAttach | null | undefined);
+}
+
+export function getMystiOrderSku(order: Pick<MystiOrderRow, 'sku' | 'attach_json'>): MystiSku {
+  return getAttachObject(order.attach_json)?.sku ?? order.sku;
+}
+
+export function getMystiOrderRedirectPath(
+  order: Pick<MystiOrderRow, 'redirect_path' | 'attach_json'>,
+): string | null {
+  return getAttachObject(order.attach_json)?.redirect ?? order.redirect_path ?? null;
+}
+
+function getMystiOrderDeviceId(
+  order: Pick<MystiOrderRow, 'device_id' | 'attach_json'>,
+): string | null {
+  return getAttachObject(order.attach_json)?.deviceId ?? order.device_id ?? null;
+}
+
+function buildFallbackSubscription(order: MystiOrderRow): ServerSubscription | null {
+  const sku = getMystiOrderSku(order);
+  const days = SUBSCRIPTION_DAYS[sku];
+  if (!days) return null;
+
+  const startsAt = Date.parse(order.paid_at ?? order.created_at);
+  const expiresAt = startsAt + days * 86400_000;
+
+  return {
+    sku,
+    startsAt,
+    expiresAt,
+    status: expiresAt > Date.now() ? 'active' : 'expired',
   };
 }
 
@@ -182,30 +265,58 @@ function toClientGiftCard(row: MystiGiftCardRow): GiftCard {
 export async function createPendingMystiOrder(
   input: CreateMystiOrderInput,
 ): Promise<MystiOrderRow> {
-  const { data, error } = await admin()
-    .from('mysti_orders')
-    .insert({
+  const attachJson = sanitizeAttach(input.attachJson);
+  const legacySku = getLegacyStoredSku(input.sku);
+  const candidates: Array<{ sku: MystiSku; includeDeviceId: boolean }> = [
+    { sku: input.sku, includeDeviceId: true },
+    ...(input.deviceId ? [{ sku: input.sku, includeDeviceId: false }] : []),
+    ...(legacySku ? [{ sku: legacySku, includeDeviceId: true }] : []),
+    ...(legacySku && input.deviceId ? [{ sku: legacySku, includeDeviceId: false }] : []),
+  ];
+
+  let lastError: unknown = null;
+
+  for (const candidate of candidates) {
+    const payload = {
       trade_order_id: input.tradeOrderId,
       provider: 'xunhupay',
       channel: input.channel,
-      sku: input.sku,
+      sku: candidate.sku,
       resource_id: input.resourceId,
       title: input.title,
       amount_cents: input.amountCents,
       status: 'pending',
       redirect_path: input.redirectPath ?? null,
       referral_code: input.referralCode ?? null,
-      device_id: input.deviceId ?? null,
-      attach_json: sanitizeAttach(input.attachJson),
-    })
-    .select('*')
-    .single();
+      attach_json: attachJson,
+      ...(candidate.includeDeviceId && input.deviceId
+        ? { device_id: input.deviceId }
+        : {}),
+    };
 
-  if (error || !data) {
-    throw new Error(`mysti_order_insert_failed:${error?.message ?? 'unknown'}`);
+    const { data, error } = await admin()
+      .from('mysti_orders')
+      .insert(payload)
+      .select('*')
+      .single();
+
+    if (!error && data) {
+      return data as MystiOrderRow;
+    }
+
+    lastError = error;
+    if (
+      !isMissingColumnError(error, 'device_id') &&
+      !isLegacySkuConstraintError(error)
+    ) {
+      break;
+    }
   }
 
-  return data as MystiOrderRow;
+  const message = isSupabaseErrorLike(lastError)
+    ? lastError.message ?? 'unknown'
+    : 'unknown';
+  throw new Error(`mysti_order_insert_failed:${message}`);
 }
 
 export async function updateMystiOrderStatus(
@@ -261,48 +372,68 @@ export async function markMystiOrderPaid(args: {
   const client = admin();
   const existing = await findMystiOrder(args.tradeOrderId);
   const attach = mergeAttach(existing?.attach_json ?? null, args.attach);
-  const sku = existing?.sku ?? sanitizeSku(attach?.sku);
+  const requestedSku = sanitizeSku(attach?.sku);
+  const sku = requestedSku ?? (existing ? getMystiOrderSku(existing) : null);
   const resourceId = existing?.resource_id ?? sanitizeText(attach?.resourceId, 64);
+  const redirectPath = existing
+    ? getMystiOrderRedirectPath(existing)
+    : sanitizeText(attach?.redirect, 200);
 
   if (!sku || !resourceId) {
     throw new Error('mysti_order_payload_incomplete');
   }
 
-  const { data, error } = await client
-    .from('mysti_orders')
-    .upsert(
-      {
-        trade_order_id: args.tradeOrderId,
-        provider: 'xunhupay',
-        provider_order_id: args.providerOrderId ?? existing?.provider_order_id ?? null,
-        channel: existing?.channel ?? args.channel,
-        sku,
-        resource_id: resourceId,
-        title:
-          existing?.title ??
-          sanitizeText(args.orderTitle, 128) ??
-          'Mysti 订单',
-        amount_cents: existing?.amount_cents ?? Math.round(args.totalFee * 100),
-        status: 'paid',
-        redirect_path: existing?.redirect_path ?? sanitizeText(attach?.redirect, 200),
-        referral_code: existing?.referral_code ?? sanitizeText(attach?.ref, 32),
-        attach_json: attach,
-        notify_payload: args.notifyPayload,
-        paid_at: existing?.paid_at ?? new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      {
-        onConflict: 'trade_order_id',
-      },
-    )
-    .select('*')
-    .single();
+  const storedSkuCandidates = [sku, getLegacyStoredSku(sku)].filter(
+    (value, index, array): value is MystiSku => !!value && array.indexOf(value) === index,
+  );
 
-  if (error || !data) {
-    throw new Error(`mysti_order_mark_paid_failed:${error?.message ?? 'unknown'}`);
+  let lastError: unknown = null;
+
+  for (const storedSku of storedSkuCandidates) {
+    const { data, error } = await client
+      .from('mysti_orders')
+      .upsert(
+        {
+          trade_order_id: args.tradeOrderId,
+          provider: 'xunhupay',
+          provider_order_id: args.providerOrderId ?? existing?.provider_order_id ?? null,
+          channel: existing?.channel ?? args.channel,
+          sku: storedSku,
+          resource_id: resourceId,
+          title:
+            existing?.title ??
+            sanitizeText(args.orderTitle, 128) ??
+            'Mysti 订单',
+          amount_cents: existing?.amount_cents ?? Math.round(args.totalFee * 100),
+          status: 'paid',
+          redirect_path: redirectPath,
+          referral_code: existing?.referral_code ?? sanitizeText(attach?.ref, 32),
+          attach_json: attach,
+          notify_payload: args.notifyPayload,
+          paid_at: existing?.paid_at ?? new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        {
+          onConflict: 'trade_order_id',
+        },
+      )
+      .select('*')
+      .single();
+
+    if (!error && data) {
+      return data as MystiOrderRow;
+    }
+
+    lastError = error;
+    if (!isLegacySkuConstraintError(error)) {
+      break;
+    }
   }
 
-  return data as MystiOrderRow;
+  const message = isSupabaseErrorLike(lastError)
+    ? lastError.message ?? 'unknown'
+    : 'unknown';
+  throw new Error(`mysti_order_mark_paid_failed:${message}`);
 }
 
 export async function markMystiOrderVerified(orderId: string): Promise<void> {
@@ -325,10 +456,11 @@ export async function markMystiOrderVerified(orderId: string): Promise<void> {
 export async function ensureGiftCardIssued(
   order: MystiOrderRow,
 ): Promise<GiftCard | null> {
+  const businessSku = getMystiOrderSku(order);
   if (
-    order.sku !== 'gift-card' &&
-    order.sku !== 'festival-gift-card' &&
-    order.sku !== 'besties-bundle'
+    businessSku !== 'gift-card' &&
+    businessSku !== 'festival-gift-card' &&
+    businessSku !== 'besties-bundle'
   ) {
     return null;
   }
@@ -501,6 +633,9 @@ export async function findActiveSubscriptionByDevice(
     .limit(1)
     .maybeSingle();
   if (error) {
+    if (isMissingTableError(error, 'mysti_subscriptions')) {
+      return null;
+    }
     throw new Error(`mysti_subscription_lookup_failed:${error.message}`);
   }
   return data ? toServerSubscription(data as MystiSubscriptionRow) : null;
@@ -515,8 +650,10 @@ export async function findActiveSubscriptionByDevice(
 export async function ensureSubscriptionFromOrder(
   order: MystiOrderRow,
 ): Promise<ServerSubscription | null> {
-  if (!SUBSCRIPTION_DAYS[order.sku]) return null;
-  if (!order.device_id) return null;
+  const businessSku = getMystiOrderSku(order);
+  const deviceId = getMystiOrderDeviceId(order);
+  if (!SUBSCRIPTION_DAYS[businessSku]) return null;
+  if (!deviceId) return buildFallbackSubscription(order);
 
   const client = admin();
 
@@ -527,23 +664,33 @@ export async function ensureSubscriptionFromOrder(
     .eq('source_order_id', order.id)
     .maybeSingle();
   if (existingError) {
+    if (isMissingTableError(existingError, 'mysti_subscriptions')) {
+      return buildFallbackSubscription(order);
+    }
     throw new Error(`mysti_subscription_lookup_failed:${existingError.message}`);
   }
   if (existing) return toServerSubscription(existing as MystiSubscriptionRow);
 
-  const days = SUBSCRIPTION_DAYS[order.sku];
+  const days = SUBSCRIPTION_DAYS[businessSku];
   const now = new Date();
 
   // If an active sub already exists for this device, extend it.
-  const { data: active } = await client
+  const { data: active, error: activeError } = await client
     .from('mysti_subscriptions')
     .select('*')
-    .eq('device_id', order.device_id)
+    .eq('device_id', deviceId)
     .eq('status', 'active')
     .gt('expires_at', now.toISOString())
     .order('expires_at', { ascending: false })
     .limit(1)
     .maybeSingle();
+
+  if (activeError) {
+    if (isMissingTableError(activeError, 'mysti_subscriptions')) {
+      return buildFallbackSubscription(order);
+    }
+    throw new Error(`mysti_subscription_lookup_failed:${activeError.message}`);
+  }
 
   if (active) {
     const base = new Date((active as MystiSubscriptionRow).expires_at);
@@ -569,8 +716,8 @@ export async function ensureSubscriptionFromOrder(
   const { data, error } = await client
     .from('mysti_subscriptions')
     .insert({
-      device_id: order.device_id,
-      sku: order.sku,
+      device_id: deviceId,
+      sku: businessSku,
       starts_at: now.toISOString(),
       expires_at: expiresAt.toISOString(),
       source_order_id: order.id,
@@ -579,6 +726,9 @@ export async function ensureSubscriptionFromOrder(
     .select('*')
     .single();
   if (error || !data) {
+    if (isMissingTableError(error, 'mysti_subscriptions')) {
+      return buildFallbackSubscription(order);
+    }
     throw new Error(
       `mysti_subscription_insert_failed:${error?.message ?? 'unknown'}`,
     );

@@ -16,16 +16,16 @@ function ReturnContent() {
   const router = useRouter();
   const search = useSearchParams();
   const { theme } = useMystiTheme();
+  const hasOrderId = Boolean(search.get('orderId') || search.get('trade_order_id'));
   const [status, setStatus] = useState<'verifying' | 'paid' | 'failed'>('verifying');
 
   useEffect(() => {
     const orderId = search.get('orderId') || search.get('trade_order_id') || '';
-    const sku = (search.get('sku') as MystiSku | null) || null;
-    const resourceId = search.get('resourceId') || '';
+    const initialSku = (search.get('sku') as MystiSku | null) || null;
+    const initialResourceId = search.get('resourceId') || '';
     const stub = search.get('stub') === '1' ? '1' : '';
-    const redirect = search.get('redirect') || '/mysti/';
-    if (!orderId || !sku || !resourceId) {
-      setStatus('failed');
+    const initialRedirect = search.get('redirect') || '/mysti/';
+    if (!orderId) {
       return;
     }
 
@@ -41,6 +41,9 @@ function ReturnContent() {
             paid?: boolean;
             pending?: boolean;
             token?: string;
+            sku?: MystiSku;
+            resourceId?: string;
+            redirect?: string | null;
             subscription?: {
               sku: MystiSku;
               startsAt: number;
@@ -62,7 +65,16 @@ function ReturnContent() {
 
           if (cancelled) return;
 
+          const sku = data.sku ?? initialSku;
+          const resourceId = data.resourceId ?? initialResourceId;
+          const redirect = data.redirect ?? initialRedirect;
+
           if (data.paid) {
+            if (!sku) {
+              setStatus('failed');
+              return;
+            }
+
             // 订阅类——另外记录到会员仓储
             if (isSubscriptionSku(sku)) {
               const serverSub = data.subscription;
@@ -81,6 +93,11 @@ function ReturnContent() {
                 /* noop */
               }
             } else {
+              if (!resourceId) {
+                setStatus('failed');
+                return;
+              }
+
               recordUnlock({
                 sku,
                 resourceId,
@@ -116,7 +133,7 @@ function ReturnContent() {
             }
 
             setStatus('paid');
-            window.setTimeout(() => router.replace(redirect), 1200);
+            window.setTimeout(() => router.replace(redirect || '/mysti/'), 1200);
             return;
           }
 
@@ -143,6 +160,8 @@ function ReturnContent() {
     };
   }, [router, search]);
 
+  const displayStatus = hasOrderId ? status : 'failed';
+
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-6"
@@ -157,11 +176,11 @@ function ReturnContent() {
       >
         ✦
       </div>
-      {status === 'verifying' && <p>正在确认你的支付……</p>}
-      {status === 'paid' && (
+      {displayStatus === 'verifying' && <p>正在确认你的支付……</p>}
+      {displayStatus === 'paid' && (
         <p style={{ color: theme.accentGold }}>支付成功，正在为你打开内容</p>
       )}
-      {status === 'failed' && (
+      {displayStatus === 'failed' && (
         <>
           <p style={{ color: '#FFB1B1' }}>验证失败，请稍后重试</p>
           <button

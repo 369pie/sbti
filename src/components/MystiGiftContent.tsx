@@ -20,6 +20,7 @@ import { recordUnlock, SKU_PRICES } from '@/lib/mysti/unlock';
 import { getActiveReferralCode } from '@/lib/mysti/creator-referral';
 import { getOrCreateDeviceId } from '@/lib/mysti/device';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
+import { readApiJson } from '@/lib/api';
 
 type Tab = 'buy' | 'mine' | 'redeem';
 
@@ -36,35 +37,48 @@ export function MystiGiftContent() {
   const [issuedCard, setIssuedCard] = useState<GiftCard | null>(null);
 
   useEffect(() => {
-    setCards(getGiftCards());
-    setHydrated(true);
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setCards(getGiftCards());
+      setHydrated(true);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     if (!issuedCode) return;
-    const local = getGiftCardByCode(issuedCode);
-    if (local) {
-      setIssuedCard(local);
-      return;
-    }
 
     let cancelled = false;
-    fetch(`/api/mysti/gift-card?code=${encodeURIComponent(issuedCode)}`, {
-      cache: 'no-store',
-    })
-      .then(async response => {
-        if (!response.ok) return null;
-        const data = (await response.json()) as { card?: GiftCard };
-        return data.card ?? null;
+    queueMicrotask(() => {
+      if (cancelled) return;
+
+      const local = getGiftCardByCode(issuedCode);
+      if (local) {
+        setIssuedCard(local);
+        return;
+      }
+
+      fetch(`/api/mysti/gift-card?code=${encodeURIComponent(issuedCode)}`, {
+        cache: 'no-store',
       })
-      .then(card => {
-        if (cancelled || !card) return;
-        upsertGiftCard(card);
-        setCards(getGiftCards());
-        setIssuedCard(card);
-      })
-      .catch(() => {
-        // noop
+        .then(async response => {
+          if (!response.ok) return null;
+          const data = (await response.json()) as { card?: GiftCard };
+          return data.card ?? null;
+        })
+        .then(card => {
+          if (cancelled || !card) return;
+          upsertGiftCard(card);
+          setCards(getGiftCards());
+          setIssuedCard(card);
+        })
+        .catch(() => {
+          // noop
+        });
       });
 
     return () => {
@@ -196,14 +210,15 @@ function BuyTab({ onPurchased, presetGiftSku }: { onPurchased: (card: GiftCard) 
           metadata: { giftSku: pickedSku, fromName, toName, message, festivalThemeId: bundleSku === 'festival-gift-card' ? festivalThemeId : undefined },
         }),
       });
-      const data = (await res.json()) as {
+      const data = await readApiJson<{
         url?: string;
         orderId?: string;
         stub?: boolean;
         error?: string;
-      };
+        message?: string;
+      }>(res);
       if (!res.ok || !data.url || !data.orderId) {
-        throw new Error(data.error || 'create_failed');
+        throw new Error(data.message || data.error || 'create_failed');
       }
 
       if (data.stub) {
@@ -235,7 +250,7 @@ function BuyTab({ onPurchased, presetGiftSku }: { onPurchased: (card: GiftCard) 
       // Live 模式：支付成功后由 /mysti/payment/return → verify → 服务端签发礼品卡。
       window.location.href = data.url;
     } catch (e) {
-      setError(String(e));
+      setError(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(false);
     }

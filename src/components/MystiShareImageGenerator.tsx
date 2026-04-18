@@ -10,6 +10,7 @@ import type { MystiTheme, MystiShareImageGeneratorHandle } from '@/lib/mysti/typ
 import { getMystiTarotData } from '@/lib/mysti/tarot-mapping';
 import { getDualInterpretation } from '@/lib/mysti/dual-interpretation';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
+import { readApiJson } from '@/lib/api';
 import {
   SHARE_CARD_TIERS,
   SHARE_CARD_TIER_LABEL,
@@ -851,14 +852,20 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ sku, resourceId, paymentType: 'wechat', redirect }),
           });
-          const data = (await res.json()) as { url?: string; error?: string };
+          const data = await readApiJson<{
+            url?: string;
+            error?: string;
+            message?: string;
+          }>(res);
           if (data.url && typeof window !== 'undefined') {
             window.location.href = data.url;
             return;
           }
-          setSaveHint(data.error || '支付下单失败，请稍后再试。');
+          setSaveHint(data.message || data.error || '支付下单失败，请稍后再试。');
         } catch (e) {
-          setSaveHint(`支付下单失败：${String(e)}`);
+          setSaveHint(
+            `支付下单失败：${e instanceof Error ? e.message : String(e)}`,
+          );
         } finally {
           setGenerating(false);
         }
