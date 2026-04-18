@@ -41,13 +41,14 @@ export function CptiGalleryContent() {
       }
 
       const data = await cptiApi.getCollection();
-      if (data?.recentRelationships?.length > 0) {
-        const backendSlugs = new Set(data.recentRelationships.map(r => r.slug));
+      const recentRelationships = data?.recentRelationships ?? [];
+      if (recentRelationships.length > 0) {
+        const backendSlugs = new Set(recentRelationships.map(r => r.slug));
         setSyncedSlugs(backendSlugs);
         // Merge: keep unique by slug, prefer backend data
         const localSlugs = new Set(card?.relationships?.map(r => r.slug) ?? []);
         const merged = [...(card?.relationships ?? [])];
-        for (const br of data.recentRelationships) {
+        for (const br of recentRelationships) {
           if (!localSlugs.has(br.slug)) {
             merged.push({
               slug: br.slug,
