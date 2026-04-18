@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { ASSET_SYNC_EVENT, type AssetSummary, type AssetSyncEventDetail } from '@/lib/assets/asset-contract';
 import { getApiPath, readApiJson } from '@/lib/api';
+import { hasBrowserSupabaseSession } from '@/lib/supabase/client';
 import type { SoultiLayeredResult } from '@/lib/soulti/scoring';
 import { getAllCollected, getCollectionCount } from '@/lib/mysti/collection';
 import {
@@ -873,42 +874,47 @@ export function CardContent() {
   // Fetch backend truth on mount (fire-and-forget)
   useEffect(() => {
     let cancelled = false;
-    Promise.all([
-      cptiApi.getCollection().catch(() => null),
-      fetch(getApiPath('/assets/me'), {
-        credentials: 'include',
-        headers: { Accept: 'application/json' },
-      }).then((response) => {
-        if (!response.ok) return null;
-        return readApiJson<CardAssetsResponse>(response);
-      }).catch(() => null),
-    ])
-      .then(([collectionData, assetData]) => {
-        if (cancelled) return;
+    void (async () => {
+      const hasSession = await hasBrowserSupabaseSession();
+      if (!hasSession || cancelled) {
+        return;
+      }
 
-        const recentRelationships = collectionData?.recentRelationships ?? [];
-        const slugs = new Set<string>(
-          recentRelationships.map((r) => r.slug).filter(Boolean)
-        );
-        setSyncedSlugs(slugs);
+      const [collectionData, assetData] = await Promise.all([
+        cptiApi.getCollection().catch(() => null),
+        fetch(getApiPath('/assets/me'), {
+          credentials: 'include',
+          headers: { Accept: 'application/json' },
+        }).then((response) => {
+          if (!response.ok) return null;
+          return readApiJson<CardAssetsResponse>(response);
+        }).catch(() => null),
+      ]);
 
-        const remoteCard = assetData?.assets?.['wtf-card'] ?? null;
-        if (remoteCard) {
-          setCard(remoteCard);
-          setPinnedIds(remoteCard.pinnedUniverses ?? []);
-        }
+      if (cancelled) return;
 
-        if (assetData?.summary?.wtfCard) {
-          setRemoteCardSummary(assetData.summary.wtfCard);
-        }
+      const recentRelationships = collectionData?.recentRelationships ?? [];
+      const slugs = new Set<string>(
+        recentRelationships.map((r) => r.slug).filter(Boolean)
+      );
+      setSyncedSlugs(slugs);
 
-        if (collectionData || assetData?.summary?.wtfCard) {
-          setBackendSynced(true);
-        }
-      })
-      .catch(() => {
-        // Backend unavailable — stay in local-only mode
-      });
+      const remoteCard = assetData?.assets?.['wtf-card'] ?? null;
+      if (remoteCard) {
+        setCard(remoteCard);
+        setPinnedIds(remoteCard.pinnedUniverses ?? []);
+      }
+
+      if (assetData?.summary?.wtfCard) {
+        setRemoteCardSummary(assetData.summary.wtfCard);
+      }
+
+      if (collectionData || assetData?.summary?.wtfCard) {
+        setBackendSynced(true);
+      }
+    })().catch(() => {
+      // Backend unavailable — stay in local-only mode
+    });
     return () => { cancelled = true; };
   }, []);
 

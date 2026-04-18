@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { loadCard, type RelationshipRecord } from '@/lib/wtf-card';
+import { hasBrowserSupabaseSession } from '@/lib/supabase/client';
 import {
   CPTI_RELATIONSHIP_TYPES,
   RELATIONSHIP_TIER_INFO,
@@ -33,7 +34,13 @@ export function CptiGalleryContent() {
     }
 
     // Also fetch from backend
-    cptiApi.getCollection().then(data => {
+    void (async () => {
+      const hasSession = await hasBrowserSupabaseSession();
+      if (!hasSession) {
+        return;
+      }
+
+      const data = await cptiApi.getCollection();
       if (data?.recentRelationships?.length > 0) {
         const backendSlugs = new Set(data.recentRelationships.map(r => r.slug));
         setSyncedSlugs(backendSlugs);
@@ -54,7 +61,7 @@ export function CptiGalleryContent() {
         }
         setRelationships(merged);
       }
-    }).catch(() => { /* offline fallback — local only */ });
+    })().catch(() => { /* offline fallback — local only */ });
   }, []);
 
   const collectedSlugs = new Set(relationships.map(r => r.slug));

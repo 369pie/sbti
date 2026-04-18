@@ -34,6 +34,7 @@ const cormorant = Cormorant_Garamond({
   weight: ["400", "600"],
   display: "swap",
   variable: "--font-cormorant",
+  preload: false,
 });
 
 const fraunces = Fraunces({
@@ -42,6 +43,7 @@ const fraunces = Fraunces({
   style: ["italic"],
   display: "swap",
   variable: "--font-fraunces",
+  preload: false,
 });
 
 const jetbrains = JetBrains_Mono({
@@ -49,6 +51,7 @@ const jetbrains = JetBrains_Mono({
   weight: ["400"],
   display: "swap",
   variable: "--font-mono-ui",
+  preload: false,
 });
 
 export const metadata: Metadata = {

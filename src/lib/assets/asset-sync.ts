@@ -1,4 +1,4 @@
-import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { hasBrowserSupabaseSession, tryCreateBrowserSupabaseClient } from '@/lib/supabase/client';
 import { getOrCreateAnonymousSession } from '@/lib/supabase/auth';
 import { getApiPath, readApiJson } from '@/lib/api';
 import {
@@ -130,9 +130,7 @@ function applyServerAssets(
 }
 
 async function hasExistingSession(): Promise<boolean> {
-  const supabase = createBrowserSupabaseClient();
-  const { data: { session } } = await supabase.auth.getSession();
-  return !!session;
+  return hasBrowserSupabaseSession();
 }
 
 async function ensureSyncSession(): Promise<boolean> {
@@ -140,7 +138,11 @@ async function ensureSyncSession(): Promise<boolean> {
   if (sessionPromise) return sessionPromise;
 
   sessionPromise = (async () => {
-    const supabase = createBrowserSupabaseClient();
+    const supabase = tryCreateBrowserSupabaseClient();
+    if (!supabase) {
+      return false;
+    }
+
     const { data: { session } } = await supabase.auth.getSession();
     if (session) return true;
 

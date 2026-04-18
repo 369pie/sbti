@@ -30,4 +30,20 @@ export function createBrowserSupabaseClient() {
   return browserClientSingleton;
 }
 
+export async function hasBrowserSupabaseSession(): Promise<boolean> {
+  const client = tryCreateBrowserSupabaseClient();
+  if (!client) {
+    return false;
+  }
+
+  try {
+    const {
+      data: { session },
+    } = await client.auth.getSession();
+    return Boolean(session);
+  } catch {
+    return false;
+  }
+}
+
 export const createClient = createBrowserSupabaseClient;
