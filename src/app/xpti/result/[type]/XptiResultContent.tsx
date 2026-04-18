@@ -24,6 +24,7 @@ import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 interface Props {
   personality: XptiPersonalityType;
@@ -34,6 +35,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<XptiShareImageGeneratorHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
 
   const shareUrl = getSiteUrl(`/xpti/result/${personality.slug}/`);
 
@@ -128,7 +130,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
         <div className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center relative">
           {/* Share button */}
           <button
-            onClick={() => shareRef.current?.generate()}
+            onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
             className="absolute top-6 right-6 p-2.5 rounded-full border border-rule-soft bg-bg-elevated hover:bg-paper-deep text-text-muted hover:text-text-primary transition-all cursor-pointer"
             title="生成分享图片"
             aria-label="生成分享图片"
@@ -396,7 +398,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
           </h2>
 
           <div className="space-y-3">
-            <XptiShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} presetId="xpti-editorial" />
+            {shareMounted ? <XptiShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} presetId="xpti-editorial" /> : null}
 
             <button
               onClick={copyShareText}

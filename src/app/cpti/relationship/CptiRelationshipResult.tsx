@@ -29,6 +29,7 @@ import { ClaimAssetCard } from '@/components/ClaimAssetCard';
 import CptiPairShareCard from '@/components/CptiPairShareCard';
 import { SendAsGiftCTA } from '@/components/SendAsGiftCTA';
 import { getRelationshipRarity } from '@/lib/cpti/relationships-rarity';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 const emptySubscribe = () => () => {};
 
@@ -81,6 +82,7 @@ export function CptiRelationshipResult() {
   const [aImageMode, setAImageMode] = useState<'full' | 'thumb' | 'emoji'>('thumb');
   const [bImageMode, setBImageMode] = useState<'full' | 'thumb' | 'emoji'>('thumb');
   const shareRef = useRef<CptiRelationshipShareImageGeneratorHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
 
   const { data, backendData, fromLink } = useMemo(() => {
     if (!mounted) {
@@ -517,7 +519,7 @@ export function CptiRelationshipResult() {
         <div className="max-w-3xl mx-auto px-6 pt-14 pb-10 text-center relative">
           {/* Share button */}
           <button
-            onClick={() => shareRef.current?.generate()}
+            onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
             className="absolute top-14 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-rose-400 transition-all cursor-pointer"
             title="生成分享图片"
           >
@@ -884,12 +886,11 @@ export function CptiRelationshipResult() {
           </div>
 
           <div className="space-y-3">
-            <CptiRelationshipShareImageGenerator
-              ref={shareRef}
+            {shareMounted ? <CptiRelationshipShareImageGenerator ref={shareRef}
               relationship={relationship}
               nicknameA={nicknameA}
               nicknameB="你"
-            />
+            /> : null}
 
             <button
               onClick={copyShareText}

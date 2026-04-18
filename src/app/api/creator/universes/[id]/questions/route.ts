@@ -14,14 +14,22 @@ export async function GET(_request: Request, { params }: Params) {
     .eq('universe_id', id)
     .order('sort_order');
 
-  return NextResponse.json({
-    questions: (questions ?? []).map((q: Record<string, unknown>) => ({
-      ...q,
-      options: ((q.creator_options as Record<string, unknown>[]) ?? [])
-        .sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
-          (a.sort_order as number) - (b.sort_order as number)),
-    })),
-  });
+  return NextResponse.json(
+    {
+      questions: (questions ?? []).map((q: Record<string, unknown>) => ({
+        ...q,
+        options: ((q.creator_options as Record<string, unknown>[]) ?? [])
+          .sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
+            (a.sort_order as number) - (b.sort_order as number)),
+      })),
+    },
+    {
+      headers: {
+        // Public-shape data; safe to share at the edge across users.
+        'Cache-Control': 'public, max-age=0, s-maxage=120, stale-while-revalidate=600',
+      },
+    },
+  );
 }
 
 /** POST /api/creator/universes/[id]/questions — add a question */

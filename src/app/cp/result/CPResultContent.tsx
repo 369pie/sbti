@@ -17,6 +17,7 @@ const CPShareImageGenerator = dynamic(
 );
 import type { CPShareImageGeneratorHandle } from '@/components/CPShareImageGenerator';
 import { getSiteUrl } from '@/lib/site';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 function CompatibilityRing({ value, size = 160, color }: { value: number; size?: number; color: string }) {
   const r = (size - 16) / 2;
@@ -126,6 +127,7 @@ export function CPResultContent() {
   const slugA = searchParams.get('a');
   const slugB = searchParams.get('b');
   const shareRef = useRef<CPShareImageGeneratorHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
   const [cpLinkCopied, setCpLinkCopied] = useState(false);
 
   const copyCPResultLink = useCallback(() => {
@@ -180,7 +182,7 @@ export function CPResultContent() {
       <section className="max-w-3xl mx-auto px-6 pt-12 pb-8 relative">
         {/* Share button */}
         <button
-          onClick={() => shareRef.current?.generate()}
+          onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
           className="absolute top-12 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-accent transition-all cursor-pointer"
           title="生成分享图片"
         >
@@ -406,7 +408,7 @@ export function CPResultContent() {
             分享你们的 CP 结果
           </h2>
           <div className="space-y-3">
-            <CPShareImageGenerator ref={shareRef} cpResult={result} />
+            {shareMounted ? <CPShareImageGenerator ref={shareRef} cpResult={result} /> : null}
           </div>
         </motion.div>
       </section>

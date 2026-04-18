@@ -18,6 +18,7 @@ import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 interface Props {
   personality: LovePersonalityType;
@@ -28,6 +29,7 @@ export function LoveResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<LoveShareImageGeneratorHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
 
   const shareUrl = getSiteUrl(`/love/result/${personality.slug}/`);
 
@@ -75,7 +77,7 @@ export function LoveResultContent({ personality, dimensionScores }: Props) {
         <div className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center relative">
           {/* Top-right share button */}
           <button
-            onClick={() => shareRef.current?.generate()}
+            onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
             className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-pink-400 transition-all cursor-pointer"
             title="生成分享图片"
           >
@@ -221,7 +223,7 @@ export function LoveResultContent({ personality, dimensionScores }: Props) {
           </h2>
 
           <div className="space-y-3">
-            <LoveShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
+            {shareMounted ? <LoveShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} /> : null}
 
             <button
               onClick={copyShareText}

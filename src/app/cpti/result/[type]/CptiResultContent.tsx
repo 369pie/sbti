@@ -30,6 +30,7 @@ import { cptiApi } from '@/lib/cpti/cpti-api';
 import { ClaimAssetCard } from '@/components/ClaimAssetCard';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 interface Props {
   personality: CptiPersonalityType;
@@ -42,6 +43,7 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
   const [heroImageMode, setHeroImageMode] = useState<'thumb' | 'medium' | 'full' | 'emoji'>('medium');
   const [otherImageModes, setOtherImageModes] = useState<Record<string, 'thumb' | 'full' | 'emoji'>>({});
   const shareRef = useRef<CptiShareImageGeneratorHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
 
   const shareUrl = getSiteUrl(`/cpti/result/${personality.slug}/`);
   const heroImageSrc = heroImageMode === 'full'
@@ -120,7 +122,7 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
         <div className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center relative">
           {/* Top-right share button */}
           <button
-            onClick={() => shareRef.current?.generate()}
+            onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
             className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-rose-400 transition-all cursor-pointer"
             title="生成分享图片"
           >
@@ -325,7 +327,7 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
           </h2>
 
           <div className="space-y-3">
-            <CptiShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
+            {shareMounted ? <CptiShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} /> : null}
 
             <button
               onClick={copyShareText}

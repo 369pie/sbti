@@ -23,6 +23,7 @@ import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { Glyph } from '@/components/Glyph';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 const emptySubscribe = () => () => {};
 
@@ -92,6 +93,7 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
     typeof crypto !== 'undefined' ? crypto.randomUUID() : `identify-${Date.now()}`,
   );
   const shareRef = useRef<IdentifyShareImageGeneratorHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
 
   useEffect(() => {
     let cancelled = false;
@@ -230,7 +232,7 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
       {/* Hero — Editorial magazine certificate */}
       <section className="relative">
         <div className="max-w-5xl mx-auto px-6 sm:px-10 pt-16 sm:pt-24 pb-16 sm:pb-20 relative">
-          <button onClick={() => shareRef.current?.generate()}
+          <button onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
             className="absolute top-16 right-6 sm:right-10 p-2.5 text-text-muted hover:text-text-primary transition-colors cursor-pointer"
             style={{ border: '1px solid var(--color-rule)' }}
             title="生成鉴定书图片">
@@ -482,7 +484,7 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 0.5 }}>
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4 text-center">分享鉴定书</h2>
           <div className="space-y-3">
-            <IdentifyShareImageGenerator ref={shareRef} persona={persona} dimensionScores={activeDimensionScores} friendName={friendName} />
+            {shareMounted ? <IdentifyShareImageGenerator ref={shareRef} persona={persona} dimensionScores={activeDimensionScores} friendName={friendName} /> : null}
             <button onClick={copyShareText}
               className="w-full py-3 rounded-xl border border-pink-500/20 bg-pink-500/5 text-sm text-pink-400 hover:bg-pink-500/10 transition-all cursor-pointer">
               {textCopied ? (

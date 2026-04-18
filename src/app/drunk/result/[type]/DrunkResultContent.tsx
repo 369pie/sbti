@@ -22,6 +22,7 @@ import { ResultDiagnosticsPanel } from '@/components/ResultDiagnosticsPanel';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { Glyph } from '@/components/Glyph';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 const emptySubscribe = () => () => {};
 
@@ -35,6 +36,7 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<DrunkShareImageGeneratorHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
 
   const shareUrl = getSiteUrl(`/drunk/result/${persona.slug}/`);
   const sessionResult = useMemo(() => {
@@ -71,7 +73,7 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
           style={{ background: `radial-gradient(ellipse, ${persona.color}12, transparent 70%)` }} />
 
         <div className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center relative">
-          <button onClick={() => shareRef.current?.generate()}
+          <button onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
             className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-gold transition-all cursor-pointer"
             title="生成分享图片">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -163,7 +165,7 @@ export function DrunkResultContent({ persona, dimensionScores }: Props) {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 0.5 }}>
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4 text-center">分享你的酒后人设</h2>
           <div className="space-y-3">
-            <DrunkShareImageGenerator ref={shareRef} persona={persona} dimensionScores={activeDimensionScores} />
+            {shareMounted ? <DrunkShareImageGenerator ref={shareRef} persona={persona} dimensionScores={activeDimensionScores} /> : null}
             <button onClick={copyShareText}
               className="w-full py-3 rounded-xl border border-gold/30 bg-gold/5 text-sm text-gold hover:bg-gold/10 transition-all cursor-pointer">
               {textCopied ? (

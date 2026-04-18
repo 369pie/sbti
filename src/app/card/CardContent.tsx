@@ -28,6 +28,7 @@ const WtfCardShareImageGenerator = dynamic(
   { ssr: false },
 );
 import type { WtfCardShareImageGeneratorHandle } from '@/components/WtfCardShareImageGenerator';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 import { IdentifyHistoryPanel } from '@/components/IdentifyHistoryPanel';
 import {
   CPTI_RELATIONSHIP_TYPES,
@@ -863,6 +864,7 @@ export function CardContent() {
   }, [isAuthenticated, displayName]);
 
   const shareRef = useRef<WtfCardShareImageGeneratorHandle>(null);
+  const { mounted: shareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
   const theirCard = useMemo(() => {
     if (typeof window === 'undefined' || !theirEncoded) {
       return null;
@@ -928,8 +930,8 @@ export function CardContent() {
   }, []);
 
   const handleShareImage = useCallback(() => {
-    shareRef.current?.generate();
-  }, []);
+    triggerShareGenerate();
+  }, [triggerShareGenerate]);
 
   const handleTogglePin = useCallback((uid: string) => {
     const updated = togglePinnedUniverse(uid);
@@ -1153,7 +1155,7 @@ export function CardContent() {
       )}
 
       {/* Hidden share image generator */}
-      <WtfCardShareImageGenerator ref={shareRef} card={card} />
+      {shareMounted ? <WtfCardShareImageGenerator ref={shareRef} card={card} /> : null}
     </div>
   );
 }

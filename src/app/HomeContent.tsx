@@ -4,7 +4,7 @@ import { PERSONALITY_TYPES, getTypeThumbnailImage } from '@/lib/personalities';
 import { getLiveUniverses } from '@/lib/universes';
 import { withBasePath } from '@/lib/site';
 import { FollowMeCard, FollowMeFloating } from '@/components/FollowMeLinks';
-import { WtfCardBanner } from '@/components/WtfCardBanner';
+import { DeferredWtfCardBanner } from '@/components/DeferredWtfCardBanner';
 
 // ─── Intent-based data (mirrors Navigation.tsx categories) ───────────────────
 
@@ -92,7 +92,7 @@ export default function HomeContent() {
       {/* ── Hero — Editorial magazine cover ── */}
       <section className="relative overflow-hidden">
         <div className="max-w-5xl mx-auto px-6 sm:px-10 pt-20 sm:pt-32 pb-24 sm:pb-32 relative">
-          <div className="animate-fade-up">
+          <div>
             {/* Issue marker */}
             <div className="flex items-center gap-4 mb-10">
               <span className="serial-number text-sm">Issue 01</span>
@@ -121,7 +121,7 @@ export default function HomeContent() {
           </div>
 
           {/* Primary CTA row */}
-          <div className="mt-12 sm:mt-16 flex flex-wrap items-center gap-4 animate-fade-up-delay-1">
+          <div className="mt-12 sm:mt-16 flex flex-wrap items-center gap-4">
             <Link href="/test/" prefetch={false} className="btn btn-ink">
               开始测试
               <span className="opacity-60">→</span>
@@ -142,7 +142,7 @@ export default function HomeContent() {
       {/* ── Intent grid — "你想做什么？" ── */}
       <section className="py-20 sm:py-28 px-6 sm:px-10">
         <div className="max-w-5xl mx-auto">
-          <div className="flex items-baseline justify-between mb-12 animate-fade-up">
+          <div className="flex items-baseline justify-between mb-12">
             <div>
               <span className="serial-number text-xs mr-3">02</span>
               <span className="eyebrow">Where to start</span>
@@ -178,7 +178,7 @@ export default function HomeContent() {
           </div>
 
           {/* Stats row */}
-          <div className="mt-16 grid grid-cols-3 animate-fade-up-delay-2" style={{ borderTop: '1px solid var(--color-rule-soft)', borderBottom: '1px solid var(--color-rule-soft)' }}>
+          <div className="mt-16 grid grid-cols-3" style={{ borderTop: '1px solid var(--color-rule-soft)', borderBottom: '1px solid var(--color-rule-soft)' }}>
             {[
               { value: `${universes.length}`, label: '测试宇宙' },
               { value: '100+', label: '种人格' },
@@ -198,7 +198,7 @@ export default function HomeContent() {
       </section>
 
       {/* ── Hot Picks — 推荐测试 ── */}
-      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="max-w-5xl mx-auto">
           <div className="mb-12 animate-fade-up flex items-baseline justify-between">
             <div>
@@ -252,7 +252,7 @@ export default function HomeContent() {
       </section>
 
       {/* ── Universe Hub — 按风格浏览 ── */}
-      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="max-w-5xl mx-auto">
           <div className="mb-12 animate-fade-up">
             <span className="serial-number text-xs mr-3">04</span>
@@ -324,10 +324,12 @@ export default function HomeContent() {
       </section>
 
       {/* ── WTF Card Banner ── */}
-      <WtfCardBanner />
+      <div className="defer-section">
+        <DeferredWtfCardBanner />
+      </div>
 
       {/* ── Relationship Plays — 测关系 ── */}
-      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="max-w-5xl mx-auto">
           <div className="mb-12 animate-fade-up">
             <span className="serial-number text-xs mr-3">05</span>
@@ -368,7 +370,7 @@ export default function HomeContent() {
       </section>
 
       {/* ── Casual + Explore — 合并为二栏 editorial 目录 ── */}
-      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-16">
           <div className="animate-fade-up">
             <span className="serial-number text-xs mr-3">06</span>
@@ -429,7 +431,7 @@ export default function HomeContent() {
       </section>
 
       {/* ── Creator Program — editorial feature ── */}
-      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="max-w-5xl mx-auto">
           <div className="relative overflow-hidden p-10 sm:p-16" style={{ background: 'var(--color-paper-warm)', border: '1px solid var(--color-rule)' }}>
             <div className="flex items-center gap-4 mb-8">
@@ -459,7 +461,7 @@ export default function HomeContent() {
       </section>
 
       {/* ── Featured Types — 图鉴墙 ── */}
-      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="max-w-5xl mx-auto">
           <div className="mb-12 flex items-baseline justify-between flex-wrap gap-4">
             <div>
@@ -515,7 +517,7 @@ export default function HomeContent() {
       </section>
 
       {/* ── FAQ — editorial Q&A ── */}
-      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="max-w-3xl mx-auto">
           <div className="mb-12">
             <span className="serial-number text-xs mr-3">10</span>
@@ -548,7 +550,7 @@ export default function HomeContent() {
       </section>
 
       {/* ── Community ── */}
-      <section className="py-16 px-6 border-t border-border-subtle">
+      <section className="defer-section py-16 px-6 border-t border-border-subtle">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8 animate-fade-up">
             <span className="section-label block mb-2">Community</span>
@@ -609,10 +611,12 @@ export default function HomeContent() {
         </div>
       </section>
 
-      <FollowMeCard />
+      <div className="defer-section">
+        <FollowMeCard />
+      </div>
 
       {/* ── Bottom CTA ── */}
-      <section className="py-20 px-6 text-center">
+      <section className="defer-section py-20 px-6 text-center">
         <div className="max-w-lg mx-auto">
           <h2 className="section-headline text-2xl sm:text-3xl mb-4">
             准备好了吗？

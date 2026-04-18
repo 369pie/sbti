@@ -27,6 +27,7 @@ import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 import { UniverseSwitcher } from '@/components/UniverseSwitcher';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { Glyph } from '@/components/Glyph';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 interface Props {
   birdPersonality: BirdPersonality;
@@ -37,6 +38,7 @@ export function BirdResultContent({ birdPersonality: p, dimensionScores }: Props
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<BirdShareImageHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
 
   const shareUrl = getSiteUrl(`/bird/result/${p.slug}/`);
 
@@ -86,7 +88,7 @@ export function BirdResultContent({ birdPersonality: p, dimensionScores }: Props
           {/* Top actions */}
           <div className="absolute top-16 right-6 flex items-center gap-2">
             <button
-              onClick={() => shareRef.current?.generate()}
+              onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
               className="p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-accent transition-all cursor-pointer"
               title="生成分享图片"
             >
@@ -259,12 +261,11 @@ export function BirdResultContent({ birdPersonality: p, dimensionScores }: Props
           </p>
 
           <div className="max-w-sm mx-auto mb-4">
-            <BirdShareImageGenerator
-              ref={shareRef}
+            {shareMounted ? <BirdShareImageGenerator ref={shareRef}
               personality={p}
               imageUrl={typeImageUrl}
               dimensionScores={dimensionScores}
-            />
+            /> : null}
           </div>
 
           <div className="flex gap-3 max-w-sm mx-auto">

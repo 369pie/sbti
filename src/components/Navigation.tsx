@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { signOut } from '@/lib/supabase/auth';
-import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { getLiveUniverses } from '@/lib/universes';
 import { Logo } from '@/components/Logo';
 
@@ -125,6 +124,9 @@ export function Navigation() {
     if (isLoggingOut) return;
     setIsLoggingOut(true);
     try {
+      // Lazy-import the supabase client only when the user actually logs out.
+      // Keeps @supabase/supabase-js (~70 KB gzip) out of the public-page bundle.
+      const { createBrowserSupabaseClient } = await import('@/lib/supabase/client');
       const supabase = createBrowserSupabaseClient();
       const { error } = await signOut(supabase);
 

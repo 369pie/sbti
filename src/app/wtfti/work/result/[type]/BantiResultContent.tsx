@@ -27,6 +27,7 @@ import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { Glyph } from '@/components/Glyph';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 interface Props {
   bantiPersonality: BantiPersonality;
@@ -37,6 +38,7 @@ export function BantiResultContent({ bantiPersonality: p, dimensionScores }: Pro
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<BantiShareImageHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
 
   const shareUrl = getSiteUrl(`/wtfti/work/result/${p.slug}/`);
 
@@ -86,7 +88,7 @@ export function BantiResultContent({ bantiPersonality: p, dimensionScores }: Pro
           {/* Top actions */}
           <div className="absolute top-16 right-6 flex items-center gap-2">
             <button
-              onClick={() => shareRef.current?.generate()}
+              onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
               className="p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-accent transition-all cursor-pointer"
               title="生成分享图片"
             >
@@ -255,12 +257,11 @@ export function BantiResultContent({ bantiPersonality: p, dimensionScores }: Pro
 
           {/* Share image generator */}
           <div className="max-w-sm mx-auto mb-4">
-            <BantiShareImageGenerator
-              ref={shareRef}
+            {shareMounted ? <BantiShareImageGenerator ref={shareRef}
               personality={p}
               imageUrl={typeImageUrl}
               dimensionScores={dimensionScores}
-            />
+            /> : null}
           </div>
 
           {/* Share buttons */}

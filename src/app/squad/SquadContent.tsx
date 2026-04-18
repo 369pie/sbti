@@ -24,6 +24,7 @@ const SquadShareImageGenerator = dynamic(
   { ssr: false },
 );
 import type { SquadShareImageGeneratorHandle } from '@/components/SquadShareImageGenerator';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 // ─── Step indicator ──────────────────────────────────────
 
@@ -457,6 +458,7 @@ function SquadResultDisplay({
 export default function SquadContent() {
   const searchParams = useSearchParams();
   const shareRef = useRef<SquadShareImageGeneratorHandle>(null);
+  const { mounted: shareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
 
   // Try to restore from URL params
   const restored = useMemo(() => decodeSquadParams(searchParams), [searchParams]);
@@ -497,8 +499,8 @@ export default function SquadContent() {
   }, []);
 
   const handleShare = useCallback(() => {
-    shareRef.current?.generate();
-  }, []);
+    triggerShareGenerate();
+  }, [triggerShareGenerate]);
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
@@ -575,9 +577,9 @@ export default function SquadContent() {
         )}
       </AnimatePresence>
 
-      {analysis && (
+      {analysis && shareMounted ? (
         <SquadShareImageGenerator ref={shareRef} analysis={analysis} />
-      )}
+      ) : null}
     </div>
   );
 }

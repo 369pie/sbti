@@ -18,6 +18,7 @@ const ComboShareImageGenerator = dynamic(
   { ssr: false },
 );
 import type { ComboShareImageGeneratorHandle } from '@/components/ComboShareImageGenerator';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 // ─── Step indicator ──────────────────────────────────────
 
@@ -164,6 +165,7 @@ function ZodiacPicker({
 
 function ComboResultDisplay({ result }: { result: ComboResult }) {
   const shareRef = useRef<ComboShareImageGeneratorHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
   const [copied, setCopied] = useState(false);
   const comboImageSrc = getComboPersonalityMediumImage(result.comboPersonality.code);
   const comboImageFallbackSrc = getComboPersonalityImage(result.comboPersonality.code);
@@ -198,7 +200,7 @@ function ComboResultDisplay({ result }: { result: ComboResult }) {
     >
       {/* Top-right share button */}
       <button
-        onClick={() => shareRef.current?.generate()}
+        onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
         className="absolute -top-2 right-0 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-purple-400 transition-all cursor-pointer z-10"
         title="生成分享图片"
       >
@@ -347,7 +349,7 @@ function ComboResultDisplay({ result }: { result: ComboResult }) {
 
       {/* Share section */}
       <div className="space-y-3 mb-8">
-        <ComboShareImageGenerator ref={shareRef} result={result} />
+        {shareMounted ? <ComboShareImageGenerator ref={shareRef} result={result} /> : null}
       </div>
 
       {/* Actions */}

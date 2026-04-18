@@ -7,6 +7,7 @@ import "./globals.css";
 import { Navigation } from "@/components/Navigation";
 import { AuthProvider } from "@/components/AuthProvider";
 import { FollowMeInline } from '@/components/FollowMeLinks';
+import { WebVitalsReporter } from '@/components/WebVitalsReporter';
 import { getLegacyRedirectScript, getSiteLabel, getSiteOrigin, getSiteUrl, isLegacyPagesBuild } from "@/lib/site";
 
 // ─── Typography system v3: Editorial Feminine ──────────────────────────────
@@ -194,6 +195,7 @@ export default function RootLayout({
           </footer>
         </AuthProvider>
         <Analytics />
+        <WebVitalsReporter />
       </body>
     </html>
   );

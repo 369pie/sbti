@@ -27,6 +27,7 @@ import { UniverseProgressBar } from '@/components/UniverseProgressBar';
 import { TheoryAnchorCard } from '@/components/TheoryAnchorCard';
 import { persistUniverseProfile } from '@/lib/wtfi/cci';
 import { projectLegacyToWtfi } from '@/lib/wtfi/dimension-alias';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 interface Props {
   wtftiPersonality: WtftiPersonality;
@@ -37,6 +38,7 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<WtftiShareImageHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
 
   // Mark as collected on mount
   useEffect(() => {
@@ -98,7 +100,7 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
           {/* Top actions */}
           <div className="absolute top-16 right-6 flex items-center gap-2">
             <button
-              onClick={() => shareRef.current?.generate()}
+              onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
               className="p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-accent transition-all cursor-pointer"
               title="生成分享图片"
             >
@@ -259,12 +261,11 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
 
           {/* Share image generator */}
           <div className="max-w-sm mx-auto mb-4">
-            <WtftiShareImageGenerator
-              ref={shareRef}
+            {shareMounted ? <WtftiShareImageGenerator ref={shareRef}
               personality={p}
               imageUrl={typeImageUrl}
               dimensionScores={dimensionScores}
-            />
+            /> : null}
           </div>
 
           {/* Share buttons */}

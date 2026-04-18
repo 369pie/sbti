@@ -21,6 +21,7 @@ import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { loadStoredQuizResult } from '@/lib/quiz-result-session';
 import { ResultDiagnosticsPanel } from '@/components/ResultDiagnosticsPanel';
 import { generateDailyFortune, loadTodayResult, msUntilMidnight, cacheDailyResult } from '@/lib/daily/fortune';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 const emptySubscribe = () => () => {};
 
@@ -34,6 +35,7 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<DailyShareImageGeneratorHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
   const [countdown, setCountdown] = useState('');
 
   // Ensure today's result is cached (handles direct link access)
@@ -111,7 +113,7 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
         <div className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center relative">
           {/* Top-right share button */}
           <button
-            onClick={() => shareRef.current?.generate()}
+            onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
             className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-teal-400 transition-all cursor-pointer"
             title="生成分享图片"
           >
@@ -317,7 +319,7 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
           </h2>
 
           <div className="space-y-3">
-            <DailyShareImageGenerator ref={shareRef} status={status} dimensionScores={activeDimensionScores} />
+            {shareMounted ? <DailyShareImageGenerator ref={shareRef} status={status} dimensionScores={activeDimensionScores} /> : null}
 
             <button
               onClick={copyShareText}

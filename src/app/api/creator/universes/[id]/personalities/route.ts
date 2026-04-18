@@ -14,7 +14,15 @@ export async function GET(_request: Request, { params }: Params) {
     .eq('universe_id', id)
     .order('sort_order');
 
-  return NextResponse.json({ personalities: data ?? [] });
+  return NextResponse.json(
+    { personalities: data ?? [] },
+    {
+      headers: {
+        // Public-shape data; safe to share at the edge across users.
+        'Cache-Control': 'public, max-age=0, s-maxage=120, stale-while-revalidate=600',
+      },
+    },
+  );
 }
 
 /** POST /api/creator/universes/[id]/personalities — add a personality */

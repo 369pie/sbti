@@ -22,6 +22,7 @@ import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 import { UniverseSwitcher } from '@/components/UniverseSwitcher';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 interface Props {
   kingsPersonality: KingsPersonality;
@@ -32,6 +33,7 @@ export function KingsResultContent({ kingsPersonality: p, dimensionScores }: Pro
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<KingsShareImageHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
 
   const shareUrl = getSiteUrl(`/wtfti/kings/result/${p.slug}/`);
 
@@ -80,7 +82,7 @@ export function KingsResultContent({ kingsPersonality: p, dimensionScores }: Pro
         <div className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center relative">
           <div className="absolute top-16 right-6 flex items-center gap-2">
             <button
-              onClick={() => shareRef.current?.generate()}
+              onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
               className="p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-accent transition-all cursor-pointer"
               title="生成分享图片"
             >
@@ -231,12 +233,11 @@ export function KingsResultContent({ kingsPersonality: p, dimensionScores }: Pro
           </p>
 
           <div className="max-w-sm mx-auto mb-4">
-            <KingsShareImageGenerator
-              ref={shareRef}
+            {shareMounted ? <KingsShareImageGenerator ref={shareRef}
               personality={p}
               imageUrl={typeImageUrl}
               dimensionScores={dimensionScores}
-            />
+            /> : null}
           </div>
 
           {/* Share buttons */}

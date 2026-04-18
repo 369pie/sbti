@@ -27,6 +27,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { SoultiPortraitShareCard } from '@/components/SoultiPortraitShareCard';
 import { getSoultiExtendedSections, generateSoulLetter } from '@/lib/soulti/extended-sections';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 interface Props {
   personality: SoultiPersonalityType;
@@ -40,6 +41,7 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
   const [textCopied, setTextCopied] = useState(false);
   const [heroImageFailed, setHeroImageFailed] = useState(false);
   const shareRef = useRef<SoultiShareImageGeneratorHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
   const [activeMirror, setActiveMirror] = useState<'day' | 'night' | 'dream'>('day');
   const { isAuthenticated } = useAuth();
 
@@ -158,7 +160,7 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
           {/* Share button - subtle, top right */}
           <div className="relative">
             <button
-              onClick={() => shareRef.current?.generate()}
+              onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
               className="absolute -top-2 right-0 p-2 rounded-lg text-[#7A6A5A] opacity-40 hover:opacity-100 transition-opacity cursor-pointer"
               title="生成分享图片"
             >
@@ -1278,7 +1280,7 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
           </h3>
 
           <div className="space-y-3">
-            <SoultiShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
+            {shareMounted ? <SoultiShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} /> : null}
 
             <button
               onClick={copyShareText}

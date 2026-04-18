@@ -23,8 +23,22 @@ function isPublicGet(request: NextRequest): boolean {
   return PUBLIC_GET_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
+/**
+ * Endpoints that should never trigger a Supabase session refresh, regardless
+ * of HTTP method. RUM beacons fire from every page; running `updateSession`
+ * for each one doubles the roundtrip count to us-east-1 for no benefit.
+ */
+const SESSION_BYPASS_PREFIXES = [
+  '/api/perf/report',
+];
+
+function isSessionBypass(request: NextRequest): boolean {
+  const { pathname } = request.nextUrl;
+  return SESSION_BYPASS_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
+
 export async function proxy(request: NextRequest) {
-  if (isPublicGet(request)) {
+  if (isPublicGet(request) || isSessionBypass(request)) {
     return NextResponse.next({ request });
   }
   return updateSession(request);

@@ -25,6 +25,7 @@ import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 interface Props {
   personality: FlowerPersonalityType;
@@ -35,6 +36,7 @@ export function FlowerResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<FlowerShareImageGeneratorHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
 
   const shareUrl = getSiteUrl(`/flower/result/${personality.slug}/`);
 
@@ -91,7 +93,7 @@ export function FlowerResultContent({ personality, dimensionScores }: Props) {
         <div className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center relative">
           {/* Share button */}
           <button
-            onClick={() => shareRef.current?.generate()}
+            onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
             className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-rose-400 transition-all cursor-pointer"
             title="生成分享图片"
           >
@@ -260,7 +262,7 @@ export function FlowerResultContent({ personality, dimensionScores }: Props) {
           </h2>
 
           <div className="space-y-3">
-            <FlowerShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} />
+            {shareMounted ? <FlowerShareImageGenerator ref={shareRef} personality={personality} dimensionScores={dimensionScores} /> : null}
 
             <button
               onClick={copyShareText}

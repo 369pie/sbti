@@ -24,6 +24,7 @@ import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
+import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 interface Props {
   fengPersonality: FengPersonality;
@@ -246,6 +247,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const shareRef = useRef<FengShareImageHandle>(null);
+  const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef);
 
   const shareUrl = getSiteUrl(`/wtfti/feng/result/${p.slug}/`);
 
@@ -374,7 +376,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
           {/* Top actions */}
           <div className="absolute top-12 right-6 flex items-center gap-2">
             <button
-              onClick={() => shareRef.current?.generate()}
+              onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
               className="p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all cursor-pointer feng-shake-lite"
               title="生成分享图片"
             >
@@ -560,7 +562,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
 
             {/* Share image generator */}
             <div className="max-w-sm mx-auto mb-5">
-              <FengShareImageGenerator ref={shareRef} personality={p} imageUrl={typeImageUrl} dimensionScores={dimensionScores} />
+              {shareMounted ? <FengShareImageGenerator ref={shareRef} personality={p} imageUrl={typeImageUrl} dimensionScores={dimensionScores} /> : null}
             </div>
 
             {/* Share buttons */}
