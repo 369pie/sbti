@@ -21,6 +21,11 @@ type EnvKey =
   | (typeof SUPABASE_SERVER_URL_KEYS)[number]
   | (typeof SUPABASE_SERVER_PUBLISHABLE_KEY_KEYS)[number];
 
+type SupabasePublicEnv = {
+  url?: string;
+  publishableKey?: string;
+};
+
 function isBrowserRuntime(): boolean {
   return typeof window !== 'undefined';
 }
@@ -36,6 +41,19 @@ function getRuntimeKeys() {
   return {
     urlKeys: SUPABASE_SERVER_URL_KEYS,
     publishableKeyKeys: SUPABASE_SERVER_PUBLISHABLE_KEY_KEYS,
+  };
+}
+
+function readBrowserPublicEnv(): SupabasePublicEnv {
+  // Next.js only inlines browser env vars for direct property access.
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const publishableKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  return {
+    url: typeof url === 'string' && url.length > 0 ? url : undefined,
+    publishableKey:
+      typeof publishableKey === 'string' && publishableKey.length > 0 ? publishableKey : undefined,
   };
 }
 
@@ -61,6 +79,15 @@ function requireEnv(label: string, keys: readonly EnvKey[]): string {
 }
 
 export function getOptionalSupabasePublicEnv() {
+  if (isBrowserRuntime()) {
+    const env = readBrowserPublicEnv();
+    if (!env.url || !env.publishableKey) {
+      return null;
+    }
+
+    return env as { url: string; publishableKey: string };
+  }
+
   const { urlKeys, publishableKeyKeys } = getRuntimeKeys();
   const url = readEnv(urlKeys);
   const publishableKey = readEnv(publishableKeyKeys);
@@ -73,6 +100,17 @@ export function getOptionalSupabasePublicEnv() {
 }
 
 export function getSupabasePublicEnv() {
+  if (isBrowserRuntime()) {
+    const env = readBrowserPublicEnv();
+
+    return {
+      url: env.url || requireEnv('Supabase URL', SUPABASE_BROWSER_URL_KEYS),
+      publishableKey:
+        env.publishableKey ||
+        requireEnv('Supabase publishable key', SUPABASE_BROWSER_PUBLISHABLE_KEY_KEYS),
+    };
+  }
+
   const { urlKeys, publishableKeyKeys } = getRuntimeKeys();
 
   return {
