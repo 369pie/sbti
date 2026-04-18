@@ -20,6 +20,9 @@ export interface XunhupayConfig {
   appsecret: string;
   /** 接口域名，默认官方 */
   apiBase?: string;
+  appidEnvKey: string;
+  appsecretEnvKey: string;
+  apiBaseEnvKey?: string;
   /** 来源：独立渠道配置，或兼容旧版共享配置 */
   source: 'channel' | 'shared';
 }
@@ -89,12 +92,36 @@ export function verifyXunhupayCallback(
   return incoming.toLowerCase() === expected.toLowerCase();
 }
 
-function readFirstEnv(names: readonly string[]): string | undefined {
-  for (const name of names) {
-    const value = process.env[name]?.trim();
-    if (value) return value;
+interface ResolvedEnvValue {
+  value?: string;
+  key?: string;
+  conflict?: {
+    keys: string[];
+    values: string[];
+  };
+}
+
+function readEnvValue(names: readonly string[]): ResolvedEnvValue {
+  const entries = names
+    .map(name => ({ name, value: process.env[name]?.trim() }))
+    .filter((entry): entry is { name: string; value: string } => Boolean(entry.value));
+
+  if (entries.length === 0) return {};
+
+  const values = [...new Set(entries.map(entry => entry.value))];
+  if (values.length > 1) {
+    return {
+      conflict: {
+        keys: entries.map(entry => entry.name),
+        values,
+      },
+    };
   }
-  return undefined;
+
+  return {
+    value: entries[0].value,
+    key: entries[0].name,
+  };
 }
 
 function hasAnyEnv(names: readonly string[]): boolean {
@@ -114,20 +141,54 @@ export function maskXunhupayAppId(appid: string): string {
   return `${appid.slice(0, 3)}***${appid.slice(-3)}`;
 }
 
+function logEnvConflict(
+  channel: XunhupayPaymentChannel,
+  source: XunhupayConfig['source'],
+  field: 'appid' | 'appsecret' | 'apiBase',
+  conflict: NonNullable<ResolvedEnvValue['conflict']>,
+) {
+  console.error('[xunhupay-config] conflicting env values', {
+    channel,
+    source,
+    field,
+    keys: conflict.keys,
+    values:
+      field === 'appid'
+        ? conflict.values.map(maskXunhupayAppId)
+        : conflict.values.map(() => '[redacted]'),
+  });
+}
+
 function readSharedConfig(
   channel: XunhupayPaymentChannel,
 ): XunhupayConfig | null {
   const names = buildEnvNames('XUNHUPAY_');
-  const appid = readFirstEnv(names.appid);
-  const appsecret = readFirstEnv(names.appsecret);
-  if (!appid || !appsecret) return null;
+  const appid = readEnvValue(names.appid);
+  const appsecret = readEnvValue(names.appsecret);
+  const apiBase = readEnvValue(names.apiBase);
+
+  if (appid.conflict) {
+    logEnvConflict(channel, 'shared', 'appid', appid.conflict);
+    return null;
+  }
+  if (appsecret.conflict) {
+    logEnvConflict(channel, 'shared', 'appsecret', appsecret.conflict);
+    return null;
+  }
+  if (apiBase.conflict) {
+    logEnvConflict(channel, 'shared', 'apiBase', apiBase.conflict);
+    return null;
+  }
+  if (!appid.value || !appsecret.value || !appid.key || !appsecret.key) return null;
+
   return {
     channel,
-    appid,
-    appsecret,
-    apiBase:
-      readFirstEnv(names.apiBase) ||
-      'https://api.xunhupay.com',
+    appid: appid.value,
+    appsecret: appsecret.value,
+    apiBase: apiBase.value || 'https://api.xunhupay.com',
+    appidEnvKey: appid.key,
+    appsecretEnvKey: appsecret.key,
+    apiBaseEnvKey: apiBase.key,
     source: 'shared',
   };
 }
@@ -137,22 +198,45 @@ export function readXunhupayConfig(
 ): XunhupayConfig | null {
   const prefix = channel === 'wechat' ? 'XUNHUPAY_WECHAT_' : 'XUNHUPAY_ALIPAY_';
   const names = buildEnvNames(prefix);
-  const appid = readFirstEnv(names.appid);
-  const appsecret = readFirstEnv(names.appsecret);
-  if (appid && appsecret) {
+  const appid = readEnvValue(names.appid);
+  const appsecret = readEnvValue(names.appsecret);
+  const apiBase = readEnvValue(names.apiBase);
+
+  if (appid.conflict) {
+    logEnvConflict(channel, 'channel', 'appid', appid.conflict);
+    return null;
+  }
+  if (appsecret.conflict) {
+    logEnvConflict(channel, 'channel', 'appsecret', appsecret.conflict);
+    return null;
+  }
+  if (apiBase.conflict) {
+    logEnvConflict(channel, 'channel', 'apiBase', apiBase.conflict);
+    return null;
+  }
+
+  if (appid.value && appsecret.value && appid.key && appsecret.key) {
     return {
       channel,
-      appid,
-      appsecret,
+      appid: appid.value,
+      appsecret: appsecret.value,
       apiBase:
-        readFirstEnv(names.apiBase) ||
-        readFirstEnv(buildEnvNames('XUNHUPAY_').apiBase) ||
+        apiBase.value ||
+        readSharedConfig(channel)?.apiBase ||
         'https://api.xunhupay.com',
+      appidEnvKey: appid.key,
+      appsecretEnvKey: appsecret.key,
+      apiBaseEnvKey: apiBase.key,
       source: 'channel',
     };
   }
 
   if (hasAnyEnv(names.appid) || hasAnyEnv(names.appsecret)) {
+    console.error('[xunhupay-config] incomplete channel env', {
+      channel,
+      appidKeys: names.appid.filter(name => Boolean(process.env[name]?.trim())),
+      appsecretKeys: names.appsecret.filter(name => Boolean(process.env[name]?.trim())),
+    });
     return null;
   }
 
