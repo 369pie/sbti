@@ -89,17 +89,45 @@ export function verifyXunhupayCallback(
   return incoming.toLowerCase() === expected.toLowerCase();
 }
 
+function readFirstEnv(names: readonly string[]): string | undefined {
+  for (const name of names) {
+    const value = process.env[name]?.trim();
+    if (value) return value;
+  }
+  return undefined;
+}
+
+function hasAnyEnv(names: readonly string[]): boolean {
+  return names.some(name => Boolean(process.env[name]?.trim()));
+}
+
+function buildEnvNames(prefix: string) {
+  return {
+    appid: [`${prefix}APP_ID`, `${prefix}APPID`] as const,
+    appsecret: [`${prefix}APP_SECRET`, `${prefix}APPSECRET`] as const,
+    apiBase: [`${prefix}API_BASE`, `${prefix}APIBASE`] as const,
+  };
+}
+
+export function maskXunhupayAppId(appid: string): string {
+  if (appid.length <= 6) return `${appid.slice(0, 2)}***`;
+  return `${appid.slice(0, 3)}***${appid.slice(-3)}`;
+}
+
 function readSharedConfig(
   channel: XunhupayPaymentChannel,
 ): XunhupayConfig | null {
-  const appid = process.env.XUNHUPAY_APP_ID;
-  const appsecret = process.env.XUNHUPAY_APP_SECRET;
+  const names = buildEnvNames('XUNHUPAY_');
+  const appid = readFirstEnv(names.appid);
+  const appsecret = readFirstEnv(names.appsecret);
   if (!appid || !appsecret) return null;
   return {
     channel,
     appid,
     appsecret,
-    apiBase: process.env.XUNHUPAY_API_BASE || 'https://api.xunhupay.com',
+    apiBase:
+      readFirstEnv(names.apiBase) ||
+      'https://api.xunhupay.com',
     source: 'shared',
   };
 }
@@ -108,20 +136,26 @@ export function readXunhupayConfig(
   channel: XunhupayPaymentChannel,
 ): XunhupayConfig | null {
   const prefix = channel === 'wechat' ? 'XUNHUPAY_WECHAT_' : 'XUNHUPAY_ALIPAY_';
-  const appid = process.env[`${prefix}APP_ID`];
-  const appsecret = process.env[`${prefix}APP_SECRET`];
+  const names = buildEnvNames(prefix);
+  const appid = readFirstEnv(names.appid);
+  const appsecret = readFirstEnv(names.appsecret);
   if (appid && appsecret) {
     return {
       channel,
       appid,
       appsecret,
       apiBase:
-        process.env[`${prefix}API_BASE`] ||
-        process.env.XUNHUPAY_API_BASE ||
+        readFirstEnv(names.apiBase) ||
+        readFirstEnv(buildEnvNames('XUNHUPAY_').apiBase) ||
         'https://api.xunhupay.com',
       source: 'channel',
     };
   }
+
+  if (hasAnyEnv(names.appid) || hasAnyEnv(names.appsecret)) {
+    return null;
+  }
+
   return readSharedConfig(channel);
 }
 

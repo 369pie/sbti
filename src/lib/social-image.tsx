@@ -5,13 +5,50 @@ import { ImageResponse } from 'next/og';
 // Keep OG font assets tiny and self-contained so serverless deploys do not
 // depend on pruned node_modules files at runtime. Regenerate these subsets if
 // the Chinese copy in this image changes.
-const notoSansScRegular = readFile(
-  join(process.cwd(), 'assets', 'fonts', 'noto-sans-sc-social-400.woff'),
-);
+//
+// On Vercel these files must be force-included via `outputFileTracingIncludes`
+// in next.config.ts. If a deploy ever loses them, fall back to no-font instead
+// of crashing the lambda (exit 128). Satori will draw boxes for unknown
+// glyphs, but the OG response still succeeds and X/WeChat will at least show
+// the gradient + ASCII.
+async function tryReadFont(filename: string): Promise<Buffer | null> {
+  try {
+    return await readFile(
+      join(process.cwd(), 'assets', 'fonts', filename),
+    );
+  } catch (error) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === 'ENOENT'
+    ) {
+      console.warn('[social-image] optional font missing', { filename });
+      return null;
+    }
 
-const notoSansScBold = readFile(
-  join(process.cwd(), 'assets', 'fonts', 'noto-sans-sc-social-700.woff'),
-);
+    throw error;
+  }
+}
+
+let socialFontsPromise: Promise<{
+  regular: Buffer | null;
+  bold: Buffer | null;
+}> | null = null;
+
+function loadSocialFonts(): Promise<{
+  regular: Buffer | null;
+  bold: Buffer | null;
+}> {
+  if (!socialFontsPromise) {
+    socialFontsPromise = Promise.all([
+      tryReadFont('noto-sans-sc-social-400.woff'),
+      tryReadFont('noto-sans-sc-social-700.woff'),
+    ]).then(([regular, bold]) => ({ regular, bold }));
+  }
+
+  return socialFontsPromise;
+}
 
 const featuredTypes = [
   { code: 'CTRL', label: '拿捏者', background: 'linear-gradient(135deg, #f59e0b 0%, #fb923c 100%)' },
@@ -29,10 +66,8 @@ export const socialImageSize = {
 export const socialImageContentType = 'image/png';
 
 export async function createSocialImageResponse() {
-  const [chineseRegularFont, chineseBoldFont] = await Promise.all([
-    notoSansScRegular,
-    notoSansScBold,
-  ]);
+  const { regular: chineseRegularFont, bold: chineseBoldFont } =
+    await loadSocialFonts();
 
   return new ImageResponse(
     (
@@ -285,18 +320,22 @@ export async function createSocialImageResponse() {
     {
       ...socialImageSize,
       fonts: [
-        {
-          name: 'Noto Sans SC',
-          data: chineseRegularFont,
-          style: 'normal',
-          weight: 400,
-        },
-        {
-          name: 'Noto Sans SC',
-          data: chineseBoldFont,
-          style: 'normal',
-          weight: 700,
-        },
+        ...(chineseRegularFont
+          ? [{
+              name: 'Noto Sans SC',
+              data: chineseRegularFont,
+              style: 'normal' as const,
+              weight: 400 as const,
+            }]
+          : []),
+        ...(chineseBoldFont
+          ? [{
+              name: 'Noto Sans SC',
+              data: chineseBoldFont,
+              style: 'normal' as const,
+              weight: 700 as const,
+            }]
+          : []),
       ],
     },
   );

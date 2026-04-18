@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   createXunhupayOrder,
+  maskXunhupayAppId,
   readXunhupayConfig,
   type XunhupayPaymentChannel,
 } from '@/lib/payment/xunhupay';
@@ -240,6 +241,8 @@ export async function POST(req: NextRequest) {
       sku,
       paymentType,
       origin,
+      cfgSource: cfg?.source ?? null,
+      cfgAppId: cfg ? maskXunhupayAppId(cfg.appid) : null,
       notifyUrlLength: notifyUrl.length,
       returnUrlLength: returnUrl.length,
       callbackUrlLength: callbackUrl?.length ?? 0,

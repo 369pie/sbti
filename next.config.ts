@@ -24,6 +24,16 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_SITE_BASE_PATH: process.env.NEXT_PUBLIC_SITE_BASE_PATH ?? '',
     NEXT_PUBLIC_SITE_ORIGIN: process.env.NEXT_PUBLIC_SITE_ORIGIN ?? '',
   },
+  // Vercel serverless functions only ship files Next can statically trace.
+  // The OG/Twitter image routes read woff fonts from `assets/fonts/` at
+  // runtime via `process.cwd()`, which the tracer can't see. Force-include
+  // them so they exist under /var/task in production.
+  outputFileTracingIncludes: {
+    '/opengraph-image*': ['./assets/fonts/**'],
+    '/twitter-image*': ['./assets/fonts/**'],
+    '/**/opengraph-image*': ['./assets/fonts/**'],
+    '/**/twitter-image*': ['./assets/fonts/**'],
+  },
   experimental: {
     // Tree-shake heavy barrels we know we depend on.
     optimizePackageImports: ['framer-motion', 'recharts', 'qrcode'],
