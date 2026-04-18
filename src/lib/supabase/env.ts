@@ -1,15 +1,43 @@
-const SUPABASE_URL_KEYS = [
-  'NEXT_PUBLIC_SUPABASE_URL',
+const SUPABASE_BROWSER_URL_KEYS = ['NEXT_PUBLIC_SUPABASE_URL'] as const;
+
+const SUPABASE_BROWSER_PUBLISHABLE_KEY_KEYS = [
+  'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY',
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+] as const;
+
+const SUPABASE_SERVER_URL_KEYS = [
+  ...SUPABASE_BROWSER_URL_KEYS,
   'SUPABASE_URL',
 ] as const;
 
-const SUPABASE_PUBLISHABLE_KEY_KEYS = [
-  'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY',
-  'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+const SUPABASE_SERVER_PUBLISHABLE_KEY_KEYS = [
+  ...SUPABASE_BROWSER_PUBLISHABLE_KEY_KEYS,
   'SUPABASE_ANON_KEY',
 ] as const;
 
-type EnvKey = (typeof SUPABASE_URL_KEYS)[number] | (typeof SUPABASE_PUBLISHABLE_KEY_KEYS)[number];
+type EnvKey =
+  | (typeof SUPABASE_BROWSER_URL_KEYS)[number]
+  | (typeof SUPABASE_BROWSER_PUBLISHABLE_KEY_KEYS)[number]
+  | (typeof SUPABASE_SERVER_URL_KEYS)[number]
+  | (typeof SUPABASE_SERVER_PUBLISHABLE_KEY_KEYS)[number];
+
+function isBrowserRuntime(): boolean {
+  return typeof window !== 'undefined';
+}
+
+function getRuntimeKeys() {
+  if (isBrowserRuntime()) {
+    return {
+      urlKeys: SUPABASE_BROWSER_URL_KEYS,
+      publishableKeyKeys: SUPABASE_BROWSER_PUBLISHABLE_KEY_KEYS,
+    };
+  }
+
+  return {
+    urlKeys: SUPABASE_SERVER_URL_KEYS,
+    publishableKeyKeys: SUPABASE_SERVER_PUBLISHABLE_KEY_KEYS,
+  };
+}
 
 function readEnv(keys: readonly EnvKey[]): string | undefined {
   for (const key of keys) {
@@ -32,13 +60,35 @@ function requireEnv(label: string, keys: readonly EnvKey[]): string {
   );
 }
 
+export function getOptionalSupabasePublicEnv() {
+  const { urlKeys, publishableKeyKeys } = getRuntimeKeys();
+  const url = readEnv(urlKeys);
+  const publishableKey = readEnv(publishableKeyKeys);
+
+  if (!url || !publishableKey) {
+    return null;
+  }
+
+  return { url, publishableKey };
+}
+
 export function getSupabasePublicEnv() {
+  const { urlKeys, publishableKeyKeys } = getRuntimeKeys();
+
   return {
-    url: requireEnv('Supabase URL', SUPABASE_URL_KEYS),
-    publishableKey: requireEnv('Supabase publishable key', SUPABASE_PUBLISHABLE_KEY_KEYS),
+    url: requireEnv('Supabase URL', urlKeys),
+    publishableKey: requireEnv('Supabase publishable key', publishableKeyKeys),
   };
 }
 
 export function isSupabaseConfigured(): boolean {
-  return Boolean(readEnv(SUPABASE_URL_KEYS) && readEnv(SUPABASE_PUBLISHABLE_KEY_KEYS));
+  return Boolean(getOptionalSupabasePublicEnv());
+}
+
+export function isSupabaseConfigError(error: unknown): error is Error {
+  return error instanceof Error && /^Missing Supabase (URL|publishable key)\./.test(error.message);
+}
+
+export function getSupabaseBrowserConfigHelpMessage(): string {
+  return '站点认证配置缺失，请在 Vercel 环境变量中设置 NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY（或 NEXT_PUBLIC_SUPABASE_ANON_KEY）后重新部署。';
 }

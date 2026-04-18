@@ -130,9 +130,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const cancel = scheduleIdle(() => {
       setLoading(true);
       import('@/lib/supabase/client')
-        .then(({ createBrowserSupabaseClient }) => {
+        .then(({ tryCreateBrowserSupabaseClient }) => {
           if (cancelled) return;
-          setSupabase(createBrowserSupabaseClient());
+          const client = tryCreateBrowserSupabaseClient();
+          if (!client) {
+            setLoading(false);
+            return;
+          }
+          setSupabase(client);
         })
         .catch(() => {
           if (cancelled) return;

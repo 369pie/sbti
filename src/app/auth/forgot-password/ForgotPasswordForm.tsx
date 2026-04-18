@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { getSupabaseBrowserConfigHelpMessage, isSupabaseConfigError } from '@/lib/supabase/env';
 import { sendPasswordResetEmail } from '@/lib/supabase/auth';
 
 export function ForgotPasswordForm() {
@@ -36,6 +37,13 @@ export function ForgotPasswordForm() {
       }
 
       setSent(true);
+    } catch (err) {
+      if (isSupabaseConfigError(err)) {
+        setError(getSupabaseBrowserConfigHelpMessage());
+        return;
+      }
+
+      setError(err instanceof Error ? err.message : '发送失败');
     } finally {
       setLoading(false);
     }

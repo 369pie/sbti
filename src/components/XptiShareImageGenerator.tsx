@@ -589,7 +589,7 @@ export const XptiShareImageGenerator = forwardRef<XptiShareImageGeneratorHandle,
           tier={tierCtl.tier}
           setTier={tierCtl.setTier}
           tierUnlocked={tierCtl.tierUnlocked}
-          variant="dark"
+          variant="light"
           className="mb-3"
         />
         <button

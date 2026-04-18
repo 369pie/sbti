@@ -408,7 +408,7 @@ function SingleModeContent({
           }}
         />
         <div className="mt-4">
-          <WtfiTheoryWiring universe="mysti" variant="dark" />
+          <WtfiTheoryWiring universe="mysti" variant={theme.id === 'pale' ? 'light' : 'dark'} />
         </div>
       </motion.div>
 

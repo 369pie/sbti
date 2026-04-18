@@ -21,7 +21,6 @@
     "docs:metadata": "node scripts/check-doc-metadata.mjs"
   },
   "dependencies": {
-    "@fontsource/noto-sans-sc": "^5.2.9",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.103.2",
     "@vercel/analytics": "^2.0.1",

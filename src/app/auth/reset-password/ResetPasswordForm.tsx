@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { getSupabaseBrowserConfigHelpMessage, isSupabaseConfigError } from '@/lib/supabase/env';
 import { updatePassword } from '@/lib/supabase/auth';
 
 export function ResetPasswordForm() {
@@ -45,6 +46,13 @@ export function ResetPasswordForm() {
 
       setSuccess(true);
       setTimeout(() => router.push('/auth/login/'), 2000);
+    } catch (err) {
+      if (isSupabaseConfigError(err)) {
+        setError(getSupabaseBrowserConfigHelpMessage());
+        return;
+      }
+
+      setError(err instanceof Error ? err.message : '重置失败');
     } finally {
       setLoading(false);
     }

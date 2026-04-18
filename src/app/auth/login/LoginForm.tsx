@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { finalizeClaimedSession, stageAnonymousSourceForMerge } from '@/lib/auth/claimed-session';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { getSupabaseBrowserConfigHelpMessage, isSupabaseConfigError } from '@/lib/supabase/env';
 import { signInWithPassword } from '@/lib/supabase/auth';
 import { useAuth } from '@/components/AuthProvider';
 
@@ -46,6 +47,13 @@ export function LoginForm() {
       await refresh();
       await finalizeClaimedSession().catch(() => null);
       router.push(redirectTo);
+    } catch (err) {
+      if (isSupabaseConfigError(err)) {
+        setError(getSupabaseBrowserConfigHelpMessage());
+        return;
+      }
+
+      setError(err instanceof Error ? err.message : '登录失败，请稍后重试');
     } finally {
       setLoading(false);
     }

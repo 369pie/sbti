@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { finalizeClaimedSession, stageAnonymousSourceForMerge } from '@/lib/auth/claimed-session';
 import { getApiPath } from '@/lib/api';
+import { getSupabaseBrowserConfigHelpMessage, isSupabaseConfigError } from '@/lib/supabase/env';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -82,6 +83,13 @@ export function RegisterForm() {
         // Redirect to login with success message
         router.push(`/auth/login/?registered=1&next=${encodeURIComponent(redirectTo)}`);
       }
+    } catch (err) {
+      if (isSupabaseConfigError(err)) {
+        setError(getSupabaseBrowserConfigHelpMessage());
+        return;
+      }
+
+      setError(err instanceof Error ? err.message : '注册失败，请稍后重试');
     } finally {
       setLoading(false);
     }

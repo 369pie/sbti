@@ -1,5 +1,5 @@
 import { getApiPath } from '@/lib/api';
-import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { tryCreateBrowserSupabaseClient } from '@/lib/supabase/client';
 
 export const PENDING_SOURCE_USER_ID_KEY = 'cpti-pending-merge-source-user-id';
 
@@ -24,7 +24,11 @@ let finalizePromise: Promise<FinalizeClaimedSessionResult> | null = null;
 export async function stageAnonymousSourceForMerge(): Promise<string | null> {
   if (typeof window === 'undefined') return null;
 
-  const supabase = createBrowserSupabaseClient();
+  const supabase = tryCreateBrowserSupabaseClient();
+  if (!supabase) {
+    window.localStorage.removeItem(PENDING_SOURCE_USER_ID_KEY);
+    return null;
+  }
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -58,7 +62,15 @@ export async function finalizeClaimedSession(): Promise<FinalizeClaimedSessionRe
   }
 
   finalizePromise = (async () => {
-    const supabase = createBrowserSupabaseClient();
+    const supabase = tryCreateBrowserSupabaseClient();
+    if (!supabase) {
+      return {
+        ok: false,
+        userId: null,
+        merged: false,
+        sourceUserId: readPendingMergeSourceUserId(),
+      };
+    }
     const {
       data: { user },
       error: authError,

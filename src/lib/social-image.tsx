@@ -2,26 +2,15 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { ImageResponse } from 'next/og';
 
+// Keep OG font assets tiny and self-contained so serverless deploys do not
+// depend on pruned node_modules files at runtime. Regenerate these subsets if
+// the Chinese copy in this image changes.
 const notoSansScRegular = readFile(
-  join(
-    process.cwd(),
-    'node_modules',
-    '@fontsource',
-    'noto-sans-sc',
-    'files',
-    'noto-sans-sc-chinese-simplified-400-normal.woff',
-  ),
+  join(process.cwd(), 'assets', 'fonts', 'noto-sans-sc-social-400.woff'),
 );
 
 const notoSansScBold = readFile(
-  join(
-    process.cwd(),
-    'node_modules',
-    '@fontsource',
-    'noto-sans-sc',
-    'files',
-    'noto-sans-sc-chinese-simplified-700-normal.woff',
-  ),
+  join(process.cwd(), 'assets', 'fonts', 'noto-sans-sc-social-700.woff'),
 );
 
 const featuredTypes = [

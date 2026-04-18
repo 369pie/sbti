@@ -449,7 +449,7 @@ export const MystiDailyShareImageGenerator = forwardRef<MystiShareImageGenerator
           tier={tierCtl.tier}
           setTier={tierCtl.setTier}
           tierUnlocked={tierCtl.tierUnlocked}
-          variant="dark"
+          variant={themeId === 'pale' ? 'light' : 'dark'}
           className="mb-3"
         />
         <button

@@ -97,7 +97,7 @@ export default function FlowerHomeContent() {
             className="rounded-2xl p-8 sm:p-10"
             style={{ background: 'linear-gradient(135deg, #2D2820, #3D2F28)' }}
           >
-            <p className="text-[10px] tracking-[0.35em] uppercase mb-8" style={{ color: 'rgba(245,158,11,0.5)' }}>
+            <p className="text-[10px] tracking-[0.35em] uppercase mb-8" style={{ color: 'rgba(245,158,11,0.75)' }}>
               FLOWER PERSONALITY
             </p>
 
@@ -115,11 +115,11 @@ export default function FlowerHomeContent() {
                 { left: '带刺 or 无刺', right: '你怎么保护自己' },
               ].map(row => (
                 <div key={row.left} className="flex items-center gap-4 text-sm">
-                  <span className="flex-1 text-right" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                  <span className="flex-1 text-right" style={{ color: 'rgba(255,255,255,0.65)' }}>
                     {row.left}
                   </span>
-                  <span style={{ color: 'rgba(245,158,11,0.5)' }}>→</span>
-                  <span className="flex-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                  <span style={{ color: 'rgba(245,158,11,0.75)' }}>→</span>
+                  <span className="flex-1" style={{ color: 'rgba(255,255,255,0.85)' }}>
                     {row.right}
                   </span>
                 </div>
