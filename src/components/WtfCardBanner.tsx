@@ -36,7 +36,7 @@ export function WtfCardBanner() {
   if (!mounted) return null;
 
   return (
-    <section className="px-6 pb-4 -mt-8">
+    <section className="px-6 pb-4 pt-2">
       <div className="max-w-4xl mx-auto">
         <Link
           href="/card/"

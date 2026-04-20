@@ -402,20 +402,20 @@ function getDataHealthItems(): OpsDataHealthItem[] {
     {
       module: 'First Look',
       status: 'partial',
-      summary: '现阶段只有 Vercel / dataLayer 事件。',
-      note: '未进入 Supabase，暂时不能做内部漏斗报表。',
+      summary: 'Vercel / dataLayer 事件已镜像到 product_events，可看 7 天漏斗。',
+      note: '完成、分享仍为客户端口径，待补服务端结果表后再做收入归因。',
     },
     {
       module: 'Mysti',
-      status: 'client-only',
-      summary: '抽卡与收藏主要在本地存储。',
-      note: '只能看外部事件，不能做可靠留存和收藏看板。',
+      status: 'partial',
+      summary: '抽卡与收藏在本地存储，但 mysti_* 事件已写入 product_events。',
+      note: '可看入口/分享/付费转化漏斗，留存仍需结合用户登录后的服务端记录。',
     },
     {
       module: 'SoulTI',
       status: 'partial',
-      summary: '结果未持久化，支付链路仍是 stub。',
-      note: '适合下一阶段补深度报告转化漏斗。',
+      summary: '结果未持久化，但 soulti_finish / share / deep_report_view 已落库。',
+      note: '深度报告与支付链路下一阶段要补 Supabase 数据。',
     },
   ];
 }

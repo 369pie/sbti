@@ -18,6 +18,9 @@ import type { GalleryItem, GalleryTab } from '@/app/types/gallery-data';
 import { getFeaturedCopy } from '@/lib/museum/featured-slogans';
 import { trackMuseum } from '@/lib/museum/analytics';
 import { generateShareCard, downloadBlob } from '@/lib/museum/share-card';
+import { buildUnlockPath } from '@/lib/museum/unlock-path';
+import SealedCard from './SealedCard';
+import { getSeasonInfo } from '@/lib/museum/season';
 
 export interface CardDrawerPayload {
   tab: Pick<GalleryTab, 'id' | 'label' | 'emoji' | 'accent' | 'testHref'>;
@@ -99,11 +102,23 @@ export default function CardDrawer({ payload, onClose }: CardDrawerProps) {
     }
   }, [payload, sharing]);
 
+  // Track unlock-path impression — must be before any early return
+  const lockedTabId = !payload?.isUnlocked ? payload?.tab.id : undefined;
+  const lockedSlug = !payload?.isUnlocked ? payload?.item.slug : undefined;
+  useEffect(() => {
+    if (!isOpen || !lockedTabId || !lockedSlug) return;
+    trackMuseum('unlock_path_view', { tab: lockedTabId, slug: lockedSlug });
+  }, [isOpen, lockedTabId, lockedSlug]);
+
   if (!isOpen || !payload) return null;
 
   const { tab, item, isUnlocked } = payload;
   const copy = getFeaturedCopy(tab.id, item.slug);
   const accent = tab.accent;
+  const season = getSeasonInfo();
+  const unlockPath = !isUnlocked
+    ? buildUnlockPath({ tabId: tab.id, tabLabel: tab.label, testHref: tab.testHref, slug: item.slug })
+    : null;
 
   // Locked teaser preserves mystery
   const headline = isUnlocked ? (copy?.headline ?? item.name) : '??? 未解锁';
@@ -169,35 +184,41 @@ export default function CardDrawer({ payload, onClose }: CardDrawerProps) {
           <div
             className="relative w-full aspect-square rounded-2xl overflow-hidden mb-5 flex items-center justify-center"
             style={{
-              background: `linear-gradient(160deg, ${accent}1a 0%, ${accent}06 60%, transparent 100%)`,
+              background: isUnlocked
+                ? `linear-gradient(160deg, ${accent}1a 0%, ${accent}06 60%, transparent 100%)`
+                : undefined,
             }}
           >
-            {/* Corner ornaments */}
-            <span className="absolute top-3 left-3 opacity-40 text-base" style={{ color: accent }}>✦</span>
-            <span className="absolute top-3 right-3 opacity-40 text-base" style={{ color: accent }}>✦</span>
-            <span className="absolute bottom-3 left-3 opacity-40 text-base" style={{ color: accent }}>✦</span>
-            <span className="absolute bottom-3 right-3 opacity-40 text-base" style={{ color: accent }}>✦</span>
+            {isUnlocked ? (
+              <>
+                {/* Corner ornaments */}
+                <span className="absolute top-3 left-3 opacity-40 text-base" style={{ color: accent }}>✦</span>
+                <span className="absolute top-3 right-3 opacity-40 text-base" style={{ color: accent }}>✦</span>
+                <span className="absolute bottom-3 left-3 opacity-40 text-base" style={{ color: accent }}>✦</span>
+                <span className="absolute bottom-3 right-3 opacity-40 text-base" style={{ color: accent }}>✦</span>
 
-            {item.image ? (
-              <NextImage
-                src={item.image}
-                alt={item.name}
-                width={520}
-                height={520}
-                className="w-[72%] h-[72%] object-contain drop-shadow-[0_18px_36px_rgba(0,0,0,0.18)]"
-                style={isUnlocked ? undefined : { filter: 'grayscale(0.85) blur(6px)', opacity: 0.7 }}
-              />
+                {item.image ? (
+                  <NextImage
+                    src={item.image}
+                    alt={item.name}
+                    width={520}
+                    height={520}
+                    className="w-[72%] h-[72%] object-contain drop-shadow-[0_18px_36px_rgba(0,0,0,0.18)]"
+                  />
+                ) : (
+                  <div className="text-7xl">{item.emoji ?? '✦'}</div>
+                )}
+              </>
             ) : (
-              <div className="text-7xl">{item.emoji ?? '✦'}</div>
-            )}
-
-            {!isUnlocked && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-3xl mb-1.5" aria-hidden>🔒</span>
-                <span className="eyebrow text-[10px]" style={{ color: accent }}>
-                  做测试解锁
-                </span>
-              </div>
+              <SealedCard
+                accent={accent}
+                sealStyle={season.sealStyle}
+                isHidden={Boolean(item.isSpecial)}
+                code={item.code}
+                tabLabel={tab.label}
+                interactive
+                className="absolute inset-0"
+              />
             )}
           </div>
 
@@ -230,6 +251,27 @@ export default function CardDrawer({ payload, onClose }: CardDrawerProps) {
           <p className="text-base sm:text-lg leading-[1.7] text-text-secondary mb-6">
             {longCopy}
           </p>
+
+          {/* Unlock path (locked only) */}
+          {!isUnlocked && unlockPath && (
+            <div
+              className="mb-6 rounded-2xl border px-4 py-4"
+              style={{ borderColor: `${accent}33`, background: `${accent}08` }}
+            >
+              <span className="text-[10px] font-mono tracking-[0.22em] uppercase" style={{ color: accent }}>
+                {unlockPath.headline}
+              </span>
+              <ul className="mt-2 space-y-1.5">
+                {unlockPath.steps.map((step, i) => (
+                  <li key={i} className="text-xs sm:text-sm text-text-secondary leading-snug flex gap-2">
+                    <span className="font-mono opacity-60 mt-0.5" style={{ color: accent }}>0{i + 1}</span>
+                    <span>{step.text}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2.5 text-[11px] text-text-muted leading-relaxed">{unlockPath.tail}</p>
+            </div>
+          )}
 
           <hr className="editorial-rule-soft mb-6" />
 

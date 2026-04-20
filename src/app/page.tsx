@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import HomeContent from './HomeContent';
-import { getSiteUrl } from '@/lib/site';
 
 const homepageFaqSchema = {
   '@context': 'https://schema.org',
@@ -27,7 +26,7 @@ const homepageFaqSchema = {
       name: '这么多宇宙，我该从哪个开始？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: '推荐先测经典版 SBTI，拿到你的基线人格后再去其他宇宙看看你会被翻译成什么样。每个宇宙都有自己的风格和乐趣。',
+        text: '推荐先从 WTFTI 人格神域开始：90 秒召唤你的主神，拿到主星与神龛后，再去 SoulTI、CPTI、XPTI 等宇宙看同一个你在不同主题中的翻译。',
       },
     },
     {

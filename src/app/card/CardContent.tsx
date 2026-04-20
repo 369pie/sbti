@@ -23,6 +23,8 @@ import {
 import { getUniverse } from '@/lib/universes';
 import { resolvePersonality } from '@/lib/personality-resolver';
 import { SHARE_SITE_URL } from '@/lib/site';
+import { PremiumPaywall } from '@/components/PremiumPaywall';
+import { trackFunnelEvent } from '@/lib/analytics/funnel';
 const WtfCardShareImageGenerator = dynamic(
   () => import('@/components/WtfCardShareImageGenerator').then((m) => m.WtfCardShareImageGenerator),
   { ssr: false },
@@ -1156,6 +1158,109 @@ export function CardContent() {
 
       {/* Hidden share image generator */}
       {shareMounted ? <WtfCardShareImageGenerator ref={shareRef} card={card} /> : null}
+
+      {/* ── Collector Pro · Light paywall (W4 A6) ─────────────────────────── */}
+      <CollectorProSection cardId={card.id} />
+    </div>
+  );
+}
+
+function CollectorProSection({ cardId }: { cardId: string }) {
+  useEffect(() => {
+    trackFunnelEvent('paywall_view', { module: 'wtfcard', sku: 'wtfcard-collector', cardId });
+  }, [cardId]);
+
+  return (
+    <div className="mt-12 mb-6">
+      <PremiumPaywall
+        sku="wtfcard-collector"
+        brand="wtfcard"
+        resourceId={`wtfcard:${cardId}`}
+        lockedTitle="解锁 WTF Card · 收藏家版"
+        teaserBullets={[
+          '印刷级 PDF 卡背 · A4 / Letter 双版',
+          '4K 桌面 + 手机壁纸 · 含暗面副形',
+          '人格速查（typeahead）· 跨宇宙比对',
+        ]}
+        preview={
+          <div className="grid gap-3 py-4 text-center">
+            <p
+              className="text-[10px] tracking-[0.32em] uppercase"
+              style={{ color: '#8a6d3b', fontFamily: 'var(--font-mono)' }}
+            >
+              COLLECTOR · ¥9.9
+            </p>
+            <p
+              className="text-base italic"
+              style={{ fontFamily: 'var(--font-display)', color: '#1F1A16' }}
+            >
+              把这张卡，做成可以挂起来的纪念品。
+            </p>
+            <p className="text-xs" style={{ color: '#5B524B' }}>
+              印刷级 PDF · 4K 壁纸 · 跨宇宙速查 — 一次买断
+            </p>
+          </div>
+        }
+      >
+        <div className="grid gap-4 py-4">
+          <CollectorPerk
+            eyebrow="PDF · 印刷级"
+            title="A4 / Letter 双版卡背"
+            desc="300 dpi · CMYK 安全 · 出血线齐全，可直接送印。"
+          />
+          <CollectorPerk
+            eyebrow="WALLPAPER · 4K"
+            title="桌面 + 手机壁纸"
+            desc="2880×1800 / 1170×2532 · 含暗面副形版本。"
+          />
+          <CollectorPerk
+            eyebrow="LOOKUP · 跨宇宙"
+            title="人格速查 typeahead"
+            desc="按代码 / 名字 / 别名秒查任意宇宙类型卡片。"
+          />
+          <CollectorPerk
+            eyebrow="COMPARE · 多人"
+            title="收藏家比对面板"
+            desc="把朋友的卡和你的拼成 2×2 / 3×3 海报。"
+          />
+        </div>
+      </PremiumPaywall>
+    </div>
+  );
+}
+
+function CollectorPerk({
+  eyebrow,
+  title,
+  desc,
+}: {
+  eyebrow: string;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <div
+      className="rounded-xl border px-4 py-3"
+      style={{
+        borderColor: 'rgba(168,138,90,0.35)',
+        background: 'rgba(255,253,249,0.7)',
+      }}
+    >
+      <div
+        className="text-[10px] tracking-[0.32em] uppercase mb-1"
+        style={{ color: '#8a6d3b', fontFamily: 'var(--font-mono)' }}
+      >
+        {eyebrow}
+      </div>
+      <p
+        className="italic text-base"
+        style={{ fontFamily: 'var(--font-display)', color: '#1F1A16', margin: 0 }}
+      >
+        {title}
+      </p>
+      <p className="mt-1 text-xs leading-relaxed" style={{ color: '#5B524B', margin: 0 }}>
+        {desc}
+      </p>
     </div>
   );
 }

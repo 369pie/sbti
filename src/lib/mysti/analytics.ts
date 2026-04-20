@@ -1,3 +1,5 @@
+import { enqueueProductEvent } from '@/lib/analytics/product-events';
+
 type MystiEvent =
   | 'mysti_test_start'
   | 'mysti_test_complete'
@@ -40,4 +42,40 @@ export function trackMystiEvent(event: MystiEvent, properties?: Record<string, u
       console.log(`[MystiAnalytics] ${event}`, properties);
     }
   }
+
+  try {
+    enqueueProductEvent('mysti', event, {
+      slug: typeof properties?.slug === 'string' ? properties.slug : undefined,
+      code: typeof properties?.code === 'string' ? properties.code : undefined,
+      tier: typeof properties?.tier === 'string' ? properties.tier : undefined,
+      step: classifyMystiStep(event),
+      ok: typeof properties?.ok === 'boolean' ? properties.ok : undefined,
+      value: typeof properties?.value === 'number' ? properties.value : undefined,
+      props: {
+        sku: typeof properties?.sku === 'string' ? properties.sku : undefined,
+        partner: typeof properties?.partner === 'string' ? properties.partner : undefined,
+        paymentType: typeof properties?.paymentType === 'string' ? properties.paymentType : undefined,
+        source: typeof properties?.source === 'string' ? properties.source : undefined,
+        reason: typeof properties?.reason === 'string' ? properties.reason : undefined,
+        arcanaName: typeof properties?.arcanaName === 'string' ? properties.arcanaName : undefined,
+        isDual: typeof properties?.isDual === 'boolean' ? properties.isDual : undefined,
+      },
+    });
+  } catch {
+    // tracking must never throw
+  }
+}
+
+function classifyMystiStep(event: MystiEvent): string | undefined {
+  if (event.includes('paywall')) return 'paywall';
+  if (event.includes('subscribe')) return 'subscribe';
+  if (event.includes('gift')) return 'gift';
+  if (event.includes('gacha')) return 'gacha';
+  if (event.includes('share')) return 'share';
+  if (event.includes('daily')) return 'daily';
+  if (event.endsWith('_test_start')) return 'entry';
+  if (event.endsWith('_test_complete')) return 'finish';
+  if (event.endsWith('_return_landing')) return 'return_landing';
+  if (event.endsWith('_return_complete')) return 'return_finish';
+  return undefined;
 }

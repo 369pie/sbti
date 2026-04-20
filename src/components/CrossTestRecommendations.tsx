@@ -30,6 +30,7 @@ const ALL_TESTS: TestRecommendation[] = [
   { id: 'flower', emoji: '🌸', title: '花TI 花格鉴定', hook: '测测你像自然界的哪朵花', href: '/flower', accent: '#e11d48', cardUniverseId: 'flower' },
   { id: 'identify', emoji: '🔍', title: '好友鉴定器', hook: '帮你朋友鉴定ta是什么人格', href: '/identify', accent: '#ec4899' },
   { id: 'cpti', emoji: '💗', title: 'CPTI 关系角色', hook: 'CPTI：你在关系里扮演什么角色？', href: '/cpti', accent: '#f43f5e', cardUniverseId: 'cpti' },
+  { id: 'wtfti', emoji: '✦', title: 'WTFTI 人格神域', hook: '90 秒召唤一位主神 — 看看哪位神选了你', href: '/wtfti/galaxy/test/', accent: '#C9A676', cardUniverseId: 'wtfti' },
 ];
 
 interface Props {

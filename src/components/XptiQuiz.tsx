@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useLayoutEffect, useRef, useSyncExter
 import { XPTI_QUESTIONS, XPTI_DEFAULT_OPTIONS, shuffleXptiQuestions } from '@/lib/xpti/questions';
 import type { XptiAnswerOption } from '@/lib/xpti/questions';
 import { calculateXptiResult } from '@/lib/xpti/scoring';
+import { saveXptiResult } from '@/lib/xpti/storage';
 import type { Answer } from '@/lib/xpti/scoring';
 import { XPTI_MODEL_NAMES, XPTI_MODEL_COLORS } from '@/lib/xpti/dimensions';
 import { basePath } from '@/lib/site';
@@ -60,6 +61,10 @@ export function XptiQuiz() {
     setIsFinishing(true);
 
     const result = calculateXptiResult(finalAnswers, questions);
+
+    // Persist user's actual dimension scores so couple/archive features can
+    // read them without forcing a re-test (Sprint 2-3 of v3.0).
+    saveXptiResult(result);
 
     // Record to WTF Card
     recordUniverseResult('xpti', result.personality.slug);

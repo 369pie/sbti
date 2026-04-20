@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import NextImage from 'next/image';
-import { getDrunkTypeImage, getDrunkTypeThumbnailImage, getDrunkTypeMediumImage } from '@/lib/drunk/personas';
+import { getDrunkTypeImage, getDrunkTypeMediumImage } from '@/lib/drunk/personas';
 import type { DrunkPersonaType } from '@/lib/drunk/personas';
 
 interface Props {
@@ -18,6 +18,13 @@ interface Props {
 
 export function DrunkPersonaAvatar({
   persona,
+  ...props
+}: Props) {
+  return <DrunkPersonaAvatarInner key={persona.slug} persona={persona} {...props} />;
+}
+
+function DrunkPersonaAvatarInner({
+  persona,
   className,
   alt,
   sizes = '128px',
@@ -28,11 +35,6 @@ export function DrunkPersonaAvatar({
 }: Props) {
   const [imageFailed, setImageFailed] = useState(false);
   const [useOriginalImage, setUseOriginalImage] = useState(false);
-
-  useEffect(() => {
-    setImageFailed(false);
-    setUseOriginalImage(false);
-  }, [persona.slug]);
 
   const imageSrc = useOriginalImage
     ? getDrunkTypeImage(persona.slug)
@@ -47,7 +49,6 @@ export function DrunkPersonaAvatar({
           src={imageSrc}
           alt={alt ?? `${persona.name}形象`}
           fill
-          unoptimized
           priority={priority}
           sizes={sizes}
           className={imageClassName}

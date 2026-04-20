@@ -38,7 +38,7 @@ export default function ContactPage() {
               alt="WTFTI 微信交流群二维码"
               width={220}
               height={220}
-              unoptimized
+              sizes="220px"
             />
           </div>
           <p className="text-sm text-text-secondary mt-4 leading-7">
@@ -54,7 +54,7 @@ export default function ContactPage() {
               alt="WTFTI QQ 群二维码"
               width={220}
               height={220}
-              unoptimized
+              sizes="220px"
             />
           </div>
           <p className="text-sm text-text-secondary mt-4 leading-7">

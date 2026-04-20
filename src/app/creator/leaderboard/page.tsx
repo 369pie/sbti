@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
+import { unstable_cache } from 'next/cache';
 import { getSiteUrl } from '@/lib/site';
+import { fetchLeaderboard } from '@/lib/ugc/earnings';
+import { createPublicServerSupabaseClient } from '@/lib/supabase/server-public';
 import { LeaderboardContent } from './LeaderboardContent';
 
 export const metadata: Metadata = {
@@ -13,6 +16,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LeaderboardPage() {
-  return <LeaderboardContent />;
+const loadCreatorLeaderboard = unstable_cache(
+  async () => {
+    const supabase = createPublicServerSupabaseClient();
+    return fetchLeaderboard(supabase, 50);
+  },
+  ['creator-public-leaderboard-v1'],
+  { revalidate: 60 },
+);
+
+export default async function LeaderboardPage() {
+  const entries = await loadCreatorLeaderboard();
+  return <LeaderboardContent entries={entries} />;
 }

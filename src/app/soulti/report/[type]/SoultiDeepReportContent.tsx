@@ -13,6 +13,8 @@ import {
   getCurrentWeeklyPrompt,
 } from '@/lib/soulti/deep-report';
 import { useEffect, useState } from 'react';
+import { PremiumPaywall } from '@/components/PremiumPaywall';
+import { buildResourceId } from '@/lib/payments/skus';
 
 interface Props {
   personality: SoultiPersonalityType;
@@ -198,9 +200,40 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
       </div>
 
       {/* ══════════════════════════════════════════════
-          SECTION 2: Axis Cross-Interpretations
-          ⚠️ PAYMENT GATE: wrap this section when payment is enabled
+          SECTIONS 2-4: Premium deep mirror (paywalled)
          ══════════════════════════════════════════════ */}
+      <div className="max-w-2xl mx-auto px-6 py-4">
+      <PremiumPaywall
+        sku="soulti-deep-mirror"
+        brand="soulti"
+        resourceId={buildResourceId('soulti', personality.slug)}
+        lockedTitle="深度镜像 · 完整版"
+        teaserBullets={[
+          `${crossReadings.length} 段 · 轴间交叉解读：看见你的关系模式`,
+          repair ? '修复处方 · 基于蜕变轴的私人练习' : '修复处方',
+          soulLetter ? '灵魂手信 · 写给你的私人长信' : '灵魂手信',
+        ]}
+        preview={(
+          <div className="py-2">
+            <p className="text-[10px] tracking-[0.3em] text-[#8b7355] uppercase mb-2" style={{ fontFamily: serifFont }}>
+              AXIS CROSS · 轴间交叉解读
+            </p>
+            <p className="text-xs text-[#7A6A5A] mb-6" style={{ fontFamily: serifFont }}>
+              单一维度只能看到轮廓，交叉才能看到你的模式
+            </p>
+            {crossReadings[0] && (
+              <div className="rounded-2xl border p-6" style={{ borderColor: `${personality.color}18`, background: '#FDFCFA' }}>
+                <h3 className="text-base mb-2" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+                  {crossReadings[0].label} · {crossReadings[0].tagline}
+                </h3>
+                <p className="text-sm leading-[2] text-[#7A6A5A]" style={{ fontFamily: serifFont }}>
+                  {crossReadings[0].interpretation.slice(0, 140)}…
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      >
       <motion.section
         className="max-w-2xl mx-auto px-6 py-12"
         initial={{ opacity: 0, y: 12 }}
@@ -405,6 +438,8 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
           </div>
         </motion.section>
       )}
+      </PremiumPaywall>
+      </div>
 
       {/* ── Thin divider ── */}
       <div className="max-w-xs mx-auto px-6">

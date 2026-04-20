@@ -17,6 +17,8 @@ import { getBirdSlugs } from '@/lib/bird/personalities';
 import { getAllFlowerSlugs } from '@/lib/flower/personalities';
 import { getAllIdentifySlugs } from '@/lib/identify/personas';
 import { getAllCptiSlugs } from '@/lib/cpti/personalities';
+import { getAllRelationshipSlugs } from '@/lib/cpti/relationships';
+import { getAllCptiScenarioSlugs } from '@/lib/cpti/scenarios';
 
 export const dynamic = 'force-static';
 
@@ -48,6 +50,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: getSiteUrl('/flower/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/identify/'), lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: getSiteUrl('/cpti/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: getSiteUrl('/cpti/theory/'), lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: getSiteUrl('/cpti/gallery/'), lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
     { url: getSiteUrl('/wtfti/symptoms/'), lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
     { url: getSiteUrl('/mysti/'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: getSiteUrl('/mysti/daily/'), lastModified: now, changeFrequency: 'daily', priority: 0.8 },
@@ -165,6 +169,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
+  const cptiRelationshipTypePages: MetadataRoute.Sitemap = getAllRelationshipSlugs().map((slug) => ({
+    url: getSiteUrl(`/cpti/relationship/${slug}/`),
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  const cptiScenarioPages: MetadataRoute.Sitemap = getAllCptiScenarioSlugs().map((slug) => ({
+    url: getSiteUrl(`/cpti/scenarios/${slug}/`),
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
+
   const symptomsPages: MetadataRoute.Sitemap = getWtftiSlugs().map((slug) => ({
     url: getSiteUrl(`/wtfti/symptoms/${slug}/`),
     lastModified: now,
@@ -179,5 +197,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...cptiResultPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages, ...kingsResultPages, ...deltaResultPages, ...xptiResultPages, ...soultiResultPages, ...birdResultPages, ...flowerResultPages, ...identifyResultPages, ...symptomsPages, ...mystiResultPages];
+  return [...staticPages, ...guidePages, ...resultPages, ...workResultPages, ...loveResultPages, ...cptiResultPages, ...cptiRelationshipTypePages, ...cptiScenarioPages, ...dailyResultPages, ...drunkResultPages, ...wtftiResultPages, ...bantiResultPages, ...kingsResultPages, ...deltaResultPages, ...xptiResultPages, ...soultiResultPages, ...birdResultPages, ...flowerResultPages, ...identifyResultPages, ...symptomsPages, ...mystiResultPages];
 }

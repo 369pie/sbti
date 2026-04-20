@@ -16,18 +16,24 @@ const SoultiShareImageGenerator = dynamic(
   { ssr: false },
 );
 import type { SoultiShareImageGeneratorHandle } from '@/components/SoultiShareImageGenerator';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { SoultiCommunityCTA } from '@/components/SoultiCommunityCTA';
+import { SoultiTearRateHero } from '@/components/SoultiTearRateHero';
+import { SoultiTonightAction } from '@/components/SoultiTonightAction';
+import { SoultiSoulLetterSubscribe } from '@/components/SoultiSoulLetterSubscribe';
+import { SoultiMonthlyRetestNudge } from '@/components/SoultiMonthlyRetestNudge';
+import { SoultiWishingWell } from '@/components/SoultiWishingWell';
+import { SoultiShareCardSwitcher } from '@/components/SoultiShareCardSwitcher';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
 import { getCurrentWeeklyPrompt } from '@/lib/soulti/deep-report';
 import { useAuth } from '@/components/AuthProvider';
-import { SoultiPortraitShareCard } from '@/components/SoultiPortraitShareCard';
 import { getSoultiExtendedSections, generateSoulLetter } from '@/lib/soulti/extended-sections';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
+import { trackSoulti } from '@/lib/soulti/analytics';
 
 interface Props {
   personality: SoultiPersonalityType;
@@ -61,6 +67,16 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
   const unlockHref = `/auth/login/?next=${encodeURIComponent(`/soulti/result/${personality.slug}/`)}`;
   const resonance = getSoultiResonance(personality.slug);
   const rarity = getSoultiRarity(personality.slug);
+
+  // Fire one durable `soulti_finish` event per page mount so the ops dashboard
+  // can build a real entry → finish funnel for SoulTI.
+  useEffect(() => {
+    trackSoulti('soulti_finish', {
+      slug: personality.slug,
+      code: personality.code,
+      tier: rarity?.tier,
+    });
+  }, [personality.slug, personality.code, rarity?.tier]);
 
   const mirrorType = resonance ? SOULTI_PERSONALITY_TYPES.find(p => p.slug === resonance.mirrorSlug) : undefined;
   const oppositeType = resonance ? SOULTI_PERSONALITY_TYPES.find(p => p.slug === resonance.oppositeSlug) : undefined;
@@ -107,6 +123,7 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
   }, [shareUrl]);
 
   const quickShare = useCallback(async () => {
+    trackSoulti('soulti_share_click', { slug: personality.slug, code: personality.code, channel: 'native' });
     if (navigator.share) {
       try {
         await navigator.share({
@@ -132,8 +149,14 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
   // Spaced-out code letters for display
   const spacedCode = personality.code.split('').join(' · ');
 
+  // Tear rate level (drives Tonight's Action picker as well)
+  const tearLevel = useMemo(() => {
+    if (!layered) return undefined;
+    return calculateTearRate(layered).level;
+  }, [layered]);
+
   return (
-    <div className="min-h-screen" style={{ background: '#FAF8F5' }}>
+    <div className="min-h-screen" data-soulti-surface="cream" style={{ background: '#FAF8F5' }}>
 
       {/* ── Header bar ── */}
       <motion.header
@@ -149,6 +172,18 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
           {personality.number} / 32
         </span>
       </motion.header>
+
+      {/* ── E1 · Tear Rate Hero (撕裂度首屏) — strategy 2026-04-19 ── */}
+      {layered && <SoultiTearRateHero layered={layered} accent={personality.color} />}
+
+      {/* ── E11 · Monthly Retest Nudge — only renders when previous snapshot ≥ 25 days old ── */}
+      {layered && (
+        <SoultiMonthlyRetestNudge
+          personalitySlug={personality.slug}
+          currentTearRate={calculateTearRate(layered).percent}
+          accent={personality.color}
+        />
+      )}
 
       {/* ── Hero: Type code + name ── */}
       <section className="max-w-2xl mx-auto px-6 pt-12 pb-8 text-center">
@@ -716,6 +751,11 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
               <Link
                 href={`/soulti/report/${personality.slug}`}
                 onClick={() => {
+                  trackSoulti('soulti_deep_report_view', {
+                    slug: personality.slug,
+                    code: personality.code,
+                    source: 'result_teaser',
+                  });
                   // Track demand signal
                   try {
                     const key = 'soulti-deep-mirror-clicks';
@@ -747,6 +787,12 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
         </motion.section>
         );
       })()}
+
+      {/* ── E9 · Tonight's Small Action — free, actionable closer ── */}
+      <SoultiTonightAction
+        personality={personality}
+        tearLevel={tearLevel}
+      />
 
       {/* ── Divider ── */}
       <div className="max-w-xs mx-auto px-6">
@@ -1216,7 +1262,12 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
         <p className="text-[10px] tracking-[0.3em] uppercase mb-4 text-center" style={{ fontFamily: serifFont, color: '#8b7355' }}>
           PORTRAIT CARD · 9:16 分享卡
         </p>
-        <SoultiPortraitShareCard personality={personality} tearRate={layered ? calculateTearRate(layered).percent : undefined} />
+        <SoultiShareCardSwitcher
+          personality={personality}
+          tearRate={layered ? calculateTearRate(layered).percent : undefined}
+          daySelfName={layered ? getSoultiPersonalityBySlug(layered.daySelf.slug)?.name : undefined}
+          nightSelfName={layered ? getSoultiPersonalityBySlug(layered.nightSelf.slug)?.name : undefined}
+        />
       </motion.section>
 
       {/* ── SoulTI 宇宙导航 ── */}
@@ -1252,6 +1303,22 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
           ))}
         </div>
       </motion.section>
+
+      {/* ── E6 · Soul Letter D+1 subscribe — turn one-shot into 7-day relationship ── */}
+      <SoultiSoulLetterSubscribe
+        personalitySlug={personality.slug}
+        personalityName={personality.name}
+        personalityCode={personality.code}
+        tearRatePercent={layered ? calculateTearRate(layered).percent : undefined}
+        accent={personality.color}
+      />
+
+      {/* ── E10 · Wishing Well (匿名许愿池) ── */}
+      <SoultiWishingWell
+        personalitySlug={personality.slug}
+        personalityName={personality.name}
+        accent={personality.color}
+      />
 
       <SoultiCommunityCTA
         personalityName={personality.name}

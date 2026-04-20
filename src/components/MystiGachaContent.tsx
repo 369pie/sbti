@@ -310,9 +310,9 @@ export function MystiGachaContent() {
               {/* Card with flip animation */}
               <div className="mx-auto max-w-sm" style={{ perspective: '1000px' }}>
                 <motion.div
-                  initial={{ rotateY: 180, opacity: 0 }}
+                  initial={{ rotateY: 0, opacity: 0 }}
                   animate={{
-                    rotateY: isFlipped ? 0 : 180,
+                    rotateY: isFlipped ? 180 : 0,
                     opacity: 1,
                     scale: isFlipped ? (showGlow ? 1 : 1.03) : 1,
                   }}

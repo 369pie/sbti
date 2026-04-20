@@ -1,21 +1,40 @@
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
+import { StardustDueBanner } from '@/components/galaxy/StardustDueBanner';
 import WtftiLandingContent from './WtftiLandingContent';
 
+const WTFTI_TAGLINE = 'WTFTI · 人格神域 — 90 秒被一位主神召唤，留下你的灵魂印记。';
+const WTFTI_DESCRIPTION =
+  '不是测试，是一座可以被装饰、被分享、随月相成长的女性精神生活神域。8 主神 × 灵魂印记 × 五感探针 × 月相日课 — 一次召唤，长期归属。';
+
 export const metadata: Metadata = {
-  title: 'WTFTI — WTF 我居然是这种人？',
-  description: 'WTFTI 人格图鉴：29 种 WTF 人格，每一种都说中你。同样的 15 维度测试，全新的毒舌解读。',
-  keywords: ['WTFTI', 'WTF人格', '人格测试', '人格图鉴', 'SBTI', '性格测试', '心理测试'],
+  title: 'WTFTI · 人格神域 — 90 秒召唤你的主神',
+  description: WTFTI_DESCRIPTION,
+  keywords: [
+    'WTFTI',
+    '人格神域',
+    '灵魂印记',
+    '主神召唤',
+    '五感人格',
+    '神域居民',
+    '人格测试',
+    '女性向人格测试',
+    '神性人格',
+    'Personal Pantheon',
+    'Soul Sigil',
+  ],
   alternates: { canonical: '/wtfti/' },
   openGraph: {
-    title: 'WTFTI — WTF 我居然是这种人？',
-    description: '29 种 WTF 人格，每一种都说中你。来测测你的 WTF 人格。',
+    title: WTFTI_TAGLINE,
+    description: WTFTI_DESCRIPTION,
     url: getSiteUrl('/wtfti/'),
+    type: 'website',
+    siteName: 'WTFTI',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'WTFTI — WTF 我居然是这种人？',
-    description: '29 种 WTF 人格，每一种都说中你。来测测你的 WTF 人格。',
+    title: WTFTI_TAGLINE,
+    description: WTFTI_DESCRIPTION,
   },
 };
 
@@ -27,8 +46,8 @@ export default function WtftiPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'WebPage',
-          name: 'WTFTI 人格图鉴',
-          description: '29 种 WTF 人格，每一种都说中你。来测测你的 WTF 人格。',
+          name: 'WTFTI 人格神域',
+          description: WTFTI_DESCRIPTION,
           url: getSiteUrl('/wtfti/'),
           breadcrumb: {
             '@type': 'BreadcrumbList',
@@ -39,6 +58,7 @@ export default function WtftiPage() {
           },
         }) }}
       />
+      <StardustDueBanner />
       <WtftiLandingContent />
     </>
   );

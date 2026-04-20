@@ -2,8 +2,8 @@
 
 import NextImage from 'next/image';
 import type { CSSProperties } from 'react';
-import { useEffect, useState } from 'react';
-import { getLoveTypeImage, getLoveTypeThumbnailImage, getLoveTypeMediumImage } from '@/lib/love/personalities';
+import { useState } from 'react';
+import { getLoveTypeImage, getLoveTypeMediumImage } from '@/lib/love/personalities';
 import type { LovePersonalityType } from '@/lib/love/personalities';
 
 interface Props {
@@ -19,6 +19,13 @@ interface Props {
 
 export function LovePersonalityAvatar({
   personality,
+  ...props
+}: Props) {
+  return <LovePersonalityAvatarInner key={personality.slug} personality={personality} {...props} />;
+}
+
+function LovePersonalityAvatarInner({
+  personality,
   className,
   alt,
   sizes = '128px',
@@ -29,11 +36,6 @@ export function LovePersonalityAvatar({
 }: Props) {
   const [imageFailed, setImageFailed] = useState(false);
   const [useOriginalImage, setUseOriginalImage] = useState(false);
-
-  useEffect(() => {
-    setImageFailed(false);
-    setUseOriginalImage(false);
-  }, [personality.slug]);
 
   const imageSrc = useOriginalImage
     ? getLoveTypeImage(personality.slug)
@@ -48,7 +50,6 @@ export function LovePersonalityAvatar({
           src={imageSrc}
           alt={alt ?? `${personality.name}形象`}
           fill
-          unoptimized
           priority={priority}
           sizes={sizes}
           className={imageClassName}

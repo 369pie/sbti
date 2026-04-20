@@ -4,6 +4,7 @@ import { unstable_cache } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { getSiteUrl } from '@/lib/site';
 import { createPublicServerSupabaseClient } from '@/lib/supabase/server-public';
+import { CreatorAvatarImage } from '@/components/CreatorAvatarImage';
 import { ProfileShareButton } from './ProfileShareButton';
 
 type PageProps = {
@@ -194,7 +195,6 @@ export default async function CreatorPublicProfilePage({ params }: PageProps) {
     creator,
     universes,
     totalTests,
-    totalShares,
     shareRate,
     featuredUniverse,
     latestUniverse,
@@ -212,7 +212,7 @@ export default async function CreatorPublicProfilePage({ params }: PageProps) {
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-start">
             <div className="w-20 h-20 rounded-3xl bg-bg-tertiary overflow-hidden flex items-center justify-center text-3xl shrink-0">
               {creator.avatar_url ? (
-                <img src={creator.avatar_url} alt="" className="w-full h-full object-cover" />
+                <CreatorAvatarImage src={creator.avatar_url} alt={`${creator.name}头像`} size={80} />
               ) : (
                 <span>{creator.name.slice(0, 1)}</span>
               )}

@@ -12,6 +12,8 @@
 
 import { track } from '@vercel/analytics';
 
+import { enqueueProductEvent } from '@/lib/analytics/product-events';
+
 export type FirstLookEventName =
   | 'first_look_entry'
   | 'first_look_q'
@@ -62,6 +64,39 @@ export function trackFirstLook(event: FirstLookEventName, payload?: Record<strin
 
   try {
     track(event, eventPayload);
+  } catch {
+    // never block UX for analytics
+  }
+
+  try {
+    const stepMap: Record<FirstLookEventName, string> = {
+      first_look_entry: 'entry',
+      first_look_q: 'q_advance',
+      first_look_finish: 'finish',
+      first_look_share: 'share',
+      first_look_deep_click: 'deep_click',
+    };
+    const slug = typeof payload?.slug === 'string' ? payload.slug : undefined;
+    const code = typeof payload?.code === 'string' ? payload.code : undefined;
+    const tier = typeof payload?.tier === 'string' ? payload.tier : undefined;
+    const value = typeof payload?.match === 'number'
+      ? payload.match
+      : typeof payload?.id === 'number'
+      ? payload.id
+      : undefined;
+    enqueueProductEvent('first_look', event, {
+      slug,
+      code,
+      tier,
+      step: stepMap[event],
+      value,
+      props: {
+        target: typeof payload?.target === 'string' ? payload.target : undefined,
+        channel: typeof payload?.channel === 'string' ? payload.channel : undefined,
+        rarity: typeof payload?.rarity === 'string' ? payload.rarity : undefined,
+        stage: typeof payload?.stage === 'string' ? payload.stage : undefined,
+      },
+    });
   } catch {
     // never block UX for analytics
   }

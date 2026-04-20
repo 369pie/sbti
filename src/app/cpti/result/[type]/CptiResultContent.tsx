@@ -24,13 +24,12 @@ import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { trackCptiEvent } from '@/lib/cpti/analytics';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
-import { loadCptiProfile } from '@/lib/cpti/cpti-profile';
-import { encodeCptiInvite } from '@/lib/cpti/cpti-invite';
-import { cptiApi } from '@/lib/cpti/cpti-api';
 import { ClaimAssetCard } from '@/components/ClaimAssetCard';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
+import { CptiPairEntryPanel } from '@/components/cpti/CptiPairEntryPanel';
+import { CptiCompatibilityPredictor } from '@/components/cpti/CptiCompatibilityPredictor';
 
 interface Props {
   personality: CptiPersonalityType;
@@ -226,7 +225,7 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
       </section>
 
       {/* Description */}
-      <section className="max-w-2xl mx-auto px-6 pb-16">
+      <section className="max-w-2xl mx-auto px-6 pb-12">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -240,6 +239,52 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
             {personality.description}
           </p>
         </motion.div>
+      </section>
+
+      {/* ★ Pair entry panel — promoted to second screen (Sprint 1, 2026-04-19) */}
+      <section className="max-w-2xl mx-auto px-6 pb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25, duration: 0.5 }}
+        >
+          <CptiPairEntryPanel personality={personality} />
+        </motion.div>
+      </section>
+
+      {/* ★ Compatibility prediction widget (Sprint 2 polish, 2026-04-19) */}
+      <section className="max-w-2xl mx-auto px-6 pb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.28, duration: 0.5 }}
+        >
+          <CptiCompatibilityPredictor
+            personality={personality}
+            dimensionScores={dimensionScores}
+          />
+        </motion.div>
+      </section>
+
+      {/* Gallery entry card — promoted from leaderboard footer */}
+      <section className="max-w-2xl mx-auto px-6 pb-12">
+        <Link
+          href="/cpti/gallery/"
+          className="group block rounded-2xl border border-border-subtle bg-bg-elevated hover:border-rose-500/40 transition-all p-6 sm:p-7"
+        >
+          <div className="flex items-center gap-4">
+            <div className="text-3xl">📖</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-base sm:text-lg font-semibold text-text-primary mb-1">
+                我的关系图鉴
+              </div>
+              <div className="text-xs sm:text-sm text-text-muted">
+                25 格可收集 · 看看你已点亮哪几格 · 还缺哪些
+              </div>
+            </div>
+            <span className="text-rose-500 group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </Link>
       </section>
 
       {/* Dimension Bars */}
@@ -323,7 +368,7 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
           transition={{ delay: 0.6, duration: 0.5 }}
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4 text-center">
-            发给ta看看你是什么角色
+            发给身边的人看看你是什么角色
           </h2>
 
           <div className="space-y-3">
@@ -363,14 +408,32 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
         </motion.div>
       </section>
 
-      {/* Invite & Stealth CTA */}
+      {/* Stealth (偊测) — demoted to tertiary entry (Sprint 1) */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.5 }}
         >
-          <InviteAndStealthCTA personality={personality} />
+          <Link
+            href="/cpti/stealth"
+            className="block rounded-2xl border border-purple-500/20 bg-purple-500/5 p-5 sm:p-6 text-center hover:bg-purple-500/10 transition-all group"
+          >
+            <div className="flex items-center justify-center gap-3">
+              <span className="text-2xl">🔮</span>
+              <div className="text-left">
+                <div className="text-base font-medium text-purple-400 group-hover:text-purple-300 transition-colors">
+                  偊偊测一下
+                </div>
+                <div className="text-xs text-text-muted mt-0.5">
+                  不用发链接，根据你对 ta 的了解来测你们的默契
+                </div>
+              </div>
+              <svg className="w-5 h-5 text-text-muted group-hover:text-purple-400 transition-colors ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </Link>
         </motion.div>
       </section>
 
@@ -432,227 +495,3 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
   );
 }
 
-/* ── Invite + Stealth CTA component ── */
-function InviteAndStealthCTA({ personality }: { personality: CptiPersonalityType }) {
-  const [nickname, setNickname] = useState('');
-  const [inviteLink, setInviteLink] = useState('');
-  const [inviteCopied, setInviteCopied] = useState(false);
-  const [showInvitePanel, setShowInvitePanel] = useState(false);
-  const [pairCode, setPairCode] = useState('');
-  const [pairCodeCopied, setPairCodeCopied] = useState(false);
-  const [pairCodeLinkCopied, setPairCodeLinkCopied] = useState(false);
-  const [isGeneratingPairCode, setIsGeneratingPairCode] = useState(false);
-
-  const generateInviteLink = useCallback(() => {
-    const profile = loadCptiProfile();
-    if (!profile) return;
-    const code = encodeCptiInvite({
-      nickname: nickname.trim() || '朋友',
-      dimensions: profile.dimensions,
-      personalitySlug: profile.slug,
-    });
-    setInviteLink(getSiteUrl(`/cpti/invite/?code=${code}`));
-  }, [nickname]);
-
-  const copyInviteLink = useCallback(() => {
-    navigator.clipboard.writeText(inviteLink);
-    setInviteCopied(true);
-    setTimeout(() => setInviteCopied(false), 2000);
-  }, [inviteLink]);
-
-  const shareInviteLink = useCallback(async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: '来测测我们是什么CP关系！',
-          text: `我是${personality.code}（${personality.name}），来测测我们是什么关系吧 💕`,
-          url: inviteLink,
-        });
-        return;
-      } catch { /* cancelled */ }
-    }
-    copyInviteLink();
-  }, [inviteLink, copyInviteLink, personality.code, personality.name]);
-
-  const generatePairCode = useCallback(async () => {
-    if (isGeneratingPairCode) return;
-    setIsGeneratingPairCode(true);
-    try {
-      const profile = loadCptiProfile();
-      await cptiApi.bootstrap();
-      const result = await cptiApi.createPairCode({
-        mode: 'direct',
-        personalitySlug: profile?.slug,
-        dimensionScores: profile?.dimensions,
-        source: 'self_test',
-      });
-      setPairCode(result.code);
-    } catch (err) {
-      console.warn('[CPTI] Failed to generate pair code:', err);
-    } finally {
-      setIsGeneratingPairCode(false);
-    }
-  }, [isGeneratingPairCode]);
-
-  const copyPairCode = useCallback(() => {
-    navigator.clipboard.writeText(pairCode);
-    setPairCodeCopied(true);
-    setTimeout(() => setPairCodeCopied(false), 2000);
-  }, [pairCode]);
-
-  const pairCodeLink = pairCode ? getSiteUrl(`/cpti/invite/?pairCode=${pairCode}`) : '';
-
-  const copyPairCodeLink = useCallback(() => {
-    navigator.clipboard.writeText(pairCodeLink);
-    setPairCodeLinkCopied(true);
-    setTimeout(() => setPairCodeLinkCopied(false), 2000);
-  }, [pairCodeLink]);
-
-  return (
-    <div className="space-y-3">
-      {/* Invite CTA */}
-      <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-6 sm:p-8 text-center">
-        <div className="text-3xl mb-3">💌</div>
-        <h3 className="text-lg font-semibold mb-2">想知道你们是什么关系？</h3>
-        <p className="text-sm text-text-muted mb-4">
-          邀请ta也来测一份，系统会自动匹配你们的CP关系类型
-          <br />
-          25种关系图鉴等你解锁
-        </p>
-
-        {!showInvitePanel ? (
-          <button
-            onClick={() => setShowInvitePanel(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-rose-500 text-white font-medium text-sm hover:bg-rose-600 transition-all cursor-pointer"
-          >
-            生成邀请链接
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </button>
-        ) : !inviteLink ? (
-          <div className="space-y-3 max-w-xs mx-auto">
-            <input
-              type="text"
-              placeholder="输入你的昵称（对方会看到）"
-              value={nickname}
-              onChange={e => setNickname(e.target.value)}
-              maxLength={20}
-              className="w-full px-4 py-3 rounded-xl border border-border-subtle bg-bg-secondary text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-rose-500/40 transition-colors"
-            />
-            <button
-              onClick={generateInviteLink}
-              className="w-full py-3 rounded-xl bg-rose-500 text-white font-medium text-sm hover:bg-rose-600 transition-all cursor-pointer"
-            >
-              生成邀请链接
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <div className="rounded-xl border border-border-subtle bg-bg-elevated p-3">
-              <div className="text-xs text-text-muted text-left mb-1">邀请链接</div>
-              <div className="text-xs text-text-secondary break-all text-left font-mono leading-relaxed">
-                {inviteLink}
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={copyInviteLink}
-                className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all cursor-pointer"
-              >
-                {inviteCopied ? '已复制 ✓' : '📋 复制链接'}
-              </button>
-              <button
-                onClick={shareInviteLink}
-                className="flex-1 py-3 rounded-xl border border-rose-500/30 text-sm text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer"
-              >
-                分享给ta
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Pair Code CTA */}
-      <div className="rounded-2xl border border-gold/30 bg-gold/5 p-6 sm:p-8 text-center">
-        <div className="text-3xl mb-3">🔗</div>
-        <h3 className="text-lg font-semibold mb-2">快速配对码</h3>
-        <p className="text-sm text-text-muted mb-4">
-          生成一个6位配对码，让对方直接输入配对
-          <br />
-          无需发送链接，更方便快捷
-        </p>
-
-        {!pairCode ? (
-          <button
-            onClick={generatePairCode}
-            disabled={isGeneratingPairCode}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gold text-bg-elevated font-medium text-sm hover:bg-gold-leaf transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {isGeneratingPairCode ? (
-              <>
-                <div className="w-4 h-4 border-2 border-bg-elevated border-t-transparent rounded-full animate-spin" />
-                生成中...
-              </>
-            ) : (
-              <>
-                生成配对码
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </>
-            )}
-          </button>
-        ) : (
-          <div className="space-y-3">
-            <div className="flex items-center justify-center gap-2">
-              <span className="text-4xl font-mono font-bold tracking-[0.3em] text-amber-500">
-                {pairCode}
-              </span>
-            </div>
-            <p className="text-xs text-text-muted">把这个配对码发给对方</p>
-            <button
-              onClick={copyPairCode}
-              className="w-full py-3 rounded-xl border border-amber-500/30 text-sm text-amber-400 hover:bg-amber-500/10 transition-all cursor-pointer"
-            >
-              {pairCodeCopied ? '已复制 ✓' : '📋 复制配对码'}
-            </button>
-            <div className="rounded-xl border border-border-subtle bg-bg-elevated p-3">
-              <div className="text-xs text-text-muted text-left mb-1">配对链接</div>
-              <div className="text-xs text-text-secondary break-all text-left font-mono leading-relaxed">
-                {pairCodeLink}
-              </div>
-            </div>
-            <button
-              onClick={copyPairCodeLink}
-              className="w-full py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all cursor-pointer"
-            >
-              {pairCodeLinkCopied ? '已复制 ✓' : '📋 复制配对链接'}
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Stealth CTA */}
-      <Link
-        href="/cpti/stealth"
-        className="block rounded-2xl border border-purple-500/20 bg-purple-500/5 p-5 sm:p-6 text-center hover:bg-purple-500/10 transition-all group"
-      >
-        <div className="flex items-center justify-center gap-3">
-          <span className="text-2xl">🔮</span>
-          <div className="text-left">
-            <div className="text-base font-medium text-purple-400 group-hover:text-purple-300 transition-colors">
-              偷偷测CP感
-            </div>
-            <div className="text-xs text-text-muted mt-0.5">
-              不用发链接，根据你对TA的了解来测试你们的默契
-            </div>
-          </div>
-          <svg className="w-5 h-5 text-text-muted group-hover:text-purple-400 transition-colors ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </Link>
-    </div>
-  );
-}

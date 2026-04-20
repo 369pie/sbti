@@ -8,7 +8,7 @@ import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { IDENTIFY_DIMENSIONS, IDENTIFY_MODEL_NAMES, IDENTIFY_MODEL_COLORS } from '@/lib/identify/dimensions';
 import type { IdentifyPersonaType } from '@/lib/identify/personas';
-import { getIdentifyTypeImage, getIdentifyTypeThumbnailImage, getIdentifyTypeMediumImage } from '@/lib/identify/personas';
+import { getIdentifyTypeImage, getIdentifyTypeMediumImage } from '@/lib/identify/personas';
 import type { IdentifyDimensionScore } from '@/lib/identify/scoring';
 const IdentifyShareImageGenerator = dynamic(
   () => import('@/components/IdentifyShareImageGenerator').then((m) => m.IdentifyShareImageGenerator),
@@ -24,6 +24,7 @@ import { loadStoredQuizResult } from '@/lib/quiz-result-session';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { Glyph } from '@/components/Glyph';
 import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
+import { useId } from 'react';
 
 const emptySubscribe = () => () => {};
 
@@ -39,10 +40,18 @@ function PersonaAvatar({ persona, className, style, priority = false, sizes = '1
   priority?: boolean;
   sizes?: string;
 }) {
+  return <PersonaAvatarInner key={persona.slug} persona={persona} className={className} style={style} priority={priority} sizes={sizes} />;
+}
+
+function PersonaAvatarInner({ persona, className, style, priority = false, sizes = '128px' }: {
+  persona: IdentifyPersonaType;
+  className?: string;
+  style?: React.CSSProperties;
+  priority?: boolean;
+  sizes?: string;
+}) {
   const [imageFailed, setImageFailed] = useState(false);
   const [useOriginal, setUseOriginal] = useState(false);
-
-  useEffect(() => { setImageFailed(false); setUseOriginal(false); }, [persona.slug]);
 
   const src = useOriginal ? getIdentifyTypeImage(persona.slug) : getIdentifyTypeMediumImage(persona.slug);
 
@@ -55,7 +64,6 @@ function PersonaAvatar({ persona, className, style, priority = false, sizes = '1
           src={src}
           alt={`${persona.name}形象`}
           fill
-          unoptimized
           priority={priority}
           sizes={sizes}
           className="object-contain p-2"
@@ -89,10 +97,9 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
     personaSlug: string;
     createdAt: string;
   } | null>(null);
-  const clientMutationIdRef = useRef(
-    typeof crypto !== 'undefined' ? crypto.randomUUID() : `identify-${Date.now()}`,
-  );
+  const clientMutationId = useId();
   const shareRef = useRef<IdentifyShareImageGeneratorHandle>(null);
+  const isSavingRef = useRef(false);
   const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, IdentifyShareImageGenerator);
 
   useEffect(() => {
@@ -144,11 +151,16 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
   useEffect(() => {
     let active = true;
 
-    if (!mounted || sharedAssessmentToken || !sessionResult || savedAssessment || saveState === 'saving') {
+    if (!mounted || sharedAssessmentToken || !sessionResult || savedAssessment || isSavingRef.current) {
       return;
     }
 
-    setSaveState('saving');
+    isSavingRef.current = true;
+    queueMicrotask(() => {
+      if (active) {
+        setSaveState('saving');
+      }
+    });
 
     identifyApi
       .saveAssessment({
@@ -156,22 +168,24 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
         friendName,
         dimensionScores: sessionResult.dimensionScores,
         diagnostics: sessionResult.diagnostics,
-        clientMutationId: clientMutationIdRef.current,
+        clientMutationId,
       })
       .then((result) => {
         if (!active) return;
+        isSavingRef.current = false;
         setSavedAssessment(result.assessment);
         setSaveState('saved');
       })
       .catch(() => {
         if (!active) return;
+        isSavingRef.current = false;
         setSaveState('error');
       });
 
     return () => {
       active = false;
     };
-  }, [friendName, mounted, persona.slug, saveState, savedAssessment, sessionResult, sharedAssessmentToken]);
+  }, [clientMutationId, friendName, mounted, persona.slug, savedAssessment, sessionResult, sharedAssessmentToken]);
 
   const activeDimensionScores = sharedPreview?.dimensionScores ?? sessionResult?.dimensionScores ?? dimensionScores;
 

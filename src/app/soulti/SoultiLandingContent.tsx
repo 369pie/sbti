@@ -79,7 +79,7 @@ export default function SoultiLandingContent() {
               className="text-[2rem] sm:text-[2.5rem] md:text-[3rem] leading-[1.5] mb-6"
               style={{ fontFamily: serifFont, fontWeight: 400, color: '#2D2A26', letterSpacing: '0.02em' }}
             >
-              你的灵魂<br />像一种自然力
+              深夜的你，<br />需要 8 分钟
             </h1>
 
             <DecoLine className="text-[#8b7355] opacity-30 mb-6" />
@@ -88,25 +88,25 @@ export default function SoultiLandingContent() {
               className="text-base sm:text-lg leading-[2.2] max-w-md mx-auto mb-3"
               style={{ fontFamily: serifFont, color: '#5a5550' }}
             >
-              而历史上有个女人，
+              白天的你，和深夜的你，
               <br />
-              跟你以同样的方式燃烧过。
+              到底差了多少？
             </p>
 
             <p
               className="text-base sm:text-lg leading-[3] max-w-md mx-auto mb-10"
               style={{ fontFamily: serifFont, color: '#2D2A26' }}
             >
-              带着这股共通的力量，作为独一无二的你，
+              测出你的「撕裂度」，
               <br />
-              <span style={{ color: '#8b7355' }}>继续热烈地燃烧，永远不熄。</span>
+              <span style={{ color: '#8b7355' }}>看见你今晚为什么睡不着。</span>
             </p>
 
             <p
               className="text-sm mb-12"
               style={{ fontFamily: serifFont, color: '#9a918a', fontStyle: 'italic' }}
             >
-              五轴深探 · 32 种自然力 · 灵魂共振
+              5 轴 · 32 种自然力 · 三层镜像 · 撕裂度算法
             </p>
 
             <Link
@@ -119,7 +119,7 @@ export default function SoultiLandingContent() {
                 letterSpacing: '0.1em',
               }}
             >
-              开启共振
+              现在就来
               <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </Link>
 

@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getSoultiPair, normalizePairSlugs } from '@/lib/soulti/pair';
 import { getAllSoultiSlugs, getSoultiResonance } from '@/lib/soulti/personalities';
 import { getSiteUrl } from '@/lib/site';
+import { SoultiPairTearPK } from '@/components/SoultiPairTearPK';
 
 const serifFont = "Georgia, 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif";
 const monoFont = "'SF Mono', 'Roboto Mono', ui-monospace, monospace";
@@ -88,6 +89,9 @@ export default async function Page({ params }: PageProps) {
       </header>
 
       <main className="max-w-2xl mx-auto px-6 pb-16 space-y-6">
+        {/* ── E8 · Pair Tear Rate (双人撕裂度) — strategy 2026-04-19 ── */}
+        <SoultiPairTearPK a={pair.a} b={pair.b} />
+
         {/* 5 axes */}
         <section className="rounded-3xl p-6 sm:p-8" style={{ background: '#FDFCFA', border: '1px solid rgba(139,115,85,0.15)' }}>
           <p className="text-[10px] tracking-[0.3em] uppercase mb-4" style={{ fontFamily: monoFont, color: '#8b7355' }}>

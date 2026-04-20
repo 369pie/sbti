@@ -2,8 +2,8 @@
 
 import NextImage from 'next/image';
 import type { CSSProperties } from 'react';
-import { useEffect, useState } from 'react';
-import { getDailyTypeImage, getDailyTypeThumbnailImage, getDailyTypeMediumImage } from '@/lib/daily/statuses';
+import { useState } from 'react';
+import { getDailyTypeImage, getDailyTypeMediumImage } from '@/lib/daily/statuses';
 import type { DailyStatusType } from '@/lib/daily/statuses';
 
 interface Props {
@@ -19,6 +19,13 @@ interface Props {
 
 export function DailyStatusAvatar({
   status,
+  ...props
+}: Props) {
+  return <DailyStatusAvatarInner key={status.slug} status={status} {...props} />;
+}
+
+function DailyStatusAvatarInner({
+  status,
   className,
   alt,
   sizes = '128px',
@@ -29,11 +36,6 @@ export function DailyStatusAvatar({
 }: Props) {
   const [imageFailed, setImageFailed] = useState(false);
   const [useOriginalImage, setUseOriginalImage] = useState(false);
-
-  useEffect(() => {
-    setImageFailed(false);
-    setUseOriginalImage(false);
-  }, [status.slug]);
 
   const imageSrc = useOriginalImage
     ? getDailyTypeImage(status.slug)
@@ -48,7 +50,6 @@ export function DailyStatusAvatar({
           src={imageSrc}
           alt={alt ?? `${status.name}形象`}
           fill
-          unoptimized
           priority={priority}
           sizes={sizes}
           className={imageClassName}

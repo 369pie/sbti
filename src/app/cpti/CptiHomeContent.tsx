@@ -20,9 +20,15 @@ const MODES = [
 ];
 
 const EXPLORE = [
-  { href: '/card/', label: '我的关系图鉴', desc: '查看已收集的 CP 关系，点亮你的关系宇宙。' },
+  { href: '/cpti/gallery/', label: '我的关系图鉴', desc: '25 种 CP 关系图鉴，每多测一个人就多解锁一格。' },
   { href: '/cpti/leaderboard/', label: '关系排行榜', desc: '看看谁是当周收集最多关系类型的玩家。' },
-  { href: '/cpti/join/', label: '输入配对码', desc: '用 ta 发来的代码加入配对，解锁新的关系。' },
+  { href: '/cpti/join/', label: '输入配对码', desc: '用 ta 发来的六位码加入配对，解锁新的关系。' },
+  { href: '/cpti/theory/', label: '维度白皮书', desc: '5 个维度怎么算出 25 种关系？看一眼就懂。' },
+  { href: '/cpti/scenarios/lover/', label: '情侣 CP 测试', desc: '你和对象是灵魂伴侣还是相爱相杀？' },
+  { href: '/cpti/scenarios/bestie/', label: '闺蜜浓度测试', desc: '塑料姐妹 / 双子星 / 怪咖联盟，你们是哪一种？' },
+  { href: '/cpti/scenarios/family/', label: '家人关系测试', desc: '和妈、和爸、和兄弟姐妹，到底是哪一种关系？' },
+  { href: '/cpti/scenarios/work/', label: '同事关系测试', desc: '战略同盟、狱友、塑料死敌，打工人必测。' },
+  { href: '/cpti/scenarios/enemy/', label: '死对头测试', desc: '相爱相杀、欢喜冤家、桃园结义到底是哪一种？' },
 ];
 
 export default function CptiHomeContent() {
@@ -46,15 +52,15 @@ export default function CptiHomeContent() {
 
             <div className="max-w-2xl">
               <p className="editorial-display text-3xl sm:text-5xl md:text-6xl mb-6">
-                你在关系里
+                你和 ta
                 <br />
-                <span className="editorial-italic" style={{ color: 'var(--color-rose-deep)' }}>扮演什么角色？</span>
+                <span className="editorial-italic" style={{ color: 'var(--color-rose-deep)' }}>是什么关系？</span>
               </p>
               <hr className="editorial-rule w-24 mb-6" />
               <p className="text-base sm:text-lg leading-[1.8] text-text-secondary max-w-xl">
-                5 个关系维度 · 16 种 CP 角色 · 25 种关系类型。
+                情侣 · 闺蜜 · 妈 · 同事 · 死对头 —— 任何一段关系都能测。
                 <br className="hidden sm:block" />
-                3 分钟测出你在关系里的角色，邀请 ta 配对解锁你们的关系图鉴。
+                5 个关系维度 · 16 种角色 · 25 种关系类型。3 分钟一对，集齐图鉴。
               </p>
             </div>
 
@@ -68,6 +74,29 @@ export default function CptiHomeContent() {
               <Link href="/" prefetch={false} className="eyebrow ml-1 hover:text-text-primary transition-colors">
                 ← 返回 WTFti
               </Link>
+            </div>
+
+            {/* Scenario quick-jump chips (Sprint 2 polish, 2026-04-19) */}
+            <div className="mt-8 sm:mt-10">
+              <div className="eyebrow mb-3">和谁测？</div>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { href: '/cpti/scenarios/lover/', label: '👫 对象 / 暧昧' },
+                  { href: '/cpti/scenarios/bestie/', label: '👯 闺蜜 / 死党' },
+                  { href: '/cpti/scenarios/family/', label: '👨\u200d👩\u200d👧 家人' },
+                  { href: '/cpti/scenarios/work/', label: '💼 同事 / 队友' },
+                  { href: '/cpti/scenarios/enemy/', label: '⚔️ 死对头' },
+                ].map((s) => (
+                  <Link
+                    key={s.href}
+                    href={s.href}
+                    prefetch={false}
+                    className="px-4 py-2 rounded-full text-sm border border-border-subtle bg-bg-secondary/40 text-text-secondary hover:text-rose-500 hover:border-rose-500/40 transition-colors"
+                  >
+                    {s.label}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -248,14 +277,14 @@ export default function CptiHomeContent() {
           <span className="serial-number text-xs mr-3">07</span>
           <span className="eyebrow">Ready</span>
           <h2 className="editorial-display text-3xl sm:text-5xl md:text-6xl mt-6 mb-4">
-            准备好测一下了吗？
+            准备好开测了吗？
           </h2>
           <p className="text-base sm:text-lg text-text-secondary mb-10 leading-[1.8]">
-            一份关于关系的人格图鉴，<br className="sm:hidden" />送给正在认真谈一段感情的你。
+            一份关于关系的图鉴，<br className="sm:hidden" />送给在意身边任何一段关系的你。
           </p>
           <hr className="editorial-rule w-16 mx-auto mb-10" />
           <Link href="/cpti/test/" prefetch={false} className="btn btn-rose">
-            测测你的 CP 角色 <span className="opacity-70">→</span>
+            测测你和身边人是什么关系 <span className="opacity-70">→</span>
           </Link>
         </div>
       </section>

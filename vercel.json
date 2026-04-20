@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/soulti/soul-letter/dispatch",
+      "schedule": "30 13 * * *"
+    }
+  ],
   "redirects": [
     {
       "source": "/:path*",

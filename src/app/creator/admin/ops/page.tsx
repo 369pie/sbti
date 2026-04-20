@@ -3,6 +3,12 @@ import Link from 'next/link';
 
 import { ADMIN_USER_IDS_ENV, hasConfiguredAdminUsers, isAdminUserId } from '@/lib/admin/roles';
 import { fetchWtftiOpsDashboardData, type OpsDataHealthItem, type OpsMetricDelta } from '@/lib/admin/wtfti-ops';
+import {
+  fetchProductEventsInsights,
+  type ProductEventsInsights,
+  type OpsModuleFunnel,
+  type OpsTopEventDelta,
+} from '@/lib/admin/wtfti-ops-insights';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
@@ -215,6 +221,312 @@ function AdminErrorState({ message }: { message: string }) {
   );
 }
 
+function formatDuration(ms: number | null): string {
+  if (ms === null || !Number.isFinite(ms)) return '—';
+  if (ms < 60_000) return `${(ms / 1000).toFixed(1)}s`;
+  return `${Math.floor(ms / 60_000)}m ${Math.round((ms % 60_000) / 1000)}s`;
+}
+
+function formatChange(value: number): string {
+  if (!Number.isFinite(value)) return '新事件';
+  const sign = value > 0 ? '+' : '';
+  return `${sign}${value.toFixed(1)}%`;
+}
+
+function FunnelCard({ funnel }: { funnel: OpsModuleFunnel }) {
+  return (
+    <div className="rounded-2xl border border-border-subtle bg-bg-secondary/50 p-4">
+      <div className="flex items-baseline justify-between">
+        <div className="text-sm font-medium text-text-primary">{funnel.label}</div>
+        <div className="text-xs text-text-muted">
+          7 天 {formatCount(funnel.totalSessions7Days)} 会话 ·{' '}
+          vs 前 7 天{' '}
+          {funnel.totalSessions7DaysPrev > 0
+            ? formatChange(((funnel.totalSessions7Days - funnel.totalSessions7DaysPrev) / funnel.totalSessions7DaysPrev) * 100)
+            : '新出现'}
+        </div>
+      </div>
+      <div className="mt-4 space-y-2">
+        {funnel.steps.map((step, index) => {
+          const previousStep = index > 0 ? funnel.steps[index - 1] : null;
+          const stepDrop =
+            previousStep && previousStep.sessions > 0
+              ? ((previousStep.sessions - step.sessions) / previousStep.sessions) * 100
+              : 0;
+          return (
+            <div key={step.step}>
+              <div className="flex items-center justify-between text-xs text-text-secondary">
+                <span>
+                  <span className="mr-1 font-mono text-text-muted">#{index + 1}</span>
+                  {step.label}
+                </span>
+                <span>
+                  {formatCount(step.sessions)} 会话 · {formatPercent(step.conversion)}
+                  {previousStep ? (
+                    <span className={`ml-2 text-[11px] ${stepDrop > 30 ? 'text-rose-600' : 'text-text-muted'}`}>
+                      流失 {stepDrop.toFixed(1)}%
+                    </span>
+                  ) : null}
+                </span>
+              </div>
+              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-bg-secondary">
+                <div
+                  className="h-full rounded-full bg-accent/80"
+                  style={{ width: `${Math.min(100, step.conversion)}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ProductInsightsSection({
+  insights,
+  insightsError,
+}: {
+  insights: ProductEventsInsights | null;
+  insightsError: string | null;
+}) {
+  if (insightsError) {
+    return (
+      <div className="mt-8">
+        <SectionCard
+          title="UX 漏斗与体验信号"
+          description="读取 product_events / perf_metrics 时出错，已降级显示。"
+        >
+          <EmptyState message={`UX 数据加载失败: ${insightsError}`} />
+        </SectionCard>
+      </div>
+    );
+  }
+
+  if (!insights) {
+    return null;
+  }
+
+  if (!insights.hasProductEvents && !insights.hasPerfMetrics) {
+    return (
+      <div className="mt-8">
+        <SectionCard
+          title="UX 漏斗与体验信号"
+          description="启用统一埋点后，这里会自动出现 7 天漏斗、流失点和性能健康度。"
+        >
+          {insights.warnings.length > 0 ? (
+            <div className="grid gap-2">
+              {insights.warnings.map((warning) => (
+                <div
+                  key={warning}
+                  className="rounded-2xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm text-amber-900/80"
+                >
+                  {warning}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState message="还没有收到任何 product_events 上报，等用户开始触发即可看到漏斗。" />
+          )}
+        </SectionCard>
+      </div>
+    );
+  }
+
+  const usableFunnels = insights.funnels.filter((funnel) => funnel.totalSessions7Days > 0);
+  const dropOffWithData = insights.dropOffs.filter((item) =>
+    item.points.some((point) => point.sessions > 0),
+  );
+  const engagementWithData = insights.engagement.filter((item) => item.sessions > 0);
+
+  return (
+    <>
+      <div className="mt-8 grid gap-6 xl:grid-cols-2">
+        <SectionCard
+          title="近 7 天模块漏斗"
+          description="按 session_id 去重统计：进入 → 答题 → 完成 → 分享 → 深度。比单纯 PV 更接近真实使用质量。"
+        >
+          {usableFunnels.length > 0 ? (
+            <div className="grid gap-4">
+              {usableFunnels.map((funnel) => (
+                <FunnelCard key={funnel.module} funnel={funnel} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState message="没有满足漏斗定义的事件，先确认核心模块的埋点已经上线。" />
+          )}
+        </SectionCard>
+
+        <SectionCard
+          title="模块互动质量"
+          description="衡量留得住和分享出去的能力。中位完成时长可作为'内容是否过长'的参考。"
+        >
+          {engagementWithData.length > 0 ? (
+            <div className="overflow-hidden rounded-2xl border border-border-subtle">
+              <table className="min-w-full divide-y divide-border-subtle text-sm">
+                <thead className="bg-bg-secondary/70 text-text-muted">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-medium">模块</th>
+                    <th className="px-3 py-2 text-right font-medium">会话</th>
+                    <th className="px-3 py-2 text-right font-medium">完成率</th>
+                    <th className="px-3 py-2 text-right font-medium">分享率</th>
+                    <th className="px-3 py-2 text-right font-medium">中位完成</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border-subtle bg-bg-elevated">
+                  {engagementWithData.map((item) => (
+                    <tr key={item.module}>
+                      <td className="px-3 py-2 text-text-primary">{item.label}</td>
+                      <td className="px-3 py-2 text-right text-text-secondary">{formatCount(item.sessions)}</td>
+                      <td className="px-3 py-2 text-right text-text-secondary">{formatPercent(item.finishRate)}</td>
+                      <td className="px-3 py-2 text-right text-text-secondary">{formatPercent(item.shareRate)}</td>
+                      <td className="px-3 py-2 text-right text-text-secondary">{formatDuration(item.medianTimeToFinishMs)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState message="近 7 天还没有可统计的会话级数据。" />
+          )}
+        </SectionCard>
+      </div>
+
+      <div className="mt-8 grid gap-6 xl:grid-cols-2">
+        <SectionCard
+          title="流失热点"
+          description="高于 30% 的流失会高亮，作为下一步 UX 优化的入口。"
+        >
+          {dropOffWithData.length > 0 ? (
+            <div className="space-y-4">
+              {dropOffWithData.map((item) => (
+                <div key={item.module}>
+                  <div className="text-sm font-medium text-text-primary">{item.label}</div>
+                  <div className="mt-2 space-y-2">
+                    {item.points.map((point) => (
+                      <div key={point.step}>
+                        <div className="flex items-center justify-between text-xs text-text-secondary">
+                          <span>{point.label}</span>
+                          <span className={point.drop > 30 ? 'text-rose-600' : 'text-text-muted'}>
+                            流失 {point.drop.toFixed(1)}% · 留下 {formatCount(point.sessions)} 会话
+                          </span>
+                        </div>
+                        <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-bg-secondary">
+                          <div
+                            className={`h-full rounded-full ${point.drop > 30 ? 'bg-rose-500/80' : 'bg-amber-500/70'}`}
+                            style={{ width: `${Math.min(100, point.drop)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState message="目前还没有覆盖到的漏斗流失数据。" />
+          )}
+        </SectionCard>
+
+        <SectionCard
+          title="近 7 天性能健康"
+          description="基于 perf_metrics 的 p75 LCP / INP / CLS。LCP 较差 (>30%) 的页面优先排查。"
+        >
+          {insights.perfTopPaths.length > 0 ? (
+            <div className="overflow-hidden rounded-2xl border border-border-subtle">
+              <table className="min-w-full divide-y divide-border-subtle text-sm">
+                <thead className="bg-bg-secondary/70 text-text-muted">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-medium">路径</th>
+                    <th className="px-3 py-2 text-right font-medium">样本</th>
+                    <th className="px-3 py-2 text-right font-medium">LCP p75</th>
+                    <th className="px-3 py-2 text-right font-medium">INP p75</th>
+                    <th className="px-3 py-2 text-right font-medium">CLS p75</th>
+                    <th className="px-3 py-2 text-right font-medium">LCP poor</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border-subtle bg-bg-elevated">
+                  {insights.perfTopPaths.map((row) => (
+                    <tr key={row.pathname}>
+                      <td className="px-3 py-2 text-text-primary">
+                        <span className="font-mono text-xs">{row.pathname}</span>
+                      </td>
+                      <td className="px-3 py-2 text-right text-text-secondary">{formatCount(row.samples)}</td>
+                      <td className="px-3 py-2 text-right text-text-secondary">{Math.round(row.lcpP75)}</td>
+                      <td className="px-3 py-2 text-right text-text-secondary">{Math.round(row.inpP75)}</td>
+                      <td className="px-3 py-2 text-right text-text-secondary">{row.clsP75.toFixed(2)}</td>
+                      <td className={`px-3 py-2 text-right ${row.lcpPoorShare > 30 ? 'text-rose-600' : 'text-text-secondary'}`}>
+                        {formatPercent(row.lcpPoorShare)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState message="近 7 天没有 perf_metrics 样本。" />
+          )}
+        </SectionCard>
+      </div>
+
+      <div className="mt-8">
+        <SectionCard
+          title="周环比信号 TOP"
+          description="按变化率排序的事件，正向意味着产品某条路径在加热，负向意味着掉队。"
+        >
+          {insights.topDeltas.length > 0 ? (
+            <div className="overflow-hidden rounded-2xl border border-border-subtle">
+              <table className="min-w-full divide-y divide-border-subtle text-sm">
+                <thead className="bg-bg-secondary/70 text-text-muted">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-medium">模块</th>
+                    <th className="px-3 py-2 text-left font-medium">事件</th>
+                    <th className="px-3 py-2 text-right font-medium">本周</th>
+                    <th className="px-3 py-2 text-right font-medium">前周</th>
+                    <th className="px-3 py-2 text-right font-medium">变化</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border-subtle bg-bg-elevated">
+                  {insights.topDeltas.map((row: OpsTopEventDelta) => (
+                    <tr key={`${row.module}-${row.event}`}>
+                      <td className="px-3 py-2 text-text-primary">{row.module}</td>
+                      <td className="px-3 py-2 font-mono text-xs text-text-secondary">{row.event}</td>
+                      <td className="px-3 py-2 text-right text-text-secondary">{formatCount(row.current)}</td>
+                      <td className="px-3 py-2 text-right text-text-muted">{formatCount(row.previous)}</td>
+                      <td
+                        className={`px-3 py-2 text-right ${
+                          Number.isFinite(row.change) && row.change >= 0 ? 'text-emerald-600' : 'text-rose-600'
+                        }`}
+                      >
+                        {formatChange(row.change)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState message="近 14 天事件样本不足，等更多数据后再分析。" />
+          )}
+        </SectionCard>
+      </div>
+
+      {insights.warnings.length > 0 ? (
+        <div className="mt-6 grid gap-2">
+          {insights.warnings.map((warning) => (
+            <div
+              key={warning}
+              className="rounded-2xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-xs text-amber-900/80"
+            >
+              {warning}
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </>
+  );
+}
+
 export default async function CreatorAdminOpsPage() {
   const supabase = await createServerSupabaseClient();
   const {
@@ -236,11 +548,19 @@ export default async function CreatorAdminOpsPage() {
   }
 
   let data;
+  let insights: ProductEventsInsights | null = null;
+  let insightsError: string | null = null;
 
   try {
     data = await fetchWtftiOpsDashboardData();
   } catch (error) {
     return <AdminErrorState message={error instanceof Error ? error.message : 'Unknown error'} />;
+  }
+
+  try {
+    insights = await fetchProductEventsInsights();
+  } catch (error) {
+    insightsError = error instanceof Error ? error.message : 'Unknown error';
   }
 
   const trendMax = Math.max(...data.trends14Days.map((item) => item.total), 1);
@@ -762,6 +1082,8 @@ export default async function CreatorAdminOpsPage() {
             </div>
           </SectionCard>
         </div>
+
+        <ProductInsightsSection insights={insights} insightsError={insightsError} />
 
         <div className="mt-8">
           <SectionCard title="数据覆盖情况" description="这是决定下一阶段该补哪条数据链路的依据。">

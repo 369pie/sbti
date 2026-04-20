@@ -155,6 +155,8 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
         window.location.href = `${basePath}/cp/result?a=${encodeURIComponent(cpPartner)}&b=${encodeURIComponent(result.personality.slug)}${sep}`;
       } else if (isMysti) {
         window.location.href = `${basePath}/mysti/result/${encodeURIComponent(result.personality.slug)}${skinParam}`;
+      } else if (resultPrefix === '/wtfti') {
+        window.location.href = `${basePath}/wtfti/galaxy/preview/?seed=${encodeURIComponent(result.personality.slug)}`;
       } else {
         window.location.href = `${basePath}${resultPrefix}/result/${encodeURIComponent(result.personality.slug)}${skinParam}`;
       }

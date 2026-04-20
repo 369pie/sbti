@@ -5,8 +5,9 @@ import NextImage from 'next/image';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { XPTI_DIMENSIONS, XPTI_MODEL_NAMES, XPTI_MODEL_COLORS } from '@/lib/xpti/dimensions';
-import { XPTI_PERSONALITY_TYPES, getXptiRarity, getXptiTypeThumbnailImage, getXptiTypeMediumImage } from '@/lib/xpti/personalities';
+import { XPTI_PERSONALITY_TYPES, getXptiRarity, getXptiTypeThumbnailImage, getXptiTypeMediumImage, getXptiTensionSignature } from '@/lib/xpti/personalities';
 import type { XptiPersonalityType } from '@/lib/xpti/personalities';
+import { ITC_AXES } from '@/lib/xpti/itc';
 import type { XptiDimensionScore } from '@/lib/xpti/scoring';
 import type { XptiShareImageGeneratorHandle } from '@/components/XptiShareImageGenerator';
 const XptiShareImageGenerator = dynamic(
@@ -31,9 +32,39 @@ interface Props {
   dimensionScores: XptiDimensionScore[];
 }
 
+// ─── Perspective wrapper (v3.0 · 视角切换 only — content is unchanged) ───
+type PerspectiveId = 'couple' | 'single' | 'samesex' | 'nonbinary';
+const PERSPECTIVES: { id: PerspectiveId; label: string; eyebrow: string; rewriteIntro: (name: string) => string }[] = [
+  {
+    id: 'couple',
+    label: '恋爱中 / 暧昧期',
+    eyebrow: 'In a relationship · 默认视角',
+    rewriteIntro: (name) => `给在关系里的你：以下这份《${name}》请把"对方"理解成现在那个人。`,
+  },
+  {
+    id: 'single',
+    label: '单身 / 间隔期',
+    eyebrow: 'Single · 自我观测视角',
+    rewriteIntro: (name) => `给现在单身的你：把这份《${name}》当成一份"下次靠近别人之前的自我说明书"，关键词是"我会被谁卡住"。`,
+  },
+  {
+    id: 'samesex',
+    label: '同性 / 同志关系',
+    eyebrow: 'Same-sex · 视角切换',
+    rewriteIntro: (name) => `给在同性关系里的你：以下《${name}》中所有"他 / 她"请按你和对方的代词重读。我们 v3.2 会有专门的 LGBTQ+ 全量内容版本。`,
+  },
+  {
+    id: 'nonbinary',
+    label: '非二元 / 流动光谱',
+    eyebrow: 'Non-binary · 流动视角',
+    rewriteIntro: (name) => `给非二元 / 流动谱系上的你：《${name}》里的"主导 / 被主导""男方 / 女方"是文本快捷方式，不是身份判断。先看张力本身怎么解释你。`,
+  },
+];
+
 export function XptiResultContent({ personality, dimensionScores }: Props) {
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
+  const [perspective, setPerspective] = useState<PerspectiveId>('couple');
   const shareRef = useRef<XptiShareImageGeneratorHandle>(null);
   const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, XptiShareImageGenerator);
 
@@ -240,8 +271,144 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
         </div>
       </section>
 
+      {/* ITC 张力签名 (v3.0) — 从 personality.profile 推导出三张力轴签名 */}
+      <section className="max-w-2xl mx-auto px-6 pb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.18, duration: 0.5 }}
+          className="rounded-2xl border border-rule-soft bg-bg-elevated backdrop-blur-xl shadow-sm p-6 sm:p-8"
+        >
+          <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
+            <h2 className="text-[10px] sm:text-xs font-mono tracking-[0.32em] text-text-muted uppercase">
+              亲密张力签名 · ITC Signature
+            </h2>
+            <Link
+              href={`/xpti/theory/`}
+              className="text-[10px] sm:text-xs font-mono tracking-[0.18em] uppercase underline"
+              style={{ color: personality.color }}
+            >
+              什么是 ITC
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {ITC_AXES.map((axis) => {
+              const sig = getXptiTensionSignature(personality);
+              const tier = sig[axis.id];
+              const isNeutral = tier === 'NEUTRAL';
+              return (
+                <div
+                  key={axis.id}
+                  className="rounded-xl border p-4"
+                  style={{
+                    borderColor: isNeutral ? 'var(--color-rule-soft)' : `${axis.color}55`,
+                    background: isNeutral ? 'transparent' : `${axis.color}0E`,
+                  }}
+                >
+                  <div
+                    className="text-[10px] font-mono tracking-[0.32em] uppercase mb-1"
+                    style={{ color: isNeutral ? 'var(--color-ink-mute)' : axis.color }}
+                  >
+                    {axis.english}
+                  </div>
+                  <div
+                    className="text-base sm:text-lg italic"
+                    style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}
+                  >
+                    {tier}
+                  </div>
+                  <div className="text-[12px] text-text-muted mt-1 leading-relaxed">
+                    {tier === axis.poleHigh.en ? axis.poleHigh.oneLine
+                      : tier === axis.poleLow.en ? axis.poleLow.oneLine
+                      : '在这条轴上你偏中间——看对手怎么推你。'}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Couple invite CTA — Sprint 2 of v3.0 */}
+          <div
+            className="mt-6 rounded-xl border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
+            style={{
+              background: `${personality.color}0A`,
+              borderColor: `${personality.color}33`,
+            }}
+          >
+            <div className="flex-1">
+              <div className="text-[10px] font-mono tracking-[0.32em] uppercase mb-1" style={{ color: personality.color }}>
+                Couple Report · 12 Q
+              </div>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                把这个签名发给伴侣，对方做 12 题精简版即可生成<strong>双人张力雷达 + 配对模型</strong>。
+              </p>
+            </div>
+            <Link
+              href={`/xpti/couple/`}
+              className="inline-flex items-center justify-center px-4 py-2.5 rounded-full text-xs font-mono tracking-[0.18em] uppercase whitespace-nowrap"
+              style={{ background: personality.color, color: '#FFFDF9' }}
+            >
+              邀请伴侣 →
+            </Link>
+          </div>
+
+          {/* Archive / replay CTA — Sprint 3 of v3.0 */}
+          <div className="mt-3 flex items-center justify-between gap-3 text-xs">
+            <span className="text-text-muted">想看张力是否随时间变化？</span>
+            <Link
+              href={`/xpti/archive/`}
+              className="font-mono tracking-[0.18em] uppercase underline"
+              style={{ color: personality.color }}
+            >
+              我的张力档案 →
+            </Link>
+          </div>
+        </motion.div>
+      </section>
+
       {/* Description — 4 sections */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
+        {/* v3.0 · 视角切换 wrapper — 不改原文，只换框架 */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.16, duration: 0.45 }}
+          className="mb-5 rounded-2xl border border-rule-soft bg-bg-elevated backdrop-blur-xl shadow-sm p-5 sm:p-6"
+        >
+          <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+            <div className="text-[10px] font-mono tracking-[0.32em] uppercase" style={{ color: personality.color }}>
+              换镜头读
+            </div>
+            <div className="text-[10px] font-mono tracking-[0.18em] uppercase text-text-muted">
+              Perspective Wrapper · v3.0
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 mb-3">
+            {PERSPECTIVES.map((p) => {
+              const active = perspective === p.id;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setPerspective(p.id)}
+                  className="px-3 py-1.5 rounded-full text-xs transition-all border"
+                  style={{
+                    borderColor: active ? personality.color : 'var(--color-rule-soft)',
+                    background: active ? `${personality.color}18` : 'transparent',
+                    color: active ? personality.color : 'var(--color-text-secondary)',
+                    fontWeight: active ? 600 : 400,
+                  }}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-sm leading-relaxed text-text-secondary italic" style={{ fontFamily: 'var(--font-display)' }}>
+            {(PERSPECTIVES.find((x) => x.id === perspective) ?? PERSPECTIVES[0]).rewriteIntro(personality.name)}
+          </p>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}

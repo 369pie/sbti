@@ -109,6 +109,141 @@ header.sticky {
   z-index: 50;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   Galaxy Twilight Palette · 人格神域统一设计 token（在 :root 暴露，可跨组件复用）
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  /* 暮光底 · 三层景深 */
+  --galaxy-ink-deep: #0F0A22;
+  --galaxy-ink: #1A1530;
+  --galaxy-ink-soft: #2A1C4D;
+  --galaxy-twilight: #3F2F6B;
+
+  /* 羊皮纸 · 主内容色 */
+  --galaxy-cream: #F5F0E8;
+  --galaxy-parchment: #EDE3D2;
+  --galaxy-mist: rgba(245, 240, 232, 0.65);
+  --galaxy-mist-faint: rgba(245, 240, 232, 0.35);
+
+  /* Editorial 四色 */
+  --galaxy-rose: #C07A8E;
+  --galaxy-rose-soft: rgba(192, 122, 142, 0.22);
+  --galaxy-rose-glow: rgba(192, 122, 142, 0.28);
+  --galaxy-gold: #C9A676;
+  --galaxy-gold-soft: #D4B58A;
+  --galaxy-gold-faint: rgba(201, 166, 118, 0.35);
+  --galaxy-violet: #9C7CFF;
+  --galaxy-violet-soft: rgba(156, 124, 255, 0.22);
+  --galaxy-violet-glow: rgba(156, 124, 255, 0.28);
+  --galaxy-moon: #C9B6FF;
+  --galaxy-nebula: #FF9BB8;
+
+  /* 背景配方 · Hero / Section / 羊皮纸浮层 */
+  --galaxy-bg-hero: radial-gradient(
+    ellipse 120% 70% at 50% 0%,
+    #3F2F6B 0%,
+    #1A1530 45%,
+    #0F0A22 100%
+  );
+  --galaxy-bg-section: radial-gradient(
+    ellipse 100% 60% at 50% 30%,
+    #2A1C4D 0%,
+    #1A1530 70%
+  );
+  --galaxy-bg-paper: linear-gradient(180deg, #1A1530 0%, #211842 100%);
+
+  /* 金箔细线 · 博物馆质感分割 */
+  --galaxy-hairline: linear-gradient(90deg, transparent, #C9A676 50%, transparent);
+  --galaxy-divider-gold: 1px solid rgba(201, 166, 118, 0.35);
+
+  /* 光晕 · 克制使用 */
+  --galaxy-rose-halo: 0 0 60px rgba(192, 122, 142, 0.25),
+    0 0 120px rgba(192, 122, 142, 0.12);
+  --galaxy-violet-halo: 0 0 80px rgba(156, 124, 255, 0.22);
+
+  /* 字体映射：galaxy 沿用站点 display / sans */
+  --galaxy-font-display: var(--font-display);
+  --galaxy-font-body: var(--font-sans);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   人格神域 · 主题域 — 挂在 body[data-theme='galaxy']
+   在 /wtfti/galaxy/** 和需要神域视觉的页面启用；
+   默认米白主题 token 被暮紫覆盖，解决主站与神域的视觉割裂。
+   ───────────────────────────────────────────────────────────────────────── */
+body[data-theme='galaxy'] {
+  background: var(--galaxy-ink-deep);
+  background-image: none;
+  color: var(--galaxy-cream);
+}
+body[data-theme='galaxy'] ::selection {
+  background: rgba(192, 122, 142, 0.38);
+  color: var(--galaxy-cream);
+}
+body[data-theme='galaxy'] :focus-visible {
+  outline-color: var(--galaxy-gold);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   WTFTI 仪式沉浸态 — 隐藏全站导航/页脚 / 收掉 paper-texture / 锁深色宇宙
+   触发：组件在 mount 时 document.body.dataset.wtftiRitual = '1'
+   ───────────────────────────────────────────────────────────────────────── */
+body[data-wtfti-ritual='1'] {
+  background: #0a0820 !important;
+  background-image: none !important;
+}
+body[data-wtfti-ritual='1'] > header,
+body[data-wtfti-ritual='1'] > footer {
+  display: none !important;
+}
+body[data-wtfti-ritual='1'] > main {
+  padding: 0 !important;
+  margin: 0 !important;
+  flex: 1 1 auto;
+}
+/* 章节卡片内部的 <header> 不能被误伤 */
+body[data-wtfti-ritual='1'] section header {
+  display: revert !important;
+}
+
+@keyframes wtfti-orbit-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes wtfti-orbit-spin-rev {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(0deg); }
+}
+@keyframes wtfti-stardust-drift {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0.0; }
+  10%  { opacity: 0.55; }
+  100% { transform: translate3d(-12vw, -110vh, 0); opacity: 0; }
+}
+@keyframes wtfti-orb-breathe {
+  0%, 100% { transform: scale(1); filter: blur(38px); opacity: 0.55; }
+  50%      { transform: scale(1.08); filter: blur(46px); opacity: 0.75; }
+}
+@keyframes wtfti-card-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes s-card-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes s-anchor-float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-6px) scale(1.04); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wtfti-ritual-orbit,
+  .wtfti-ritual-stardust,
+  .wtfti-ritual-orb {
+    animation: none !important;
+  }
+}
+
 /* Custom selection */
 ::selection {
   background: rgba(210, 106, 135, 0.22);

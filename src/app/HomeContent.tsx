@@ -1,68 +1,113 @@
 import Link from 'next/link';
 import NextImage from 'next/image';
-import { PERSONALITY_TYPES, getTypeThumbnailImage } from '@/lib/personalities';
 import { getLiveUniverses } from '@/lib/universes';
 import { withBasePath } from '@/lib/site';
 import { FollowMeCard, FollowMeFloating } from '@/components/FollowMeLinks';
-import { DeferredWtfCardBanner } from '@/components/DeferredWtfCardBanner';
+import type { MystiSku } from '@/lib/mysti/unlock';
 
-// ─── Intent-based data (mirrors Navigation.tsx categories) ───────────────────
+// ─── Data ────────────────────────────────────────────────────────────────────
 
-/** Hero quick-action cards — 4 core intents */
-const HERO_INTENTS = [
-  { href: '/test/', emoji: '🎯', label: '去测自己', desc: '选一个宇宙开始', accent: '#ff4d6d' },
-  { href: '/cpti/', emoji: '💕', label: '测段关系', desc: '你们的化学反应', accent: '#e06088' },
-  { href: '/identify/', emoji: '🔍', label: '鉴定 TA', desc: '偷偷测 ta 是什么人', accent: '#a855f7' },
-  { href: '/card/', emoji: '🃏', label: '我的档案', desc: '多宇宙人格卡', accent: '#f59e0b' },
-];
-
-/** Hot-pick universes — curated selection */
-const HOT_PICKS = [
-  { href: '/wtfti/', label: 'WTF 毒舌版', emoji: '🤯', desc: '敢听真话吗？直接骂醒你', tag: '热门', accent: '#ff4d6d' },
-  { href: '/soulti/', label: 'SoulTI 灵魂镜像', emoji: '🌙', desc: '安静地看见真正的自己', tag: '深度', accent: '#8b7ec8' },
-  { href: '/xpti/', label: 'XPTI 恋爱XP', emoji: '💜', desc: '你的亲密偏好是什么？', tag: '热门', accent: '#7c3aed' },
-  { href: '/cpti/', label: 'CPTI 关系深测', emoji: '💕', desc: '你们的关系是什么型？', tag: '新', accent: '#e06088' },
+/**
+ * 6-universe magazine grid — the single "What's Inside" surface that anchors
+ * pricing and routes each visitor into a deep funnel. Order = strategic
+ * priority: WTFTI / SoulTI flagships first, then relationships, then Mysti
+ * (subscription) and WTFCard (collector).
+ */
+const UNIVERSE_GRID: Array<{
+  href: string;
+  numeral: string;
+  eyebrow: string;
+  title: string;
+  italic: string;
+  desc: string;
+  free: string;
+  sku: MystiSku;
+  accent: string;
+}> = [
+  {
+    href: '/wtfti/',
+    numeral: 'I',
+    eyebrow: 'WTFTI · Pantheon',
+    title: '人格神域',
+    italic: '召唤你的主神',
+    desc: '主神 × 神侍三位 × 暗面副形 × 月相日课 × 五感档案。一份只属于你的神祇身份。',
+    free: '免费 90 秒召唤',
+    sku: 'wtfti-deep-pantheon',
+    accent: '#C07A8E',
+  },
+  {
+    href: '/soulti/',
+    numeral: 'II',
+    eyebrow: 'SOULTI · Mirror',
+    title: '灵魂镜像',
+    italic: '安静地看见自己',
+    desc: '九轴交叉 × 修复处方 × 写给你的灵魂长信。这一面镜子很轻，但很狠。',
+    free: '免费完整测试',
+    sku: 'soulti-deep-mirror',
+    accent: '#8B7AD9',
+  },
+  {
+    href: '/cpti/',
+    numeral: 'III',
+    eyebrow: 'CPTI · Together',
+    title: '关系深测',
+    italic: '你们是什么型？',
+    desc: '24 题双人 × 8 维关系雷达 × 30 条共修建议 × 12 个月主题。',
+    free: '免费 24 题双人测',
+    sku: 'cpti-deep-relationship',
+    accent: '#B85A78',
+  },
+  {
+    href: '/xpti/',
+    numeral: 'IV',
+    eyebrow: 'XPTI · Intimacy',
+    title: '恋爱 XP',
+    italic: '你的偏好与雷区',
+    desc: 'XP 雷达 × 6 类亲密配对推荐 × 8 个雷区清单 × 24 个对话开场白。',
+    free: '免费 XP 测试',
+    sku: 'xpti-deep-xp',
+    accent: '#A855F7',
+  },
+  {
+    href: '/mysti/',
+    numeral: 'V',
+    eyebrow: 'MYSTI · Daily',
+    title: '灵鉴 Mysti',
+    italic: '每日抽牌 · 长期陪伴',
+    desc: '塔罗 × 人格牌 × 灵魂信。订阅制陪伴你看见每一天的小预兆。',
+    free: '每日免费抽牌',
+    sku: 'monthly-pass',
+    accent: '#9C7CFF',
+  },
+  {
+    href: '/card/',
+    numeral: 'VI',
+    eyebrow: 'WTFCARD · Archive',
+    title: '多宇宙档案',
+    italic: '你的人格收藏册',
+    desc: '把所有测过的宇宙合并为一张可下载的典藏档案。集邮 / 印刷级 PDF / 1080×1920 壁纸。',
+    free: '免费集邮',
+    sku: 'wtfcard-collector',
+    accent: '#C9A676',
+  },
 ];
 
 /** Style universes (auto-generated from live universes) */
 const STYLE_UNIVERSES = getLiveUniverses()
   .filter(u => !['cpti', 'xpti', 'soulti', 'wtfti', 'mysti'].includes(u.id) && !u.isUgc);
 
-/** UGC universes */
-const UGC_CARDS = getLiveUniverses().filter(u => u.isUgc);
-
-/** Relationship / social play */
+/** Relationship / social play — shrunk to 3 marquee cards */
 const RELATIONSHIP_PLAYS = [
-  { href: '/cpti/', emoji: '💕', label: 'CPTI 关系深测', desc: '24题 · 你们的关系是什么型？' },
   { href: '/cp/', emoji: '💗', label: 'CP 配对', desc: '快速匹配默契度' },
   { href: '/identify/', emoji: '🔍', label: '好友鉴定', desc: '帮朋友做一份人格鉴定书' },
-  { href: '/puzzle/', emoji: '🧩', label: '闺蜜拼图', desc: '4人组合人格画' },
   { href: '/squad/', emoji: '🎯', label: '组局测试', desc: '拉群一起测' },
-  { href: '/rank/', emoji: '🏆', label: '群组排行', desc: '看看谁人格最多' },
-];
-
-/** Casual / quick tests */
-const CASUAL_TESTS = [
-  { href: '/daily/', emoji: '🎲', label: '今日模式', desc: '6题秒测今天状态' },
-  { href: '/gacha/', emoji: '🎴', label: '今日抽签', desc: '每天一抽 · S/A/B/C' },
-  { href: '/drunk/', emoji: '🍺', label: '酒后人设', desc: '喝多了你是谁？' },
-  { href: '/work/', emoji: '💼', label: '打工人设', desc: '你的职场角色' },
-  { href: '/love/', emoji: '💗', label: '恋爱人设', desc: '你的恋爱角色' },
-];
-
-/** Explore / collect */
-const EXPLORE_ITEMS = [
-  { href: '/mysti/', emoji: '🔮', label: '灵鉴 Mysti', desc: '塔罗 × 人格牌' },
-  { href: '/combo/', emoji: '🧩', label: '人格拼盘', desc: 'SBTI × MBTI × 星座' },
-  { href: '/share-templates/', emoji: '📕', label: '小红书文案', desc: '一键复制发小红书' },
-  { href: '/types/', emoji: '📖', label: '人设图鉴', desc: '全部人格类型一览' },
 ];
 
 const FAQS = [
   {
     question: 'WTFTI 是什么？',
     answer:
-      'WTFTI 是一个多宇宙人格测试平台。同一个你，在不同主题宇宙里有不同的人格翻译——毒舌版的你、灵魂版的你、鸟类版的你、花朵版的你。',
+      'WTFTI 是一个多宇宙人格测试平台。同一个你，在不同主题宇宙里有不同的人格翻译——毒舌版的你、灵魂版的你、关系版的你、收藏版的你。',
   },
   {
     question: '和 MBTI 有什么区别？',
@@ -72,7 +117,12 @@ const FAQS = [
   {
     question: '这么多宇宙，从哪个开始？',
     answer:
-      '想被骂醒选毒舌版，想安静认识自己选 SoulTI，想测关系选 CPTI，想随便玩玩选今日模式。',
+      '先从 WTFTI 人格神域开始：90 秒召唤主神，拿到你的主星与神龛，再去 SoulTI、CPTI、XPTI 看同一个你在不同主题里的翻译。',
+  },
+  {
+    question: '付费内容是什么？为什么不全部订阅？',
+    answer:
+      '六大宇宙的核心测试和结果页全部免费。如果想读到「深度档案」（深档主神三联档 / 灵魂长信 / 关系雷达 / XP 雷达），可以单次解锁 ¥3.9–9.9；想长期陪伴和每日抽牌再考虑 Mysti 月度通行证 ¥19/月。',
   },
   {
     question: '结果能拿来做严肃诊断吗？',
@@ -81,7 +131,7 @@ const FAQS = [
   },
 ];
 
-const FEATURED = PERSONALITY_TYPES.slice(0, 6);
+// ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function HomeContent() {
   const universes = getLiveUniverses();
@@ -122,136 +172,169 @@ export default function HomeContent() {
 
           {/* Primary CTA row */}
           <div className="mt-12 sm:mt-16 flex flex-wrap items-center gap-4">
-            <Link href="/test/" prefetch={false} className="btn btn-ink">
-              开始测试
+            <Link href="/wtfti/galaxy/test/" prefetch={false} className="btn btn-ink">
+              ✦ 召唤你的主神
               <span className="opacity-60">→</span>
             </Link>
-            <Link href="/types/" prefetch={false} className="btn btn-ghost">
-              先翻翻图鉴
+            <Link href="/wtfti/" prefetch={false} className="btn btn-ghost">
+              人格神域首页
             </Link>
             <span className="eyebrow ml-2 hidden sm:inline">
               {universes.length} 个宇宙 · 100+ 种人格
             </span>
           </div>
+          {/* 经典初见兜底链接 — 低承诺用户分流 */}
+          <p className="mt-4 text-xs text-text-muted">
+            不想进神域？
+            <Link href="/test/" prefetch={false} className="underline underline-offset-2 hover:text-text-secondary transition-colors ml-1">
+              经典初见版（文字版 · 3-5 分钟）→
+            </Link>
+          </p>
         </div>
 
-        {/* Horizontal rule to separate hero */}
         <hr className="editorial-rule-soft max-w-5xl mx-6 sm:mx-auto" />
       </section>
 
-      {/* ── Intent grid — "你想做什么？" ── */}
-      <section className="py-20 sm:py-28 px-6 sm:px-10">
+      {/* ══════════════════════════════════════════════════════════════════════
+          N°02 What's Inside · 6 大宇宙 magazine grid
+         ══════════════════════════════════════════════════════════════════════ */}
+      <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="max-w-5xl mx-auto">
-          <div className="flex items-baseline justify-between mb-12">
+          <div className="mb-12 flex items-baseline justify-between flex-wrap gap-4">
             <div>
               <span className="serial-number text-xs mr-3">02</span>
-              <span className="eyebrow">Where to start</span>
+              <span className="eyebrow">What&apos;s Inside</span>
               <h2 className="section-headline text-3xl sm:text-4xl mt-3">
-                你今天想做什么？
+                六大<span className="editorial-italic" style={{ color: 'var(--color-rose)' }}>宇宙</span>
               </h2>
+              <p className="display-tagline text-text-secondary mt-3 text-base max-w-xl">
+                每个宇宙都能先免费体验核心测试与结果，再按你喜欢的方向慢慢深入。
+              </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-rule-soft border border-rule-soft" style={{ backgroundColor: 'var(--color-rule-soft)', borderColor: 'var(--color-rule-soft)' }}>
-            {HERO_INTENTS.map((item, i) => (
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px"
+            style={{ backgroundColor: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}
+          >
+            {UNIVERSE_GRID.map((u) => (
               <Link
-                key={item.href}
-                href={item.href}
+                key={u.href}
+                href={u.href}
                 prefetch={false}
-                className="group relative block p-6 sm:p-8 transition-colors duration-500"
-                style={{ backgroundColor: 'var(--color-bg-elevated)', animationDelay: `${i * 60}ms` }}
+                className="group relative block p-7 sm:p-9 transition-colors duration-500"
+                style={{ backgroundColor: 'var(--color-bg-elevated)' }}
               >
-                <span className="serial-number text-xs block mb-8">
-                  0{i + 1}
-                </span>
-                <div className="text-4xl mb-6 transition-transform duration-500 group-hover:scale-110 origin-left">{item.emoji}</div>
-                <h3 className="font-display text-xl text-text-primary mb-1" style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}>
-                  {item.label}
-                </h3>
-                <p className="text-xs text-text-muted">{item.desc}</p>
-                <span
-                  className="absolute left-6 sm:left-8 bottom-4 h-px w-8 transition-all duration-500 group-hover:w-16"
-                  style={{ background: item.accent, opacity: 0.5 }}
-                />
-              </Link>
-            ))}
-          </div>
-
-          {/* Stats row */}
-          <div className="mt-16 grid grid-cols-3" style={{ borderTop: '1px solid var(--color-rule-soft)', borderBottom: '1px solid var(--color-rule-soft)' }}>
-            {[
-              { value: `${universes.length}`, label: '测试宇宙' },
-              { value: '100+', label: '种人格' },
-              { value: '10+', label: '社交玩法' },
-            ].map((stat, idx) => (
-              <div
-                key={stat.label}
-                className="py-8 text-center"
-                style={{ borderLeft: idx > 0 ? '1px solid var(--color-rule-soft)' : 'none' }}
-              >
-                <div className="stat-value text-4xl sm:text-5xl text-text-primary leading-none">{stat.value}</div>
-                <div className="eyebrow mt-3">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Hot Picks — 推荐测试 ── */}
-      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-12 animate-fade-up flex items-baseline justify-between">
-            <div>
-              <span className="serial-number text-xs mr-3">03</span>
-              <span className="eyebrow">Editor&apos;s picks</span>
-              <h2 className="section-headline text-3xl sm:text-4xl mt-3">
-                不知道从哪开始，<br className="sm:hidden" />
-                <span className="editorial-italic" style={{ color: 'var(--color-rose)' }}>先试这几个</span>
-              </h2>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-px" style={{ backgroundColor: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
-            {HOT_PICKS.map((item, i) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                prefetch={false}
-                className="animate-fade-up group relative block p-7 sm:p-10 transition-colors duration-500"
-                style={{ backgroundColor: 'var(--color-bg-elevated)', animationDelay: `${i * 70}ms` }}
-              >
-                <div className="flex items-start justify-between gap-4 mb-6">
-                  <span className="serial-number text-xs">N°{String(i + 1).padStart(2, '0')}</span>
-                  {item.tag && (
-                    <span
-                      className="eyebrow"
-                      style={{ color: item.accent }}
-                    >
-                      — {item.tag}
-                    </span>
-                  )}
+                <div className="flex items-start justify-between gap-4 mb-5">
+                  <span className="serial-number text-xs" style={{ color: u.accent }}>
+                    N°{u.numeral.padStart(3, '0')}
+                  </span>
+                  <span className="eyebrow text-[10px]" style={{ color: u.accent, opacity: 0.85 }}>
+                    {u.eyebrow}
+                  </span>
                 </div>
-                <div className="text-5xl mb-8">{item.emoji}</div>
-                <h3 className="text-2xl sm:text-3xl mb-3 text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.02em' }}>
-                  {item.label}
+
+                <h3
+                  className="text-2xl sm:text-3xl text-text-primary leading-[1.1] mb-2"
+                  style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.015em' }}
+                >
+                  {u.title}
                 </h3>
-                <p className="text-sm sm:text-base text-text-secondary leading-relaxed max-w-md">{item.desc}</p>
-                <div className="mt-8 flex items-center gap-3">
+                <p
+                  className="text-base mb-5"
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontStyle: 'italic',
+                    color: u.accent,
+                  }}
+                >
+                  {u.italic}
+                </p>
+
+                <p className="text-[13.5px] text-text-secondary leading-[1.85] mb-6">
+                  {u.desc}
+                </p>
+
+                <p
+                  className="text-[11px] tracking-wider"
+                  style={{ fontFamily: 'var(--font-display)', color: '#7A6A5A' }}
+                >
+                  {u.free}
+                </p>
+
+                <div className="mt-6 flex items-center gap-3">
                   <span
                     className="h-px flex-1 transition-all duration-500 group-hover:opacity-100"
-                    style={{ background: item.accent, opacity: 0.25 }}
+                    style={{ background: u.accent, opacity: 0.25 }}
                   />
-                  <span className="text-sm transition-transform duration-500 group-hover:translate-x-1" style={{ color: item.accent }}>
-                    开始 →
+                  <span
+                    className="text-sm transition-transform duration-500 group-hover:translate-x-1"
+                    style={{ color: u.accent }}
+                  >
+                    走进 →
                   </span>
                 </div>
               </Link>
             ))}
           </div>
+
+          <div className="mt-10 text-center">
+            <span className="eyebrow text-text-muted">
+              本期统计 · {universes.length} 个测试宇宙 · 100+ 种人格
+            </span>
+          </div>
         </div>
       </section>
 
-      {/* ── Universe Hub — 按风格浏览 ── */}
+      {/* ══════════════════════════════════════════════════════════════════════
+          N°03 Together · 关系玩法（精选 3 张）
+         ══════════════════════════════════════════════════════════════════════ */}
+      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-12 animate-fade-up">
+            <span className="serial-number text-xs mr-3">03</span>
+            <span className="eyebrow">Together</span>
+            <h2 className="section-headline text-3xl sm:text-4xl mt-3">
+              和朋友<span className="editorial-italic">一起玩</span>
+            </h2>
+            <p className="display-tagline text-text-secondary mt-4 text-base sm:text-lg max-w-xl">
+              测完自己，拉上朋友——看看你们之间发生了什么化学反应。
+            </p>
+          </div>
+
+          <div
+            className="grid grid-cols-1 sm:grid-cols-3 gap-px"
+            style={{ backgroundColor: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}
+          >
+            {RELATIONSHIP_PLAYS.map((item, i) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                prefetch={false}
+                className="animate-fade-up group relative block p-6 sm:p-8 transition-colors duration-500"
+                style={{ backgroundColor: 'var(--color-bg-elevated)', animationDelay: `${i * 50}ms` }}
+              >
+                <span className="serial-number text-[10px] absolute top-3 right-4">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="text-3xl mb-5 transition-transform duration-500 group-hover:scale-110 origin-left">{item.emoji}</div>
+                <h3 className="text-lg text-text-primary mb-1" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
+                  {item.label}
+                </h3>
+                <p className="text-xs text-text-muted leading-relaxed">{item.desc}</p>
+                <span
+                  className="mt-4 block h-px w-6 transition-all duration-500 group-hover:w-12"
+                  style={{ background: 'var(--color-rose)', opacity: 0.5 }}
+                />
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          N°04 Style universes（缩到 1 行 grid）
+         ══════════════════════════════════════════════════════════════════════ */}
       <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="max-w-5xl mx-auto">
           <div className="mb-12 animate-fade-up">
@@ -265,7 +348,10 @@ export default function HomeContent() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-px" style={{ backgroundColor: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
+          <div
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-px"
+            style={{ backgroundColor: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}
+          >
             {STYLE_UNIVERSES.map((u, i) => (
               <Link
                 key={u.id}
@@ -294,148 +380,22 @@ export default function HomeContent() {
             ))}
           </div>
 
-          {/* UGC Universes */}
-          {UGC_CARDS.length > 0 && (
-            <div className="mt-16">
-              <div className="flex items-center gap-4 mb-6">
-                <span className="editorial-mark" style={{ color: 'var(--color-gold)' }}>✦</span>
-                <h3 className="eyebrow" style={{ color: 'var(--color-gold)' }}>Creator editions</h3>
-                <span className="editorial-rule flex-1" />
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {UGC_CARDS.map((u) => (
-                  <Link
-                    key={u.id}
-                    href={u.landingPath}
-                    prefetch={false}
-                    className="card-editorial group block p-6 text-left"
-                    style={{ borderStyle: 'dashed' }}
-                  >
-                    <span className="text-2xl mb-3 block">{u.emoji || '🧪'}</span>
-                    <h3 className="text-sm text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}>
-                      {u.name}
-                    </h3>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ── WTF Card Banner ── */}
-      <div className="defer-section">
-        <DeferredWtfCardBanner />
-      </div>
-
-      {/* ── Relationship Plays — 测关系 ── */}
-      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-12 animate-fade-up">
-            <span className="serial-number text-xs mr-3">05</span>
-            <span className="eyebrow">Together</span>
-            <h2 className="section-headline text-3xl sm:text-4xl mt-3">
-              和朋友<span className="editorial-italic">一起玩</span>
-            </h2>
-            <p className="display-tagline text-text-secondary mt-4 text-base sm:text-lg max-w-xl">
-              测完自己，拉上朋友——看看你们之间发生了什么化学反应。
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-px" style={{ backgroundColor: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
-            {RELATIONSHIP_PLAYS.map((item, i) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                prefetch={false}
-                className="animate-fade-up group relative block p-6 sm:p-8 transition-colors duration-500"
-                style={{ backgroundColor: 'var(--color-bg-elevated)', animationDelay: `${i * 50}ms` }}
-              >
-                <span className="serial-number text-[10px] absolute top-3 right-4">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <div className="text-3xl mb-5 transition-transform duration-500 group-hover:scale-110 origin-left">{item.emoji}</div>
-                <h3 className="text-lg text-text-primary mb-1" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
-                  {item.label}
-                </h3>
-                <p className="text-xs text-text-muted leading-relaxed">{item.desc}</p>
-                <span
-                  className="mt-4 block h-px w-6 transition-all duration-500 group-hover:w-12"
-                  style={{ background: 'var(--color-rose)', opacity: 0.5 }}
-                />
-              </Link>
-            ))}
+          <div className="mt-8 text-center">
+            <Link href="/types/" prefetch={false} className="text-sm text-text-secondary hover:text-text-primary transition-colors underline-offset-2 hover:underline">
+              查看完整人设图鉴 →
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── Casual + Explore — 合并为二栏 editorial 目录 ── */}
-      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
-        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-16">
-          <div className="animate-fade-up">
-            <span className="serial-number text-xs mr-3">06</span>
-            <span className="eyebrow">Quick play</span>
-            <h2 className="section-headline text-3xl mt-3 mb-8">
-              轻松<span className="editorial-italic">一测</span>
-            </h2>
-            <ul className="space-y-px" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
-              {CASUAL_TESTS.map((item) => (
-                <li key={item.href} style={{ borderBottom: '1px solid var(--color-rule-soft)' }}>
-                  <Link
-                    href={item.href}
-                    prefetch={false}
-                    className="group flex items-center gap-5 py-5 transition-colors duration-500"
-                  >
-                    <span className="text-2xl">{item.emoji}</span>
-                    <div className="flex-1">
-                      <h3 className="text-base text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
-                        {item.label}
-                      </h3>
-                      <p className="text-xs text-text-muted mt-0.5">{item.desc}</p>
-                    </div>
-                    <span className="text-text-muted transition-transform duration-500 group-hover:translate-x-1">→</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="animate-fade-up-delay-1">
-            <span className="serial-number text-xs mr-3">07</span>
-            <span className="eyebrow">Explore</span>
-            <h2 className="section-headline text-3xl mt-3 mb-8">
-              发现<span className="editorial-italic">更多</span>
-            </h2>
-            <ul className="space-y-px" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
-              {EXPLORE_ITEMS.map((item) => (
-                <li key={item.href} style={{ borderBottom: '1px solid var(--color-rule-soft)' }}>
-                  <Link
-                    href={item.href}
-                    prefetch={false}
-                    className="group flex items-center gap-5 py-5 transition-colors duration-500"
-                  >
-                    <span className="text-2xl">{item.emoji}</span>
-                    <div className="flex-1">
-                      <h3 className="text-base text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
-                        {item.label}
-                      </h3>
-                      <p className="text-xs text-text-muted mt-0.5">{item.desc}</p>
-                    </div>
-                    <span className="text-text-muted transition-transform duration-500 group-hover:translate-x-1">→</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Creator Program — editorial feature ── */}
+      {/* ══════════════════════════════════════════════════════════════════════
+          N°05 Creator program
+         ══════════════════════════════════════════════════════════════════════ */}
       <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="max-w-5xl mx-auto">
           <div className="relative overflow-hidden p-10 sm:p-16" style={{ background: 'var(--color-paper-warm)', border: '1px solid var(--color-rule)' }}>
             <div className="flex items-center gap-4 mb-8">
-              <span className="serial-number text-xs">08</span>
+              <span className="serial-number text-xs">05</span>
               <span className="editorial-rule w-16" />
               <span className="eyebrow" style={{ color: 'var(--color-gold)' }}>Creator beta</span>
             </div>
@@ -460,67 +420,13 @@ export default function HomeContent() {
         </div>
       </section>
 
-      {/* ── Featured Types — 图鉴墙 ── */}
-      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-12 flex items-baseline justify-between flex-wrap gap-4">
-            <div>
-              <span className="serial-number text-xs mr-3">09</span>
-              <span className="eyebrow">The atlas</span>
-              <h2 className="section-headline text-3xl sm:text-4xl mt-3">
-                先翻几张<span className="editorial-italic">人设卡</span>
-              </h2>
-            </div>
-            <Link href="/types/" prefetch={false} className="text-sm text-text-secondary hover:text-text-primary transition-colors">
-              全部 27 种 →
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-px" style={{ backgroundColor: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
-            {FEATURED.map((p, i) => (
-              <Link
-                key={p.slug}
-                href={`/result/${p.slug}`}
-                prefetch={false}
-                className="group relative block transition-colors duration-500 overflow-hidden"
-                style={{ backgroundColor: 'var(--color-bg-elevated)' }}
-              >
-                <span className="serial-number text-[10px] absolute top-4 left-5 z-10">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <div
-                  className="relative w-full aspect-[4/5] flex items-center justify-center overflow-hidden"
-                  style={{ background: `linear-gradient(180deg, ${p.color}06, ${p.color}14)` }}
-                >
-                  <NextImage
-                    src={getTypeThumbnailImage(p.slug)}
-                    alt={p.name}
-                    width={320}
-                    height={320}
-                    sizes="(max-width: 640px) 44vw, (max-width: 1024px) 28vw, 280px"
-                    className="w-[72%] h-[72%] object-contain transition-transform duration-700 group-hover:scale-105"
-                  />
-                </div>
-                <div className="p-5" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
-                  <span className="eyebrow block mb-2" style={{ color: p.color }}>
-                    {p.code}
-                  </span>
-                  <h3 className="text-lg text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.015em' }}>
-                    {p.name}
-                  </h3>
-                  <p className="text-xs text-text-muted mt-1 line-clamp-1">{p.tagline}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FAQ — editorial Q&A ── */}
+      {/* ══════════════════════════════════════════════════════════════════════
+          N°06 FAQ
+         ══════════════════════════════════════════════════════════════════════ */}
       <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="max-w-3xl mx-auto">
           <div className="mb-12">
-            <span className="serial-number text-xs mr-3">10</span>
+            <span className="serial-number text-xs mr-3">06</span>
             <span className="eyebrow">FAQ</span>
             <h2 className="section-headline text-3xl sm:text-4xl mt-3">
               常见<span className="editorial-italic">问题</span>
@@ -549,34 +455,35 @@ export default function HomeContent() {
         </div>
       </section>
 
-      {/* ── Community ── */}
-      <section className="defer-section py-16 px-6 border-t border-border-subtle">
+      {/* ══════════════════════════════════════════════════════════════════════
+          N°07 Community + Bottom CTA（合并）
+         ══════════════════════════════════════════════════════════════════════ */}
+      <section className="defer-section py-20 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-8 animate-fade-up">
-            <span className="section-label block mb-2">Community</span>
-            <h2 className="section-headline text-2xl sm:text-3xl">
-              加入 WTFTI 社群
+          <div className="text-center mb-10">
+            <span className="serial-number text-xs mr-3">07</span>
+            <span className="eyebrow">Community</span>
+            <h2 className="section-headline text-3xl sm:text-4xl mt-3">
+              加入 <span className="editorial-italic" style={{ color: 'var(--color-rose)' }}>WTFTI</span> 社群
             </h2>
-            <p className="display-tagline text-text-secondary mt-2 text-base">
-              测完想找同类？来群里一起玩
+            <p className="display-tagline text-text-secondary mt-3 text-base">
+              测完想找同类？来群里一起玩；想从头开始？下方一键召唤主神。
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto mb-12">
             <div className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 text-center hover:shadow-md transition-shadow animate-fade-up">
               <div className="inline-flex items-center gap-2 mb-4">
                 <span className="text-[#07C160]">💬</span>
                 <span className="font-medium text-text-primary">微信群</span>
               </div>
               <div className="rounded-xl overflow-hidden bg-white p-2 inline-block">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <NextImage
                   src={withBasePath('/images/qr-wechat.png')}
                   alt="WTFTI 微信交流群二维码"
                   width={200}
                   height={200}
-                  loading="lazy"
-                  decoding="async"
+                  sizes="192px"
                   fetchPriority="low"
                   className="block w-48 h-48 object-contain"
                 />
@@ -593,14 +500,12 @@ export default function HomeContent() {
                 <span className="font-medium text-text-primary">QQ 群</span>
               </div>
               <div className="rounded-xl overflow-hidden bg-white p-2 inline-block">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <NextImage
                   src={withBasePath('/images/qr-qq.png')}
                   alt="WTFTI QQ 交流群二维码"
                   width={200}
                   height={200}
-                  loading="lazy"
-                  decoding="async"
+                  sizes="192px"
                   fetchPriority="low"
                   className="block w-48 h-48 object-contain"
                 />
@@ -608,33 +513,38 @@ export default function HomeContent() {
               <p className="text-xs text-text-muted mt-4">WTFTI QQ 交流群</p>
             </div>
           </div>
+
+          {/* Bottom CTA — folded into community footer */}
+          <div className="text-center pt-6" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
+            <span className="eyebrow block mb-4">首选路径</span>
+            <h3 className="section-headline text-2xl sm:text-3xl mb-4">
+              从召唤主神开始<span className="editorial-italic" style={{ color: 'var(--color-rose)' }}>最对味</span>
+            </h3>
+            <p className="display-tagline text-text-secondary mb-8 text-base max-w-md mx-auto">
+              90 秒仪式 · 拿到主星与神龛 · 之后再慢慢解锁五感、月相、合奏。
+            </p>
+            <Link
+              href="/wtfti/galaxy/test/"
+              prefetch={false}
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-white font-medium transition-all hover:brightness-110"
+              style={{
+                background: 'linear-gradient(135deg, #C9A676, #C07A8E)',
+                boxShadow: '0 8px 32px rgba(192,122,142,0.28)',
+              }}
+            >
+              ✦ 召唤主神 →
+            </Link>
+            <p className="mt-5 text-xs text-text-muted">
+              想先快速预览人格轮廓？
+              <Link href="/test/" prefetch={false} className="underline underline-offset-2 hover:text-text-secondary transition-colors ml-1">
+                经典初见版（文字版，3-5 分钟）→
+              </Link>
+            </p>
+          </div>
         </div>
-      </section>
 
-      <div className="defer-section">
-        <FollowMeCard />
-      </div>
-
-      {/* ── Bottom CTA ── */}
-      <section className="defer-section py-20 px-6 text-center">
-        <div className="max-w-lg mx-auto">
-          <h2 className="section-headline text-2xl sm:text-3xl mb-4">
-            准备好了吗？
-          </h2>
-          <p className="display-tagline text-text-secondary mb-8">
-            纯前端计算，不上传任何数据。测完直接看结果。
-          </p>
-          <Link
-            href="/test/"
-            prefetch={false}
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-white font-medium transition-all hover:brightness-110"
-            style={{
-              background: 'linear-gradient(135deg, #ff4d6d, #e06088)',
-              boxShadow: '0 8px 32px rgba(255,77,109,0.2)',
-            }}
-          >
-            开始经典测试 →
-          </Link>
+        <div className="mt-16">
+          <FollowMeCard />
         </div>
       </section>
 
@@ -642,4 +552,3 @@ export default function HomeContent() {
     </div>
   );
 }
-

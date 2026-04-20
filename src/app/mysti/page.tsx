@@ -270,6 +270,61 @@ function MystiLandingContent() {
           </p>
         </div>
 
+        {/* 价格锚点卡 — 让用户一眼看到 Mysti 体系的三档定价 */}
+        <div
+          className="mb-6 rounded-2xl border px-5 py-4 backdrop-blur-md"
+          style={{
+            background: theme.cardSurface,
+            borderColor: theme.cardBorder,
+            boxShadow: `0 8px 24px ${theme.cardGlow}`,
+          }}
+        >
+          <div
+            className="text-[10px] tracking-[0.42em] uppercase mb-3 text-center"
+            style={{ color: theme.accentGold, fontFamily: 'var(--font-mono)' }}
+          >
+            MYSTI · 价位
+          </div>
+          <div className="grid grid-cols-3 gap-3 text-center">
+            {[
+              { name: '灵魂信', price: '¥9.9', sub: '深度抽牌' },
+              { name: '月报', price: '¥6.9', sub: '本月 12 张' },
+              { name: '礼品卡', price: '¥39.9', sub: '送 TA 一份' },
+            ].map((tier) => (
+              <div key={tier.name}>
+                <div
+                  className="text-[10px] tracking-[0.24em] uppercase mb-1"
+                  style={{ color: theme.textSubtle, fontFamily: 'var(--font-mono)' }}
+                >
+                  {tier.name}
+                </div>
+                <div
+                  className="text-lg italic"
+                  style={{ color: theme.accentGold, fontFamily: 'var(--font-display)' }}
+                >
+                  {tier.price}
+                </div>
+                <div
+                  className="text-[10px] mt-1"
+                  style={{ color: theme.textMuted }}
+                >
+                  {tier.sub}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div
+            className="mt-3 pt-3 text-center text-xs italic border-t"
+            style={{
+              color: theme.textMuted,
+              borderColor: theme.cardBorder,
+              fontFamily: 'var(--font-serif)',
+            }}
+          >
+            想全部解锁？<span style={{ color: theme.accentGold }}>通行证 ¥19/月</span>
+          </div>
+        </div>
+
         {/* 合盘回流模式 */}
         {partnerPersonality && partnerData && (
           <motion.div

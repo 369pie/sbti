@@ -21,7 +21,16 @@ export type SinglePurchaseSku =
   | 'festival-gift-card' // ¥49.9 节日限定礼品卡
   | 'besties-bundle'     // ¥69 闺蜜对箱
   | 'share-plus'         // ¥4.9 分享卡 · Plus 精修
-  | 'share-atelier';     // ¥19.9 分享卡 · N° 藏品
+  | 'share-atelier'      // ¥19.9 分享卡 · N° 藏品
+  // ── 模块深档（2026-04-20 轻付费试探，¥3.9-9.9）────────
+  | 'wtfti-deep-pantheon'      // ¥6.9 WTFTI 深度主神档案
+  | 'soulti-deep-mirror'       // ¥9.9 SoulTI 灵魂深镜报告
+  | 'cpti-deep-relationship'   // ¥6.9 CPTI 双人关系深档
+  | 'xpti-deep-xp'             // ¥4.9 XPTI 亲密偏好深析
+  | 'xpti-couple-report'       // ¥12.9 XPTI 关系合并报告（单人全额）
+  | 'xpti-couple-half'         // ¥6.9 XPTI 关系合并报告 · 双人各付一半
+  | 'xpti-archive-yearly'      // ¥29 XPTI 年度档案（4 次复测对比）
+  | 'wtfcard-collector';       // ¥3.9 WTFCard 多宇宙典藏
 
 /** 订阅类 */
 export type SubscriptionSku =
@@ -96,6 +105,16 @@ export const SKU_PRICES: Record<MystiSku, { price: number; label: string; taglin
   'festival-gift-card': { price: 49.9, label: '节日限定礼品卡', tagline: '七夕 / 圣诞 / 生日限定贺卡' },
   'besties-bundle': { price: 69, label: '闺蜜对箱', tagline: '双人合盘 + 双人 Plus 卡 + 自定义贺卡' },
 
+  // ── 模块深档（轻付费试探，¥3.9-9.9）─────────────────────
+  'wtfti-deep-pantheon': { price: 6.9, label: 'WTFTI 深度主神档案', tagline: '主神三联档 · Sigil 高清 · 月相 30 天封信' },
+  'soulti-deep-mirror': { price: 9.9, label: 'SoulTI 灵魂深镜报告', tagline: '轴间交叉解读 · 修复处方 · 灵魂长信' },
+  'cpti-deep-relationship': { price: 6.9, label: 'CPTI 双人关系深档', tagline: '8 维雷达 · 30 条共修建议 · 12 月主题' },
+  'xpti-deep-xp': { price: 4.9, label: 'XPTI 亲密偏好深析', tagline: 'XP 雷达 · 6 类配对 · 雷区清单' },
+  'xpti-couple-report': { price: 12.9, label: 'XPTI 关系合并报告', tagline: '双人合并雷达 · 6 类张力配对 · 24 句对话脚本 · 单方一次付清' },
+  'xpti-couple-half': { price: 6.9, label: 'XPTI 关系报告 · 双人各付一半', tagline: '你付 ¥6.9 · ta 付 ¥6.9 · 任一方报告解锁' },
+  'xpti-archive-yearly': { price: 29, label: 'XPTI 年度档案', tagline: '4 次复测 · 张力轨迹图 · 年度 PDF' },
+  'wtfcard-collector': { price: 3.9, label: 'WTFCard 多宇宙典藏', tagline: '所有宇宙合并档案 · 高清壁纸 · 印刷级 PDF' },
+
   // ── L2 订阅 / 通行证 ──────────────────────────────────────
   'monthly-pass': { price: 19, label: '灵魂月度通行证', tagline: '每日翻牌 + 全 Plus 分享卡 + 月报' },
   'quarterly-pass': { price: 99, label: '灵魂季度通行证', tagline: '相当于 ¥33/月，最甜蜜点' },
@@ -121,6 +140,14 @@ export const SINGLE_PURCHASE_SKUS: SinglePurchaseSku[] = [
   'besties-bundle',
   'share-plus',
   'share-atelier',
+  'wtfti-deep-pantheon',
+  'soulti-deep-mirror',
+  'cpti-deep-relationship',
+  'xpti-deep-xp',
+  'xpti-couple-report',
+  'xpti-couple-half',
+  'xpti-archive-yearly',
+  'wtfcard-collector',
 ];
 
 export const ALL_SKUS: MystiSku[] = [

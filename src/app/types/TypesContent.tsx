@@ -1,29 +1,58 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import NextImage from 'next/image';
 import type { GalleryItem, GalleryTab } from './gallery-data';
 import MuseumCover from '@/components/museum/MuseumCover';
 import MuseumProgress from '@/components/museum/MuseumProgress';
 import CardDrawer, { type CardDrawerPayload } from '@/components/museum/CardDrawer';
+import CardTilt from '@/components/museum/CardTilt';
+import SealedCard from '@/components/museum/SealedCard';
+import ViewModeSwitch from '@/components/museum/ViewModeSwitch';
+import SetBonusBadges from '@/components/museum/SetBonusBadges';
+import type { LightboxItem } from '@/components/museum/CardLightbox';
 import { useMuseumUnlocked } from '@/lib/museum/unlocked';
 import { trackMuseum } from '@/lib/museum/analytics';
 import type { FeaturedCard } from '@/lib/museum/featured';
+import { getSeasonInfo, type SealStyle } from '@/lib/museum/season';
+import { hasSeenDailyPick } from '@/lib/museum/daily-pick';
+import { loadViewMode, saveViewMode, type ViewMode } from '@/lib/museum/view-mode';
+import { computeSetBonus } from '@/lib/museum/set-bonus';
+import { encodePairSlug } from '@/lib/museum/cp-pair';
+import { currentYm } from '@/lib/museum/monthly-recap';
+import { computeFreePath, markViewModeSeen } from '@/lib/museum/free-path';
+import BirthdayBadge from '@/components/museum/BirthdayBadge';
+import SnapshotShareButton from '@/components/museum/SnapshotShareButton';
+
+const FreePathPanel = dynamic(() => import('@/components/museum/FreePathPanel'), { ssr: false });
+
+const CardLightbox = dynamic(() => import('@/components/museum/CardLightbox'), { ssr: false });
+const DailyPickOverlay = dynamic(() => import('@/components/museum/DailyPickOverlay'), { ssr: false });
+const BinderView = dynamic(() => import('@/components/museum/BinderView'), { ssr: false });
+const PileView = dynamic(() => import('@/components/museum/PileView'), { ssr: false });
+const ReelView = dynamic(() => import('@/components/museum/ReelView'), { ssr: false });
+const ConstellationView = dynamic(() => import('@/components/museum/ConstellationView'), { ssr: false });
 
 /* ── Gallery card ───────────────────────────────────────── */
 interface GalleryCardProps {
   item: GalleryItem;
   index: number;
   tabId: string;
+  tabAccent: string;
   isUnlocked: boolean;
+  sealStyle: SealStyle;
   onOpen: (key: string) => void;
+  onPreview: (index: number) => void;
 }
 
-function GalleryCard({ item, index, tabId, isUnlocked, onOpen }: GalleryCardProps) {
+function GalleryCard({ item, index, tabId, tabAccent, isUnlocked, sealStyle, onOpen, onPreview }: GalleryCardProps) {
   const shouldPrioritizeImage = index < 4;
   const [hasImageError, setHasImageError] = useState(false);
   const showImage = Boolean(item.image) && !hasImageError;
+  const isHidden = Boolean(item.isSpecial);
+  const tilt = isUnlocked && (item.rarity?.label?.includes('SR') || item.rarity?.label?.includes('UR') || item.isSpecial);
 
   const handleClick = useCallback(() => {
     if (!isUnlocked) {
@@ -32,59 +61,81 @@ function GalleryCard({ item, index, tabId, isUnlocked, onOpen }: GalleryCardProp
     onOpen(`${tabId}:${item.slug}`);
   }, [isUnlocked, tabId, item.slug, onOpen]);
 
+  const handlePreview = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onPreview(index);
+  }, [onPreview, index]);
+
+  // Long-press → preview
+  const longPressTimerRef = useRef<number | null>(null);
+  const handlePointerDown = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    longPressTimerRef.current = window.setTimeout(() => {
+      onPreview(index);
+    }, 480);
+  }, [onPreview, index]);
+  const cancelLongPress = useCallback(() => {
+    if (longPressTimerRef.current != null) {
+      window.clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
+
+  const imageInner = showImage ? (
+    <NextImage
+      src={item.image}
+      alt={item.name}
+      width={384}
+      height={384}
+      loading={shouldPrioritizeImage ? 'eager' : 'lazy'}
+      fetchPriority={shouldPrioritizeImage ? 'high' : 'auto'}
+      onError={() => setHasImageError(true)}
+      className="w-[70%] h-[70%] object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
+    />
+  ) : (
+    <div className="flex h-[70%] w-[70%] flex-col items-center justify-center rounded-xl border-2 border-white/30 bg-white/20 text-center backdrop-blur-sm">
+      <span className="text-3xl sm:text-4xl leading-none">{item.emoji ?? '🌿'}</span>
+      <span className="mt-2 px-3 text-xs sm:text-sm font-medium text-text-primary/85 line-clamp-2">{item.name}</span>
+    </div>
+  );
+
   return (
     <div className="animate-fade-up" style={{ animationDelay: `${index * 25}ms` }}>
       <button
         type="button"
         onClick={handleClick}
+        onPointerDown={handlePointerDown}
+        onPointerUp={cancelLongPress}
+        onPointerLeave={cancelLongPress}
+        onPointerCancel={cancelLongPress}
         aria-label={isUnlocked ? `查看 ${item.name}` : `${item.name}（未解锁）`}
         className="group block w-full text-left rounded-xl sm:rounded-2xl border border-border-subtle hover:border-accent/40 bg-bg-elevated hover:shadow-lg transition-all duration-300 overflow-hidden hover:-translate-y-1 active:translate-y-0 cursor-pointer"
       >
         <div
-          className="relative w-full aspect-square flex items-center justify-center overflow-hidden bg-gradient-to-br"
-          style={{
-            backgroundImage: `linear-gradient(135deg, ${item.color}12, ${item.color}06)`,
-          }}
+          className="relative w-full aspect-square overflow-hidden"
+          style={
+            isUnlocked
+              ? { backgroundImage: `linear-gradient(135deg, ${item.color}12, ${item.color}06)` }
+              : undefined
+          }
         >
-          {showImage ? (
-            <NextImage
-              src={item.image}
-              alt={item.name}
-              width={384}
-              height={384}
-              loading={shouldPrioritizeImage ? 'eager' : 'lazy'}
-              fetchPriority={shouldPrioritizeImage ? 'high' : 'auto'}
-              onError={() => setHasImageError(true)}
-              className="w-[70%] h-[70%] object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
-              style={
-                isUnlocked
-                  ? undefined
-                  : { filter: 'grayscale(0.95) brightness(0.85) blur(1.5px)', opacity: 0.55 }
-              }
-            />
+          {isUnlocked ? (
+            tilt ? (
+              <CardTilt holo radius="0.75rem" maxTilt={6} className="absolute inset-0 flex items-center justify-center">
+                <div className="w-full h-full flex items-center justify-center">{imageInner}</div>
+              </CardTilt>
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">{imageInner}</div>
+            )
           ) : (
-            <div className="flex h-[70%] w-[70%] flex-col items-center justify-center rounded-xl border-2 border-white/30 bg-white/20 text-center backdrop-blur-sm">
-              <span className="text-3xl sm:text-4xl leading-none">{item.emoji ?? '🌿'}</span>
-              <span className="mt-2 px-3 text-xs sm:text-sm font-medium text-text-primary/85 line-clamp-2">{item.name}</span>
-            </div>
-          )}
-
-          {/* Locked overlay */}
-          {!isUnlocked && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span
-                className="text-2xl sm:text-3xl mb-1 transition-transform duration-500 group-hover:scale-110"
-                aria-hidden
-              >
-                🔒
-              </span>
-              <span
-                className="text-[9px] sm:text-[10px] font-mono tracking-[0.2em] uppercase opacity-80"
-                style={{ color: item.color }}
-              >
-                未解锁
-              </span>
-            </div>
+            <SealedCard
+              accent={tabAccent}
+              sealStyle={sealStyle}
+              isHidden={isHidden}
+              code={item.code}
+              tabLabel={undefined}
+              className="absolute inset-0"
+            />
           )}
 
           {item.isSpecial && (
@@ -104,8 +155,23 @@ function GalleryCard({ item, index, tabId, isUnlocked, onOpen }: GalleryCardProp
               {item.rarity.label}
             </span>
           )}
-          {!item.rarity && item.emoji && (
+          {!item.rarity && item.emoji && isUnlocked && (
             <span className="absolute top-2.5 left-2.5 text-lg sm:text-xl">{item.emoji}</span>
+          )}
+
+          {/* Preview eye (unlocked only) */}
+          {isUnlocked && (
+            <button
+              type="button"
+              onClick={handlePreview}
+              aria-label="预览大图"
+              className="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-full bg-black/35 hover:bg-black/55 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
           )}
         </div>
         <div className="px-3 sm:px-4 py-2.5 sm:py-3.5">
@@ -221,8 +287,43 @@ export default function TypesContent({
   const [activeId, setActiveId] = useState(allTabs[0]?.id ?? 'sbti');
   const [drawerPayload, setDrawerPayload] = useState<CardDrawerPayload | null>(null);
   type FilterMode = 'all' | 'rarity' | 'special' | 'unlocked' | 'locked';
-  const [filterMode, setFilterMode] = useState<FilterMode>('all');
+  const [filterMode, setFilterMode] = useState<FilterMode>('all');  const [lightboxStart, setLightboxStart] = useState<number | null>(null);
+  const [dailyOpen, setDailyOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [cpPickerForKey, setCpPickerForKey] = useState<string | null>(null);
 
+  // Season info — lazy init so it's stable across renders within a session
+  const season = useMemo(() => getSeasonInfo(), []);
+
+  // Restore persisted view mode on mount (async to satisfy lint).
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const t = window.setTimeout(() => setViewMode(loadViewMode()), 0);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  const handleViewMode = useCallback((m: ViewMode) => {
+    setViewMode(m);
+    saveViewMode(m);
+    markViewModeSeen(m);
+    trackMuseum('view_mode_switch', { mode: m });
+  }, []);
+
+  // Auto-open daily pick on first visit per UTC+8 day, or via ?daily=1 query.
+  // Using a setTimeout async callback keeps us compliant with
+  // react-hooks/set-state-in-effect (no direct setState in effect body).
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    const force = url.searchParams.get('daily') === '1';
+    const today = new Date().toISOString().slice(0, 10);
+    const t = window.setTimeout(() => {
+      if (force || !hasSeenDailyPick(today)) {
+        setDailyOpen(true);
+      }
+    }, force ? 80 : 1200);
+    return () => window.clearTimeout(t);
+  }, []);
   // ── Derived ──────────────────────────────────────────────────────────
   const activeTab = allTabs.find((tab) => tab.id === activeId) ?? allTabs[0];
   const unlocked = useMuseumUnlocked();
@@ -246,6 +347,22 @@ export default function TypesContent({
     }
     return n;
   }, [activeTab, unlocked.keys]);
+
+  // Set-bonus badges (W3) — derive across ALL tabs; only show top 6.
+  const setBonus = useMemo(() => computeSetBonus(allTabs, unlocked.keys), [allTabs, unlocked.keys]);
+  const visibleBadges = useMemo(() => setBonus.badges.slice(0, 8), [setBonus.badges]);
+
+  // Free Path (W4) — seasonal decoration milestones.
+  const freePathReport = useMemo(() => computeFreePath(allTabs, unlocked.keys), [allTabs, unlocked.keys]);
+  const achievedBadgeIds = useMemo(
+    () => setBonus.badges.filter(b => b.achieved).map(b => b.id),
+    [setBonus.badges],
+  );
+
+  // Constellation only valuable if active tab has any unlocked card.
+  const viewModeEnabled = useMemo(() => ({
+    constellation: activeTabUnlockedCount > 0,
+  }), [activeTabUnlockedCount]);
 
   // ── Callbacks ────────────────────────────────────────────────────────
   const openDrawer = useCallback((key: string) => {
@@ -311,6 +428,41 @@ export default function TypesContent({
           onRandom={handleSmartRandom}
         />
       )}
+
+      {/* ── Daily pick entry (W2) ── */}
+      <div className="mb-4 sm:mb-6 animate-fade-up" style={{ animationDelay: '40ms' }}>
+        <button
+          type="button"
+          onClick={() => setDailyOpen(true)}
+          className="group w-full rounded-2xl border px-4 sm:px-5 py-3.5 sm:py-4 flex items-center justify-between gap-4 transition-all hover:-translate-y-0.5 hover:shadow-md text-left"
+          style={{
+            background: `linear-gradient(120deg, ${season.palette.tintSoft}, var(--color-bg-elevated))`,
+            borderColor: `${season.palette.tint}55`,
+          }}
+        >
+          <div className="min-w-0 flex-1">
+            <span className="text-[10px] font-mono tracking-[0.22em] uppercase block mb-1" style={{ color: season.palette.accent }}>
+              今日封印 · Today
+            </span>
+            <h3 className="text-base sm:text-lg font-semibold leading-tight truncate" style={{ fontFamily: 'var(--font-serif)' }}>
+              {season.festivalLabel ?? season.seasonLabel} · {season.signLine}
+            </h3>
+            <p className="text-[11px] sm:text-xs text-text-muted mt-1 truncate">
+              一张属于今天的人格签卡 · {season.moonLabel}
+            </p>
+          </div>
+          <span
+            className="flex-shrink-0 inline-flex items-center gap-1 text-xs sm:text-sm font-semibold px-3 py-2 rounded-xl border whitespace-nowrap group-hover:translate-x-0.5 transition-transform"
+            style={{
+              color: season.palette.accent,
+              background: `${season.palette.accent}10`,
+              borderColor: `${season.palette.accent}40`,
+            }}
+          >
+            翻开 →
+          </span>
+        </button>
+      </div>
 
       {/* ── Progress card ── */}
       <MuseumProgress totalCards={totalCount} totalSeries={seriesCount} />
@@ -382,12 +534,25 @@ export default function TypesContent({
         </Link>
       </div>
 
-      {/* ── Filter chips ── */}
+      {/* ── Set-bonus badges (W3) ── */}
+      <SetBonusBadges badges={visibleBadges} accent={activeTab.accent} />
+
+      {/* ── Free Path seasonal track (W4) ── */}
+      <FreePathPanel report={freePathReport} accent={activeTab.accent} />
+
+      {/* ── Birthday + share-snapshot tools row (W4 + W5) ── */}
+      <div className="flex flex-wrap items-center gap-2 mb-4 sm:mb-5">
+        <BirthdayBadge accent={activeTab.accent} />
+        <SnapshotShareButton unlockedKeys={unlocked.keys} badgeIds={achievedBadgeIds} accent={activeTab.accent} />
+      </div>
+
+      {/* ── Filter chips + view-mode switcher row (W3) ── */}
       <div
         key={activeTab.id + '-filters'}
-        className="flex flex-wrap gap-1.5 mb-4 sm:mb-5 animate-fade-up"
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 mb-4 sm:mb-5 animate-fade-up"
         style={{ animationDelay: '120ms' }}
       >
+        <div className="flex flex-wrap gap-1.5">
         {(
           [
             { mode: 'all', label: `全部 ${activeTab.items.length}`, always: true },
@@ -420,35 +585,268 @@ export default function TypesContent({
               </button>
             );
           })}
+        </div>
+        <ViewModeSwitch
+          active={viewMode}
+          onChange={handleViewMode}
+          accent={activeTab.accent}
+          enabled={viewModeEnabled}
+        />
       </div>
 
-      {/* ── Grid ── */}
-      <div
-        key={activeTab.id + '-grid'}
-        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 lg:gap-4 animate-fade-up"
-        style={{ animationDelay: '150ms' }}
-      >
-        {filteredItems.length > 0 ? filteredItems.map((item, i) => {
-          const key = `${activeTab.id}:${item.slug}`;
-          return (
-            <GalleryCard
-              key={key}
-              item={item}
-              index={i}
-              tabId={activeTab.id}
-              isUnlocked={unlocked.keys.has(key)}
-              onOpen={openDrawer}
-            />
-          );
-        }) : (
-          <div className="col-span-full py-12 text-center text-text-muted text-sm">
-            该筛选下暂无卡片
+      {/* ── Dispatched view (W3+W4) ── */}
+      {viewMode === 'binder' ? (
+        <BinderView
+          items={filteredItems}
+          tabId={activeTab.id}
+          tabAccent={activeTab.accent}
+          unlockedKeys={unlocked.keys}
+          sealStyle={season.sealStyle}
+          onOpen={openDrawer}
+        />
+      ) : viewMode === 'pile' ? (
+        <PileView
+          items={filteredItems}
+          tabId={activeTab.id}
+          tabAccent={activeTab.accent}
+          unlockedKeys={unlocked.keys}
+          sealStyle={season.sealStyle}
+          onOpen={openDrawer}
+        />
+      ) : viewMode === 'reel' ? (
+        <ReelView
+          items={filteredItems}
+          tabId={activeTab.id}
+          tabAccent={activeTab.accent}
+          unlockedKeys={unlocked.keys}
+          sealStyle={season.sealStyle}
+          onOpen={openDrawer}
+        />
+      ) : viewMode === 'constellation' ? (
+        <ConstellationView
+          items={activeTab.items}
+          tabId={activeTab.id}
+          tabAccent={activeTab.accent}
+          unlockedKeys={unlocked.keys}
+          onOpen={openDrawer}
+        />
+      ) : (
+        <div
+          key={activeTab.id + '-grid'}
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 lg:gap-4 animate-fade-up"
+          style={{ animationDelay: '150ms' }}
+        >
+          {filteredItems.length > 0 ? filteredItems.map((item, i) => {
+            const key = `${activeTab.id}:${item.slug}`;
+            return (
+              <GalleryCard
+                key={key}
+                item={item}
+                index={i}
+                tabId={activeTab.id}
+                tabAccent={activeTab.accent}
+                isUnlocked={unlocked.keys.has(key)}
+                sealStyle={season.sealStyle}
+                onOpen={openDrawer}
+                onPreview={(idx) => setLightboxStart(idx)}
+              />
+            );
+          }) : (
+            <div className="col-span-full py-12 text-center text-text-muted text-sm">
+              该筛选下暂无卡片
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Month + CP entry strip (W3) ── */}
+      <div className="mt-6 sm:mt-8 grid sm:grid-cols-2 gap-3 animate-fade-up" style={{ animationDelay: '160ms' }}>
+        <Link
+          href={`/types/month/${currentYm()}/`}
+          prefetch={false}
+          className="group rounded-2xl border bg-bg-elevated px-4 py-3.5 flex items-center justify-between gap-3 hover:-translate-y-0.5 transition-all"
+          style={{ borderColor: 'var(--color-border-subtle)' }}
+        >
+          <div className="min-w-0">
+            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-text-muted block">Monthly Recap</span>
+            <span className="text-sm font-semibold" style={{ fontFamily: 'var(--font-serif)' }}>本月合辑 · 拼图发圈</span>
           </div>
-        )}
+          <span className="text-text-muted group-hover:translate-x-0.5 transition-transform">→</span>
+        </Link>
+        <button
+          type="button"
+          onClick={() => setCpPickerForKey('pick-a')}
+          className="group rounded-2xl border bg-bg-elevated px-4 py-3.5 flex items-center justify-between gap-3 hover:-translate-y-0.5 transition-all text-left"
+          style={{ borderColor: 'var(--color-border-subtle)' }}
+        >
+          <div className="min-w-0">
+            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-text-muted block">CP / 配对</span>
+            <span className="text-sm font-semibold" style={{ fontFamily: 'var(--font-serif)' }}>选两张卡 · 生成 CP 锐评</span>
+          </div>
+          <span className="text-text-muted group-hover:translate-x-0.5 transition-transform">→</span>
+        </button>
       </div>
 
       {/* ── Card detail drawer ── */}
       <CardDrawer payload={drawerPayload} onClose={closeDrawer} />
+
+      {/* ── Lightbox (W2) ── */}
+      {lightboxStart !== null && (
+        <CardLightbox
+          items={filteredItems.map<LightboxItem>((it) => ({
+            tabId: activeTab.id,
+            tabLabel: activeTab.label,
+            tabAccent: activeTab.accent,
+            item: it,
+            isUnlocked: unlocked.keys.has(`${activeTab.id}:${it.slug}`),
+          }))}
+          startIndex={lightboxStart}
+          onClose={() => setLightboxStart(null)}
+        />
+      )}
+
+      {/* ── Daily Pick overlay (auto / manual) ── */}
+      {dailyOpen && (
+        <DailyPickOverlay allTabs={allTabs} mode="overlay" onClose={() => setDailyOpen(false)} />
+      )}
+
+      {/* ── CP picker overlay (W3) ── */}
+      {cpPickerForKey && (
+        <CpPicker
+          allTabs={allTabs}
+          unlockedKeys={unlocked.keys}
+          onClose={() => setCpPickerForKey(null)}
+        />
+      )}
     </>
+  );
+}
+
+/* ── CP picker — quick 2-step list-based selector ─────────────────── */
+interface CpPickerProps {
+  allTabs: GalleryTab[];
+  unlockedKeys: Set<string>;
+  onClose: () => void;
+}
+
+function CpPicker({ allTabs, unlockedKeys, onClose }: CpPickerProps) {
+  const [pickA, setPickA] = useState<{ tabId: string; slug: string } | null>(null);
+  const [pickB, setPickB] = useState<{ tabId: string; slug: string } | null>(null);
+
+  // Lock body scroll while open.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  // Once both picked, navigate.
+  useEffect(() => {
+    if (!pickA || !pickB || typeof window === 'undefined') return;
+    const slug = encodePairSlug({ tabA: pickA.tabId, slugA: pickA.slug, tabB: pickB.tabId, slugB: pickB.slug });
+    const t = window.setTimeout(() => {
+      window.location.href = `/types/cp/${slug}/`;
+    }, 200);
+    return () => window.clearTimeout(t);
+  }, [pickA, pickB]);
+
+  const step = pickA ? 'B' : 'A';
+
+  // Bias toward unlocked first within each tab; fall back to first 8.
+  const renderableTabs = useMemo(() => {
+    return allTabs.map((t) => {
+      const items = [...t.items].sort((x, y) => {
+        const xu = unlockedKeys.has(`${t.id}:${x.slug}`) ? 0 : 1;
+        const yu = unlockedKeys.has(`${t.id}:${y.slug}`) ? 0 : 1;
+        return xu - yu;
+      }).slice(0, 12);
+      return { tab: t, items };
+    });
+  }, [allTabs, unlockedKeys]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center px-4 py-6 animate-fade-in"
+      style={{ background: 'rgba(31,26,22,0.55)' }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-2xl max-h-[88vh] overflow-hidden rounded-2xl border bg-bg-elevated flex flex-col animate-slide-up"
+        style={{ borderColor: 'var(--color-border-subtle)' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className="px-5 py-4 border-b flex items-baseline justify-between" style={{ borderColor: 'var(--color-border-subtle)' }}>
+          <div>
+            <span className="serial-number text-xs">CP / 配对</span>
+            <h2 className="text-lg sm:text-xl section-headline mt-0.5">
+              {step === 'A' ? '挑第一张卡' : '再挑一张配对'}
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="关闭"
+            className="text-text-muted hover:text-text-primary text-2xl leading-none"
+          >×</button>
+        </header>
+
+        {pickA && (
+          <div className="px-5 pt-3 text-[12px] text-text-muted">
+            已选第一张：<span className="font-mono">{pickA.tabId}/{pickA.slug}</span>
+            <button onClick={() => setPickA(null)} className="ml-2 underline">重选</button>
+          </div>
+        )}
+
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+          {renderableTabs.map(({ tab, items }) => (
+            <div key={tab.id}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-base">{tab.emoji}</span>
+                <span className="text-sm font-semibold">{tab.label}</span>
+                <span className="text-[10px] font-mono text-text-muted">{tab.items.length}</span>
+              </div>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {items.map((item) => {
+                  const k = { tabId: tab.id, slug: item.slug };
+                  const isPickedA = pickA?.tabId === tab.id && pickA?.slug === item.slug;
+                  const isUnlocked = unlockedKeys.has(`${tab.id}:${item.slug}`);
+                  const disabled = step === 'B' && isPickedA;
+                  return (
+                    <button
+                      key={item.slug}
+                      type="button"
+                      disabled={disabled}
+                      onClick={() => {
+                        if (step === 'A') setPickA(k);
+                        else setPickB(k);
+                      }}
+                      className="group relative aspect-[3/4] rounded-lg border overflow-hidden bg-bg-elevated transition-all hover:-translate-y-0.5 disabled:opacity-30 disabled:cursor-not-allowed"
+                      style={{ borderColor: `${item.color}33`, background: `linear-gradient(135deg, ${item.color}10, ${item.color}04)` }}
+                    >
+                      {item.image ? (
+                        <NextImage src={item.image} alt={item.name} width={140} height={186} loading="lazy" className="absolute inset-0 w-full h-full object-contain p-2" />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-2xl">{item.emoji ?? '✦'}</div>
+                      )}
+                      {!isUnlocked && (
+                        <span className="absolute top-1 right-1 text-[8px] font-mono px-1 rounded-sm" style={{ background: 'rgba(255,253,249,0.85)', color: 'var(--color-text-muted)' }}>未</span>
+                      )}
+                      <span className="absolute bottom-0 inset-x-0 text-[8px] text-center font-mono tracking-widest py-0.5 truncate" style={{ background: 'rgba(255,253,249,0.85)', color: item.color }}>
+                        {item.code}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <footer className="px-5 py-3 border-t text-[11px] text-text-muted text-center" style={{ borderColor: 'var(--color-border-subtle)' }}>
+          已解锁卡会显示在前 · 未解锁卡也能配对（视为「假设」）
+        </footer>
+      </div>
+    </div>
   );
 }

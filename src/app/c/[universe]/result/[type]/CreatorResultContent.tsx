@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { getApiPath } from '@/lib/api';
 import type { PersonalityRow, UniverseRow } from '@/lib/ugc/db';
 import { Glyph, type GlyphName } from '@/components/Glyph';
+import { CreatorAvatarImage } from '@/components/CreatorAvatarImage';
 import { stripLeadingEmoji } from '@/lib/strip-emoji';
 
 interface Props {
@@ -248,7 +249,7 @@ export function CreatorResultContent({ universe, personality, allPersonalities, 
                 className="w-12 h-12 rounded-2xl overflow-hidden bg-white/10 flex items-center justify-center text-lg shrink-0"
               >
                 {creator.avatar_url ? (
-                  <img src={creator.avatar_url} alt="" className="w-full h-full object-cover" />
+                  <CreatorAvatarImage src={creator.avatar_url} alt={`${creator.name}头像`} size={48} />
                 ) : (
                   <span>{creator.name.slice(0, 1)}</span>
                 )}

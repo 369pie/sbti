@@ -8,7 +8,7 @@ const LazyWtfCardBanner = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="px-6 pb-4 -mt-8" aria-hidden="true">
+      <div className="px-6 pb-4 pt-2" aria-hidden="true">
         <div className="max-w-4xl mx-auto h-24" />
       </div>
     ),

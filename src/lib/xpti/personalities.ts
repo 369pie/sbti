@@ -1,5 +1,6 @@
 import type { DimensionLevel } from './dimensions';
 import { withBasePath } from '../site';
+import { deriveItcSignature, type ItcSignature } from './itc';
 
 export type XptiRarityTier = 'legendary' | 'epic' | 'rare' | 'uncommon' | 'common';
 
@@ -513,4 +514,19 @@ export function getXptiPersonalityByCode(code: string): XptiPersonalityType | un
 
 export function getAllXptiSlugs(): string[] {
   return XPTI_PERSONALITY_TYPES.map(p => p.slug);
+}
+
+/**
+ * v3.0 · ITC tension signature for a personality (memoised by reference).
+ *
+ * Computed from `personality.profile` so we never have to maintain it by hand.
+ * Used in: result page "张力签名" block, share card v3, couple matcher.
+ */
+const _signatureCache = new WeakMap<XptiPersonalityType, ItcSignature>();
+export function getXptiTensionSignature(p: XptiPersonalityType): ItcSignature {
+  const cached = _signatureCache.get(p);
+  if (cached) return cached;
+  const sig = deriveItcSignature(p.profile);
+  _signatureCache.set(p, sig);
+  return sig;
 }

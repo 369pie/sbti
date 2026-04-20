@@ -6,16 +6,29 @@ import withBundleAnalyzer from "@next/bundle-analyzer";
 // Only set NEXT_PUBLIC_BASE_PATH=/sbti if deploying to user.github.io/sbti/ without custom domain.
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
-// Toggle Vercel image optimization. Defaults OFF only when explicitly opted out
-// (legacy `output: 'export'` builds need it off; production server build now
-// benefits from on-the-fly resizing for the 488 large PNGs in /public/images).
-const imagesUnoptimized = process.env.NEXT_PUBLIC_IMAGES_UNOPTIMIZED === '1';
+// Only allow opting out of Next/Vercel image optimization in non-production
+// builds. Production should always keep the optimization pipeline on now that
+// we no longer ship `output: 'export'`.
+const imagesUnoptimized =
+  process.env.NODE_ENV !== 'production' &&
+  process.env.NEXT_PUBLIC_IMAGES_UNOPTIMIZED === '1';
 
 const nextConfig: NextConfig = {
   // output: 'export', // Removed: incompatible with API routes (Supabase/CPTI)
   trailingSlash: true,
   images: {
     unoptimized: imagesUnoptimized,
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60 * 60 * 24 * 31,
+    remotePatterns: [
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'avatars.githubusercontent.com', pathname: '/**' },
+      { protocol: 'https', hostname: '**.supabase.co', pathname: '/**' },
+      { protocol: 'https', hostname: '**.public.blob.vercel-storage.com', pathname: '/**' },
+      { protocol: 'https', hostname: '**.runninghub.cn', pathname: '/**' },
+      { protocol: 'https', hostname: 'qlogo.cn', pathname: '/**' },
+      { protocol: 'https', hostname: '**.qlogo.cn', pathname: '/**' },
+    ],
   },
   basePath,
   allowedDevOrigins: ['127.0.0.1'],

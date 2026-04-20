@@ -1,8 +1,5 @@
-'use client';
-
-import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { getApiPath } from '@/lib/api';
+import { CreatorAvatarImage } from '@/components/CreatorAvatarImage';
 
 interface LeaderboardEntry {
   creatorId: string;
@@ -27,23 +24,7 @@ function formatNumber(n: number): string {
   return n.toString();
 }
 
-export function LeaderboardContent() {
-  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchData = useCallback(async () => {
-    const res = await fetch(getApiPath('/creator/leaderboard'));
-    if (res.ok) {
-      const data = await res.json();
-      setEntries(data.entries);
-    }
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    void fetchData();
-  }, [fetchData]);
-
+export function LeaderboardContent({ entries }: { entries: LeaderboardEntry[] }) {
   const medals = ['🥇', '🥈', '🥉'];
 
   return (
@@ -57,9 +38,7 @@ export function LeaderboardContent() {
           </p>
         </div>
 
-        {loading ? (
-          <div className="text-center py-16 text-text-muted">加载中…</div>
-        ) : entries.length === 0 ? (
+        {entries.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-text-muted mb-4">暂无创作者上榜</p>
             <Link
@@ -96,11 +75,7 @@ export function LeaderboardContent() {
                     className="w-10 h-10 rounded-full bg-bg-tertiary flex items-center justify-center text-lg overflow-hidden shrink-0"
                   >
                     {entry.creatorAvatar ? (
-                      <img
-                        src={entry.creatorAvatar}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
+                      <CreatorAvatarImage src={entry.creatorAvatar} alt={`${entry.creatorName}头像`} size={40} className="w-full h-full object-cover rounded-full" />
                     ) : (
                       <span>{entry.creatorName.slice(0, 1)}</span>
                     )}

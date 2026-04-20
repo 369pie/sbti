@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { loadCard, type RelationshipRecord } from '@/lib/wtf-card';
 import { hasBrowserSupabaseSession } from '@/lib/supabase/client';
 import {
@@ -12,6 +12,8 @@ import {
   type RelationshipTier,
 } from '@/lib/cpti/relationships';
 import { cptiApi } from '@/lib/cpti/cpti-api';
+import { trackCptiEvent } from '@/lib/cpti/analytics';
+import { CptiProgressPoster } from './cpti/CptiProgressPoster';
 
 type TierGroup = {
   key: RelationshipTier;
@@ -23,14 +25,18 @@ export function CptiGalleryContent() {
   const [syncedSlugs, setSyncedSlugs] = useState<Set<string>>(new Set());
   const [selectedType, setSelectedType] = useState<CptiRelationshipType | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [milestoneToast, setMilestoneToast] = useState<number | null>(null);
+  const lastMilestoneRef = useRef<number>(-1);
 
   useEffect(() => {
-    setMounted(true);
+    // Defer setState out of effect body to satisfy react-hooks/set-state-in-effect.
+    const tid = window.setTimeout(() => setMounted(true), 0);
 
     // Load local relationships from WTF Card
     const card = loadCard();
     if (card?.relationships) {
-      setRelationships(card.relationships);
+      const local = card.relationships;
+      window.setTimeout(() => setRelationships(local), 0);
     }
 
     // Also fetch from backend
@@ -63,11 +69,52 @@ export function CptiGalleryContent() {
         setRelationships(merged);
       }
     })().catch(() => { /* offline fallback — local only */ });
+
+    return () => window.clearTimeout(tid);
   }, []);
 
   const collectedSlugs = new Set(relationships.map(r => r.slug));
   const total = CPTI_RELATIONSHIP_TYPES.length;
   const collected = collectedSlugs.size;
+
+  // Milestone detection: 5 / 12 / 25
+  useEffect(() => {
+    if (!mounted) return;
+    const milestones = [5, 12, 25];
+    const reached = milestones.filter((m) => collected >= m);
+    if (reached.length === 0) return;
+    const top = reached[reached.length - 1];
+    if (top === lastMilestoneRef.current) return;
+    // Only fire on the *first* time we see this milestone within this session
+    if (top > lastMilestoneRef.current) {
+      lastMilestoneRef.current = top;
+      const storageKey = `cpti-gallery-milestone-${top}`;
+      try {
+        if (typeof window !== 'undefined' && !window.localStorage.getItem(storageKey)) {
+          window.localStorage.setItem(storageKey, '1');
+          trackCptiEvent('cpti_gallery_milestone_reached', { milestone: top, collected });
+          // Defer state updates out of the effect body to satisfy react-hooks/set-state-in-effect
+          window.setTimeout(() => setMilestoneToast(top), 0);
+          window.setTimeout(() => setMilestoneToast(null), 6000);
+        }
+      } catch {
+        /* storage unavailable */
+      }
+    }
+  }, [collected, mounted]);
+
+  const handleSelectType = (relType: CptiRelationshipType) => {
+    const isCollected = collectedSlugs.has(relType.slug);
+    setSelectedType(relType);
+    if (!isCollected) {
+      trackCptiEvent('cpti_gallery_missing_clicked', {
+        slug: relType.slug,
+        tier: relType.tier,
+        collected,
+        remaining: total - collected,
+      });
+    }
+  };
 
   const tiers: TierGroup[] = [
     { key: 'viral', types: CPTI_RELATIONSHIP_TYPES.filter(t => t.tier === 'viral') },
@@ -82,6 +129,24 @@ export function CptiGalleryContent() {
 
   return (
     <div className="min-h-screen bg-bg-primary">
+      {/* Milestone toast */}
+      <AnimatePresence>
+        {milestoneToast !== null && (
+          <motion.div
+            initial={{ y: -80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -80, opacity: 0 }}
+            transition={{ type: 'spring', damping: 20 }}
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-2xl text-sm font-semibold flex items-center gap-2"
+          >
+            <span className="text-lg">🎉</span>
+            {milestoneToast === 25
+              ? `集齐 25/25！你已经是 CPTI 关系图鉴大师`
+              : `已收集 ${milestoneToast} 种关系，继续解锁吧！`}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="max-w-2xl mx-auto px-6 pt-8 pb-4">
         <Link
@@ -124,6 +189,13 @@ export function CptiGalleryContent() {
                 transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
               />
             </div>
+
+            {/* Share progress poster */}
+            {collected > 0 && (
+              <div className="mt-4 flex justify-center">
+                <CptiProgressPoster collectedSlugs={collectedSlugs} />
+              </div>
+            )}
           </div>
         </motion.div>
       </div>
@@ -165,7 +237,7 @@ export function CptiGalleryContent() {
                     return (
                       <button
                         key={relType.slug}
-                        onClick={() => setSelectedType(relType)}
+                        onClick={() => handleSelectType(relType)}
                         className={`relative group rounded-xl p-2.5 text-center transition-all cursor-pointer ${
                           isCollected
                             ? 'bg-bg-elevated border border-border-subtle hover:border-border hover:shadow-md'
@@ -309,13 +381,16 @@ function RelationshipDetail({
 
       {/* Description */}
       {isCollected ? (
-        <div className="text-sm text-text-secondary leading-relaxed mb-4">
+        <div className="text-sm text-text-secondary leading-relaxed mb-4 whitespace-pre-line">
           {type.description}
         </div>
       ) : (
         <div className="rounded-xl bg-bg-secondary/50 border border-dashed border-border p-4 text-center mb-4">
-          <p className="text-sm text-text-muted">
-            完成配对测试后解锁详细描述
+          <p className="text-sm text-text-muted mb-2">
+            还没解锁 · 去拉一个人测看看你们是不是
+          </p>
+          <p className="text-xs text-text-muted italic">
+            “{type.tagline}”
           </p>
         </div>
       )}
@@ -339,14 +414,22 @@ function RelationshipDetail({
       )}
 
       {/* Action */}
-      {!isCollected && (
-        <Link
-          href="/cpti/join"
-          className="block w-full text-center px-6 py-3 rounded-xl bg-rose-500 text-white font-medium hover:bg-rose-500/90 transition-colors"
-        >
-          去配对，解锁这个关系类型
-        </Link>
-      )}
+      {!isCollected ? (
+        <div className="space-y-2">
+          <Link
+            href="/cpti/test/"
+            className="block w-full text-center px-6 py-3 rounded-xl bg-rose-500 text-white font-medium hover:bg-rose-500/90 transition-colors"
+          >
+            测一个新的人 · 有机会点亮这一格
+          </Link>
+          <Link
+            href={`/cpti/relationship/${type.slug}/`}
+            className="block w-full text-center px-6 py-2.5 rounded-xl border border-border-subtle text-text-secondary text-sm hover:bg-bg-secondary/50 transition-colors"
+          >
+            先了解一下「{type.name}」是什么 →
+          </Link>
+        </div>
+      ) : null}
     </div>
   );
 }

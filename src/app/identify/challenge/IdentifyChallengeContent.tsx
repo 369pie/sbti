@@ -14,6 +14,10 @@ import type { IdentifyModelType, DimensionLevel } from '@/lib/identify/dimension
 
 /* ── Blurred avatar ── */
 function ChallengeAvatar({ persona }: { persona: IdentifyPersonaType }) {
+  return <ChallengeAvatarInner key={persona.slug} persona={persona} />;
+}
+
+function ChallengeAvatarInner({ persona }: { persona: IdentifyPersonaType }) {
   const [failed, setFailed] = useState(false);
   const [useOriginal, setUseOriginal] = useState(false);
 
@@ -34,7 +38,6 @@ function ChallengeAvatar({ persona }: { persona: IdentifyPersonaType }) {
       src={src}
       alt={persona.name}
       fill
-      unoptimized
       priority
       sizes="200px"
       className="object-contain p-3 blur-[6px] brightness-75 saturate-50"
@@ -158,15 +161,13 @@ export function IdentifyChallengeContent() {
   const typeSlug = searchParams.get('t');
   const friendName = searchParams.get('n');
   const [preview, setPreview] = useState<IdentifyPreviewResponse | null>(null);
-  const [previewResolved, setPreviewResolved] = useState(false);
+  const [resolvedToken, setResolvedToken] = useState<string | null>(null);
+  const previewResolved = !shareToken || resolvedToken === shareToken;
 
   useEffect(() => {
     let cancelled = false;
 
-    if (!shareToken) {
-      setPreviewResolved(true);
-      return;
-    }
+    if (!shareToken) return;
 
     identifyApi
       .getPreview(shareToken)
@@ -180,7 +181,7 @@ export function IdentifyChallengeContent() {
       })
       .finally(() => {
         if (cancelled) return;
-        setPreviewResolved(true);
+        setResolvedToken(shareToken);
       });
 
     identifyApi.claimReceived(shareToken, false).catch(() => {

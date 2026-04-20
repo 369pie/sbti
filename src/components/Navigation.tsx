@@ -10,11 +10,14 @@ import { Logo } from '@/components/Logo';
 
 // ─── Static data (intent-based 4-category architecture) ──────────────────────
 
-/** "测自己" — hot-picks always on top */
+/** "测自己" — 6 大核心入口（W3 重构：纳入 Mysti / WTFCard） */
 const HOT_PICKS = [
-  { href: '/wtfti/', label: 'WTF 毒舌版', emoji: '🤯', desc: '敢听真话吗？', tag: '热门' as const },
-  { href: '/soulti/', label: 'SoulTI 灵魂镜像', emoji: '🌙', desc: '安静地看见自己', tag: '深度' as const },
+  { href: '/wtfti/', label: 'WTFTI 人格神域', emoji: '✦', desc: '90 秒召唤你的主神', tag: '主入口' as const },
   { href: '/xpti/', label: 'XPTI 恋爱XP', emoji: '💜', desc: '你的亲密偏好是什么？', tag: '热门' as const },
+  { href: '/cpti/', label: 'CPTI 关系深测', emoji: '💕', desc: '你们的关系是什么型？', tag: '深度' as const },
+  { href: '/soulti/', label: 'SoulTI 灵魂镜像', emoji: '🌙', desc: '安静地看见真正的自己', tag: '深度' as const },
+  { href: '/mysti/', label: 'Mysti 灵鉴', emoji: '🔮', desc: '塔罗 × 人格牌 · ¥19/月', tag: '通行证' as const },
+  { href: '/card/', label: 'WTF Card 收藏', emoji: '🃏', desc: '多宇宙人格档案 · ¥9.9', tag: '收藏' as const },
 ];
 
 type SelfStyleItem = {
@@ -56,12 +59,8 @@ const RELATIONSHIP_ITEMS = [
   { href: '/rank/', label: '群组排行', emoji: '🏆', desc: '看看谁最…' },
 ];
 
-/** "发现" — explore & collect */
+/** "发现" — explore & collect（W3 精简：Mysti / WTFCard 已上移到核心入口） */
 const DISCOVER_ITEMS = [
-  { href: '/card/', label: 'WTF Card', emoji: '🃏', desc: '你的多宇宙人格档案' },
-  { href: '/mysti/', label: '灵鉴 Mysti', emoji: '🔮', desc: '塔罗 × 人格牌' },
-  { href: '/mysti/gift/', label: '灵魂礼物', emoji: '🎁', desc: '送 TA 一份灵魂内容' },
-  { href: '/mysti/subscribe/', label: '灵魂通行证', emoji: '🎟️', desc: '¥19/月 全权益' },
   { href: '/types/', label: '人设图鉴', emoji: '📖', desc: '全部人格类型一览' },
   { href: '/combo/', label: '人格拼盘', emoji: '🧩', desc: 'SBTI × MBTI × 星座' },
   { href: '/share-templates/', label: '小红书文案', emoji: '📕', desc: '现成分享模板' },
@@ -195,8 +194,8 @@ export function Navigation() {
                   <section className="rounded-[24px] border border-[#f2dce6] bg-[linear-gradient(180deg,rgba(255,247,251,0.96),rgba(255,255,255,0.98))] p-4">
                     <div className="mb-3 flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-[10px] font-mono tracking-[0.22em] text-text-muted uppercase">热门推荐</p>
-                        <p className="mt-1 text-xs leading-5 text-text-muted">第一次来，先从这三个最有代表性的入口开始。</p>
+                        <p className="text-[10px] font-mono tracking-[0.22em] text-text-muted uppercase">核心宇宙</p>
+                        <p className="mt-1 text-xs leading-5 text-text-muted">现阶段的四张主入口，从神域开始最容易上手。</p>
                       </div>
                       <span className="rounded-full border border-pink-200 bg-white/90 px-2.5 py-1 text-[10px] font-semibold text-[#d84c8d] shadow-sm">
                         START HERE
@@ -217,8 +216,14 @@ export function Navigation() {
                             <div className="flex items-center gap-2">
                               <span className="font-semibold text-text-primary">{item.label}</span>
                               <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold text-white ${
-                                item.tag === '深度'
+                                item.tag === '主入口'
+                                  ? 'bg-gradient-to-r from-amber-500 to-rose-500 shadow-[0_0_0_1px_rgba(255,255,255,0.6)]'
+                                  : item.tag === '深度'
                                   ? 'bg-gradient-to-r from-stone-500 to-stone-600'
+                                  : item.tag === '通行证'
+                                  ? 'bg-gradient-to-r from-violet-500 to-purple-600'
+                                  : item.tag === '收藏'
+                                  ? 'bg-gradient-to-r from-amber-600 to-yellow-600'
                                   : 'bg-gradient-to-r from-pink-500 to-fuchsia-500'
                               }`}>
                                 {item.tag}
@@ -440,10 +445,10 @@ export function Navigation() {
           </Link>
         ) : (
           <Link
-            href="/test/"
+            href="/wtfti/galaxy/test/"
             className="hidden md:inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors shrink-0"
           >
-            开始测试
+            召唤主神
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
@@ -478,11 +483,11 @@ export function Navigation() {
                   登录 / 注册
                 </Link>
                 <Link
-                  href="/test/"
+                  href="/wtfti/galaxy/test/"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center justify-center gap-2 w-full py-3 rounded-full border border-border text-text-secondary font-medium text-sm"
                 >
-                  不登录，直接测试 →
+                  不登录，直接召唤主神 →
                 </Link>
               </div>
             ) : (
@@ -494,11 +499,11 @@ export function Navigation() {
                   </div>
                 )}
                 <Link
-                  href="/test/"
+                  href="/wtfti/galaxy/test/"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full bg-accent text-white font-medium text-base"
                 >
-                  开始测试
+                  召唤主神
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>

@@ -2,8 +2,8 @@
 
 import NextImage from 'next/image';
 import type { CSSProperties } from 'react';
-import { useEffect, useState } from 'react';
-import { getWorkTypeImage, getWorkTypeThumbnailImage, getWorkTypeMediumImage } from '@/lib/work/personalities';
+import { useState } from 'react';
+import { getWorkTypeImage, getWorkTypeMediumImage } from '@/lib/work/personalities';
 import type { WorkPersonalityType } from '@/lib/work/personalities';
 
 interface Props {
@@ -19,6 +19,13 @@ interface Props {
 
 export function WorkPersonalityAvatar({
   personality,
+  ...props
+}: Props) {
+  return <WorkPersonalityAvatarInner key={personality.slug} personality={personality} {...props} />;
+}
+
+function WorkPersonalityAvatarInner({
+  personality,
   className,
   alt,
   sizes = '128px',
@@ -29,11 +36,6 @@ export function WorkPersonalityAvatar({
 }: Props) {
   const [imageFailed, setImageFailed] = useState(false);
   const [useOriginalImage, setUseOriginalImage] = useState(false);
-
-  useEffect(() => {
-    setImageFailed(false);
-    setUseOriginalImage(false);
-  }, [personality.slug]);
 
   const imageSrc = useOriginalImage
     ? getWorkTypeImage(personality.slug)
@@ -48,7 +50,6 @@ export function WorkPersonalityAvatar({
           src={imageSrc}
           alt={alt ?? `${personality.name}形象`}
           fill
-          unoptimized
           priority={priority}
           sizes={sizes}
           className={imageClassName}
