@@ -20,8 +20,9 @@ export function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [phase, setPhase] = useState<'idle' | 'submitting' | 'redirecting'>('idle');
   const [showPassword, setShowPassword] = useState(false);
+  const isBusy = phase !== 'idle';
 
   const validate = useCallback((): string | null => {
     const trimmed = username.trim();
@@ -44,6 +45,7 @@ export function RegisterForm() {
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isBusy) return;
     setError('');
 
     const validationError = validate();
@@ -52,7 +54,8 @@ export function RegisterForm() {
       return;
     }
 
-    setLoading(true);
+    setPhase('submitting');
+    let keepBusyForRedirect = false;
     try {
       await stageAnonymousSourceForMerge();
 
@@ -78,9 +81,13 @@ export function RegisterForm() {
         // Server signed us in — refresh client auth state and go
         await refresh();
         await finalizeClaimedSession().catch(() => null);
+        keepBusyForRedirect = true;
+        setPhase('redirecting');
         router.push(redirectTo);
       } else {
         // Redirect to login with success message
+        keepBusyForRedirect = true;
+        setPhase('redirecting');
         router.push(`/auth/login/?registered=1&next=${encodeURIComponent(redirectTo)}`);
       }
     } catch (err) {
@@ -91,9 +98,11 @@ export function RegisterForm() {
 
       setError(err instanceof Error ? err.message : '注册失败，请稍后重试');
     } finally {
-      setLoading(false);
+      if (!keepBusyForRedirect) {
+        setPhase('idle');
+      }
     }
-  }, [username, nickname, password, email, redirectTo, refresh, router, validate]);
+  }, [isBusy, username, nickname, password, email, redirectTo, refresh, router, validate]);
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4 py-12">
@@ -126,7 +135,7 @@ export function RegisterForm() {
               placeholder="给自己取个名字"
               className="auth-input"
               maxLength={20}
-              disabled={loading}
+              disabled={isBusy}
             />
             <p className="mt-1 text-xs text-text-muted">2-20个字符，支持中英文、数字和下划线</p>
           </div>
@@ -143,7 +152,7 @@ export function RegisterForm() {
               placeholder="你想被别人怎么称呼？"
               className="auth-input"
               maxLength={30}
-              disabled={loading}
+              disabled={isBusy}
             />
           </div>
 
@@ -160,7 +169,7 @@ export function RegisterForm() {
                 onChange={e => setPassword(e.target.value)}
                 placeholder="至少6位"
                 className="auth-input pr-10"
-                disabled={loading}
+                disabled={isBusy}
               />
               <button
                 type="button"
@@ -194,7 +203,7 @@ export function RegisterForm() {
               onChange={e => setConfirmPassword(e.target.value)}
               placeholder="再输入一次密码"
               className="auth-input"
-              disabled={loading}
+              disabled={isBusy}
             />
           </div>
 
@@ -210,22 +219,27 @@ export function RegisterForm() {
               onChange={e => setEmail(e.target.value)}
               placeholder="your@email.com"
               className="auth-input"
-              disabled={loading}
+              disabled={isBusy}
             />
           </div>
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={isBusy}
+            aria-busy={isBusy}
             className="auth-button"
           >
-            {loading ? (
+            {isBusy ? (
               <span className="inline-flex items-center gap-2">
                 <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                注册中…
+                {phase === 'redirecting' ? '跳转中…' : '注册中…'}
               </span>
             ) : '创建账号'}
           </button>
+
+          {isBusy && (
+            <p className="text-xs text-text-muted text-center">正在处理，请勿重复点击</p>
+          )}
         </form>
 
         {/* Footer */}

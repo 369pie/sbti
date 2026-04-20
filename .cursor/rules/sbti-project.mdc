@@ -1,0 +1,14 @@
+---
+description: Project-specific execution notes for the sbti workspace. Use alongside the Karpathy guidelines to preserve this repo's concept systems, visual language, and focused verification style.
+alwaysApply: true
+---
+
+# SBTI project execution notes
+
+Apply the general coding discipline with these repo-specific constraints:
+
+- Treat each universe, module, and visual surface as intentional. Do not rename, restyle, or reorganize adjacent concept systems unless asked.
+- Respect the Next.js and UI design rules in the repository instructions before reaching for broader refactors.
+- Prefer narrow verification tied to the changed surface: targeted lint or typecheck, exact route or page render, focused script run, or preview smoke check.
+- For production-sensitive flows such as Supabase, auth, payments, and OG/image routes, verify the exact path changed before doing cleanup around it.
+- Keep secrets and local tokens out of diffs, examples, logs, and user-facing messages.

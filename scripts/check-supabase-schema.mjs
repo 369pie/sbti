@@ -48,6 +48,29 @@ const REQUIRED_COLUMNS = {
   ],
 };
 
+const REQUIRED_MYSTI_ORDER_SKUS = [
+  'soul-letter',
+  'dual-report',
+  'monthly-report',
+  'gift-card',
+  'festival-gift-card',
+  'besties-bundle',
+  'share-plus',
+  'share-atelier',
+  'wtfti-deep-pantheon',
+  'soulti-deep-mirror',
+  'cpti-deep-relationship',
+  'xpti-deep-xp',
+  'xpti-couple-report',
+  'xpti-couple-half',
+  'xpti-archive-yearly',
+  'wtfcard-collector',
+  'monthly-pass',
+  'quarterly-pass',
+  'yearly-pass',
+  'creator-pass',
+];
+
 const REQUIRED_RLS_TABLES = [
   'creator_orders',
   'creator_test_results',
@@ -365,6 +388,29 @@ function collectMetadata(databaseUrl) {
     `,
   );
 
+  const constraints = queryJson(
+    databaseUrl,
+    `
+      SELECT COALESCE(
+        json_agg(
+          json_build_object(
+            'table', rel.relname,
+            'name', con.conname,
+            'definition', pg_get_constraintdef(con.oid)
+          )
+          ORDER BY rel.relname, con.conname
+        ),
+        '[]'::json
+      )::text
+      FROM pg_constraint con
+      JOIN pg_class rel ON rel.oid = con.conrelid
+      JOIN pg_namespace n ON n.oid = rel.relnamespace
+      WHERE n.nspname = 'public'
+        AND rel.relname = 'mysti_orders'
+        AND con.conname = 'mysti_orders_sku_check';
+    `,
+  );
+
   const rls = queryJson(
     databaseUrl,
     `
@@ -507,7 +553,7 @@ function collectMetadata(databaseUrl) {
     `,
   );
 
-  return { roles, tables, columns, rls, policies, tablePrivileges, functions, functionPrivileges };
+  return { roles, tables, columns, constraints, rls, policies, tablePrivileges, functions, functionPrivileges };
 }
 
 function buildPolicyMap(policies) {
@@ -546,6 +592,20 @@ function validate(metadata, options, databaseSource) {
       pushResult(results, options, columnSet.has(key), `column public.${key} exists`, columnSet.has(key) ? '' : 'column missing');
     }
   }
+
+  const mystiOrderSkuConstraint = metadata.constraints.find(
+    (row) => row.table === 'mysti_orders' && row.name === 'mysti_orders_sku_check',
+  );
+  const hasCurrentMystiOrderSkus = !!mystiOrderSkuConstraint && REQUIRED_MYSTI_ORDER_SKUS.every(
+    (sku) => mystiOrderSkuConstraint.definition.includes(`'${sku}'`),
+  );
+  pushResult(
+    results,
+    options,
+    hasCurrentMystiOrderSkus,
+    'constraint public.mysti_orders_sku_check covers current SKUs',
+    mystiOrderSkuConstraint ? mystiOrderSkuConstraint.definition : 'constraint missing',
+  );
 
   const rlsMap = new Map(metadata.rls.map((row) => [row.table, row.enabled]));
   for (const table of REQUIRED_RLS_TABLES) {

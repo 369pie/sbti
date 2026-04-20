@@ -20,11 +20,13 @@ export function LoginForm() {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [phase, setPhase] = useState<'idle' | 'submitting' | 'redirecting'>('idle');
   const [showPassword, setShowPassword] = useState(false);
+  const isBusy = phase !== 'idle';
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isBusy) return;
     setError('');
 
     if (!login.trim() || !password) {
@@ -32,7 +34,8 @@ export function LoginForm() {
       return;
     }
 
-    setLoading(true);
+    setPhase('submitting');
+    let keepBusyForRedirect = false;
     try {
       await stageAnonymousSourceForMerge();
 
@@ -46,6 +49,8 @@ export function LoginForm() {
 
       await refresh();
       await finalizeClaimedSession().catch(() => null);
+      keepBusyForRedirect = true;
+      setPhase('redirecting');
       router.push(redirectTo);
     } catch (err) {
       if (isSupabaseConfigError(err)) {
@@ -55,9 +60,11 @@ export function LoginForm() {
 
       setError(err instanceof Error ? err.message : '登录失败，请稍后重试');
     } finally {
-      setLoading(false);
+      if (!keepBusyForRedirect) {
+        setPhase('idle');
+      }
     }
-  }, [login, password, redirectTo, router, refresh]);
+  }, [isBusy, login, password, redirectTo, router, refresh]);
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4 py-12">
@@ -95,7 +102,7 @@ export function LoginForm() {
               onChange={e => setLogin(e.target.value)}
               placeholder="用户名或邮箱"
               className="auth-input"
-              disabled={loading}
+              disabled={isBusy}
             />
           </div>
 
@@ -120,7 +127,7 @@ export function LoginForm() {
                 onChange={e => setPassword(e.target.value)}
                 placeholder="请输入密码"
                 className="auth-input pr-10"
-                disabled={loading}
+                disabled={isBusy}
               />
               <button
                 type="button"
@@ -135,16 +142,21 @@ export function LoginForm() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={isBusy}
+            aria-busy={isBusy}
             className="auth-button"
           >
-            {loading ? (
+            {isBusy ? (
               <span className="inline-flex items-center gap-2">
                 <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                登录中…
+                {phase === 'redirecting' ? '跳转中…' : '登录中…'}
               </span>
             ) : '登录'}
           </button>
+
+          {isBusy && (
+            <p className="text-xs text-text-muted text-center">正在处理，请勿重复点击</p>
+          )}
         </form>
 
         {/* Footer */}

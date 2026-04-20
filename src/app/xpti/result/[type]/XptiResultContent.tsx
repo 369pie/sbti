@@ -17,6 +17,7 @@ const XptiShareImageGenerator = dynamic(
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { HermosaInputCard } from '@/components/hermosa/HermosaInputCard';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
 import { UniverseProgressBar } from '@/components/UniverseProgressBar';
 import { UgcShareCTA } from '@/components/UgcShareCTA';
@@ -546,6 +547,14 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
           </div>
         </motion.div>
       </section>
+
+      <HermosaInputCard
+        universe="xpti"
+        slug={personality.slug}
+        code={personality.code}
+        personalityName={personality.name}
+        accent={personality.color}
+      />
 
       <CrossTestRecommendations currentTest="xpti" personalityName={personality.name} variant="xpti" />
 

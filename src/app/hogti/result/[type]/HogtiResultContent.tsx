@@ -13,6 +13,7 @@ import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { UniverseSwitcher } from '@/components/UniverseSwitcher';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
+import { HermosaInputCard } from '@/components/hermosa/HermosaInputCard';
 
 interface Props {
   hogtiPersonality: HogtiPersonality;
@@ -385,6 +386,15 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
 
       <section className="max-w-2xl mx-auto px-6 pb-8">
         <WtfiTheoryWiring universe="hogti" />
+      </section>
+
+      <section className="max-w-2xl mx-auto px-6 pb-12">
+        <HermosaInputCard
+          universe="hogti"
+          slug={p.slug}
+          personalityName={character.name}
+          accent={house.accent}
+        />
       </section>
 
       <ResultClosureEngine

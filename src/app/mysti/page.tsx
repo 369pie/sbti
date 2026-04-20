@@ -9,6 +9,7 @@ import { getMystiTarotData } from '@/lib/mysti/tarot-mapping';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 import { useMystiTheme } from '@/components/MystiThemeProvider';
 import { captureCreatorReferral } from '@/lib/mysti/creator-referral';
+import { PremiumFoilStyles } from '@/components/premium/PremiumFoil';
 
 type FlowStep = 'invite' | 'shuffle' | 'choose';
 
@@ -230,6 +231,7 @@ function MystiLandingContent() {
       className="min-h-screen flex items-start sm:items-center justify-center px-5 py-10 relative overflow-hidden"
       style={bgStyle}
     >
+      <PremiumFoilStyles />
       {/* 装饰：背景星点 */}
       <div className="pointer-events-none absolute inset-0 opacity-30">
         {[...Array(20)].map((_, i) => (
@@ -314,14 +316,37 @@ function MystiLandingContent() {
             ))}
           </div>
           <div
-            className="mt-3 pt-3 text-center text-xs italic border-t"
+            className="mt-3 pt-3 text-center text-xs italic border-t flex items-center justify-center gap-2"
             style={{
               color: theme.textMuted,
               borderColor: theme.cardBorder,
               fontFamily: 'var(--font-serif)',
             }}
           >
-            想全部解锁？<span style={{ color: theme.accentGold }}>通行证 ¥19/月</span>
+            <span
+              aria-hidden
+              style={{
+                display: 'inline-block',
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background:
+                  'radial-gradient(circle at 30% 30%, #FFE6A3, #C9A676 60%, #8B6A3A)',
+                boxShadow: '0 0 6px rgba(201,166,118,0.5)',
+              }}
+            />
+            想全部解锁？
+            <span
+              className="premium-foil"
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 12,
+                letterSpacing: '0.18em',
+                fontWeight: 600,
+              }}
+            >
+              通行证 · ¥19/月
+            </span>
           </div>
         </div>
 

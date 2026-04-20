@@ -1,13 +1,27 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { basePath } from '@/lib/site';
-import type { CptiRelationshipType } from '@/lib/cpti/relationships';
+import { getRelationshipBySlug, type CptiRelationshipType } from '@/lib/cpti/relationships';
 import { PremiumPaywall } from '@/components/PremiumPaywall';
 import { buildResourceId } from '@/lib/payments/skus';
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
 import { hashString, pickN, pickLevel, levelToScore } from '@/lib/payments/deep-content';
+import {
+  PremiumFoilStyles,
+  PremiumEditionStamp,
+  hashEditionNumber,
+  formatIssuedDate,
+} from '@/components/premium/PremiumFoil';
+import { BundleCta } from '@/components/premium/BundleCta';
+import {
+  RELATIONSHIP_STAGES,
+  type RelationshipStage,
+  getPracticesForStage,
+  LANDMINE_POOL_V2,
+} from '@/lib/cpti/deep-pools';
 
 const display = '"Cormorant Garamond", "Noto Serif SC", serif';
 const mono = '"SF Mono", ui-monospace, "Menlo", monospace';
@@ -24,62 +38,7 @@ const AXES = [
   { id: 'growth',    label: '共修弹性' },
 ] as const;
 
-const PRACTICE_POOL = [
-  '每周固定 30 分钟「无议程晚饭」——只聊感受，不解决问题。',
-  '吵架后 24 小时内必须主动发一条非道歉的关心。',
-  '每月一次互写「最近 ta 让我感动的三件小事」。',
-  '设立一个共同小账户，每月各存 100 元，用来吃一顿好的。',
-  '把对方家人的生日存进自己手机日历。',
-  '一起选一首"年度主题曲"，分手前不准换。',
-  '每季度一次「关系复盘」，回答三个问题：哪里好 / 哪里累 / 想变什么。',
-  '买两本一样的书，约定一个月内各自读完，再一起聊。',
-  '约定一个手势作为安全词，见到立刻暂停争吵。',
-  '一起做一次新菜，过程不准吵架——失败也算成功。',
-  '互相写一段「最希望对方做的微小改变」并贴在冰箱上。',
-  '每月一次散步约会，不准带手机，只走路说话。',
-  '把对方说过的最暖一句话存成手机备忘录，难过时翻一翻。',
-  '约定每年一次「重新表白日」——纪念日次月那天再说一次喜欢的理由。',
-  '出差或异地时每天发一张「随手拍」，不必解释。',
-  '一起报名一项 6 周课程：陶艺 / 瑜伽 / 拳击都行。',
-  '把对方的疲劳 / 焦虑信号写下来，并约好对应的"求助信号"。',
-  '每月给对方一次完整的「无干扰周末半天」，对方做什么都不评价。',
-  '做一份「ta 喜欢的礼物清单」，平时偷偷收集。',
-  '约定一个共同基金存款目标，达成后一起去做一件想做很久的事。',
-  '一起拍一张构图认真的合照，每年同一构图复刻一次。',
-  '建立"情绪温度"短信制度——晴 / 阴 / 雨 / 雷暴 四档报告。',
-  '互相教对方一个自己擅长的小技能。',
-  '约定每月有一天是「对方做主日」，行程全部听 ta 安排。',
-  '用语音备忘录给对方录一段「希望 ta 在某种情境时听到」的话。',
-  '每年生日给彼此写一封手写信，不许电子稿。',
-  '一起做一次匿名公益捐款，金额各承担一半。',
-  '每周抽一晚不刷短视频，一起读同一本书。',
-  '约定一句"暂停咒语"，说出后两人都要至少冷静 10 分钟。',
-  '为彼此做一份「危机预案」：emo 时希望对方做什么、不做什么。',
-  '一起种一盆植物，名字由两人共同决定。',
-  '建立一个共享相册，互相往里面丢日常碎片。',
-  '每月有一晚做对方家务清单上的一项任务。',
-  '一起办一场只邀请 5 个朋友的小型聚会，提前一起设计菜单。',
-  '约定每周日晚上互发一条「新一周想被对方看见的需求」。',
-];
-
-const LANDMINE_POOL = [
-  '把"我没事"当默认台词，等对方猜——猜不中再爆。',
-  '吵架时升级到对方的过往伤痕，事后又用"开玩笑"敷衍。',
-  '因为讨厌冲突而长期回避表达，攒到某次小事一次性爆发。',
-  '在朋友面前损对方"一两句"，回家又生气对方不理解你只是开玩笑。',
-  '把所有不满都往「对方原生家庭」上贴标签。',
-  '用沉默当惩罚，时长超过 24 小时。',
-  '把对方的一次失败永远记在小本本上，每次吵架翻一次。',
-  '主动暴露伴侣的隐私给共同朋友圈做谈资。',
-  '把和前任的甜蜜瞬间用来敲打现在的人。',
-  '每次冲突都以"分手 / 离婚 / 散伙"威胁。',
-  '把对方对你好当理所当然，对外人却赞美 ta 的优点。',
-  '在对方累了的时候硬要"立刻把话讲清楚"。',
-  '用对方的工作 / 收入 / 体型 当吵架武器。',
-  '把家务分配做成绩效记录表，时不时拿出来对账。',
-  '约会迟到从不真诚道歉，永远把锅推给路况。',
-  '在心情差时强行让对方来"接住"自己的情绪，全部吸收。',
-];
+const LANDMINE_POOL = LANDMINE_POOL_V2;
 
 const MONTH_THEMES = [
   '一月 · 仪式重启',
@@ -104,6 +63,17 @@ interface Props {
 export function CptiDeepClient({ relationship, tierInfo }: Props) {
   const slug = relationship.slug;
   const resourceId = buildResourceId('cpti', slug);
+  const searchParams = useSearchParams();
+
+  // Partner-aware overlay: ?partner=<slug> renders both polygons on the radar.
+  const partnerSlug = searchParams?.get('partner') ?? null;
+  const partner = useMemo(
+    () => (partnerSlug ? getRelationshipBySlug(partnerSlug) : null),
+    [partnerSlug],
+  );
+
+  // Stage selector — drives which practice pool is drawn from.
+  const [stage, setStage] = useState<RelationshipStage>('dating');
 
   useEffect(() => {
     trackFunnelEvent('paywall_view', { module: 'cpti', slug, sku: 'cpti-deep-relationship' });
@@ -116,13 +86,33 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
     return levelToScore(level) / 3;
   });
 
-  // Deterministic content selections.
-  const practices = pickN(PRACTICE_POOL, slug, 30, 'practice');
-  const landmines = pickN(LANDMINE_POOL, slug, 8, 'landmine');
+  // Partner radar (overlaid only if partner is loaded).
+  const partnerRadarPoints = partner
+    ? AXES.map((a) => levelToScore(pickLevel(partner.slug, a.id)) / 3)
+    : null;
+
+  // Stage-aware practice pool — re-seeded per (slug × stage) for variety.
+  const practicePool = useMemo(() => getPracticesForStage(stage), [stage]);
+  const practices = useMemo(
+    () => pickN(practicePool, `${slug}::${stage}`, 24, 'practice-v2'),
+    [practicePool, slug, stage],
+  );
+
+  // Expanded landmines — pull 12 (was 8) from the v2 pool of 60+.
+  const landmines = useMemo(
+    () => pickN(LANDMINE_POOL, slug, 12, 'landmine-v2'),
+    [slug],
+  );
+
   const monthOffset = hashString(slug) % 12;
   const themes = MONTH_THEMES.map((_, i) => MONTH_THEMES[(i + monthOffset) % 12]);
 
   const accent = relationship.color || '#B85A78';
+  const partnerAccent = '#9C7CFF'; // amethyst — visually distinct from the user's rose.
+
+  // Premium edition signature — stable per (relationship × partner).
+  const editionNo = hashEditionNumber(`cpti::${slug}::${partnerSlug ?? 'solo'}`);
+  const issuedDate = formatIssuedDate();
 
   return (
     <main
@@ -133,6 +123,7 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
         paddingBlock: '64px 96px',
       }}
     >
+      <PremiumFoilStyles />
       {/* ── Hero ── */}
       <section style={{ maxWidth: 720, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
         <Link
@@ -251,9 +242,11 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
           resourceId={resourceId}
           lockedTitle={`解锁 ${relationship.name} · 8 维关系深档`}
           teaserBullets={[
-            '8 维关系雷达 · 主导力 / 表达力 / 冲突力 / 付出力 / 融合度 + 3 深度切片',
-            '30 条共修建议 · 拿来即用的关系任务清单',
-            '12 月共修主题 + 8 大雷区清单',
+            partner
+              ? `双人对照 8 维雷达 · 你 vs ${partner.name}`
+              : '8 维关系雷达（解锁后可邀请伴侣自动合并）',
+            '24 条 stage-aware 共修建议 · 按你们的关系阶段分池',
+            '12 月共修主题 + 12 大雷区清单',
           ]}
           preview={
             <div style={{ paddingBlock: 20 }}>
@@ -289,10 +282,41 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
         >
           <div style={{ display: 'grid', gap: 56, paddingBlock: 24 }}>
 
-            <DeepSection eyebrow="RADAR · 8 维关系雷达" numeral="I" title="你们关系的形状">
+            <PremiumEditionStamp editionNo={editionNo} issuedDate={issuedDate} />
+
+            <DeepSection
+              eyebrow={partner ? 'RADAR · 双人对照 8 维' : 'RADAR · 8 维关系雷达'}
+              numeral="I"
+              title={partner ? `你 × ${partner.name} · 重叠区即默契` : '你们关系的形状'}
+            >
               <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Radar size={360} points={radarPoints} accent={accent} labels={AXES.map((a) => a.label)} />
+                <Radar
+                  size={360}
+                  points={radarPoints}
+                  accent={accent}
+                  labels={AXES.map((a) => a.label)}
+                  secondaryPoints={partnerRadarPoints ?? undefined}
+                  secondaryAccent={partnerAccent}
+                />
               </div>
+              {partner ? (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: 22,
+                    marginTop: 16,
+                    fontFamily: mono,
+                    fontSize: 11,
+                    letterSpacing: '0.18em',
+                  }}
+                >
+                  <span style={{ color: accent }}>● 你（{relationship.code}）</span>
+                  <span style={{ color: partnerAccent }}>● {partner.name}（{partner.code}）</span>
+                </div>
+              ) : (
+                <PartnerInviteCta slug={slug} />
+              )}
               <ul
                 style={{
                   marginTop: 24,
@@ -325,16 +349,26 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
                       }}
                     >
                       {radarLevels[i]} · {(radarPoints[i] * 3).toFixed(1)}
+                      {partnerRadarPoints && (
+                        <span style={{ color: partnerAccent, marginLeft: 8 }}>
+                          / {(partnerRadarPoints[i] * 3).toFixed(1)}
+                        </span>
+                      )}
                     </span>
                   </li>
                 ))}
               </ul>
             </DeepSection>
 
-            <DeepSection eyebrow="PRACTICE · 30 条共修建议" numeral="II" title="拿来就能做的关系小任务">
+            <DeepSection
+              eyebrow="PRACTICE · 24 条 stage-aware 共修"
+              numeral="II"
+              title="按你们的关系阶段定制 · 拿来就能做"
+            >
+              <StageSelector value={stage} onChange={setStage} accent={accent} />
               <ol
                 style={{
-                  margin: 0,
+                  margin: '20px 0 0',
                   padding: 0,
                   listStyle: 'none',
                   display: 'grid',
@@ -343,7 +377,7 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
               >
                 {practices.map((p, i) => (
                   <li
-                    key={i}
+                    key={`${stage}-${i}`}
                     style={{
                       display: 'grid',
                       gridTemplateColumns: '36px 1fr',
@@ -405,7 +439,7 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
               </div>
             </DeepSection>
 
-            <DeepSection eyebrow="LANDMINES · 8 大雷区" numeral="IV" title="千万别踩的关系陷阱">
+            <DeepSection eyebrow="LANDMINES · 12 大雷区" numeral="IV" title="千万别踩的关系陷阱">
               <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 10 }}>
                 {landmines.map((m, i) => (
                   <li
@@ -437,6 +471,8 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
                 ))}
               </ul>
             </DeepSection>
+
+            <BundleCta />
 
             <DeepSection
               eyebrow="NEXT · 跨模块深档"
@@ -494,22 +530,23 @@ function DeepSection({
     <section>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, marginBottom: 18 }}>
         <span
+          className="premium-foil"
           style={{
             fontFamily: mono,
             fontSize: 10,
             letterSpacing: '0.42em',
-            color: '#C9A676',
           }}
         >
           {eyebrow}
         </span>
         <span style={{ flex: 1, height: 1, background: 'rgba(201,166,118,0.25)' }} />
         <span
+          className="premium-foil"
           style={{
             fontFamily: display,
             fontStyle: 'italic',
-            fontSize: 13,
-            color: 'rgba(201,166,118,0.85)',
+            fontSize: 28,
+            letterSpacing: '0.06em',
           }}
         >
           {numeral}
@@ -610,19 +647,25 @@ function CrossLink({
   );
 }
 
-/** Lightweight inline radar — N evenly-spaced axes, 0–1 normalised values. */
+/** Lightweight inline radar — N evenly-spaced axes, 0–1 normalised values.
+ *  Optional secondary polygon overlays the partner's profile.
+ */
 function Radar({
   size,
   points,
   accent,
   labels,
   dim = false,
+  secondaryPoints,
+  secondaryAccent,
 }: {
   size: number;
   points: number[];
   accent: string;
   labels: string[];
   dim?: boolean;
+  secondaryPoints?: number[];
+  secondaryAccent?: string;
 }) {
   const cx = size / 2;
   const cy = size / 2;
@@ -630,12 +673,16 @@ function Radar({
   const n = points.length;
   const angle = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n;
 
-  const polygon = points
-    .map((v, i) => {
-      const rr = r * v;
-      return `${cx + rr * Math.cos(angle(i))},${cy + rr * Math.sin(angle(i))}`;
-    })
-    .join(' ');
+  const polyOf = (vals: number[]) =>
+    vals
+      .map((v, i) => {
+        const rr = r * v;
+        return `${cx + rr * Math.cos(angle(i))},${cy + rr * Math.sin(angle(i))}`;
+      })
+      .join(' ');
+
+  const polygon = polyOf(points);
+  const secondary = secondaryPoints ? polyOf(secondaryPoints) : null;
 
   const grid = [0.25, 0.5, 0.75, 1].map((step) => {
     const pts = Array.from({ length: n }, (_, i) => {
@@ -653,6 +700,15 @@ function Radar({
         const y2 = cy + r * Math.sin(angle(i));
         return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(245,240,232,0.1)" />;
       })}
+      {secondary && secondaryAccent && (
+        <polygon
+          points={secondary}
+          fill={`${secondaryAccent}28`}
+          stroke={secondaryAccent}
+          strokeWidth={1.4}
+          strokeDasharray="3 3"
+        />
+      )}
       <polygon
         points={polygon}
         fill={`${accent}${dim ? '20' : '38'}`}
@@ -680,5 +736,143 @@ function Radar({
         );
       })}
     </svg>
+  );
+}
+
+/** Stage selector chips — drives which practice pool feeds Section II. */
+function StageSelector({
+  value,
+  onChange,
+  accent,
+}: {
+  value: RelationshipStage;
+  onChange: (s: RelationshipStage) => void;
+  accent: string;
+}) {
+  return (
+    <div>
+      <p
+        style={{
+          fontFamily: mono,
+          fontSize: 10,
+          letterSpacing: '0.32em',
+          color: 'rgba(245,240,232,0.55)',
+          margin: '0 0 10px',
+        }}
+      >
+        STAGE · 你们现在在哪一程？
+      </p>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 8,
+        }}
+      >
+        {RELATIONSHIP_STAGES.map((s) => {
+          const active = s.id === value;
+          return (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => onChange(s.id)}
+              style={{
+                cursor: 'pointer',
+                padding: '8px 14px',
+                borderRadius: 999,
+                border: `1px solid ${active ? accent : 'rgba(245,240,232,0.2)'}`,
+                background: active ? `${accent}22` : 'rgba(245,240,232,0.04)',
+                color: active ? '#F5F0E8' : 'rgba(245,240,232,0.7)',
+                fontFamily: mono,
+                fontSize: 11,
+                letterSpacing: '0.18em',
+                transition: 'all 0.18s',
+              }}
+            >
+              {s.label}
+            </button>
+          );
+        })}
+      </div>
+      <p
+        style={{
+          marginTop: 10,
+          fontFamily: '"Noto Serif SC", serif',
+          fontSize: 12,
+          color: 'rgba(245,240,232,0.55)',
+        }}
+      >
+        {RELATIONSHIP_STAGES.find((s) => s.id === value)?.desc}
+      </p>
+    </div>
+  );
+}
+
+/** Invite-partner CTA shown only when ?partner is missing. */
+function PartnerInviteCta({ slug }: { slug: string }) {
+  const [copied, setCopied] = useState(false);
+  const url = useMemo(() => {
+    if (typeof window === 'undefined') return '';
+    const u = new URL(window.location.href);
+    u.searchParams.set('partner', '__PARTNER_SLUG__');
+    return u.toString();
+  }, []);
+
+  return (
+    <div
+      style={{
+        marginTop: 16,
+        padding: '14px 18px',
+        borderRadius: 12,
+        background: 'rgba(156,124,255,0.08)',
+        border: '1px dashed rgba(156,124,255,0.4)',
+        textAlign: 'center',
+      }}
+    >
+      <p
+        style={{
+          fontFamily: mono,
+          fontSize: 10,
+          letterSpacing: '0.32em',
+          color: '#9C7CFF',
+          margin: '0 0 8px',
+        }}
+      >
+        DUAL RADAR · 邀请伴侣
+      </p>
+      <p
+        style={{
+          fontFamily: '"Noto Serif SC", serif',
+          fontSize: 13,
+          lineHeight: 1.85,
+          color: 'rgba(245,240,232,0.78)',
+          margin: '0 0 10px',
+        }}
+      >
+        让 ta 也测一份 CPTI · 把 ta 的 slug 加到链接末尾，自动合并成双人雷达。
+      </p>
+      <button
+        type="button"
+        onClick={() => {
+          if (!url) return;
+          navigator.clipboard.writeText(url.replace('__PARTNER_SLUG__', `${slug}-partner`));
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2400);
+        }}
+        style={{
+          cursor: 'pointer',
+          padding: '8px 16px',
+          borderRadius: 999,
+          border: '1px solid rgba(156,124,255,0.55)',
+          background: 'rgba(156,124,255,0.18)',
+          color: '#F5F0E8',
+          fontFamily: mono,
+          fontSize: 11,
+          letterSpacing: '0.24em',
+        }}
+      >
+        {copied ? 'COPIED ✓' : '复制邀请链接'}
+      </button>
+    </div>
   );
 }

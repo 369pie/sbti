@@ -1,15 +1,25 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { basePath } from '@/lib/site';
 import type { XptiPersonalityType } from '@/lib/xpti/personalities';
+import { getXptiPersonalityBySlug } from '@/lib/xpti/personalities';
 import { XPTI_DIMENSIONS } from '@/lib/xpti/dimensions';
 import type { DimensionLevel } from '@/lib/xpti/dimensions';
 import { PremiumPaywall } from '@/components/PremiumPaywall';
 import { buildResourceId } from '@/lib/payments/skus';
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
 import { hashString, pickN, levelToScore } from '@/lib/payments/deep-content';
+import { pickDialogueScripts } from '@/lib/xpti/dialogue-scripts';
+import {
+  PremiumFoilStyles,
+  PremiumEditionStamp,
+  hashEditionNumber,
+  formatIssuedDate,
+} from '@/components/premium/PremiumFoil';
+import { BundleCta } from '@/components/premium/BundleCta';
 
 const display = '"Cormorant Garamond", "Noto Serif SC", serif';
 const mono = '"SF Mono", ui-monospace, "Menlo", monospace';
@@ -44,32 +54,7 @@ const LANDMINE_POOL = [
   '把每一次释怀又收回，让 ta 永远在安全感的边缘。',
 ];
 
-const OPENERS_POOL = [
-  '今天有件小事，我没法立刻消化，能借你 10 分钟听我说吗？',
-  '我刚才看到 ___，突然想到你也会喜欢，所以截下来了。',
-  '我们已经很久没有"什么都不做"地待在一起了，本周末试一下？',
-  '我有一个很傻的请求——我想被夸今天好看，可以吗？',
-  '我最近在想我们的节奏，可以聊一下你最满意 / 最不满意的部分吗？',
-  '上次你说的那句 "___" 我一直记得，今天再讲一遍好吗？',
-  '我现在想躲一会儿，你不用做任何事，只需要知道我在躲。',
-  '如果今晚是一场电影，你希望 BGM 是哪首？',
-  '我想对你提一个新尝试，但我先问问你最近的边界在哪。',
-  '我今天有点 emo，你愿意陪我安静散步 20 分钟吗？',
-  '我想你了，但不是想见你——是想被你发"在干嘛"。',
-  '可不可以告诉我，最近哪一刻你觉得"和我在一起真好"？',
-  '我有一个秘密幻想，但现在不想立刻告诉你，先给你一周猜的时间。',
-  '我们重新选一遍恋爱时的菜单——如果今天是第一次约会，你点什么？',
-  '上次冷战是我先主动的，这次轮到你了对不对？我等你。',
-  '我对自己最近的状态不满意，能不能借你的眼睛看一下我？',
-  '今晚我们各自写一句"最近最想被对方看见的需求"再交换，好吗？',
-  '我想要一个不解决问题的拥抱，给我可以吗？',
-  '今天我想做主，你愿意把行程交给我半天吗？',
-  '我们试一次"24 小时不发文字消息只发语音"，可以吗？',
-  '可不可以告诉我，关于我的什么细节你最近在想？',
-  '今晚我们各自挑一首歌，听完再决定要不要继续聊正事。',
-  '如果我们关系有一句"主题曲歌词"，你觉得是哪一句？',
-  '我现在不知道想要什么，但我知道想被你抱一下——可以吗？',
-];
+
 
 interface Props {
   personality: XptiPersonalityType;
@@ -79,6 +64,14 @@ export function XptiDeepClient({ personality }: Props) {
   const slug = personality.slug;
   const accent = personality.color || '#8B7AD9';
   const resourceId = buildResourceId('xpti', slug);
+
+  // Partner-aware: ?partner=<xpti-slug> overlays a compatibility band.
+  const searchParams = useSearchParams();
+  const partnerSlug = searchParams?.get('partner') ?? null;
+  const partner = useMemo(
+    () => (partnerSlug ? getXptiPersonalityBySlug(partnerSlug) ?? null : null),
+    [partnerSlug],
+  );
 
   useEffect(() => {
     trackFunnelEvent('paywall_view', { module: 'xpti', slug, sku: 'xpti-deep-xp' });
@@ -90,6 +83,39 @@ export function XptiDeepClient({ personality }: Props) {
   });
   const radarPoints = dimensionScores.map((d) => d.score / 3);
 
+  // Partner radar overlay — uses the partner's actual XPTI_DIMENSIONS profile.
+  const partnerRadarPoints = useMemo(() => {
+    if (!partner) return null;
+    return XPTI_DIMENSIONS.map((d) => {
+      const level = (partner.profile[d.id] ?? 'M') as DimensionLevel;
+      return levelToScore(level) / 3;
+    });
+  }, [partner]);
+
+  // Compatibility readout — sum of axis-distance × weight (0..1, higher = closer).
+  // Inlined (not memoized) — the React Compiler optimizes pure derives automatically.
+  const compatibility: { score: number; verdict: string } | null = (() => {
+    if (!partnerRadarPoints) return null;
+    const totalDelta = radarPoints.reduce(
+      (acc, v, i) => acc + Math.abs(v - partnerRadarPoints[i]),
+      0,
+    );
+    const maxPossible = radarPoints.length;
+    const closeness = 1 - totalDelta / maxPossible;
+    const score = Math.round(closeness * 100);
+    const verdict =
+      score >= 80
+        ? '镜像默契 · 一拍即合的 XP 双子'
+        : score >= 65
+        ? '同频共振 · 大方向一致，小细节互补'
+        : score >= 50
+        ? '互补共生 · 高低维交错，节奏可咬合'
+        : score >= 35
+        ? '张力配 · 反差大，需要谈判才能合拍'
+        : '极性配 · 一个引力一个斥力，靠运气';
+    return { score, verdict };
+  })();
+
   const offset = hashString(slug) % 6;
   const pairs = pickN(PAIR_POOL, slug, 6, 'pair').map((p, i) => ({
     ...p,
@@ -97,7 +123,17 @@ export function XptiDeepClient({ personality }: Props) {
     rank: i + 1 + offset,
   }));
   const landmines = pickN(LANDMINE_POOL, slug, 8, 'mine');
-  const openers = pickN(OPENERS_POOL, slug, 24, 'opener');
+  // Partner-aware: when partner is known, the dialogue seed shifts so the 6
+  // scripts are re-rolled to a couple-specific subset.
+  const dialogues = pickDialogueScripts(
+    partner ? `${slug}::${partner.slug}` : slug,
+    6,
+  );
+
+  // Premium edition signature.
+  const editionNo = hashEditionNumber(`xpti::${slug}::${partnerSlug ?? 'solo'}`);
+  const issuedDate = formatIssuedDate();
+  const partnerAccent = '#9C7CFF';
 
   // Trim long description to first paragraph for the free band.
   const firstPara = personality.description.split('\n').find((l) => l.trim().length > 6) ?? personality.tagline;
@@ -111,6 +147,7 @@ export function XptiDeepClient({ personality }: Props) {
         paddingBlock: '64px 96px',
       }}
     >
+      <PremiumFoilStyles />
       {/* ── Hero ── */}
       <section style={{ maxWidth: 720, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
         <Link
@@ -210,9 +247,11 @@ export function XptiDeepClient({ personality }: Props) {
           resourceId={resourceId}
           lockedTitle={`解锁 ${personality.name} · 9 维 XP 深档`}
           teaserBullets={[
-            '9 维 XP 雷达 · 印刷级解读',
+            partner
+              ? `双人对照 9 维 · 你 vs ${partner.name} · 含相容度`
+              : '9 维 XP 雷达 · 印刷级解读（解锁后可叠加伴侣画像）',
             '6 类亲密配对推荐 + 8 大雷区',
-            '24 个对话开场白 · 拿来就能发',
+            '6 段场景化对话脚本 · 完整轮次 + 导演备注',
           ]}
           preview={
             <div style={{ paddingBlock: 20 }}>
@@ -247,22 +286,97 @@ export function XptiDeepClient({ personality }: Props) {
                   marginTop: 18,
                 }}
               >
-                完整版含每个轴的高/中/低注解、6 类亲密配对、24 个开场白。
+                完整版含每个轴的高/中/低注解、6 类亲密配对、6 段对话脚本。
               </p>
             </div>
           }
         >
           <div style={{ display: 'grid', gap: 56, paddingBlock: 24 }}>
 
-            <DeepSection eyebrow="RADAR · 9 维 XP 雷达" numeral="I" title="你的亲密形状">
+            <PremiumEditionStamp editionNo={editionNo} issuedDate={issuedDate} />
+
+            <DeepSection
+              eyebrow={partner ? 'RADAR · 双人对照 9 维' : 'RADAR · 9 维 XP 雷达'}
+              numeral="I"
+              title={partner ? `你 × ${partner.name} · 重叠区即默契` : '你的亲密形状'}
+            >
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <Radar
                   size={360}
                   points={radarPoints}
                   accent={accent}
                   labels={dimensionScores.map((d) => d.name)}
+                  secondaryPoints={partnerRadarPoints ?? undefined}
+                  secondaryAccent={partnerAccent}
                 />
               </div>
+              {partner && compatibility && (
+                <div
+                  style={{
+                    marginTop: 18,
+                    padding: '14px 18px',
+                    borderRadius: 12,
+                    border: '1px solid rgba(201,166,118,0.35)',
+                    background:
+                      'linear-gradient(135deg, rgba(192,122,142,0.08), rgba(156,124,255,0.08))',
+                    textAlign: 'center',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontFamily: mono,
+                      fontSize: 10,
+                      letterSpacing: '0.32em',
+                      color: '#C9A676',
+                      margin: '0 0 6px',
+                    }}
+                  >
+                    COMPATIBILITY · 相容度
+                  </p>
+                  <p
+                    className="premium-foil"
+                    style={{
+                      fontFamily: display,
+                      fontStyle: 'italic',
+                      fontSize: 36,
+                      lineHeight: 1.1,
+                      margin: '0 0 6px',
+                    }}
+                  >
+                    {compatibility.score}
+                    <span style={{ fontSize: 16, marginLeft: 4 }}>/ 100</span>
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: '"Noto Serif SC", serif',
+                      fontSize: 13,
+                      lineHeight: 1.85,
+                      color: 'rgba(245,240,232,0.85)',
+                      margin: 0,
+                    }}
+                  >
+                    {compatibility.verdict}
+                  </p>
+                </div>
+              )}
+              {partner ? (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: 22,
+                    marginTop: 14,
+                    fontFamily: mono,
+                    fontSize: 11,
+                    letterSpacing: '0.18em',
+                  }}
+                >
+                  <span style={{ color: accent }}>● 你（{personality.code}）</span>
+                  <span style={{ color: partnerAccent }}>● {partner.name}（{partner.code}）</span>
+                </div>
+              ) : (
+                <PartnerInviteCta />
+              )}
               <ul
                 style={{
                   marginTop: 24,
@@ -389,43 +503,125 @@ export function XptiDeepClient({ personality }: Props) {
               </ul>
             </DeepSection>
 
-            <DeepSection eyebrow="OPENERS · 24 个开场白" numeral="IV" title="拿来就能发的对话起点">
-              <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 10 }}>
-                {openers.map((o, i) => (
-                  <li
-                    key={i}
+            <DeepSection
+              eyebrow="DIALOGUES · 6 段场景化脚本"
+              numeral="IV"
+              title="不是开场白 · 是完整剧本"
+            >
+              <div style={{ display: 'grid', gap: 24 }}>
+                {dialogues.map((d, i) => (
+                  <article
+                    key={d.id}
                     style={{
-                      display: 'grid',
-                      gridTemplateColumns: '32px 1fr',
-                      gap: 12,
-                      alignItems: 'baseline',
+                      padding: '20px 22px',
+                      borderRadius: 8,
+                      border: '1px solid rgba(245,240,232,0.12)',
+                      background:
+                        'linear-gradient(180deg, rgba(245,240,232,0.05) 0%, rgba(245,240,232,0.02) 100%)',
                     }}
                   >
-                    <span
+                    <header style={{ marginBottom: 14 }}>
+                      <p
+                        style={{
+                          fontFamily: mono,
+                          fontSize: 10,
+                          letterSpacing: '0.32em',
+                          color: '#C9A676',
+                          margin: '0 0 6px',
+                        }}
+                      >
+                        SCRIPT {String(i + 1).padStart(2, '0')} · {d.eyebrow}
+                      </p>
+                      <h3
+                        style={{
+                          fontFamily: display,
+                          fontSize: 19,
+                          fontWeight: 500,
+                          fontStyle: 'italic',
+                          color: '#F5F0E8',
+                          margin: '0 0 6px',
+                        }}
+                      >
+                        {d.scenario}
+                      </h3>
+                      <p
+                        style={{
+                          fontFamily: '"Noto Serif SC", serif',
+                          fontSize: 12,
+                          lineHeight: 1.75,
+                          color: 'rgba(245,240,232,0.55)',
+                          margin: 0,
+                        }}
+                      >
+                        <span style={{ color: accent, marginRight: 6 }}>目标 ·</span>
+                        {d.goal}
+                      </p>
+                    </header>
+
+                    <ol
                       style={{
-                        fontFamily: mono,
-                        fontSize: 10,
-                        letterSpacing: '0.24em',
-                        color: '#C9A676',
+                        margin: 0,
+                        padding: 0,
+                        listStyle: 'none',
+                        display: 'grid',
+                        gap: 12,
+                        borderLeft: '1px dashed rgba(245,240,232,0.18)',
+                        paddingLeft: 16,
                       }}
                     >
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: display,
-                        fontStyle: 'italic',
-                        fontSize: 14,
-                        lineHeight: 1.85,
-                        color: 'rgba(245,240,232,0.86)',
-                      }}
-                    >
-                      “{o}”
-                    </span>
-                  </li>
+                      {d.turns.map((t, ti) => {
+                        const isYou = t.speaker === 'you';
+                        return (
+                          <li key={ti} style={{ display: 'grid', gap: 4 }}>
+                            <span
+                              style={{
+                                fontFamily: mono,
+                                fontSize: 9,
+                                letterSpacing: '0.32em',
+                                color: isYou ? accent : 'rgba(245,240,232,0.45)',
+                              }}
+                            >
+                              {isYou ? '你 →' : '← TA'}
+                            </span>
+                            <p
+                              style={{
+                                fontFamily: '"Noto Serif SC", serif',
+                                fontSize: 13.5,
+                                lineHeight: 1.85,
+                                color: isYou
+                                  ? 'rgba(245,240,232,0.92)'
+                                  : 'rgba(245,240,232,0.7)',
+                                margin: 0,
+                              }}
+                            >
+                              「{t.line}」
+                            </p>
+                            {t.note && (
+                              <p
+                                style={{
+                                  fontFamily: display,
+                                  fontStyle: 'italic',
+                                  fontSize: 11.5,
+                                  lineHeight: 1.7,
+                                  color: 'rgba(201,166,118,0.7)',
+                                  margin: 0,
+                                  paddingLeft: 12,
+                                  borderLeft: '2px solid rgba(201,166,118,0.35)',
+                                }}
+                              >
+                                导演备注 · {t.note}
+                              </p>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </article>
                 ))}
-              </ol>
+              </div>
             </DeepSection>
+
+            <BundleCta />
 
             <DeepSection
               eyebrow="NEXT · 跨模块深档"
@@ -480,22 +676,23 @@ function DeepSection({
     <section>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, marginBottom: 18 }}>
         <span
+          className="premium-foil"
           style={{
             fontFamily: mono,
             fontSize: 10,
             letterSpacing: '0.42em',
-            color: '#C9A676',
           }}
         >
           {eyebrow}
         </span>
         <span style={{ flex: 1, height: 1, background: 'rgba(201,166,118,0.25)' }} />
         <span
+          className="premium-foil"
           style={{
             fontFamily: display,
             fontStyle: 'italic',
-            fontSize: 13,
-            color: 'rgba(201,166,118,0.85)',
+            fontSize: 28,
+            letterSpacing: '0.06em',
           }}
         >
           {numeral}
@@ -593,18 +790,61 @@ function CrossLink({
   );
 }
 
+function PartnerInviteCta() {
+  return (
+    <div
+      style={{
+        marginTop: 16,
+        padding: '14px 18px',
+        borderRadius: 12,
+        background: 'rgba(156,124,255,0.08)',
+        border: '1px dashed rgba(156,124,255,0.4)',
+        textAlign: 'center',
+      }}
+    >
+      <p
+        style={{
+          fontFamily: mono,
+          fontSize: 10,
+          letterSpacing: '0.32em',
+          color: '#9C7CFF',
+          margin: '0 0 8px',
+        }}
+      >
+        DUAL RADAR · 邀请伴侣
+      </p>
+      <p
+        style={{
+          fontFamily: '"Noto Serif SC", serif',
+          fontSize: 13,
+          lineHeight: 1.85,
+          color: 'rgba(245,240,232,0.78)',
+          margin: 0,
+        }}
+      >
+        让 ta 也测一份 XPTI · 在当前链接末尾追加 <code style={{ color: '#C9A676' }}>?partner=ta-的-slug</code>，
+        自动叠加 ta 的画像与你们的相容度评分。
+      </p>
+    </div>
+  );
+}
+
 function Radar({
   size,
   points,
   accent,
   labels,
   dim = false,
+  secondaryPoints,
+  secondaryAccent,
 }: {
   size: number;
   points: number[];
   accent: string;
   labels: string[];
   dim?: boolean;
+  secondaryPoints?: number[];
+  secondaryAccent?: string;
 }) {
   const cx = size / 2;
   const cy = size / 2;
@@ -612,12 +852,16 @@ function Radar({
   const n = points.length;
   const angle = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n;
 
-  const polygon = points
-    .map((v, i) => {
-      const rr = r * v;
-      return `${cx + rr * Math.cos(angle(i))},${cy + rr * Math.sin(angle(i))}`;
-    })
-    .join(' ');
+  const polyOf = (vals: number[]) =>
+    vals
+      .map((v, i) => {
+        const rr = r * v;
+        return `${cx + rr * Math.cos(angle(i))},${cy + rr * Math.sin(angle(i))}`;
+      })
+      .join(' ');
+
+  const polygon = polyOf(points);
+  const secondary = secondaryPoints ? polyOf(secondaryPoints) : null;
 
   const grid = [0.25, 0.5, 0.75, 1].map((step) => {
     const pts = Array.from({ length: n }, (_, i) => {
@@ -635,6 +879,15 @@ function Radar({
         const y2 = cy + r * Math.sin(angle(i));
         return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke="rgba(245,240,232,0.1)" />;
       })}
+      {secondary && secondaryAccent && (
+        <polygon
+          points={secondary}
+          fill={`${secondaryAccent}28`}
+          stroke={secondaryAccent}
+          strokeWidth={1.4}
+          strokeDasharray="3 3"
+        />
+      )}
       <polygon
         points={polygon}
         fill={`${accent}${dim ? '20' : '38'}`}

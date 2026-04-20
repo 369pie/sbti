@@ -25,6 +25,7 @@ import { SoultiTonightAction } from '@/components/SoultiTonightAction';
 import { SoultiSoulLetterSubscribe } from '@/components/SoultiSoulLetterSubscribe';
 import { SoultiMonthlyRetestNudge } from '@/components/SoultiMonthlyRetestNudge';
 import { SoultiWishingWell } from '@/components/SoultiWishingWell';
+import { HermosaInputCard } from '@/components/hermosa/HermosaInputCard';
 import { SoultiShareCardSwitcher } from '@/components/SoultiShareCardSwitcher';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
@@ -1316,6 +1317,15 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
       {/* ── E10 · Wishing Well (匿名许愿池) ── */}
       <SoultiWishingWell
         personalitySlug={personality.slug}
+        personalityName={personality.name}
+        accent={personality.color}
+      />
+
+      {/* ── HERMOSA · 她的话｜女性涂鸦黑板留言入口（W2 试点：SoulTI） ── */}
+      <HermosaInputCard
+        universe="soulti"
+        slug={personality.slug}
+        code={personality.code}
         personalityName={personality.name}
         accent={personality.color}
       />

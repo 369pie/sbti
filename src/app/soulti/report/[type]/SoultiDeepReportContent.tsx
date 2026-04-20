@@ -10,11 +10,18 @@ import {
   getCrossReadingsForCode,
   getRepairForCode,
   getSoulLetterForCode,
-  getCurrentWeeklyPrompt,
+  getWeeklyPromptForPersonality,
 } from '@/lib/soulti/deep-report';
 import { useEffect, useState } from 'react';
 import { PremiumPaywall } from '@/components/PremiumPaywall';
 import { buildResourceId } from '@/lib/payments/skus';
+import {
+  PremiumFoilStyles,
+  PremiumEditionStamp,
+  hashEditionNumber,
+  formatIssuedDate,
+} from '@/components/premium/PremiumFoil';
+import { BundleCta } from '@/components/premium/BundleCta';
 
 interface Props {
   personality: SoultiPersonalityType;
@@ -50,7 +57,15 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
   const repair = getRepairForCode(personality.code);
   const soulLetter = getSoulLetterForCode(personality.code);
   const resonance = getSoultiResonance(personality.slug);
-  const weeklyPrompt = getCurrentWeeklyPrompt();
+  const weeklyPrompt = getWeeklyPromptForPersonality({
+    code: personality.code,
+    name: personality.name,
+    slug: personality.slug,
+  });
+
+  // Premium edition signature — stable per personality, drawn fresh each render.
+  const editionNo = hashEditionNumber(`soulti::${personality.slug}::${personality.code}`);
+  const issuedDate = formatIssuedDate();
 
   // Three mirrors data
   const dayP = layered ? getSoultiPersonalityBySlug(layered.daySelf.slug) : null;
@@ -59,6 +74,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
 
   return (
     <div className="min-h-screen" style={{ background: '#FAF8F5' }}>
+      <PremiumFoilStyles />
 
       {/* ── Header ── */}
       <header className="max-w-2xl mx-auto px-6 pt-16 pb-4">
@@ -234,6 +250,9 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
           </div>
         )}
       >
+      <div className="max-w-2xl mx-auto px-6 pt-10">
+        <PremiumEditionStamp editionNo={editionNo} issuedDate={issuedDate} />
+      </div>
       <motion.section
         className="max-w-2xl mx-auto px-6 py-12"
         initial={{ opacity: 0, y: 12 }}
@@ -241,7 +260,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
         transition={{ delay: 0.25, duration: 0.6 }}
       >
         <h2
-          className="text-[11px] tracking-[0.3em] text-[#8b7355] font-medium uppercase mb-2"
+          className="premium-foil text-[11px] tracking-[0.3em] font-medium uppercase mb-2"
           style={{ fontFamily: serifFont }}
         >
           AXIS CROSS · 轴间交叉解读
@@ -319,7 +338,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
           transition={{ delay: 0.4, duration: 0.6 }}
         >
           <h2
-            className="text-[11px] tracking-[0.3em] text-[#8b7355] font-medium uppercase mb-2"
+            className="premium-foil text-[11px] tracking-[0.3em] font-medium uppercase mb-2"
             style={{ fontFamily: serifFont }}
           >
             REPAIR · 修复处方
@@ -395,7 +414,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
           transition={{ delay: 0.5, duration: 0.6 }}
         >
           <h2
-            className="text-[11px] tracking-[0.3em] text-[#8b7355] font-medium uppercase mb-8"
+            className="premium-foil text-[11px] tracking-[0.3em] font-medium uppercase mb-8"
             style={{ fontFamily: serifFont }}
           >
             SOUL LETTER · 写给你的信
@@ -438,6 +457,8 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
           </div>
         </motion.section>
       )}
+
+      <BundleCta accent={personality.color} />
       </PremiumPaywall>
       </div>
 

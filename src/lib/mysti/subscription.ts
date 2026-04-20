@@ -8,9 +8,9 @@
  * - creator-pass    ¥39  → 30 天（创作者）
  *
  * 通行证权益（C 端，不含 creator-pass）：
- *   1. 灵魂月报 monthly-report 自动解锁
+ *   1. 灵魂月报 + 四大深档（WTFTI / SoulTI / CPTI / XPTI）自动解锁
  *   2. 全部分享卡 share-plus 自动解锁（资源级）
- *   3. 单次 SKU（灵魂信 / 合盘 / 藏品卡）享 7 折
+ *   3. 礼品卡 6 折；灵魂信 / 合盘 / 藏品卡享 7 折
  *   4. 每日翻牌额外仪式（前端区分）
  *
  * 注意：
@@ -141,6 +141,10 @@ export function passCoversSingleSku(sku: string): boolean {
   switch (sku) {
     case 'monthly-report':
     case 'share-plus':
+    case 'wtfti-deep-pantheon':
+    case 'soulti-deep-mirror':
+    case 'cpti-deep-relationship':
+    case 'xpti-deep-xp':
       return true;
     default:
       return false;
@@ -151,6 +155,9 @@ export function passCoversSingleSku(sku: string): boolean {
 export function passDiscountForSku(sku: string): number {
   // 折扣 0~1。0 表示不打折。
   switch (sku) {
+    case 'gift-card':
+    case 'festival-gift-card':
+      return 0.4; // 6 折 = 折扣 0.4
     case 'soul-letter':
     case 'dual-report':
     case 'share-atelier':

@@ -33,10 +33,10 @@ const TIERS: TierDef[] = [
     badge: '试一个月',
     perMonth: '¥19/月',
     bullets: [
+      'WTFTI / SoulTI / CPTI / XPTI 深档自动解锁',
       '每日翻牌专属仪式',
-      '全部 Plus 分享卡 · 去水印 / 金边精修',
-      '灵魂月报自动解锁（¥6.9/月）',
-      '灵魂信 / 合盘报告 / 藏品卡 全 7 折',
+      '灵魂月报 + 全部 Plus 分享卡 自动解锁',
+      '礼品卡 6 折 · 灵魂信 / 合盘报告 / 藏品卡 7 折',
       '到期自然结束 · 不自动续费',
     ],
     cta: '开通月度通行证',
@@ -185,7 +185,7 @@ function SubscribeInner() {
             className="mt-3 text-sm leading-7 max-w-xl mx-auto"
             style={{ color: theme.textMuted, fontFamily: 'var(--font-serif)' }}
           >
-            把单次解锁、月报、Plus 分享卡、每日仪式打包到一张通行证。
+            把四大深档、月报、Plus 分享卡、每日仪式打包到一张通行证。
             <br />
             到期自然结束，不自动续费——这是我们对你最基本的尊重。
           </p>

@@ -1,6 +1,6 @@
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import type { XunhupayPaymentChannel } from '@/lib/payment/xunhupay';
-import type { MystiSku } from '@/lib/mysti/unlock';
+import { ALL_SKUS, type MystiSku } from '@/lib/mysti/unlock';
 import {
   GIFT_CARD_OPTIONS,
   generateGiftCode,
@@ -79,24 +79,21 @@ export interface CreateMystiOrderInput {
 }
 
 const VALID_GIFT_SKUS = new Set(GIFT_CARD_OPTIONS.map(option => option.giftSku));
-const VALID_ORDER_SKUS = new Set<MystiSku>([
-  'soul-letter',
-  'dual-report',
-  'monthly-report',
-  'gift-card',
-  'festival-gift-card',
-  'besties-bundle',
-  'share-plus',
-  'share-atelier',
-  'monthly-pass',
-  'quarterly-pass',
-  'yearly-pass',
-  'creator-pass',
-]);
+const VALID_ORDER_SKUS = new Set<MystiSku>(ALL_SKUS);
 
+// Preserve the business SKU in attach_json when the database constraint lags
+// behind the app's live SKU catalog.
 const LEGACY_ORDER_SKU_FALLBACK: Partial<Record<MystiSku, MystiSku>> = {
   'festival-gift-card': 'gift-card',
   'besties-bundle': 'gift-card',
+  'wtfti-deep-pantheon': 'monthly-report',
+  'soulti-deep-mirror': 'monthly-report',
+  'cpti-deep-relationship': 'monthly-report',
+  'xpti-deep-xp': 'monthly-report',
+  'xpti-couple-report': 'monthly-report',
+  'xpti-couple-half': 'monthly-report',
+  'xpti-archive-yearly': 'monthly-report',
+  'wtfcard-collector': 'monthly-report',
   'monthly-pass': 'monthly-report',
   'quarterly-pass': 'monthly-report',
   'yearly-pass': 'monthly-report',

@@ -24,6 +24,7 @@ import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { trackCptiEvent } from '@/lib/cpti/analytics';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
+import { HermosaInputCard } from '@/components/hermosa/HermosaInputCard';
 import { ClaimAssetCard } from '@/components/ClaimAssetCard';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
@@ -328,6 +329,13 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
           </div>
         </motion.div>
       </section>
+
+      <HermosaInputCard
+        universe="cpti"
+        slug={personality.slug}
+        code={personality.code}
+        personalityName={personality.name}
+      />
 
       <CrossTestRecommendations currentTest="cpti" personalityName={personality.name} />
 

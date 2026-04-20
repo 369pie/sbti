@@ -4,6 +4,58 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
+<!-- BEGIN:karpathy-guidelines -->
+# Karpathy-Inspired Coding Discipline
+
+Source: adapted from `forrestchang/andrej-karpathy-skills`.
+Local copy: `KARPATHY-CLAUDE.md`.
+
+For non-trivial coding tasks:
+
+## 1. Think Before Coding
+
+- State assumptions explicitly.
+- If ambiguity exists, ask instead of guessing.
+- Present tradeoffs when multiple reasonable paths exist.
+- Push back when a simpler approach exists.
+- If something is unclear, stop and clarify.
+
+## 2. Simplicity First
+
+- Implement the minimum code that solves the requested problem.
+- Do not add speculative features, abstractions, configurability, or impossible-scenario error handling.
+- If the solution feels overengineered, simplify it.
+
+## 3. Surgical Changes
+
+- Touch only the code required for the task.
+- Do not refactor, reformat, or "improve" unrelated nearby code.
+- Match the existing style unless the task requires otherwise.
+- Remove only the unused code created by your own change.
+- Mention unrelated issues instead of fixing them opportunistically.
+
+## 4. Goal-Driven Execution
+
+- Convert requests into verifiable success criteria.
+- Prefer tests, checks, builds, or direct behavioral verification.
+- For multi-step work, state a short plan where each step has a verification check.
+- Iterate until the success criteria are satisfied or a real blocker is identified.
+
+Tradeoff: bias toward caution over speed. For trivial one-line fixes, use judgment.
+<!-- END:karpathy-guidelines -->
+
+<!-- BEGIN:sbti-project-execution -->
+# SBTI Project Execution Addendum
+
+Apply the general coding discipline with these repo-specific constraints:
+
+- Treat each universe, module, and visual surface as intentional. Do not rename, restyle, or reorganize adjacent concept systems unless asked.
+- Respect the Next.js and UI design rules in this file before reaching for broader refactors.
+- Prefer narrow verification tied to the changed surface: targeted lint or typecheck, exact route or page render, focused script run, or preview smoke check.
+- For production-sensitive flows such as Supabase, auth, payments, and OG/image routes, verify the exact path changed before doing cleanup around it.
+- Keep secrets and local tokens out of diffs, examples, logs, and user-facing responses.
+<!-- END:sbti-project-execution -->
+
 <!-- BEGIN:ui-design-defaults -->
 # UI / UX Design Defaults
 

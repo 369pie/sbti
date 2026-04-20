@@ -13,6 +13,7 @@ import { UniverseResultBar } from '@/components/UniverseResultBar';
 import { UniverseSwitcher } from '@/components/UniverseSwitcher';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
+import { HermosaInputCard } from '@/components/hermosa/HermosaInputCard';
 
 interface Props {
   personality: FanrentiPersonality;
@@ -358,6 +359,15 @@ export function FanrentiResultContent({ personality: p }: Props) {
 
       <section className="max-w-2xl mx-auto px-6 pb-8">
         <WtfiTheoryWiring universe="fanrenti" />
+      </section>
+
+      <section className="max-w-2xl mx-auto px-6 pb-12">
+        <HermosaInputCard
+          universe="fanrenti"
+          slug={p.slug}
+          personalityName={character.name}
+          accent={realm.accent}
+        />
       </section>
 
       <ResultClosureEngine

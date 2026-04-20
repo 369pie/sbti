@@ -66,6 +66,20 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
 
     const resourceId = buildResourceId('wtfti', personalitySlug);
 
+    // Stable edition number per (resultId × personalitySlug) — feels personal,
+    // determined client-side from the session, NOT exposed to the free tier.
+    const editionNo = (() => {
+      const seed = `${resultId}::${personalitySlug}`;
+      let h = 0x811c9dc5;
+      for (let i = 0; i < seed.length; i += 1) {
+        h ^= seed.charCodeAt(i);
+        h = Math.imul(h, 0x01000193);
+      }
+      return String(Math.abs(h) % 9000 + 1000);
+    })();
+    const today = new Date();
+    const issuedDate = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+
     return (
       <div
         style={{
@@ -77,6 +91,36 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
           paddingBottom: 120,
         }}
       >
+        {/* Paid-tier visual signature: gold-foil shimmer used on Roman numerals */}
+        <style>{`
+          @keyframes wtfti-foil-sweep {
+            0% { background-position: -180% 0; }
+            100% { background-position: 280% 0; }
+          }
+          .wtfti-deep-foil {
+            background-image: linear-gradient(
+              100deg,
+              #8B6A3A 0%,
+              #C9A676 22%,
+              #F4DDA0 38%,
+              #FFF1C2 50%,
+              #F4DDA0 62%,
+              #C9A676 78%,
+              #8B6A3A 100%
+            );
+            background-size: 280% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+            animation: wtfti-foil-sweep 6.5s linear infinite;
+            font-feature-settings: "lnum", "tnum";
+          }
+          @keyframes wtfti-stamp-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(201,166,118,0.0), inset 0 0 18px rgba(192,122,142,0.16); }
+            50% { box-shadow: 0 0 24px 0 rgba(201,166,118,0.18), inset 0 0 18px rgba(192,122,142,0.22); }
+          }
+        `}</style>
         {/* ── Header ── */}
         <header
           style={{
@@ -148,6 +192,7 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
           >
             主神 Sigil 高清 · 灵魂香水全谱注解 · 镜面碎片 24 镜框 · 30 天月相封信
           </p>
+          <EditionStamp editionNo={editionNo} issuedDate={issuedDate} />
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <PriceAnchor sku="wtfti-deep-pantheon" from="wtfti-deep" />
           </div>
@@ -427,12 +472,14 @@ function DeepSection({ eyebrow, title, numeral, children }: DeepSectionProps) {
         }}
       >
         <span
+          className="wtfti-deep-foil"
           style={{
-            fontFamily: mono,
-            fontSize: 11,
-            letterSpacing: '0.32em',
-            color: '#C9A676',
-            opacity: 0.85,
+            fontFamily: display,
+            fontStyle: 'italic',
+            fontWeight: 500,
+            fontSize: 34,
+            letterSpacing: '0.04em',
+            lineHeight: 1,
           }}
         >
           {numeral}
@@ -525,6 +572,80 @@ function CrossLink({ href, eyebrow, title, desc }: CrossLinkProps) {
         {desc}
       </p>
     </Link>
+  );
+}
+
+function EditionStamp({
+  editionNo,
+  issuedDate,
+}: {
+  editionNo: string;
+  issuedDate: string;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        margin: '0 auto 22px',
+      }}
+    >
+      <div
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 14,
+          padding: '12px 22px',
+          borderRadius: 999,
+          border: '1px solid rgba(201,166,118,0.45)',
+          background:
+            'linear-gradient(135deg, rgba(192,122,142,0.10), rgba(201,166,118,0.06))',
+          animation: 'wtfti-stamp-pulse 4.5s ease-in-out infinite',
+        }}
+      >
+        <span
+          aria-hidden
+          style={{
+            display: 'inline-block',
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            background:
+              'radial-gradient(circle at 30% 30%, #FFE6A3, #C9A676 60%, #8B6A3A)',
+            boxShadow: '0 0 8px rgba(201,166,118,0.5)',
+          }}
+        />
+        <span
+          className="wtfti-deep-foil"
+          style={{
+            fontFamily: mono,
+            fontSize: 11,
+            letterSpacing: '0.36em',
+            fontWeight: 600,
+          }}
+        >
+          EDITION №{editionNo} / 9999
+        </span>
+        <span
+          aria-hidden
+          style={{
+            width: 1,
+            height: 14,
+            background: 'rgba(201,166,118,0.4)',
+          }}
+        />
+        <span
+          style={{
+            fontFamily: mono,
+            fontSize: 10,
+            letterSpacing: '0.28em',
+            color: 'rgba(245,240,232,0.7)',
+          }}
+        >
+          ISSUED {issuedDate}
+        </span>
+      </div>
+    </div>
   );
 }
 

@@ -1160,14 +1160,25 @@ export function CardContent() {
       {shareMounted ? <WtfCardShareImageGenerator ref={shareRef} card={card} /> : null}
 
       {/* ── Collector Pro · Light paywall (W4 A6) ─────────────────────────── */}
-      <CollectorProSection cardId={card.id} />
+      <CollectorProSection card={card} />
     </div>
   );
 }
 
-function CollectorProSection({ cardId }: { cardId: string }) {
+function CollectorProSection({ card }: { card: WtfCardData }) {
+  const cardId = card.id;
   useEffect(() => {
     trackFunnelEvent('paywall_view', { module: 'wtfcard', sku: 'wtfcard-collector', cardId });
+  }, [cardId]);
+
+  // Stable edition number per card (FNV-1a hash → 4 digits)
+  const editionNo = useMemo(() => {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < cardId.length; i += 1) {
+      h ^= cardId.charCodeAt(i);
+      h = Math.imul(h, 0x01000193);
+    }
+    return String(Math.abs(h) % 9000 + 1000);
   }, [cardId]);
 
   return (
@@ -1176,28 +1187,29 @@ function CollectorProSection({ cardId }: { cardId: string }) {
         sku="wtfcard-collector"
         brand="wtfcard"
         resourceId={`wtfcard:${cardId}`}
-        lockedTitle="解锁 WTF Card · 收藏家版"
+        lockedTitle="解锁 WTF Card · 收藏版"
         teaserBullets={[
-          '印刷级 PDF 卡背 · A4 / Letter 双版',
+          '印刷级 PDF 卡背 · A4 / Letter 双版（含出血 + CMYK）',
           '4K 桌面 + 手机壁纸 · 含暗面副形',
-          '人格速查（typeahead）· 跨宇宙比对',
+          `编号典藏 · EDITION №${editionNo} / 9999（你的卡独有）`,
         ]}
         preview={
-          <div className="grid gap-3 py-4 text-center">
+          <div className="grid gap-4 py-4 text-center">
             <p
               className="text-[10px] tracking-[0.32em] uppercase"
               style={{ color: '#8a6d3b', fontFamily: 'var(--font-mono)' }}
             >
-              COLLECTOR · ¥9.9
+              COLLECTOR · ¥3.9 · ONE-TIME
             </p>
             <p
-              className="text-base italic"
+              className="text-base italic px-4"
               style={{ fontFamily: 'var(--font-display)', color: '#1F1A16' }}
             >
               把这张卡，做成可以挂起来的纪念品。
             </p>
-            <p className="text-xs" style={{ color: '#5B524B' }}>
-              印刷级 PDF · 4K 壁纸 · 跨宇宙速查 — 一次买断
+            <CollectorBookletMockup editionNo={editionNo} />
+            <p className="text-[11px]" style={{ color: '#5B524B' }}>
+              ▲ 实际 PDF 内页样张 · 单击解锁后可下载
             </p>
           </div>
         }
@@ -1214,17 +1226,187 @@ function CollectorProSection({ cardId }: { cardId: string }) {
             desc="2880×1800 / 1170×2532 · 含暗面副形版本。"
           />
           <CollectorPerk
-            eyebrow="LOOKUP · 跨宇宙"
-            title="人格速查 typeahead"
-            desc="按代码 / 名字 / 别名秒查任意宇宙类型卡片。"
-          />
-          <CollectorPerk
-            eyebrow="COMPARE · 多人"
-            title="收藏家比对面板"
-            desc="把朋友的卡和你的拼成 2×2 / 3×3 海报。"
+            eyebrow="EDITION"
+            title={`编号典藏 №${editionNo} / 9999`}
+            desc="按你的人格指纹生成的独一编号，付费后印在卡背与壁纸右下角。"
           />
         </div>
+        <CollectorDownloadPanel card={card} editionNo={editionNo} />
+        <div
+          className="mt-2 rounded-lg border border-dashed px-4 py-3 text-[11px] leading-relaxed"
+          style={{
+            borderColor: 'rgba(168,138,90,0.45)',
+            color: '#7a6a55',
+            fontFamily: 'var(--font-mono)',
+          }}
+        >
+          ROADMAP · 跨宇宙 typeahead 速查 / 多人比对面板正在制作中，
+          上线后将自动加入你的收藏版（无需重新付费）。
+        </div>
       </PremiumPaywall>
+    </div>
+  );
+}
+
+function CollectorDownloadPanel({
+  card,
+  editionNo,
+}: {
+  card: WtfCardData;
+  editionNo: string;
+}) {
+  const [pending, setPending] = useState<null | 'a4' | 'letter' | 'desktop' | 'mobile'>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const litCount = useMemo(() => getLitCount(card), [card]);
+
+  const handleDownload = useCallback(async (kind: 'a4' | 'letter' | 'desktop' | 'mobile') => {
+    setPending(kind);
+    setError(null);
+    try {
+      const collector = await import('@/lib/wtf-card-collector');
+      if (kind === 'a4' || kind === 'letter') {
+        await collector.downloadCollectorPdf(card, editionNo, kind);
+      } else {
+        await collector.downloadCollectorWallpaper(card, editionNo, kind);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '导出失败，请稍后再试');
+    } finally {
+      setPending(null);
+    }
+  }, [card, editionNo]);
+
+  return (
+    <div
+      className="rounded-xl border px-4 py-4"
+      style={{
+        borderColor: 'rgba(168,138,90,0.35)',
+        background: 'rgba(255,253,249,0.78)',
+      }}
+    >
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <div
+            className="text-[10px] tracking-[0.32em] uppercase mb-1"
+            style={{ color: '#8a6d3b', fontFamily: 'var(--font-mono)' }}
+          >
+            DOWNLOAD · 已解锁资产
+          </div>
+          <p className="text-sm italic" style={{ color: '#1F1A16', fontFamily: 'var(--font-display)' }}>
+            你的收藏版已可导出。
+          </p>
+          <p className="text-[11px] mt-1" style={{ color: '#5B524B' }}>
+            当前已点亮 {litCount} 个宇宙，导出文件会自动写入你的编号与多宇宙人格档案。
+          </p>
+        </div>
+        <span
+          className="text-[10px] px-2.5 py-1 rounded-full"
+          style={{
+            color: '#8a6d3b',
+            border: '1px solid rgba(168,138,90,0.35)',
+            fontFamily: 'var(--font-mono)',
+            letterSpacing: '0.2em',
+          }}
+        >
+          EDITION №{editionNo}
+        </span>
+      </div>
+
+      <div className="grid sm:grid-cols-2 gap-3 mt-4">
+        {[
+          { key: 'a4', title: '下载 A4 PDF', desc: '2480×3508 · 可直接送印' },
+          { key: 'letter', title: '下载 Letter PDF', desc: '2550×3300 · 海外打印友好' },
+          { key: 'desktop', title: '下载桌面壁纸', desc: '2880×1800 · 宽屏桌面版' },
+          { key: 'mobile', title: '下载手机壁纸', desc: '1170×2532 · 竖屏锁屏版' },
+        ].map((item) => {
+          const active = pending === item.key;
+          return (
+            <button
+              key={item.key}
+              type="button"
+              disabled={pending !== null}
+              onClick={() => void handleDownload(item.key as 'a4' | 'letter' | 'desktop' | 'mobile')}
+              className="text-left rounded-xl border px-4 py-3 transition-colors"
+              style={{
+                borderColor: 'rgba(168,138,90,0.35)',
+                background: active ? 'rgba(201,166,118,0.12)' : 'rgba(255,255,255,0.6)',
+                cursor: pending === null ? 'pointer' : 'wait',
+              }}
+            >
+              <div
+                className="text-[10px] tracking-[0.24em] uppercase"
+                style={{ color: '#8a6d3b', fontFamily: 'var(--font-mono)' }}
+              >
+                {active ? 'EXPORTING…' : 'COLLECTOR'}
+              </div>
+              <p className="text-sm mt-1" style={{ color: '#1F1A16' }}>
+                {active ? '正在生成，请稍候…' : item.title}
+              </p>
+              <p className="text-[11px] mt-1" style={{ color: '#5B524B' }}>
+                {item.desc}
+              </p>
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="text-[10px] mt-3" style={{ color: '#7a6a55', fontFamily: 'var(--font-mono)' }}>
+        导出过程在本地完成，不会额外上传你的卡面数据。
+      </p>
+      {error && (
+        <p className="text-[11px] mt-2" style={{ color: '#9f4b5b' }}>
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Mini SVG mockup of the printed PDF booklet — gives users a real preview. */
+function CollectorBookletMockup({ editionNo }: { editionNo: string }) {
+  return (
+    <div className="flex justify-center">
+      <svg
+        width="240"
+        height="150"
+        viewBox="0 0 240 150"
+        role="img"
+        aria-label="PDF 内页样张"
+        style={{ filter: 'drop-shadow(0 12px 24px rgba(31, 26, 22, 0.18))' }}
+      >
+        <defs>
+          <linearGradient id="cb-paper" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stopColor="#FFFCF4" />
+            <stop offset="1" stopColor="#F5EFE0" />
+          </linearGradient>
+          <linearGradient id="cb-foil" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stopColor="#C9A676" />
+            <stop offset="0.5" stopColor="#F0D08A" />
+            <stop offset="1" stopColor="#9C7B47" />
+          </linearGradient>
+        </defs>
+        {/* Two pages spread */}
+        <rect x="6" y="8" width="108" height="134" rx="3" fill="url(#cb-paper)" stroke="#d8caa6" strokeWidth="0.6" />
+        <rect x="126" y="8" width="108" height="134" rx="3" fill="url(#cb-paper)" stroke="#d8caa6" strokeWidth="0.6" />
+        {/* Left page — sigil placeholder */}
+        <circle cx="60" cy="58" r="22" fill="none" stroke="url(#cb-foil)" strokeWidth="0.8" />
+        <circle cx="60" cy="58" r="14" fill="none" stroke="#C07A8E" strokeWidth="0.5" opacity="0.7" />
+        <circle cx="60" cy="58" r="4" fill="#C07A8E" opacity="0.6" />
+        <line x1="20" y1="98" x2="100" y2="98" stroke="#C9A676" strokeWidth="0.4" />
+        <text x="60" y="112" textAnchor="middle" fontSize="5" fill="#5B524B" fontFamily="serif" fontStyle="italic">SIGIL · I</text>
+        <text x="60" y="124" textAnchor="middle" fontSize="3.5" fill="#8a6d3b" letterSpacing="1" fontFamily="monospace">EDITION №{editionNo}</text>
+        {/* Right page — text spread */}
+        <line x1="140" y1="20" x2="220" y2="20" stroke="#C9A676" strokeWidth="0.4" />
+        <text x="180" y="32" textAnchor="middle" fontSize="4" fill="#8a6d3b" letterSpacing="1.2" fontFamily="monospace">CHAPTER · II</text>
+        {Array.from({ length: 9 }).map((_, i) => (
+          <rect key={i} x="142" y={42 + i * 8} width={i === 8 ? 50 : 76} height="2.2" rx="1" fill="#1F1A16" opacity="0.55" />
+        ))}
+        <line x1="140" y1="124" x2="220" y2="124" stroke="#C9A676" strokeWidth="0.4" />
+        <text x="180" y="134" textAnchor="middle" fontSize="3.5" fill="#8a6d3b" letterSpacing="1" fontFamily="monospace">A4 · 300 DPI · CMYK</text>
+        {/* Spine shadow */}
+        <rect x="114" y="8" width="12" height="134" fill="#1F1A16" opacity="0.06" />
+      </svg>
     </div>
   );
 }

@@ -63,6 +63,7 @@ const RELATIONSHIP_ITEMS = [
 const DISCOVER_ITEMS = [
   { href: '/types/', label: '人设图鉴', emoji: '📖', desc: '全部人格类型一览' },
   { href: '/combo/', label: '人格拼盘', emoji: '🧩', desc: 'SBTI × MBTI × 星座' },
+  { href: '/her-voice/', label: '她的话', emoji: '✦', desc: '女性留言黑板 · 你的声音被听见' },
   { href: '/share-templates/', label: '小红书文案', emoji: '📕', desc: '现成分享模板' },
   { href: '/creator/', label: '创作者中心', emoji: '✨', desc: '做你自己的主题宇宙' },
 ];

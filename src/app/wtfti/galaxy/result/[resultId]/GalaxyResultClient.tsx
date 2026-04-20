@@ -18,6 +18,7 @@ import { trackGalaxyEvent } from '@/lib/wtfi/galaxy-analytics';
 import { basePath } from '@/lib/site';
 import { getDailyEphemeris } from '@/lib/wtfi/daily-ephemeris';
 import { calcFiveSenseProfile } from '@/lib/wtfi/sense-profile';
+import { HermosaInputCard } from '@/components/hermosa/HermosaInputCard';
 
 export default function GalaxyResultClient({ resultId }: { resultId: string }) {
   const [status, setStatus] = useState<'loading' | 'ready' | 'missing'>('loading');
@@ -108,6 +109,14 @@ export default function GalaxyResultClient({ resultId }: { resultId: string }) {
             )}
           </section>
         )}
+        <section style={{ maxWidth: 720, margin: '0 auto', padding: '0 24px 48px' }}>
+          <HermosaInputCard
+            universe="wtfti"
+            slug={session.personalitySlug}
+            personalityName={session.personalitySlug}
+            accent="#C07A8E"
+          />
+        </section>
         <DeepArchiveCta resultId={session.resultId} slug={session.personalitySlug} />
         <GalaxyShareDock session={session} />
       </>
