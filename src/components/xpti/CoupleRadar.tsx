@@ -31,6 +31,7 @@ const mono = '"SF Mono", ui-monospace, "Menlo", monospace';
 const display = '"Cormorant Garamond", "Noto Serif SC", serif';
 
 export function CoupleRadar({ inviter, partner, size = 320 }: Props) {
+  const viewPadding = 34;
   const center = size / 2;
   const radius = size * 0.36;
   const labelR = size * 0.46;
@@ -70,7 +71,13 @@ export function CoupleRadar({ inviter, partner, size = 320 }: Props) {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <svg viewBox={`0 0 ${size} ${size}`} width="100%" style={{ maxWidth: size, height: 'auto' }} role="img" aria-label="双人九维张力雷达对比图">
+        <svg
+          viewBox={`${-viewPadding} ${-viewPadding} ${size + viewPadding * 2} ${size + viewPadding * 2}`}
+          width="100%"
+          style={{ maxWidth: size, height: 'auto', overflow: 'visible' }}
+          role="img"
+          aria-label="双人九维张力雷达对比图"
+        >
           {/* Concentric grid */}
           {[0.33, 0.66, 1].map((level) => {
             const points = dims

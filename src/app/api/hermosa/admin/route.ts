@@ -80,6 +80,7 @@ export async function GET(req: NextRequest) {
   const rows = (data ?? []) as Row[];
   const totalsByTag: Record<HermosaTag, number> = {
     want: 0, feedback: 0, voice: 0, declare: 0, feature: 0, thanks: 0,
+    rant: 0, story: 0, solidarity: 0,
   };
   for (const r of rows) {
     for (const t of r.tags ?? []) {

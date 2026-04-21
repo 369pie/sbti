@@ -13,6 +13,7 @@ import {
 } from '@/lib/mysti/mood';
 import { getDualArchive, type DualPairRecord } from '@/lib/mysti/dual-archive';
 import { getCollectionByUniverse } from '@/lib/mysti/collection';
+import { isUnlocked } from '@/lib/mysti/unlock';
 
 function fmtMonth(yyyymm: string): string {
   const [y, m] = yyyymm.split('-');
@@ -52,6 +53,18 @@ export function MystiMonthlyContent() {
     const d = new Date(y, m - 2, 1); // m-1 当前月，再 -1
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   }, [yyyymm]);
+
+  const nextMonthKey = useMemo(() => {
+    const [y, m] = yyyymm.split('-').map(Number);
+    const d = new Date(y, m, 1); // m-1 当前月，再 +1 = m
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }, [yyyymm]);
+
+  const isCurrentMonth = yyyymm === currentMonthKey();
+  const currentUnlocked = useMemo(() => {
+    if (!hydrated) return false;
+    return isUnlocked('monthly-report', yyyymm);
+  }, [hydrated, yyyymm]);
 
   return (
     <div
@@ -99,7 +112,29 @@ export function MystiMonthlyContent() {
             >
               本月
             </button>
+            {isCurrentMonth && currentUnlocked && (
+              <button
+                onClick={() => setYyyymm(nextMonthKey)}
+                className="px-3 py-1 rounded-full border"
+                style={{
+                  borderColor: theme.accentGold ?? theme.accent,
+                  color: theme.accentGold ?? theme.accent,
+                  background: 'transparent',
+                }}
+                title="提前订下月报告"
+              >
+                ↻ 续订下月
+              </button>
+            )}
           </div>
+          {isCurrentMonth && currentUnlocked && (
+            <p
+              className="mt-2 text-[11px]"
+              style={{ color: theme.textSubtle }}
+            >
+              本月已解锁 ✦ 提前订下月报告，月初第一时间送达
+            </p>
+          )}
         </div>
 
         {!hydrated ? null : (

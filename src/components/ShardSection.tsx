@@ -35,6 +35,11 @@ export default function ShardSection({
 
   const shardState = useShardState(currentUniverse, personalitySlug);
 
+  // `isXpti` kept for API compatibility — visual differentiation is now handled
+  // by the shared editorial paper vocabulary so the section reads as part of
+  // the same museum spread as the rest of the result page.
+  void isXpti;
+
   return (
     <section className="max-w-2xl mx-auto px-6 pb-8 pt-2">
       <motion.div
@@ -42,15 +47,19 @@ export default function ShardSection({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15, duration: 0.5 }}
       >
-        <div
-          className={`rounded-3xl border px-6 py-8 ${
-            isXpti ? 'border-[#A3526E]/20 bg-[#1A0C11]' : 'border-border-subtle bg-bg-secondary/30'
-          }`}
-        >
-          <p className={`text-[11px] font-mono tracking-[0.3em] uppercase text-center mb-1 ${isXpti ? 'text-[#A38A90]' : 'text-text-muted'}`}>
-            Persona Shard
+        <div className="rounded-3xl border border-border-subtle bg-bg-elevated shadow-sm px-6 py-9">
+          <div
+            aria-hidden
+            className="mx-auto mb-5 h-px w-12"
+            style={{ background: 'linear-gradient(90deg, transparent, var(--color-gold-leaf, #C9A676), transparent)' }}
+          />
+          <p
+            className="text-[11px] font-mono tracking-[0.32em] uppercase text-center mb-1.5"
+            style={{ color: 'var(--color-gold, #B8905A)' }}
+          >
+            Persona Shard · 人格碎片
           </p>
-          <p className={`text-xs text-center mb-6 ${isXpti ? 'text-[#A38A90]/70' : 'text-text-muted/70'}`}>
+          <p className="text-xs text-text-secondary text-center mb-6 italic">
             {personalityName} 在这个宇宙的碎片
           </p>
           <PersonaShardOrb
@@ -62,7 +71,7 @@ export default function ShardSection({
           <div className="mt-6 text-center">
             <Link
               href={`/card/shard/?universe=${encodeURIComponent(currentUniverse)}&slug=${encodeURIComponent(personalitySlug)}`}
-              className="inline-flex items-center gap-1.5 text-xs font-medium transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-medium transition-colors hover:brightness-110"
               style={{ color: accent }}
             >
               查看这枚碎片的完整档案

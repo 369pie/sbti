@@ -123,8 +123,10 @@ export default function RootLayout({
       className={`${notoSerifSC.variable} ${notoSansSC.variable} ${cormorant.variable} ${fraunces.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col paper-texture">
-        <script
+        <Script
+          id="root-schema-json"
           type="application/ld+json"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',

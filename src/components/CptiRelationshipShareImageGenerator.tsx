@@ -8,6 +8,8 @@ import {
   getCptiRelationshipTypeImage,
   getCptiRelationshipTypeThumbnailImage,
 } from '@/lib/cpti/relationships';
+import { getRelationshipRarity } from '@/lib/cpti/relationships-rarity';
+import { hashString } from '@/lib/persona-shard/traits';
 import { SHARE_SITE_URL } from '@/lib/site';
 
 export interface CptiRelationshipShareImageGeneratorHandle {
@@ -18,6 +20,21 @@ interface Props {
   relationship: CptiRelationshipType;
   nicknameA?: string;
   nicknameB?: string;
+  /** Optional ids used to derive a stable per-pair edition number on the card. */
+  personalitySlugA?: string;
+  personalitySlugB?: string;
+  /**
+   * When true, renders a "subtle / 含蓄" version: nicknames are replaced with
+   * generic "我和 ta" so the card can be shared in semi-public timelines.
+   */
+  subtle?: boolean;
+  /**
+   * When true, renders the cosign / 双签限定版：金篔双线框 + 双方同时署名 + COSIGN 水印。
+   * Caller is responsible for gating this on isUnlocked('cpti-cosign-edition').
+   */
+  cosign?: boolean;
+  /** Seasonal skin id, e.g. 'qixi-2026'. Caller responsible for unlock gating. */
+  skin?: string;
 }
 
 const CARD_WIDTH = 540;
@@ -126,7 +143,12 @@ function drawImageContain(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
   ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
 }
 
-async function renderCptiRelationshipShareImage(relationship: CptiRelationshipType, nicknameA: string, nicknameB: string) {
+async function renderCptiRelationshipShareImage(
+  relationship: CptiRelationshipType,
+  nicknameA: string,
+  nicknameB: string,
+  opts: { subtle?: boolean; editionSeed?: string; cosign?: boolean; skin?: string } = {},
+) {
   const qrImage = await toQrDataUrl(CPTI_SHARE_URL, {
     width: 200, margin: 1, color: { dark: '#2D2A26', light: '#ffffffff' }, errorCorrectionLevel: 'M',
   }).then(url => getCachedImage(url)).catch(() => null);
@@ -182,7 +204,19 @@ async function renderCptiRelationshipShareImage(relationship: CptiRelationshipTy
   ctx.fillStyle = hexToRgba(ACCENT, 0.85);
   ctx.font = `600 12px ${FONT_MONO}`;
   ctx.fillText('CPTI · 关系鉴定结果', CARD_WIDTH / 2, y);
-  y += 34;
+  y += 20;
+
+  // Edition number + rarity badge (CPTI 2.0)
+  const rarity = getRelationshipRarity(relationship.slug);
+  const seed = (opts.editionSeed && opts.editionSeed.length > 0)
+    ? opts.editionSeed
+    : `${relationship.slug}-${nicknameA}-${nicknameB}`;
+  const edition = (hashString(seed) % 9999) + 1;
+  const editionText = `第 ${String(edition).padStart(4, '0')} 对 · ${rarity.label} · 约 ${rarity.populationPct.toFixed(1)}%`;
+  ctx.fillStyle = LIGHT;
+  ctx.font = `500 10px ${FONT_MONO}`;
+  ctx.fillText(editionText, CARD_WIDTH / 2, y);
+  y += 22;
 
   // Relationship card image (hero)
   const cardW = 360;
@@ -217,7 +251,10 @@ async function renderCptiRelationshipShareImage(relationship: CptiRelationshipTy
   ctx.textAlign = 'center';
   ctx.fillStyle = DARK;
   ctx.font = `600 17px ${FONT_SANS}`;
-  ctx.fillText(`${nicknameA || '朋友'} × ${nicknameB || '你'}`, CARD_WIDTH / 2, y);
+  const displayPair = opts.subtle
+    ? '我和 ta'
+    : `${nicknameA || '朋友'} × ${nicknameB || '你'}`;
+  ctx.fillText(displayPair, CARD_WIDTH / 2, y);
   y += 28;
 
   // Relationship name (subtle, since card already has it baked in)
@@ -293,8 +330,65 @@ async function renderCptiRelationshipShareImage(relationship: CptiRelationshipTy
 
   // Decorative outer frame
   cctx.scale(CARD_SCALE, CARD_SCALE);
-  strokeRoundedRect(cctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 24, hexToRgba(ACCENT, 0.22), 2.5);
-  strokeRoundedRect(cctx, 22, 22, CARD_WIDTH - 44, CARD_HEIGHT - 44, 18, hexToRgba(ACCENT, 0.08), 1);
+  if (opts.cosign) {
+    // Co-sign 限定: 金箔双线框 + COSIGN 双签印章 + 顶部金线 banner
+    const GOLD = '#C9A676';
+    const GOLD_LIGHT = '#E6D29A';
+    strokeRoundedRect(cctx, 12, 12, CARD_WIDTH - 24, CARD_HEIGHT - 24, 26, GOLD, 3.5);
+    strokeRoundedRect(cctx, 20, 20, CARD_WIDTH - 40, CARD_HEIGHT - 40, 20, GOLD_LIGHT, 1.5);
+    strokeRoundedRect(cctx, 28, 28, CARD_WIDTH - 56, CARD_HEIGHT - 56, 14, hexToRgba(GOLD, 0.35), 1);
+    // COSIGN 印章（左上）
+    cctx.save();
+    cctx.translate(48, 48);
+    cctx.rotate(-Math.PI / 14);
+    strokeRoundedRect(cctx, -32, -14, 64, 28, 6, GOLD, 1.6);
+    cctx.fillStyle = GOLD;
+    cctx.font = `700 11px ${FONT_MONO}`;
+    cctx.textAlign = 'center';
+    cctx.textBaseline = 'middle';
+    cctx.fillText('CO·SIGN', 0, 0);
+    cctx.restore();
+    // 双签 footer banner
+    cctx.textAlign = 'center';
+    cctx.textBaseline = 'alphabetic';
+    cctx.fillStyle = GOLD;
+    cctx.font = `600 10px ${FONT_MONO}`;
+    cctx.fillText(`SIGNED BY ${(nicknameA || 'A').slice(0, 8).toUpperCase()}  ✕  ${(nicknameB || 'B').slice(0, 8).toUpperCase()}`, CARD_WIDTH / 2, CARD_HEIGHT - 8);
+  } else {
+    strokeRoundedRect(cctx, 14, 14, CARD_WIDTH - 28, CARD_HEIGHT - 28, 24, hexToRgba(ACCENT, 0.22), 2.5);
+    strokeRoundedRect(cctx, 22, 22, CARD_WIDTH - 44, CARD_HEIGHT - 44, 18, hexToRgba(ACCENT, 0.08), 1);
+  }
+
+  // Seasonal skin overlay (S5.3) — minimal: tinted secondary border + corner seal label
+  if (opts.skin) {
+    try {
+      // dynamic require avoided to keep this fully synchronous; skin defs are pure data
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { getSkinById } = require('@/lib/cpti/seasonal-skins') as typeof import('@/lib/cpti/seasonal-skins');
+      const skin = getSkinById(opts.skin as never);
+      if (skin) {
+        strokeRoundedRect(cctx, 8, 8, CARD_WIDTH - 16, CARD_HEIGHT - 16, 28, hexToRgba(skin.palette.primary, 0.55), 2);
+        // corner seal: rotated rounded badge top-right
+        cctx.save();
+        cctx.translate(CARD_WIDTH - 56, 56);
+        cctx.rotate(Math.PI / 14);
+        cctx.fillStyle = skin.palette.seal;
+        strokeRoundedRect(cctx, -36, -16, 72, 32, 8, skin.palette.primary, 1.5);
+        cctx.fillStyle = skin.palette.primary;
+        cctx.font = `700 11px ${FONT_MONO}`;
+        cctx.textAlign = 'center';
+        cctx.textBaseline = 'middle';
+        cctx.fillText(skin.badge.sealText, 0, 0);
+        cctx.restore();
+        // bottom corner label
+        cctx.fillStyle = hexToRgba(skin.palette.primary, 0.85);
+        cctx.font = `600 9px ${FONT_MONO}`;
+        cctx.textAlign = 'left';
+        cctx.textBaseline = 'alphabetic';
+        cctx.fillText(skin.badge.cornerLabel, 26, CARD_HEIGHT - 8);
+      }
+    } catch { /* skin layer is optional */ }
+  }
 
   // Corner ornaments
   cctx.fillStyle = hexToRgba(ACCENT, 0.40);
@@ -311,7 +405,7 @@ async function renderCptiRelationshipShareImage(relationship: CptiRelationshipTy
 }
 
 export const CptiRelationshipShareImageGenerator = forwardRef<CptiRelationshipShareImageGeneratorHandle, Props>(
-  function CptiRelationshipShareImageGenerator({ relationship, nicknameA = '朋友', nicknameB = '你' }, ref) {
+  function CptiRelationshipShareImageGenerator({ relationship, nicknameA = '朋友', nicknameB = '你', personalitySlugA, personalitySlugB, subtle = false, cosign = false, skin }, ref) {
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
@@ -323,7 +417,10 @@ export const CptiRelationshipShareImageGenerator = forwardRef<CptiRelationshipSh
       setGenerating(true);
       setSaveHint(null);
       try {
-        const dataUrl = await renderCptiRelationshipShareImage(relationship, nicknameA, nicknameB);
+        const editionSeed = personalitySlugA && personalitySlugB
+          ? `${relationship.slug}|${personalitySlugA}|${personalitySlugB}`
+          : `${relationship.slug}|${nicknameA}|${nicknameB}`;
+        const dataUrl = await renderCptiRelationshipShareImage(relationship, nicknameA, nicknameB, { subtle, editionSeed, cosign, skin });
         const finalUrl = await tierCtl.applyOverlay(dataUrl, '#FFF9F2', 'CPTI');
         setPreviewUrl(finalUrl);
       } catch (err) {
@@ -331,7 +428,7 @@ export const CptiRelationshipShareImageGenerator = forwardRef<CptiRelationshipSh
       } finally {
         setGenerating(false);
       }
-    }, [relationship, nicknameA, nicknameB, generating, tierCtl]);
+    }, [relationship, nicknameA, nicknameB, personalitySlugA, personalitySlugB, subtle, cosign, skin, generating, tierCtl]);
 
     const handleQuickDownload = useCallback(async () => {
       if (!previewUrl) {

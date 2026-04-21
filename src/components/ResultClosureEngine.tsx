@@ -130,10 +130,18 @@ export function ResultClosureEngine({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
           >
-            <h2 className={`text-sm font-mono tracking-wider uppercase text-center mb-1 ${isXpti ? 'text-[#A38A90]' : 'text-text-muted'}`}>
-              同一个你，换个宇宙会变成谁？
+            <div
+              aria-hidden
+              className="mx-auto mb-3 h-px w-10"
+              style={{ background: 'linear-gradient(90deg, transparent, var(--color-gold-leaf, #C9A676), transparent)' }}
+            />
+            <h2
+              className="text-[11px] font-mono tracking-[0.32em] uppercase text-center mb-1.5"
+              style={{ color: 'var(--color-gold, #B8905A)' }}
+            >
+              同一个你 · 换个宇宙
             </h2>
-            <p className={`text-xs text-center mb-4 ${isXpti ? 'text-[#A38A90]/60' : 'text-text-muted/60'}`}>
+            <p className="text-xs text-center mb-5 italic text-text-secondary">
               你已经是 {personalityName}，在其他宇宙里呢？
             </p>
             <div className="grid gap-3">
@@ -146,32 +154,40 @@ export function ResultClosureEngine({
                 >
                   <Link
                     href={card.testPath}
-                    className="group flex items-center gap-4 rounded-2xl border p-4 transition-all hover:shadow-md"
+                    className="group flex items-center gap-4 rounded-2xl border bg-bg-elevated p-4 shadow-sm transition-all hover:-translate-y-px hover:shadow-md"
                     style={{
-                      borderColor: isXpti ? `${card.accent}35` : `${card.accent}25`,
-                      background: isXpti ? `linear-gradient(140deg, ${card.accent}10 0%, rgba(26,12,17,0.92) 65%)` : `${card.accent}06`,
+                      borderColor: `${card.accent}33`,
+                      backgroundImage: `linear-gradient(135deg, ${card.accent}08 0%, transparent 60%)`,
                     }}
                   >
                     <div
                       className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                      style={{ background: `${card.accent}12` }}
+                      style={{ background: `${card.accent}14`, border: `1px solid ${card.accent}22` }}
                     >
                       {card.emoji || '✨'}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
-                        className="text-sm font-semibold group-hover:brightness-110 transition-colors"
-                        style={{ color: card.accent }}
+                        className="text-sm font-semibold group-hover:brightness-95 transition-colors"
+                        style={{ color: 'var(--color-text-primary, #1F1A16)' }}
                       >
                         {card.teaser}
                       </p>
-                      <p className="text-xs text-text-muted mt-0.5">
-                        {card.name}
-                        {card.tested && <span className="ml-2 text-green-500">✓ 已测</span>}
+                      <p className="text-xs text-text-secondary mt-0.5 flex items-center gap-2">
+                        <span>{card.name}</span>
+                        {card.tested && (
+                          <span
+                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium"
+                            style={{ background: 'rgba(122, 138, 130, 0.16)', color: 'var(--color-sage, #5B6E6A)' }}
+                          >
+                            ✓ 已测
+                          </span>
+                        )}
                       </p>
                     </div>
                     <svg
-                      className="w-4 h-4 text-text-muted group-hover:translate-x-0.5 transition-transform flex-shrink-0"
+                      className="w-4 h-4 group-hover:translate-x-0.5 transition-transform flex-shrink-0"
+                      style={{ color: card.accent }}
                       fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -192,20 +208,20 @@ export function ResultClosureEngine({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.4 }}
           >
-            <div
-              className={`rounded-2xl border p-5 ${
-                isXpti
-                  ? 'border-[#A3526E]/20 bg-[#1A0C11]'
-                  : 'border-border-subtle bg-bg-secondary/40'
-              }`}
-            >
+            <div className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-5">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-2xl">🃏</span>
+                <span className="text-2xl" aria-hidden>🃏</span>
                 <div className="flex-1">
-                  <p className={`text-sm font-semibold ${isXpti ? 'text-[#F3E8EB]' : 'text-text-primary'}`}>
+                  <p
+                    className="text-[10px] font-mono tracking-[0.32em] uppercase mb-0.5"
+                    style={{ color: 'var(--color-gold, #B8905A)' }}
+                  >
+                    Multiverse Archive
+                  </p>
+                  <p className="text-sm font-semibold text-text-primary">
                     你的多宇宙人格档案
                   </p>
-                  <p className="text-xs text-text-muted">
+                  <p className="text-xs text-text-secondary mt-0.5">
                     已收集 {cardState.lit} / {cardState.total} 个宇宙
                   </p>
                 </div>
@@ -220,24 +236,24 @@ export function ResultClosureEngine({
                 ) : (
                   <Link
                     href="/card/"
-                    className="px-4 py-2 rounded-xl text-xs font-medium text-text-muted border border-border-subtle hover:text-text-primary hover:border-border transition-all"
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-text-secondary border border-border-subtle hover:text-text-primary hover:border-border transition-all"
                   >
                     查看档案 →
                   </Link>
                 )}
               </div>
               {/* Progress bar */}
-              <div className={`h-1.5 rounded-full overflow-hidden ${isXpti ? 'bg-[#3D1A25]/60' : 'bg-bg-tertiary'}`}>
+              <div className="h-1.5 rounded-full overflow-hidden bg-bg-tertiary">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{
                     width: `${Math.max((cardState.lit / cardState.total) * 100, 4)}%`,
-                    background: isXpti ? 'linear-gradient(90deg, #C2485E, #A3526E)' : `linear-gradient(90deg, ${accent}, ${accent}88)`,
+                    background: `linear-gradient(90deg, ${accent}, var(--color-gold-leaf, #C9A676))`,
                   }}
                 />
               </div>
               {cardState.lit < cardState.total && (
-                <p className="text-[11px] text-text-muted mt-2">
+                <p className="text-[11px] text-text-secondary mt-2 italic">
                   再测 {cardState.total - cardState.lit} 个宇宙就能集齐完整人格档案
                 </p>
               )}
@@ -256,33 +272,27 @@ export function ResultClosureEngine({
           <div className="grid grid-cols-2 gap-3">
             <Link
               href="/cpti/"
-              className={`group rounded-2xl border p-4 text-center transition-all hover:shadow-md ${
-                isXpti
-                  ? 'border-[#A3526E]/20 hover:border-[#A3526E]/40 bg-[#1A0C11]'
-                  : 'border-pink-200/40 hover:border-pink-300/60 bg-gradient-to-b from-pink-50/50 to-transparent'
-              }`}
+              className="group rounded-2xl border border-border-subtle bg-bg-elevated p-4 text-center shadow-sm transition-all hover:-translate-y-px hover:shadow-md"
+              style={{ backgroundImage: 'linear-gradient(180deg, rgba(192,122,142,0.10), transparent 70%)' }}
             >
-              <div className="text-2xl mb-2">💕</div>
-              <h3 className={`text-sm font-semibold mb-1 ${isXpti ? 'text-[#F3E8EB]' : 'text-text-primary'}`}>
+              <div className="text-2xl mb-2" aria-hidden>💕</div>
+              <h3 className="text-sm font-semibold mb-1 text-text-primary">
                 测段关系
               </h3>
-              <p className="text-xs text-text-muted leading-relaxed">
+              <p className="text-xs text-text-secondary leading-relaxed">
                 你们的化学反应是什么型？
               </p>
             </Link>
             <Link
               href="/identify/"
-              className={`group rounded-2xl border p-4 text-center transition-all hover:shadow-md ${
-                isXpti
-                  ? 'border-[#A3526E]/20 hover:border-[#A3526E]/40 bg-[#1A0C11]'
-                  : 'border-purple-200/40 hover:border-purple-300/60 bg-gradient-to-b from-purple-50/50 to-transparent'
-              }`}
+              className="group rounded-2xl border border-border-subtle bg-bg-elevated p-4 text-center shadow-sm transition-all hover:-translate-y-px hover:shadow-md"
+              style={{ backgroundImage: 'linear-gradient(180deg, rgba(201,166,118,0.12), transparent 70%)' }}
             >
-              <div className="text-2xl mb-2">🔍</div>
-              <h3 className={`text-sm font-semibold mb-1 ${isXpti ? 'text-[#F3E8EB]' : 'text-text-primary'}`}>
+              <div className="text-2xl mb-2" aria-hidden>🔍</div>
+              <h3 className="text-sm font-semibold mb-1 text-text-primary">
                 鉴定好友
               </h3>
-              <p className="text-xs text-text-muted leading-relaxed">
+              <p className="text-xs text-text-secondary leading-relaxed">
                 偷偷测 ta 是什么人
               </p>
             </Link>

@@ -11,7 +11,7 @@
  * via sessionStorage so a screenshot session feels coherent.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { SoultiPersonalityType } from '@/lib/soulti/personalities';
 import { SoultiPortraitShareCard } from './SoultiPortraitShareCard';
@@ -27,21 +27,26 @@ interface Props {
 const serifFont = "Georgia, 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif";
 const STORAGE_KEY = 'soulti-share-variant';
 
-function defaultVariant(): 'day' | 'night' {
-  if (typeof window === 'undefined') return 'day';
-  const stored = window.sessionStorage.getItem(STORAGE_KEY);
-  if (stored === 'day' || stored === 'night') return stored;
-  const hour = new Date().getHours();
-  return hour >= 22 || hour < 6 ? 'night' : 'day';
-}
-
 export function SoultiShareCardSwitcher({
   personality,
   tearRate,
   daySelfName,
   nightSelfName,
 }: Props) {
-  const [variant, setVariantState] = useState<'day' | 'night'>(() => defaultVariant());
+  // Use 'day' by default for SSR consistency
+  const [variant, setVariantState] = useState<'day' | 'night'>('day');
+
+  useEffect(() => {
+    const stored = window.sessionStorage.getItem(STORAGE_KEY);
+    if (stored === 'day' || stored === 'night') {
+      setVariantState(stored);
+      return;
+    }
+    const hour = new Date().getHours();
+    if (hour >= 22 || hour < 6) {
+      setVariantState('night');
+    }
+  }, []);
 
   const setVariant = (v: 'day' | 'night') => {
     setVariantState(v);

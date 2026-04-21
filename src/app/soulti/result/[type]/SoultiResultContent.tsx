@@ -52,8 +52,14 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
   const [activeMirror, setActiveMirror] = useState<'day' | 'night' | 'dream'>('day');
   const { isAuthenticated } = useAuth();
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const t0 = window.setTimeout(() => setMounted(true), 0);
+    return () => window.clearTimeout(t0);
+  }, []);
+
   const layered = useMemo<SoultiLayeredResult | null>(() => {
-    if (typeof window === 'undefined') return null;
+    if (!mounted || typeof window === 'undefined') return null;
     try {
       const raw = localStorage.getItem('soulti-layered');
       if (!raw) return null;
@@ -62,7 +68,7 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
     } catch {
       return null;
     }
-  }, [personality.slug]);
+  }, [mounted, personality.slug]);
 
   const shareUrl = getSiteUrl(`/soulti/result/${personality.slug}/`);
   const unlockHref = `/auth/login/?next=${encodeURIComponent(`/soulti/result/${personality.slug}/`)}`;

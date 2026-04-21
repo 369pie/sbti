@@ -70,9 +70,10 @@ export function SoultiNightMode() {
 
   // Derive whether night styling is active from props/state — no setState.
   const active = useMemo(() => {
-    if (!now) return false;
-    const auto = isNightHour(now.getHours());
-    return mode === 'on' || (mode === 'auto' && auto);
+    if (mode === 'on') return true;
+    if (mode === 'off') return false;
+    if (!now) return false; // auto mode needs 'now'
+    return isNightHour(now.getHours());
   }, [mode, now]);
 
   // Mirror `active` onto <html> as a side effect (DOM only, no setState)
@@ -87,16 +88,10 @@ export function SoultiNightMode() {
     window.localStorage.setItem(STORAGE_KEY, mode);
   }, [mode]);
 
-  // Don't render banner during SSR / before hydration
-  if (!now) return null;
-  if (bannerHidden) return null;
-
-  // Only show the banner when night hours are active or user already toggled on
   const showBanner = active || mode === 'on';
-  if (!showBanner) return null;
 
-  const hh = now.getHours().toString().padStart(2, '0');
-  const mm = now.getMinutes().toString().padStart(2, '0');
+  const hh = now ? now.getHours().toString().padStart(2, '0') : '00';
+  const mm = now ? now.getMinutes().toString().padStart(2, '0') : '00';
 
   return (
     <>
@@ -127,15 +122,16 @@ export function SoultiNightMode() {
         }
       `}</style>
 
-      <div
-        className="fixed left-1/2 -translate-x-1/2 z-50"
-        style={{
-          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
-          maxWidth: 'calc(100vw - 32px)',
-        }}
-        role="status"
-        aria-live="polite"
-      >
+      {now && !bannerHidden && showBanner && (
+        <div
+          className="fixed left-1/2 -translate-x-1/2 z-50"
+          style={{
+            bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+            maxWidth: 'calc(100vw - 32px)',
+          }}
+          role="status"
+          aria-live="polite"
+        >
         <div
           className="flex items-center gap-3 px-4 py-2.5 rounded-full shadow-lg"
           style={{
@@ -192,6 +188,7 @@ export function SoultiNightMode() {
           </button>
         </div>
       </div>
+      )}
     </>
   );
 }

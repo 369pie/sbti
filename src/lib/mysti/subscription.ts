@@ -144,6 +144,10 @@ export function passCoversSingleSku(sku: string): boolean {
     case 'wtfti-deep-pantheon':
     case 'soulti-deep-mirror':
     case 'cpti-deep-relationship':
+    case 'cpti-codex-pass-yearly':
+    case 'cpti-cosign-edition':
+    case 'cpti-squad-pack':
+    case 'cpti-seasonal-pack':
     case 'xpti-deep-xp':
       return true;
     default:

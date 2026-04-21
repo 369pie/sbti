@@ -58,6 +58,13 @@ export function HerVoiceContent() {
   const [rows, setRows] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [echoed, setEchoed] = useState<Set<string>>(new Set());
+  // Write form state
+  const [writeText, setWriteText] = useState('');
+  const [writeSignature, setWriteSignature] = useState('');
+  const [writeTag, setWriteTag] = useState<HermosaTag | ''>('');
+  const [writeSubmitting, setWriteSubmitting] = useState(false);
+  const [writeError, setWriteError] = useState<string | null>(null);
+  const [writeSuccess, setWriteSuccess] = useState(false);
 
   useEffect(() => {
     setEchoed(loadEchoes());
@@ -108,6 +115,47 @@ export function HerVoiceContent() {
     [echoed],
   );
 
+  const onWriteSubmit = useCallback(async () => {
+    const text = writeText.trim();
+    if (!text || text.length > 180 || writeSubmitting) return;
+    setWriteSubmitting(true);
+    setWriteError(null);
+    setWriteSuccess(false);
+    try {
+      const res = await fetch(getApiPath('/api/hermosa/messages'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          universe: 'meta',
+          text,
+          signature: writeSignature.trim() || undefined,
+          tags: writeTag ? [writeTag] : [],
+        }),
+      });
+      const data = (await res.json()) as { ok: boolean; message?: Message; error?: string };
+      if (!res.ok || !data.ok) {
+        if (data.error === 'rate_limited') {
+          setWriteError('一小时内最多写 3 条，先沉淀一下吧。');
+        } else {
+          setWriteError('提交失败，稍后再试。');
+        }
+        return;
+      }
+      setWriteSuccess(true);
+      setWriteText('');
+      setWriteTag('');
+      // Refresh wall
+      if (data.message) {
+        setRows((prev) => [data.message!, ...prev]);
+      }
+      setTimeout(() => setWriteSuccess(false), 3000);
+    } catch {
+      setWriteError('网络错误，稍后再试。');
+    } finally {
+      setWriteSubmitting(false);
+    }
+  }, [writeText, writeSignature, writeTag, writeSubmitting]);
+
   const featured = useMemo(() => rows.filter((r) => r.is_featured).slice(0, 3), [rows]);
 
   return (
@@ -143,7 +191,7 @@ export function HerVoiceContent() {
               letterSpacing: '0.02em',
             }}
           >
-            她 的 话 墙
+            她 说
           </h1>
           <p
             style={{
@@ -154,10 +202,11 @@ export function HerVoiceContent() {
               opacity: 0.7,
             }}
           >
-            一面只让女性安静说话的涂鸦黑板字报墙。
-            做完任意一个 WTFTI 测试，你都可以在结果页留下一句话；带{' '}
+            一个只让女性安静说话的声音广场。
+            写下你的态度、观点、宣言，被同频的人听见。
+            带{' '}
             <span style={{ color: '#C9A676' }}>#想要</span> /{' '}
-            <span style={{ color: '#C9A676' }}>#体验吐槽</span> 的留言会进入我们公开的{' '}
+            <span style={{ color: '#C9A676' }}>#体验吐槽</span> 的留言会进入公开的{' '}
             <Link href={withBasePath('/her-voice/we-heard-you/')} style={{ color: '#A85A6E' }}>
               「她说我们听见了」看板 →
             </Link>
@@ -234,6 +283,164 @@ export function HerVoiceContent() {
               </Pill>
             ))}
           </FilterRow>
+        </section>
+
+        {/* 写一条 */}
+        <section
+          style={{
+            marginBottom: 36,
+            padding: 24,
+            background: '#15102A',
+            borderRadius: 16,
+            border: '1px solid rgba(201,166,118,0.25)',
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              letterSpacing: '0.42em',
+              color: '#C9A676',
+              marginBottom: 14,
+              textAlign: 'center',
+              fontWeight: 500,
+            }}
+          >
+            写 下 她 说
+          </div>
+          <textarea
+            value={writeText}
+            onChange={(e) => setWriteText(e.target.value.slice(0, 200))}
+            placeholder="一句话，不超过 180 字…"
+            rows={3}
+            maxLength={200}
+            style={{
+              width: '100%',
+              padding: '14px 16px',
+              borderRadius: 12,
+              border: '1px solid rgba(201,166,118,0.30)',
+              background: 'rgba(245,240,232,0.06)',
+              color: '#F5F0E8',
+              fontSize: 15,
+              lineHeight: 1.7,
+              fontFamily: 'inherit',
+              resize: 'vertical',
+              minHeight: 80,
+              outline: 'none',
+              boxSizing: 'border-box',
+            }}
+          />
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              flexWrap: 'wrap',
+              marginTop: 12,
+            }}
+          >
+            {(HERMOSA_TAGS as readonly HermosaTag[]).map((t) => {
+              const active = writeTag === t;
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setWriteTag(active ? '' : t)}
+                  style={{
+                    padding: '5px 12px',
+                    borderRadius: 999,
+                    border: '1px solid ' + (active ? '#C9A676' : 'rgba(201,166,118,0.30)'),
+                    background: active ? '#C9A676' : 'transparent',
+                    color: active ? '#15102A' : '#C9A676',
+                    fontSize: 12,
+                    letterSpacing: '0.18em',
+                    cursor: 'pointer',
+                    transition: 'all 200ms ease',
+                  }}
+                >
+                  # {HERMOSA_TAG_LABELS[t]}
+                </button>
+              );
+            })}
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              gap: 10,
+              alignItems: 'center',
+              marginTop: 12,
+              flexWrap: 'wrap',
+            }}
+          >
+            <input
+              type="text"
+              value={writeSignature}
+              onChange={(e) => setWriteSignature(e.target.value.slice(0, 24))}
+              placeholder="可空 · 匿名昵称"
+              maxLength={24}
+              style={{
+                flex: '1 1 160px',
+                padding: '10px 14px',
+                borderRadius: 8,
+                border: '1px solid rgba(201,166,118,0.30)',
+                background: 'rgba(245,240,232,0.06)',
+                color: '#F5F0E8',
+                fontSize: 13,
+                outline: 'none',
+              }}
+            />
+            <span
+              style={{
+                fontSize: 12,
+                color: 'rgba(245,240,232,0.4)',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {writeText.length}/180
+            </span>
+            <button
+              type="button"
+              onClick={onWriteSubmit}
+              disabled={!writeText.trim() || writeText.length > 180 || writeSubmitting}
+              style={{
+                padding: '10px 26px',
+                borderRadius: 999,
+                border: 'none',
+                background:
+                  writeText.trim() && writeText.length <= 180 && !writeSubmitting
+                    ? '#C9A676'
+                    : 'rgba(201,166,118,0.20)',
+                color:
+                  writeText.trim() && writeText.length <= 180 && !writeSubmitting
+                    ? '#15102A'
+                    : 'rgba(245,240,232,0.4)',
+                fontSize: 13,
+                letterSpacing: '0.24em',
+                fontWeight: 600,
+                cursor:
+                  writeText.trim() && writeText.length <= 180 && !writeSubmitting
+                    ? 'pointer'
+                    : 'not-allowed',
+                transition: 'all 180ms ease',
+              }}
+            >
+              {writeSubmitting ? '抄写中…' : '写下来'}
+            </button>
+          </div>
+          {writeError ? (
+            <div style={{ fontSize: 12, color: '#ff8b9b', marginTop: 10 }}>{writeError}</div>
+          ) : null}
+          {writeSuccess ? (
+            <div
+              style={{
+                fontSize: 12,
+                color: '#C9A676',
+                marginTop: 10,
+                letterSpacing: '0.24em',
+                textAlign: 'center',
+              }}
+            >
+              ✦ 她说已被收藏 ✦
+            </div>
+          ) : null}
         </section>
 
         {/* Featured 编辑甄选 */}
@@ -505,7 +712,11 @@ function EmptyState() {
     >
       <div style={{ fontSize: 14, marginBottom: 12 }}>这里还很安静。</div>
       <div style={{ fontSize: 12, opacity: 0.7 }}>
-        去做一个测试，回到结果页留下你的第一句话 ✦
+        在上面写下你的第一句话，或者{' '}
+        <Link href={withBasePath('/')} style={{ color: '#A85A6E' }}>
+          做一个测试
+        </Link>{' '}
+        从结果页开始 ✦
       </div>
       <Link
         href={withBasePath('/')}

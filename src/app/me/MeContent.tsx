@@ -13,6 +13,8 @@ import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { getApiPath } from '@/lib/api';
 import { getOrCreateCard, saveCard, type WtfCardData } from '@/lib/wtf-card';
 import GrowthTimeline from '@/components/GrowthTimeline';
+import { XptiSummaryCard } from '@/components/me/XptiSummaryCard';
+import { CollectionWall } from '@/components/CollectionWall';
 
 interface MeStats {
   wtfLit: number;
@@ -20,6 +22,11 @@ interface MeStats {
   cptiRelationships: number;
   cptiCollected: number;
   cptiTotal: number;
+}
+
+interface XptiSummaryStats {
+  coupleCount: number;
+  unlockCount: number;
 }
 
 interface CreatorApplicationSummary {
@@ -66,6 +73,7 @@ export function MeContent() {
   const router = useRouter();
   const { user, isAuthenticated, displayName, loading: authLoading } = useAuth();
   const [stats, setStats] = useState<MeStats | null>(null);
+  const [xptiSummary, setXptiSummary] = useState<XptiSummaryStats | null>(null);
   const [profile, setProfile] = useState<{ nickname: string; headline: string; username: string } | null>(null);
   const [creatorApplication, setCreatorApplication] = useState<CreatorApplicationSummary | null>(null);
   const [hasCreatorAccess, setHasCreatorAccess] = useState(false);
@@ -87,9 +95,7 @@ export function MeContent() {
     const syncedCard = summaryData?.assets?.['wtf-card'] ?? null;
     if (syncedCard) {
       saveCard(syncedCard, { skipSync: true });
-    }
-
-    const nextProfile = {
+    }    const nextProfile = {
       nickname: summaryData?.profile?.nickname ?? displayName ?? '',
       headline: summaryData?.profile?.headline ?? '',
       username: summaryData?.profile?.username ?? '',
@@ -107,6 +113,24 @@ export function MeContent() {
     setCreatorApplication(creatorApplicationData?.item ?? null);
     setHasCreatorAccess(Boolean(creatorApplicationData?.creatorAccess?.hasCreator));
     setPageLoading(false);
+
+    // XPTI summary (best-effort, fail silent so card just shows local data)
+    fetch(getApiPath('/me/library'), {
+      credentials: 'include',
+      headers: { Accept: 'application/json' },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j: { summary?: { xpti?: { coupleCount?: number; unlockCount?: number } } } | null) => {
+        if (j?.summary?.xpti) {
+          setXptiSummary({
+            coupleCount: j.summary.xpti.coupleCount ?? 0,
+            unlockCount: j.summary.xpti.unlockCount ?? 0,
+          });
+        }
+      })
+      .catch(() => {
+        /* ignore */
+      });
   }, [displayName]);
 
   useEffect(() => {
@@ -251,6 +275,7 @@ export function MeContent() {
           transition={{ delay: 0.1 }}
           className="grid grid-cols-2 gap-4 mb-8"
         >
+          <XptiSummaryCard remote={xptiSummary ?? undefined} />
           <div className="rounded-2xl border border-border-subtle bg-bg-elevated p-5 text-center">
             <div className="text-2xl font-bold text-text-primary">{stats?.wtfLit ?? 0}</div>
             <div className="text-xs text-text-muted mt-0.5">已点亮宇宙
@@ -273,6 +298,16 @@ export function MeContent() {
               />
             </div>
           </div>
+        </motion.div>
+
+        {/* Collection Wall */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+          className="mb-10"
+        >
+          <CollectionWall />
         </motion.div>
 
         {/* Quick links */}
@@ -322,6 +357,16 @@ export function MeContent() {
               <div className="min-w-0">
                 <div className="text-sm font-medium text-text-primary">灵鉴收藏</div>
                 <div className="text-xs text-text-muted">塔罗卡牌图鉴</div>
+              </div>
+            </Link>
+            <Link
+              href="/me/library/"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl border border-border-subtle bg-bg-elevated hover:border-accent/30 hover:shadow-sm transition-all"
+            >
+              <span className="text-xl">🗂️</span>
+              <div className="min-w-0">
+                <div className="text-sm font-medium text-text-primary">我的解锁库</div>
+                <div className="text-xs text-text-muted">XPTI / SoulTI / CPTI 付费内容</div>
               </div>
             </Link>
             {hasCreatorAccess && (

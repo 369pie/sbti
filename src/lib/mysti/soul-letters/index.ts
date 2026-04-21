@@ -52,6 +52,17 @@ import { drama } from './drama';
 import { emo } from './emo';
 import { loveR } from './love-r';
 import { nerd } from './nerd';
+import { ctrl } from './ctrl';
+import { simp } from './simp';
+import { solo } from './solo';
+import { sleep } from './sleep';
+import { gameR } from './game-r';
+import { drunk } from './drunk';
+import { rebel } from './rebel';
+import { ohNo } from './oh-no';
+import { thinK } from './thin-k';
+import { chill } from './chill';
+import { atmEr } from './atm-er';
 
 const REGISTRY: Record<string, SoulLetter> = {
   boss,
@@ -60,6 +71,17 @@ const REGISTRY: Record<string, SoulLetter> = {
   emo,
   'love-r': loveR,
   nerd,
+  ctrl,
+  simp,
+  solo,
+  sleep,
+  'game-r': gameR,
+  drunk,
+  rebel,
+  'oh-no': ohNo,
+  'thin-k': thinK,
+  chill,
+  'atm-er': atmEr,
 };
 
 export function getSoulLetter(slug: string): SoulLetter | null {

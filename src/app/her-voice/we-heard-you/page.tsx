@@ -96,7 +96,7 @@ export default async function WeHeardYouPage() {
             每一条都标注了 <em>已收到 / 排期中 / 已上线</em>。
             没收到的——是我们还没读到，
             <Link href={withBasePath('/her-voice/')} style={{ color: '#A85A6E' }}>
-              {' '}去她的话墙留言
+              {' '}去她说墙留言
             </Link>。
           </p>
         </header>
@@ -188,7 +188,7 @@ export default async function WeHeardYouPage() {
             <div style={{ fontSize: 12, opacity: 0.75 }}>
               你的话会先出现在
               <Link href={withBasePath('/her-voice/')} style={{ color: '#A85A6E' }}>
-                {' '}「她的话」墙{' '}
+                {' '}「她说」墙{' '}
               </Link>
               ，被我们读到后会移到这里 ✦
             </div>

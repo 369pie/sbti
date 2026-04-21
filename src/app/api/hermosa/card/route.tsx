@@ -29,6 +29,9 @@ const TAG_LABELS: Record<string, string> = {
   declare: '同型号宣言',
   feature: '想要新内容',
   thanks: '感谢',
+  rant: '吐槽宣泄',
+  story: '她的故事',
+  solidarity: '共鸣声援',
 };
 
 const UNIVERSE_LABELS: Record<string, string> = {
@@ -174,7 +177,7 @@ export async function GET(req: NextRequest) {
               fontWeight: 500,
             }}
           >
-            HERMOSA · 她 的 话
+            HERMOSA · 她 说
           </div>
           <div
             style={{

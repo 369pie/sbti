@@ -12,6 +12,9 @@ export const HERMOSA_TAGS = [
   'declare',  // 同型号宣言（说给同人格姐妹的话）
   'feature',  // 想要新内容（新人格 / 新塔罗 / 新文案）
   'thanks',   // 感谢 / 共鸣（情感性，不需要 ticket）
+  'rant',     // 吐槽宣泄（安全的情绪出口）
+  'story',    // 她的故事（个人经历分享）
+  'solidarity', // 共鸣声援（"我也是"、"你不是一个人"）
 ] as const;
 
 export type HermosaTag = (typeof HERMOSA_TAGS)[number];
@@ -23,6 +26,9 @@ export const HERMOSA_TAG_LABELS: Record<HermosaTag, string> = {
   declare: '同型号宣言',
   feature: '想要新内容',
   thanks: '感谢',
+  rant: '吐槽宣泄',
+  story: '她的故事',
+  solidarity: '共鸣声援',
 };
 
 export const HERMOSA_TAG_HINTS: Record<HermosaTag, string> = {
@@ -32,6 +38,9 @@ export const HERMOSA_TAG_HINTS: Record<HermosaTag, string> = {
   declare: '说给同型号姐妹的话',
   feature: '希望出现的塔罗 / 人格 / 文案',
   thanks: '想说的一声谢谢',
+  rant: '安全的情绪出口，尽情说',
+  story: '分享你的故事和经历',
+  solidarity: '告诉她：你不是一个人',
 };
 
 export function isHermosaTag(value: unknown): value is HermosaTag {

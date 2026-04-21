@@ -63,7 +63,6 @@ const RELATIONSHIP_ITEMS = [
 const DISCOVER_ITEMS = [
   { href: '/types/', label: '人设图鉴', emoji: '📖', desc: '全部人格类型一览' },
   { href: '/combo/', label: '人格拼盘', emoji: '🧩', desc: 'SBTI × MBTI × 星座' },
-  { href: '/her-voice/', label: '她的话', emoji: '✦', desc: '女性留言黑板 · 你的声音被听见' },
   { href: '/share-templates/', label: '小红书文案', emoji: '📕', desc: '现成分享模板' },
   { href: '/creator/', label: '创作者中心', emoji: '✨', desc: '做你自己的主题宇宙' },
 ];
@@ -397,6 +396,16 @@ export function Navigation() {
             )}
           </div>
 
+          {/* 她说 standalone link */}
+          <Link
+            href="/her-voice/"
+            prefetch={false}
+            className="nav-link inline-flex items-center gap-1"
+          >
+            <span className="text-sm">✦</span>
+            她说
+          </Link>
+
           {/* 我的 / 用户 */}
           {isAuthenticated ? (
             <div className="relative" ref={userDD.ref}>
@@ -584,6 +593,21 @@ export function Navigation() {
                 ))}
               </div>
             </MobileSection>
+
+            {/* 她说 */}
+            <Link
+              href="/her-voice/"
+              prefetch={false}
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-3 px-4 py-3.5 rounded-2xl border border-[#C9A676]/30 bg-[#15102A] text-[#F5F0E8]"
+            >
+              <span className="text-lg">✦</span>
+              <span className="flex-1">
+                <span className="font-medium text-sm">她说 · Her Voice</span>
+                <span className="block text-xs text-[#C9A676] mt-0.5">女性声音广场 · 你的态度被听见</span>
+              </span>
+              <span className="text-xs text-[#C9A676]">→</span>
+            </Link>
 
             {/* 发现 */}
             <MobileSection title="发现" subtitle="探索更多人格玩法">

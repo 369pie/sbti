@@ -28,7 +28,15 @@ import type { CptiRelationshipShareImageGeneratorHandle } from '@/components/Cpt
 import { ClaimAssetCard } from '@/components/ClaimAssetCard';
 import CptiPairShareCard from '@/components/CptiPairShareCard';
 import { SendAsGiftCTA } from '@/components/SendAsGiftCTA';
+import { trackCptiEvent } from '@/lib/cpti/analytics';
 import { getRelationshipRarity } from '@/lib/cpti/relationships-rarity';
+import {
+  CPTI_SEASONAL_SKINS,
+  getSkinSku,
+  isSkinInWindow,
+  type CptiSeasonalSkinId,
+} from '@/lib/cpti/seasonal-skins';
+import { cptiApi } from '@/lib/cpti/cpti-api';
 import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 
 const emptySubscribe = () => () => {};
@@ -81,6 +89,15 @@ export function CptiRelationshipResult() {
   const [relImageMode, setRelImageMode] = useState<'full' | 'thumb' | 'emoji'>('full');
   const [aImageMode, setAImageMode] = useState<'full' | 'thumb' | 'emoji'>('thumb');
   const [bImageMode, setBImageMode] = useState<'full' | 'thumb' | 'emoji'>('thumb');
+  // CPTI 2.0 — 含蓄分享：隐藏昵称、以“我和 ta”代替，适用同事/前任/死对头场景。
+  const [subtleShare, setSubtleShare] = useState(false);  // CPTI 2.0 — 双签限定卡（金箔双线框 + COSIGN 印章），需 isUnlocked('cpti-cosign-edition')。
+  const [cosignShare, setCosignShare] = useState(false);
+  const [cosignUnlocked, setCosignUnlocked] = useState(false);
+  // CPTI 2.0 S5.3 — 季节限定皮肤
+  const [seasonSkin, setSeasonSkin] = useState<CptiSeasonalSkinId | undefined>(undefined);
+  const [availableSkins, setAvailableSkins] = useState<CptiSeasonalSkinId[]>([]);
+  const [seasonSkinPurchasing, setSeasonSkinPurchasing] = useState<CptiSeasonalSkinId | null>(null);
+  const [seasonSkinError, setSeasonSkinError] = useState<string | null>(null);
   const shareRef = useRef<CptiRelationshipShareImageGeneratorHandle>(null);
   const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, CptiRelationshipShareImageGenerator);
 
@@ -216,7 +233,104 @@ export function CptiRelationshipResult() {
     setCeremonyPhase('done');
   }, []);
 
-  const getReturnLink = useCallback(() => {
+  // CPTI 2.0 — auto-archive this result into the user's Codex. Local stays as
+  // an immediate/offline cache; Supabase mirrors it in the background.
+  useEffect(() => {
+    if (!data) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { archiveCodexRecord, getCodexCount, CODEX_MILESTONES } = await import('@/lib/cpti/codex-archive');
+        const { trackCptiEvent } = await import('@/lib/cpti/analytics');
+        const before = getCodexCount();
+        const rec = archiveCodexRecord({
+          relationshipSlug: data.relationship.slug,
+          personalitySlugA: data.personalitySlugA,
+          personalitySlugB: data.personalitySlugB,
+          partnerNickname: data.nicknameA && data.nicknameA !== '朋友' ? data.nicknameA : undefined,
+          compatibility: data.compatibility,
+        });
+        if (cancelled || !rec) return;
+        void cptiApi.syncCodexRecords([rec]).catch(() => {});
+        const after = getCodexCount();
+        if (after > before) {
+          trackCptiEvent('cpti_codex_record_added', { relationship: data.relationship.slug, value: after });
+          for (const m of CODEX_MILESTONES) {
+            if (after === m) {
+              trackCptiEvent('cpti_codex_milestone_reached', { milestone: m, value: after });
+            }
+          }
+        }
+      } catch { /* archive is best-effort; never block render */ }
+    })();
+    return () => { cancelled = true; };
+  }, [data, fromLink]);
+
+  // CPTI 2.0 — Detect cosign unlock state for this specific relationship.
+  useEffect(() => {
+    if (!data) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const [{ isUnlocked }, { passCoversSingleSku }] = await Promise.all([
+          import('@/lib/mysti/unlock'),
+          import('@/lib/mysti/subscription'),
+        ]);
+        const resourceId = `cpti-cosign:${data.relationship.slug}:${data.personalitySlugA}:${data.personalitySlugB}`;
+        const unlocked = isUnlocked('cpti-cosign-edition', resourceId) || passCoversSingleSku('cpti-cosign-edition');
+        if (!cancelled) setCosignUnlocked(unlocked);
+      } catch { /* best-effort */ }
+    })();
+    return () => { cancelled = true; };
+  }, [data]);
+
+  // CPTI 2.0 S5.3 — Detect available seasonal skins (in window or unlocked).
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { CPTI_SEASONAL_SKINS, isSkinAvailable } = await import('@/lib/cpti/seasonal-skins');
+        const results = await Promise.all(
+          CPTI_SEASONAL_SKINS.map(async s => ((await isSkinAvailable(s.id)) ? s.id : null)),
+        );
+        if (!cancelled) setAvailableSkins(results.filter((x): x is CptiSeasonalSkinId => x !== null));
+      } catch { /* skins are optional */ }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    const requestedSkin = searchParams.get('skin') as CptiSeasonalSkinId | null;
+    if (!requestedSkin) return;
+    if (availableSkins.includes(requestedSkin)) {
+      setSeasonSkin(requestedSkin);
+    }
+  }, [availableSkins, searchParams]);
+
+  // CPTI 2.0 S5.4 — If arrived via ?inv=SENDER, queue a notification back for the inviter.
+  useEffect(() => {
+    if (!data || typeof window === 'undefined') return;
+    const inv = new URLSearchParams(window.location.search).get('inv');
+    if (!inv) return;
+    (async () => {
+      try {
+        await cptiApi.consumeInviteLoopback(inv);
+        const { trackCptiEvent } = await import('@/lib/cpti/analytics');
+        trackCptiEvent('cpti_invite_loopback_queued', { to: inv, relationship: data.relationship.slug });
+      } catch {
+        try {
+          const { queueInviteNotification } = await import('@/lib/cpti/invite-loopback');
+          queueInviteNotification({
+            toSenderId: inv,
+            relationshipSlug: data.relationship.slug,
+            fromNickname: data.nicknameA,
+          });
+        } catch { /* noop */ }
+      }
+    })();
+  }, [data]);
+
+  const getReturnBaseLink = useCallback(() => {
     if (!data) return '';
     return getSiteUrl(`/cpti/relationship/?r=${encodeRelationshipLink({
       relationshipSlug: data.relationship.slug,
@@ -228,13 +342,25 @@ export function CptiRelationshipResult() {
     })}`);
   }, [data]);
 
-  const copyReturnLink = useCallback(() => {
-    const link = getReturnLink();
+  const copyReturnLink = useCallback(async () => {
+    if (!data) return;
+    const base = getReturnBaseLink();
+    let inv: string | null = null;
+    try {
+      const created = await cptiApi.createInviteLoopback({ relationshipSlug: data.relationship.slug });
+      inv = created.shareToken;
+    } catch {
+      try {
+        const mod = await import('@/lib/cpti/invite-loopback');
+        inv = mod.getOrCreateSenderId();
+      } catch { /* noop */ }
+    }
+    const link = inv ? `${base}&inv=${encodeURIComponent(inv)}` : base;
     if (!link) return;
-    navigator.clipboard.writeText(link);
+    await navigator.clipboard.writeText(link);
     setReturnLinkCopied(true);
     setTimeout(() => setReturnLinkCopied(false), 2000);
-  }, [getReturnLink]);
+  }, [data, getReturnBaseLink]);
 
   const copyShareText = useCallback(() => {
     if (!data) return;
@@ -249,6 +375,95 @@ export function CptiRelationshipResult() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }, [shareUrl]);
+
+  const handleUnlockSeasonalSkin = useCallback(async (skinId: CptiSeasonalSkinId) => {
+    setSeasonSkinPurchasing(skinId);
+    setSeasonSkinError(null);
+    try {
+      const [
+        { getPaymentAvailabilityStatus },
+        { getActiveReferralCode },
+        { getOrCreateDeviceId },
+        { recordUnlock },
+        { readApiJson },
+      ] = await Promise.all([
+        import('@/lib/payment/availability'),
+        import('@/lib/mysti/creator-referral'),
+        import('@/lib/mysti/device'),
+        import('@/lib/mysti/unlock'),
+        import('@/lib/api'),
+      ]);
+
+      const availability = getPaymentAvailabilityStatus();
+      if (availability.blocked) {
+        throw new Error(availability.message ?? 'payment_unavailable');
+      }
+
+      const sku = getSkinSku(skinId);
+      const ref = getActiveReferralCode() || undefined;
+      const deviceId = getOrCreateDeviceId() || undefined;
+      const redirect = (() => {
+        const pathname = window.location.pathname;
+        const search = window.location.search;
+        const params = new URLSearchParams(search);
+        params.set('skin', skinId);
+        params.set('unlocked', sku);
+        const next = params.toString();
+        return `${pathname}?${next}`;
+      })();
+
+      trackCptiEvent('cpti_pricing_sku_clicked', { tier: sku, relationship: data?.relationship.slug });
+
+      const res = await fetch('/api/mysti/payment/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sku,
+          resourceId: skinId,
+          paymentType: 'wechat',
+          ref,
+          deviceId,
+          redirect,
+        }),
+      });
+      const payload = await readApiJson<{
+        url?: string;
+        orderId?: string;
+        stub?: boolean;
+        error?: string;
+        message?: string;
+      }>(res);
+      if (!res.ok || !payload.url || !payload.orderId) {
+        throw new Error(payload.message || payload.error || 'create_failed');
+      }
+
+      if (payload.stub) {
+        const verify = await fetch(
+          `/api/mysti/payment/verify?orderId=${encodeURIComponent(payload.orderId)}&stub=1`,
+        );
+        const verified = (await verify.json()) as { paid?: boolean; token?: string };
+        if (verified.paid) {
+          recordUnlock({
+            sku,
+            resourceId: skinId,
+            orderId: payload.orderId,
+            unlockedAt: Date.now(),
+            token: verified.token,
+          });
+          setAvailableSkins((prev) => (prev.includes(skinId) ? prev : [...prev, skinId]));
+          setSeasonSkin(skinId);
+          trackCptiEvent('cpti_seasonal_skin_applied', { skin: skinId, relationship: data?.relationship.slug });
+          return;
+        }
+      }
+
+      window.location.href = payload.url;
+    } catch (error) {
+      setSeasonSkinError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSeasonSkinPurchasing(null);
+    }
+  }, [data?.relationship.slug]);
 
   if (!mounted) {
     return (
@@ -886,10 +1101,137 @@ export function CptiRelationshipResult() {
           </div>
 
           <div className="space-y-3">
+            {/* Subtle Mode toggle (S5.1) */}
+            <label className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border bg-bg-secondary/40 text-xs text-text-secondary cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={subtleShare}
+                onChange={(e) => {
+                  const next = e.target.checked;
+                  setSubtleShare(next);
+                  import('@/lib/cpti/analytics').then(({ trackCptiEvent }) => {
+                    trackCptiEvent('cpti_subtle_share_toggled', { enabled: next, relationship: relationship.slug });
+                  }).catch(() => {});
+                }}
+                className="accent-rose-400"
+              />
+              <span>含蓄模式：隐藏昵称，只显“我和 ta”</span>
+              <span className="ml-auto text-[10px] text-text-muted">适同事/前任/死对头</span>
+            </label>
+            {/* Cosign Mode toggle (S2.3) — pay or pass-covered */}
+            {cosignUnlocked ? (
+              <label className="flex items-center gap-2 px-3 py-2 rounded-xl border border-amber-500/40 bg-amber-500/5 text-xs text-amber-200 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={cosignShare}
+                  onChange={(e) => {
+                    const next = e.target.checked;
+                    setCosignShare(next);
+                    if (next) {
+                      import('@/lib/cpti/analytics').then(({ trackCptiEvent }) => {
+                        trackCptiEvent('cpti_cosign_completed', { relationship: relationship.slug });
+                      }).catch(() => {});
+                    }
+                  }}
+                  className="accent-amber-400"
+                />
+                <span>双签限定卡：金箔双线框 + COSIGN 印章</span>
+                <span className="ml-auto text-[10px] text-amber-300/70">已解锁</span>
+              </label>
+            ) : (
+              <Link
+                href={`/cpti/pricing/?intent=cosign&rel=${relationship.slug}`}
+                onClick={() => {
+                  import('@/lib/cpti/analytics').then(({ trackCptiEvent }) => {
+                    trackCptiEvent('cpti_cosign_invited', { relationship: relationship.slug });
+                  }).catch(() => {});
+                }}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 to-transparent text-xs text-amber-300 hover:bg-amber-500/15 transition-all"
+              >
+                <span>✦</span>
+                <span>解锁双签金箔限定卡</span>
+                <span className="ml-auto font-mono text-amber-200">¥9.9</span>
+              </Link>
+            )}
+            <div className="space-y-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-3 text-xs text-amber-200">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-amber-300">季节限定皮肤</span>
+                {availableSkins.length > 0 && (
+                  <select
+                    value={seasonSkin ?? ''}
+                    onChange={(e) => {
+                      const v = (e.target.value || undefined) as CptiSeasonalSkinId | undefined;
+                      setSeasonSkin(v);
+                      if (v) {
+                        trackCptiEvent('cpti_seasonal_skin_applied', { skin: v, relationship: relationship.slug });
+                      }
+                    }}
+                    className="min-w-[180px] bg-transparent text-amber-200 text-xs outline-none cursor-pointer"
+                  >
+                    <option value="" className="bg-bg-primary text-text-primary">— 不使用皮肤 —</option>
+                    {availableSkins.map((id) => (
+                      <option key={id} value={id} className="bg-bg-primary text-text-primary">
+                        {CPTI_SEASONAL_SKINS.find((skin) => skin.id === id)?.label ?? id}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+              <div className="space-y-2">
+                {CPTI_SEASONAL_SKINS.map((skin) => {
+                  const unlocked = availableSkins.includes(skin.id);
+                  const active = isSkinInWindow(skin);
+                  const selected = seasonSkin === skin.id;
+                  return (
+                    <div
+                      key={skin.id}
+                      className={`flex items-center gap-3 rounded-lg border px-3 py-2 ${selected ? 'border-amber-300/60 bg-amber-400/10' : 'border-amber-500/20 bg-transparent'}`}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 text-[11px] text-amber-100">
+                          <span>{skin.label}</span>
+                          <span className="rounded-full border border-amber-400/30 px-1.5 py-0.5 text-[10px] text-amber-300/80">
+                            {active ? '本期开放' : '窗口外可购买'}
+                          </span>
+                        </div>
+                        <p className="mt-1 line-clamp-2 text-[11px] text-amber-100/70">{skin.tagline}</p>
+                      </div>
+                      {unlocked ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSeasonSkin(skin.id);
+                            trackCptiEvent('cpti_seasonal_skin_applied', { skin: skin.id, relationship: relationship.slug });
+                          }}
+                          className={`rounded-lg px-3 py-1.5 text-[11px] ${selected ? 'bg-amber-300 text-[#2c2620]' : 'border border-amber-400/40 text-amber-200 hover:bg-amber-400/10'}`}
+                        >
+                          {selected ? '使用中' : '使用这套'}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => void handleUnlockSeasonalSkin(skin.id)}
+                          disabled={seasonSkinPurchasing === skin.id}
+                          className="rounded-lg border border-amber-400/40 px-3 py-1.5 text-[11px] text-amber-200 hover:bg-amber-400/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {seasonSkinPurchasing === skin.id ? '创建订单…' : `¥${skin.unlockPrice} 解锁`}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              {seasonSkinError && <p className="text-[11px] text-rose-300">{seasonSkinError}</p>}
+            </div>
             {shareMounted ? <CptiRelationshipShareImageGenerator ref={shareRef}
               relationship={relationship}
               nicknameA={nicknameA}
               nicknameB="你"
+              personalitySlugA={data.personalitySlugA}
+              personalitySlugB={data.personalitySlugB}
+              subtle={subtleShare}
+              cosign={cosignShare && cosignUnlocked}
+              skin={seasonSkin}
             /> : null}
 
             <button

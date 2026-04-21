@@ -1,5 +1,7 @@
 import { enqueueProductEvent } from '@/lib/analytics/product-events';
 
+type AnalyticsPrimitive = string | number | boolean | null;
+
 type MystiEvent =
   | 'mysti_test_start'
   | 'mysti_test_complete'
@@ -29,18 +31,73 @@ type MystiEvent =
   | 'mysti_gift_cta_click'
   | 'mysti_gift_purchase_initiate'
   | 'mysti_gift_purchase_success'
-  | 'mysti_daily_bonus_pull';
+  | 'mysti_daily_bonus_pull'
+  // ── Decision Quick-Card v1 (2026-04-21) ──
+  | 'mysti_decision_entry'
+  | 'mysti_decision_quota_consume'
+  | 'mysti_decision_pick'
+  | 'mysti_decision_share'
+  | 'mysti_decision_archive';
+
+function isAnalyticsPrimitive(value: unknown): value is AnalyticsPrimitive {
+  return value === null || ['string', 'number', 'boolean'].includes(typeof value);
+}
+
+function getNestedProps(properties?: Record<string, unknown>): Record<string, AnalyticsPrimitive> {
+  const raw = properties?.props;
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return {};
+  }
+
+  const next: Record<string, AnalyticsPrimitive> = {};
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (isAnalyticsPrimitive(value)) {
+      next[key] = value;
+    }
+  }
+  return next;
+}
+
+function toVercelPayload(properties?: Record<string, unknown>): Record<string, AnalyticsPrimitive> | undefined {
+  if (!properties) return undefined;
+
+  const next: Record<string, AnalyticsPrimitive> = {};
+
+  for (const [key, value] of Object.entries(properties)) {
+    if (key === 'props') continue;
+    if (isAnalyticsPrimitive(value)) {
+      next[key] = value;
+    }
+  }
+
+  for (const [key, value] of Object.entries(getNestedProps(properties))) {
+    if (!(key in next)) {
+      next[key] = value;
+    }
+  }
+
+  return Object.keys(next).length > 0 ? next : undefined;
+}
 
 export function trackMystiEvent(event: MystiEvent, properties?: Record<string, unknown>) {
-  // Try Vercel Analytics first (client-side only)
-  try {
-    const { track } = require('@vercel/analytics');
-    track(event, properties);
-  } catch {
-    // Fallback: console.log in dev
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[MystiAnalytics] ${event}`, properties);
-    }
+  const vercelPayload = toVercelPayload(properties);
+  const nestedProps = getNestedProps(properties);
+
+  // Try Vercel Analytics first (client-side only) via dynamic import (避免 require)
+  if (typeof window !== 'undefined') {
+    import('@vercel/analytics')
+      .then((mod) => {
+        try {
+          mod.track?.(event, vercelPayload as Parameters<typeof mod.track>[1]);
+        } catch {
+          // ignore analytics failures
+        }
+      })
+      .catch(() => {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[MystiAnalytics] ${event}`, properties);
+        }
+      });
   }
 
   try {
@@ -52,6 +109,7 @@ export function trackMystiEvent(event: MystiEvent, properties?: Record<string, u
       ok: typeof properties?.ok === 'boolean' ? properties.ok : undefined,
       value: typeof properties?.value === 'number' ? properties.value : undefined,
       props: {
+        ...nestedProps,
         sku: typeof properties?.sku === 'string' ? properties.sku : undefined,
         partner: typeof properties?.partner === 'string' ? properties.partner : undefined,
         paymentType: typeof properties?.paymentType === 'string' ? properties.paymentType : undefined,
@@ -73,6 +131,7 @@ function classifyMystiStep(event: MystiEvent): string | undefined {
   if (event.includes('gacha')) return 'gacha';
   if (event.includes('share')) return 'share';
   if (event.includes('daily')) return 'daily';
+  if (event.includes('decision')) return 'decision';
   if (event.endsWith('_test_start')) return 'entry';
   if (event.endsWith('_test_complete')) return 'finish';
   if (event.endsWith('_return_landing')) return 'return_landing';

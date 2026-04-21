@@ -1,4 +1,5 @@
 import type { CptiClaimSource } from './claim';
+import type { CodexRecord, CodexScenarioBucket } from './codex-archive';
 import { getApiPath } from '@/lib/api';
 import { hasBrowserSupabaseSession, tryCreateBrowserSupabaseClient } from '@/lib/supabase/client';
 
@@ -136,6 +137,19 @@ interface CollectionResponse {
   };
 }
 
+interface InviteLoopbackNotificationResponse {
+  notifications: Array<{
+    id: string;
+    relationshipSlug: string;
+    openedAt: string;
+    createdAt: string;
+  }>;
+}
+
+interface CodexResponse {
+  records: CodexRecord[];
+}
+
 function isAuthenticationError(error: unknown): error is Error {
   return error instanceof Error && /authentication required/i.test(error.message);
 }
@@ -225,6 +239,10 @@ export const cptiApi = {
     matchId: string;
     initiatorAnswers: Record<number, number>;
     participantAnswers: Record<number, number>;
+    participantProfile?: {
+      personalitySlug: string;
+      dimensionScores: Array<{ id: string; score: number; level: string }>;
+    };
   }) =>
     apiFetch<CompletedMatchResponse>('/matches/complete', {
       method: 'POST',
@@ -236,6 +254,44 @@ export const cptiApi = {
   getStats: () => apiFetchIfSessionExists<Record<string, unknown>>('/me/stats'),
 
   getRelationships: () => apiFetchIfSessionExists<Record<string, unknown>>('/me/relationships'),
+
+  getCodex: () => apiFetchIfSessionExists<CodexResponse>('/codex'),
+
+  syncCodexRecords: (records: CodexRecord[]) =>
+    apiFetch<CodexResponse>('/codex', {
+      method: 'POST',
+      body: JSON.stringify({ records }),
+    }),
+
+  updateCodexRecord: (id: string, patch: { partnerNickname?: string; note?: string; scenario?: CodexScenarioBucket }) =>
+    apiFetch<{ record: CodexRecord }>(`/codex/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(patch),
+    }),
+
+  deleteCodexRecord: (id: string) =>
+    apiFetch<{ ok: boolean }>(`/codex/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }),
+
+  createInviteLoopback: (data: { relationshipSlug: string }) =>
+    apiFetch<{ shareToken: string }>('/invite-loopbacks', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  consumeInviteLoopback: (shareToken: string) =>
+    apiFetch<{ ok: boolean; ignored: boolean; alreadyOpened: boolean }>(
+      `/invite-loopbacks/${encodeURIComponent(shareToken)}/consume`,
+      { method: 'POST' },
+    ),
+
+  getInviteLoopbacks: () => apiFetchIfSessionExists<InviteLoopbackNotificationResponse>('/invite-loopbacks'),
+
+  markInviteLoopbacksSeen: () =>
+    apiFetch<{ ok: boolean }>('/invite-loopbacks/seen', {
+      method: 'POST',
+    }),
 
   getLeaderboard: (type: string, limit?: number) =>
     apiFetch<Record<string, unknown>>(`/leaderboards?type=${type}&limit=${limit ?? 50}`),

@@ -18,6 +18,10 @@ import {
   updateMystiOrderStatus,
   type MystiOrderAttach,
 } from '@/lib/mysti/payment-store';
+import {
+  markCoupleUnlocked,
+  parseCoupleResourceId,
+} from '@/lib/xpti/couple-server';
 
 function parseAttach(raw: string | undefined): MystiOrderAttach | null {
   if (!raw) return null;
@@ -88,7 +92,7 @@ export async function POST(req: NextRequest) {
   const attach = parseAttach(payload.attach);
 
   try {
-    await markMystiOrderPaid({
+    const order = await markMystiOrderPaid({
       tradeOrderId,
       providerOrderId:
         String(payload.open_order_id ?? '') ||
@@ -100,6 +104,24 @@ export async function POST(req: NextRequest) {
       attach,
       notifyPayload: payload,
     });
+
+    // Phase 1 hook: when an XPTI couple SKU is paid, also flip the couple
+    // record to unlocked so any holder of the share_token sees content.
+    const sku = order.sku as string | null;
+    if (sku === 'xpti-couple-report' || sku === 'xpti-couple-half') {
+      const shareToken = parseCoupleResourceId(order.resource_id);
+      if (shareToken) {
+        try {
+          await markCoupleUnlocked(shareToken, {
+            sku,
+            userId: order.user_id ?? null,
+            deviceId: order.device_id ?? null,
+          });
+        } catch (couplErr) {
+          console.warn('[mysti.payment.notify] couple unlock sync failed', couplErr);
+        }
+      }
+    }
   } catch (error) {
     console.error('[mysti.payment.notify] persist failed', error);
     return new NextResponse('persist_failed', { status: 500 });

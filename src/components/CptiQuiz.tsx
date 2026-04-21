@@ -15,6 +15,7 @@ import { CPTI_MODEL_NAMES, CPTI_MODEL_COLORS } from '@/lib/cpti/dimensions';
 import { basePath } from '@/lib/site';
 import { recordUniverseResult, recordRelationship } from '@/lib/wtf-card';
 import { cptiApi } from '@/lib/cpti/cpti-api';
+import type { CptiPricingIntent } from '@/lib/cpti/pricing-intents';
 import { QuizShell, QuestionTitle, QuizOptions, QuizOption } from '@/components/QuizShell';
 
 /** CPTI 主调：枯玫瑰，与品牌 rose 同根。 */
@@ -41,6 +42,8 @@ interface CptiQuizProps {
   pairCodeId?: string;
   /** Optional inviter nickname for six-digit pair code flow */
   pairPartnerNickname?: string;
+  /** Optional pricing funnel hint to preserve through the solo result redirect */
+  pricingIntent?: Extract<CptiPricingIntent, 'deep' | 'cosign' | 'seasonal'>;
 }
 
 export function CptiQuiz({
@@ -49,6 +52,7 @@ export function CptiQuiz({
   targetNickname,
   pairCodeId,
   pairPartnerNickname,
+  pricingIntent,
 }: CptiQuizProps = {}) {
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
@@ -185,9 +189,12 @@ export function CptiQuiz({
     }
 
     finishTimeoutRef.current = window.setTimeout(() => {
-      window.location.href = `${basePath}/cpti/result/${encodeURIComponent(result.personality.slug)}/`;
+      const params = new URLSearchParams();
+      if (pricingIntent) params.set('intent', pricingIntent);
+      const query = params.toString();
+      window.location.href = `${basePath}/cpti/result/${encodeURIComponent(result.personality.slug)}/${query ? `?${query}` : ''}`;
     }, 800);
-  }, [pairCodeId, pairPartnerNickname, storeRelationshipResult]);
+  }, [pairCodeId, pairPartnerNickname, pricingIntent, storeRelationshipResult]);
 
   // ── Finish: peer-assessment done ──
   const finishPeerTest = useCallback((finalAnswers: Map<number, Answer>) => {

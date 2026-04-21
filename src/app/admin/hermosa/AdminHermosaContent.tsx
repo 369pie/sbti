@@ -126,7 +126,7 @@ export function AdminHermosaContent() {
             HERMOSA · ADMIN
           </div>
           <h1 style={{ fontSize: 32, fontStyle: 'italic', margin: 0 }}>
-            她的话 · 后台看板
+            她说 · 后台看板
           </h1>
           <p style={{ opacity: 0.6, marginTop: 8, fontSize: 14 }}>
             按标签聚合、可标注 已收到 / 排期中 / 已上线 / 精选 / 隐藏，闭环用户共建。

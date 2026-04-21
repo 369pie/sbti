@@ -14,8 +14,12 @@ import type { User } from '@supabase/supabase-js';
 
 interface CompleteMatchBody {
   matchId: string;
-  initiatorAnswers: Record<number, 1 | 2 | 3>;
-  participantAnswers: Record<number, 1 | 2 | 3>;
+  initiatorAnswers?: Record<number, 1 | 2 | 3>;
+  participantAnswers?: Record<number, 1 | 2 | 3>;
+  participantProfile?: {
+    personalitySlug: string;
+    dimensionScores: CptiDimensionScore[];
+  };
 }
 
 interface SnapshotRow {
@@ -32,12 +36,30 @@ export const POST = withAuth(async (
 ) => {
   try {
     const body = await req.json();
-    const { matchId, initiatorAnswers, participantAnswers } = body as CompleteMatchBody;
+    const {
+      matchId,
+      initiatorAnswers: rawInitiatorAnswers,
+      participantAnswers: rawParticipantAnswers,
+      participantProfile: rawParticipantProfile,
+    } = body as CompleteMatchBody;
 
-    if (!matchId || !initiatorAnswers || !participantAnswers) {
+    const initiatorAnswers = rawInitiatorAnswers ?? {};
+    const participantAnswers = rawParticipantAnswers ?? {};
+    const participantProfileInput = rawParticipantProfile;
+
+    if (!matchId) {
       return NextResponse.json(
         {
-          error: 'Missing required fields: matchId, initiatorAnswers, participantAnswers',
+          error: 'Missing required field: matchId',
+        },
+        { status: 400 }
+      );
+    }
+
+    if (Object.keys(participantAnswers).length === 0 && !participantProfileInput) {
+      return NextResponse.json(
+        {
+          error: 'Missing required fields: participantAnswers or participantProfile',
         },
         { status: 400 }
       );
@@ -125,7 +147,30 @@ export const POST = withAuth(async (
       );
     }
 
-    const participantProfile = scoreUser(participantAnswers as Record<number, Answer>);
+    let participantProfile: UserProfile | null = null;
+
+    if (
+      participantProfileInput &&
+      typeof participantProfileInput.personalitySlug === 'string' &&
+      Array.isArray(participantProfileInput.dimensionScores)
+    ) {
+      participantProfile = profileFromSnapshot({
+        personalitySlug: participantProfileInput.personalitySlug,
+        dimensionScores: participantProfileInput.dimensionScores,
+      });
+    }
+
+    if (!participantProfile && Object.keys(participantAnswers).length > 0) {
+      participantProfile = scoreUser(participantAnswers as Record<number, Answer>);
+    }
+
+    if (!participantProfile) {
+      return NextResponse.json(
+        { error: 'Participant profile is invalid. Please retake CPTI test.' },
+        { status: 400 }
+      );
+    }
+
     const result = computeMatchFromProfiles(initiatorProfile, participantProfile);
 
     // Create profile snapshot for participant
@@ -136,7 +181,7 @@ export const POST = withAuth(async (
         source: 'pair_flow',
         personality_slug: result.participantProfile.personality.slug,
         dimension_scores: result.participantProfile.dimensions,
-        raw_answers: participantAnswers,
+        raw_answers: Object.keys(participantAnswers).length > 0 ? participantAnswers : null,
         created_at: new Date().toISOString(),
       })
       .select()

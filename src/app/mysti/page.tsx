@@ -21,6 +21,18 @@ function MystiLandingContent() {
   const [step, setStep] = useState<FlowStep>('invite');
   const [pickedCardIdx, setPickedCardIdx] = useState<number | null>(null);
   const [showSelfPicker, setShowSelfPicker] = useState(false);
+  // 7 张牌的预洗 slug 池（mount 时一次性生成；handler 直接索引读取）
+  const [pickPool] = useState<string[]>(() => {
+    const pool: string[] = [];
+    const used = new Set<number>();
+    while (pool.length < 7) {
+      const i = Math.floor(Math.random() * WTFTI_PERSONALITIES.length);
+      if (used.has(i)) continue;
+      used.add(i);
+      pool.push(WTFTI_PERSONALITIES[i].slug);
+    }
+    return pool;
+  });
 
   const partnerSlug = searchParams.get('slug') || '';
   const refCode = searchParams.get('ref') || '';
@@ -55,8 +67,7 @@ function MystiLandingContent() {
 
   const handleCardPick = (idx: number) => {
     setPickedCardIdx(idx);
-    const slug =
-      WTFTI_PERSONALITIES[(Date.now() + idx * 7) % WTFTI_PERSONALITIES.length].slug;
+    const slug = pickPool[idx % pickPool.length];
     window.setTimeout(() => {
       const url = partnerSlug
         ? `/mysti/result/${slug}?partner=${partnerSlug}&ritual=1`
@@ -272,6 +283,45 @@ function MystiLandingContent() {
           </p>
         </div>
 
+        {/* ── 今日决策 · 90 秒决策快卡 (E1 v1, 2026-04-21) ── */}
+        <Link
+          href="/mysti/decision/"
+          className="block mb-6 rounded-2xl border px-5 py-5 transition-transform hover:-translate-y-0.5"
+          style={{
+            borderColor: theme.accentGold,
+            background: `linear-gradient(135deg, ${theme.cardSurfaceElevated} 0%, ${theme.cardSurface} 100%)`,
+            boxShadow: `0 16px 36px -16px ${theme.cardGlow}`,
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <span
+              className="text-[10px] tracking-[0.42em] uppercase font-bold"
+              style={{ color: theme.accentGold }}
+            >
+              ✦ 今夜决策 · 90 SEC
+            </span>
+            <span
+              className="text-[11px]"
+              style={{ color: theme.accent }}
+            >
+              进入 →
+            </span>
+          </div>
+          <p
+            className="mt-3 text-lg italic leading-snug"
+            style={{ color: theme.text, fontFamily: 'var(--font-display)' }}
+          >
+            今夜赴约？此刻交锋？出门远行？
+          </p>
+          <p
+            className="mt-2 text-xs"
+            style={{ color: theme.textMuted }}
+          >
+            选一个场景 · 抽 3 张牌 · 一句可截屏的暮光金句
+          </p>
+        </Link>
+
+
         {/* 价格锚点卡 — 让用户一眼看到 Mysti 体系的三档定价 */}
         <div
           className="mb-6 rounded-2xl border px-5 py-4 backdrop-blur-md"
@@ -315,12 +365,14 @@ function MystiLandingContent() {
               </div>
             ))}
           </div>
-          <div
-            className="mt-3 pt-3 text-center text-xs italic border-t flex items-center justify-center gap-2"
+          <Link
+            href="/mysti/subscribe/"
+            className="mt-3 pt-3 text-center text-xs italic border-t flex items-center justify-center gap-2 hover:opacity-80 transition-opacity"
             style={{
               color: theme.textMuted,
               borderColor: theme.cardBorder,
               fontFamily: 'var(--font-serif)',
+              textDecoration: 'none',
             }}
           >
             <span
@@ -347,7 +399,7 @@ function MystiLandingContent() {
             >
               通行证 · ¥19/月
             </span>
-          </div>
+          </Link>
         </div>
 
         {/* 合盘回流模式 */}
@@ -539,11 +591,13 @@ function MystiLandingContent() {
         )}
 
         {/* W3/W5/W6 入口 */}
-        <div className="mt-3 grid grid-cols-4 gap-2">
+        <div className="mt-3 grid grid-cols-3 gap-2">
           {[
             { href: '/mysti/archive/', emoji: '📜', label: '关系档案' },
             { href: '/mysti/mood/', emoji: '🌗', label: '今日心情' },
+            { href: '/mysti/seasonal/', emoji: '✦', label: '节气年报' },
             { href: '/mysti/monthly/', emoji: '🌙', label: '灵魂月报' },
+            { href: '/mysti/sigil/', emoji: '✺', label: '年度纪章' },
             { href: '/mysti/gift/', emoji: '🎁', label: '礼品卡' },
           ].map(item => (
             <Link

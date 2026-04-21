@@ -46,7 +46,10 @@ interface Props {
 
 export function CrossTestRecommendations({ currentTest, personalityName, max = 4, variant = 'default' }: Props) {
   const [testedUniverses, setTestedUniverses] = useState<Set<string>>(new Set());
-  const isXpti = variant === 'xpti';
+  // `variant` retained for API compatibility; visual treatment is unified
+  // under the editorial paper vocabulary so cross-test cards always read as
+  // part of the same museum spread, regardless of host universe.
+  void variant;
 
   useEffect(() => {
     const card = loadCard();
@@ -75,9 +78,20 @@ export function CrossTestRecommendations({ currentTest, personalityName, max = 4
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.5 }}
       >
-        <h2 className={`text-sm font-mono tracking-wider uppercase mb-4 ${isXpti ? 'text-[#A38A90]' : 'text-text-muted'}`}>
-          {personalityName ? `${personalityName}，再来一个？` : '不过瘾？再来一个'}
+        <div
+          aria-hidden
+          className="mx-auto mb-3 h-px w-10"
+          style={{ background: 'linear-gradient(90deg, transparent, var(--color-gold-leaf, #C9A676), transparent)' }}
+        />
+        <h2
+          className="text-[11px] font-mono tracking-[0.32em] uppercase text-center mb-1.5"
+          style={{ color: 'var(--color-gold, #B8905A)' }}
+        >
+          Continue · 再来一个
         </h2>
+        <p className="text-xs text-center mb-5 italic text-text-secondary">
+          {personalityName ? `${personalityName}，再来一个？` : '不过瘾？再来一个'}
+        </p>
         <div className="grid grid-cols-2 gap-3">
           {recommendations.map(test => {
             const isTested = test.cardUniverseId ? testedUniverses.has(test.cardUniverseId) : false;
@@ -86,31 +100,40 @@ export function CrossTestRecommendations({ currentTest, personalityName, max = 4
                 key={test.id}
                 href={test.href}
                 prefetch={false}
-                className={`group relative rounded-2xl border transition-all p-4 sm:p-5 ${
-                  isXpti
-                    ? 'border-[#A3526E]/20 hover:border-[#A3526E]/40 bg-[#1A0C11] hover:shadow-md'
-                    : 'border-border-subtle hover:border-border bg-bg-elevated hover:shadow-md'
-                }`}
+                className="group relative rounded-2xl border border-border-subtle bg-bg-elevated p-4 sm:p-5 shadow-sm transition-all hover:-translate-y-px hover:border-border hover:shadow-md"
+                style={{ backgroundImage: `linear-gradient(135deg, ${test.accent}08 0%, transparent 60%)` }}
               >
                 {/* Untested badge — nudge to try */}
                 {test.cardUniverseId && !isTested && (
-                  <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-accent/10 text-accent">
+                  <span
+                    className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[10px] font-semibold tracking-wide"
+                    style={{
+                      background: 'rgba(168, 90, 110, 0.14)',
+                      color: 'var(--color-rose-deep, #A85A6E)',
+                      border: '1px solid rgba(168, 90, 110, 0.28)',
+                    }}
+                  >
                     未解锁
                   </span>
                 )}
                 {/* Tested badge */}
                 {isTested && (
-                  <span className={`absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[10px] font-medium ${
-                    isXpti ? 'bg-[#A3526E]/15 text-[#A38A90]' : 'bg-green-500/10 text-green-500'
-                  }`}>
+                  <span
+                    className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[10px] font-semibold tracking-wide"
+                    style={{
+                      background: 'rgba(91, 110, 106, 0.14)',
+                      color: 'var(--color-gem, #5B6E6A)',
+                      border: '1px solid rgba(91, 110, 106, 0.28)',
+                    }}
+                  >
                     ✓ 已测
                   </span>
                 )}
-                <div className="text-2xl mb-2">{test.emoji}</div>
-                <h3 className={`text-sm font-semibold mb-1 transition-colors ${isXpti ? 'text-[#F3E8EB]' : 'text-text-primary group-hover:text-accent'}`}>
+                <div className="text-2xl mb-2" aria-hidden>{test.emoji}</div>
+                <h3 className="text-sm font-semibold mb-1 text-text-primary transition-colors group-hover:text-accent">
                   {test.title}
                 </h3>
-                <p className="text-xs leading-relaxed text-text-muted">{test.hook}</p>
+                <p className="text-xs leading-relaxed text-text-secondary">{test.hook}</p>
               </Link>
             );
           })}

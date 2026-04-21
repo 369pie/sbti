@@ -51,6 +51,7 @@ export default async function SoultiResultPage({ params }: PageProps) {
     <>
       <script
         type="application/ld+json"
+        suppressHydrationWarning
         dangerouslySetInnerHTML={{ __html: JSON.stringify({
           '@context': 'https://schema.org',
           '@graph': [

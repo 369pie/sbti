@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cptiApi } from '@/lib/cpti/cpti-api';
 import { getCptiPersonalityBySlug } from '@/lib/cpti/personalities';
+import { loadCptiProfile, type CptiProfile } from '@/lib/cpti/cpti-profile';
 import { trackCptiEvent } from '@/lib/cpti/analytics';
+import { recordRelationship } from '@/lib/wtf-card';
 
 const emptySubscribe = () => () => {};
 
@@ -25,8 +27,11 @@ export default function JoinContent() {
   const [digits, setDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [step, setStep] = useState<Step>('input');
   const [resolved, setResolved] = useState<ResolvedPairCode | null>(null);
+  const [profile, setProfile] = useState<CptiProfile | null>(null);
   const [loading, setLoading] = useState(false);
+  const [directMatching, setDirectMatching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resolvedError, setResolvedError] = useState<string | null>(null);
 
   useEffect(() => {
     trackCptiEvent('cpti_join_page_opened');
@@ -93,12 +98,15 @@ export default function JoinContent() {
 
     try {
       const res = await cptiApi.resolvePairCode(code);
+      const localProfile = loadCptiProfile();
       setResolved({
         id: res.id,
         code: res.code,
         inviterNickname: res.inviterNickname,
         inviterPersonalitySlug: res.inviterPersonalitySlug,
       });
+      setProfile(localProfile);
+      setResolvedError(null);
       setStep('resolved');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : '配对码无效或已过期';
@@ -120,11 +128,69 @@ export default function JoinContent() {
     router.push(`/cpti/test?${next.toString()}`);
   }, [resolved, router]);
 
+  const handleDirectMatch = useCallback(async () => {
+    if (!resolved) return;
+    if (!profile || !profile.slug || profile.dimensions.length === 0) {
+      setResolvedError('未检测到可用的 CPTI 历史结果，请重新测试后再配对。');
+      return;
+    }
+
+    setDirectMatching(true);
+    setResolvedError(null);
+
+    try {
+      await cptiApi.bootstrap();
+      const startRes = await cptiApi.startMatch({ pairCodeId: resolved.id });
+      const completeRes = await cptiApi.completeMatch({
+        matchId: startRes.matchId,
+        initiatorAnswers: {},
+        participantAnswers: {},
+        participantProfile: {
+          personalitySlug: profile.slug,
+          dimensionScores: profile.dimensions,
+        },
+      });
+
+      recordRelationship({
+        slug: completeRes.relationship.slug,
+        partnerNickname: resolved.inviterNickname || '对方',
+        mySlug: completeRes.participantProfile.personality.slug,
+        partnerSlug: completeRes.initiatorProfile.personality.slug,
+        compatibility: completeRes.compatibility,
+      });
+
+      try {
+        sessionStorage.setItem('cpti-relationship-backend', JSON.stringify(completeRes));
+        sessionStorage.setItem('cpti-relationship', JSON.stringify({
+          relationship: completeRes.relationship,
+          pairs: [],
+          compatibility: completeRes.compatibility,
+          nicknameA: resolved.inviterNickname || '对方',
+          personalitySlugA: completeRes.initiatorProfile.personality.slug,
+          personalitySlugB: completeRes.participantProfile.personality.slug,
+          dimsA: completeRes.initiatorProfile.dimensions,
+          dimsB: completeRes.participantProfile.dimensions,
+        }));
+      } catch {
+        // ignore storage failures
+      }
+
+      router.push('/cpti/relationship/');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '直接配对失败，请改用重新测试';
+      setResolvedError(message);
+    } finally {
+      setDirectMatching(false);
+    }
+  }, [profile, resolved, router]);
+
   const handleReset = useCallback(() => {
     setDigits(['', '', '', '', '', '']);
     setStep('input');
     setResolved(null);
+    setProfile(null);
     setError(null);
+    setResolvedError(null);
     setTimeout(() => inputRefs.current[0]?.focus(), 50);
   }, []);
 
@@ -141,6 +207,7 @@ export default function JoinContent() {
     const personality = resolved.inviterPersonalitySlug
       ? getCptiPersonalityBySlug(resolved.inviterPersonalitySlug)
       : null;
+    const hasProfile = !!profile?.slug && profile.dimensions.length > 0;
 
     return (
       <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-6">
@@ -166,20 +233,64 @@ export default function JoinContent() {
           </div>
 
           <p className="text-text-secondary text-sm leading-relaxed max-w-xs mx-auto mb-8">
-            你即将完成 CPTI 测试，
-            <br />
-            测试后将为你和对方生成CP关系鉴定卡。
+            {hasProfile ? (
+              '检测到你已有 CPTI 结果，可直接配对或重新测试后再配对。'
+            ) : (
+              <>
+                你即将完成 CPTI 测试，
+                <br />
+                测试后将为你和对方生成CP关系鉴定卡。
+              </>
+            )}
           </p>
 
-          <button
-            onClick={handleStartTest}
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-rose-500 text-white font-medium text-base hover:bg-rose-600 transition-all cursor-pointer"
-          >
-            开始测试
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </button>
+          {hasProfile ? (
+            <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
+              <button
+                onClick={handleDirectMatch}
+                disabled={directMatching}
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-rose-500 text-white font-medium text-base hover:bg-rose-600 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {directMatching ? '配对中...' : '直接配对'}
+              </button>
+              <button
+                onClick={handleStartTest}
+                disabled={directMatching}
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full border border-border-subtle bg-bg-secondary/40 text-text-primary font-medium text-base hover:bg-bg-secondary/60 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                重新测试
+              </button>
+              <p className="text-xs text-text-muted">
+                重新测试会覆盖你当前的 CPTI 画像并用于本次配对。
+              </p>
+            </div>
+          ) : (
+            <button
+              onClick={handleStartTest}
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-rose-500 text-white font-medium text-base hover:bg-rose-600 transition-all cursor-pointer"
+            >
+              开始测试
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+          )}
+
+          <AnimatePresence>
+            {resolvedError && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                className="mt-4"
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-500/20 bg-red-500/5 text-sm text-red-400">
+                  <span>⚠</span>
+                  <span>{resolvedError}</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="mt-8">
             <button

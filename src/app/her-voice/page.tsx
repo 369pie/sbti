@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { HerVoiceContent } from './HerVoiceContent';
 
 export const metadata: Metadata = {
-  title: 'HERMOSA · 她的话 · WTFTI',
+  title: '她说 · HERMOSA · WTFTI',
   description:
     '一面只让女性安静说话的涂鸦黑板字报墙。做完任意 WTFTI 测试，留下一句话，被同型号姐妹读到。',
 };

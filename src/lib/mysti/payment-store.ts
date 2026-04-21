@@ -46,6 +46,7 @@ export interface MystiOrderRow {
   paid_at: string | null;
   verified_at: string | null;
   device_id: string | null;
+  user_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -89,11 +90,20 @@ const LEGACY_ORDER_SKU_FALLBACK: Partial<Record<MystiSku, MystiSku>> = {
   'wtfti-deep-pantheon': 'monthly-report',
   'soulti-deep-mirror': 'monthly-report',
   'cpti-deep-relationship': 'monthly-report',
+  'cpti-codex-pass-yearly': 'monthly-report',
+  'cpti-cosign-edition': 'monthly-report',
+  'cpti-squad-pack': 'monthly-report',
+  'cpti-seasonal-pack': 'monthly-report',
+  'cpti-seasonal-qixi-2026': 'monthly-report',
+  'cpti-seasonal-valentines-2026': 'monthly-report',
+  'cpti-seasonal-lunar-newyear-2026': 'monthly-report',
   'xpti-deep-xp': 'monthly-report',
   'xpti-couple-report': 'monthly-report',
   'xpti-couple-half': 'monthly-report',
   'xpti-archive-yearly': 'monthly-report',
   'wtfcard-collector': 'monthly-report',
+  'decision-pack': 'monthly-report',
+  'sigil-yearly': 'monthly-report',
   'monthly-pass': 'monthly-report',
   'quarterly-pass': 'monthly-report',
   'yearly-pass': 'monthly-report',

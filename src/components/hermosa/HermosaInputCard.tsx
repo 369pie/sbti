@@ -184,41 +184,68 @@ export function HermosaInputCard({
   return (
     <section
       style={{
-        marginTop: 64,
-        padding: '40px 24px',
-        background: 'linear-gradient(180deg, rgba(21,16,42,0.04) 0%, rgba(21,16,42,0.10) 100%)',
-        border: '1px solid rgba(201,166,118,0.30)',
-        borderRadius: 18,
+        margin: '64px auto 0',
+        width: 'min(100% - 32px, 960px)',
+        padding: '44px 28px 36px',
+        background: 'var(--color-bg-elevated, #FFFDF9)',
+        border: '1px solid var(--color-border-subtle, #E3DCD1)',
+        borderRadius: 20,
+        boxShadow: '0 1px 2px rgba(31, 26, 22, 0.04), 0 12px 32px -16px rgba(31, 26, 22, 0.10)',
+        boxSizing: 'border-box',
+        color: 'var(--color-text-primary, #1F1A16)',
       }}
       aria-labelledby="hermosa-input-title"
     >
-      <header style={{ textAlign: 'center', marginBottom: 24 }}>
+      <header style={{ textAlign: 'center', marginBottom: 28 }}>
+        <div
+          aria-hidden
+          style={{
+            margin: '0 auto 14px',
+            height: 1,
+            width: 44,
+            background:
+              'linear-gradient(90deg, transparent, var(--color-gold-leaf, #C9A676), transparent)',
+          }}
+        />
         <div
           style={{
             fontSize: 11,
             letterSpacing: '0.42em',
-            color: accent,
+            color: 'var(--color-gold, #B8905A)',
             marginBottom: 10,
             fontWeight: 500,
+            textTransform: 'uppercase',
           }}
         >
-          HERMOSA · 她 的 话
+          HERMOSA · 她 说
         </div>
         <h2
           id="hermosa-input-title"
           style={{
             margin: 0,
-            fontSize: 22,
+            fontSize: 24,
+            lineHeight: 1.35,
             fontStyle: 'italic',
+            fontWeight: 500,
+            color: 'var(--color-text-primary, #1F1A16)',
             fontFamily: 'var(--font-display, "Noto Serif SC", serif)',
           }}
         >
           {personalityName ? `她想对${personalityName}说什么？` : '她想说点什么？'}
         </h2>
-        <p style={{ marginTop: 8, fontSize: 13, opacity: 0.6, lineHeight: 1.7 }}>
+        <p
+          style={{
+            marginTop: 10,
+            fontSize: 13,
+            lineHeight: 1.7,
+            color: 'var(--color-text-secondary, #5B524B)',
+            maxWidth: 520,
+            marginInline: 'auto',
+          }}
+        >
           一句话写给同型号姐妹、写给产品、写给世界。
-          带 <span style={{ color: accent }}>#想要</span> /{' '}
-          <span style={{ color: accent }}>#体验吐槽</span> 的留言会进入产品方公开看板。
+          带 <span style={{ color: accent, fontWeight: 600 }}>#想要</span> /{' '}
+          <span style={{ color: accent, fontWeight: 600 }}>#体验吐槽</span> 的留言会进入产品方公开看板。
         </p>
       </header>
 
@@ -234,13 +261,14 @@ export function HermosaInputCard({
               width: '100%',
               padding: '14px 16px',
               borderRadius: 12,
-              border: '1px solid rgba(201,166,118,0.35)',
-              background: 'rgba(255,255,255,0.6)',
+              border: '1px solid var(--color-border-subtle, #E3DCD1)',
+              background: 'var(--color-paper-warm, #F5EFE4)',
+              color: 'var(--color-text-primary, #1F1A16)',
               fontSize: 15,
               lineHeight: 1.7,
               fontFamily: 'inherit',
               resize: 'vertical',
-              minHeight: 80,
+              minHeight: 88,
               outline: 'none',
             }}
           />
@@ -255,9 +283,9 @@ export function HermosaInputCard({
                   style={{
                     padding: '6px 14px',
                     borderRadius: 999,
-                    border: '1px solid ' + (active ? accent : 'rgba(201,166,118,0.30)'),
+                    border: '1px solid ' + (active ? accent : 'var(--color-border-subtle, #E3DCD1)'),
                     background: active ? accent : 'transparent',
-                    color: active ? '#15102A' : 'inherit',
+                    color: active ? '#FFFDF9' : 'var(--color-text-secondary, #5B524B)',
                     fontSize: 12,
                     letterSpacing: '0.18em',
                     cursor: 'pointer',
@@ -287,8 +315,9 @@ export function HermosaInputCard({
                 flex: '1 1 160px',
                 padding: '10px 14px',
                 borderRadius: 8,
-                border: '1px solid rgba(201,166,118,0.30)',
-                background: 'rgba(255,255,255,0.6)',
+                border: '1px solid var(--color-border-subtle, #E3DCD1)',
+                background: 'var(--color-paper-warm, #F5EFE4)',
+                color: 'var(--color-text-primary, #1F1A16)',
                 fontSize: 13,
                 outline: 'none',
               }}
@@ -296,7 +325,7 @@ export function HermosaInputCard({
             <span
               style={{
                 fontSize: 12,
-                opacity: 0.55,
+                color: 'var(--color-text-muted, #9A908A)',
                 fontVariantNumeric: 'tabular-nums',
                 marginRight: 'auto',
               }}
@@ -311,19 +340,21 @@ export function HermosaInputCard({
                 padding: '10px 26px',
                 borderRadius: 999,
                 border: 'none',
-                background: valid ? accent : 'rgba(201,166,118,0.35)',
-                color: '#15102A',
+                background: valid ? accent : 'var(--color-bg-tertiary, #ECE5D9)',
+                color: valid ? '#FFFDF9' : 'var(--color-text-muted, #9A908A)',
                 fontSize: 13,
                 letterSpacing: '0.24em',
                 fontWeight: 600,
                 cursor: valid ? 'pointer' : 'not-allowed',
+                boxShadow: valid ? '0 6px 18px -8px rgba(31,26,22,0.30)' : 'none',
+                transition: 'all 180ms ease',
               }}
             >
-              {submitting ? '抄写中…' : '写下她的话'}
+              {submitting ? '抄写中…' : '写下她说'}
             </button>
           </div>
           {err ? (
-            <div style={{ fontSize: 12, color: '#A85A6E' }}>{err}</div>
+            <div style={{ fontSize: 12, color: 'var(--color-rose-deep, #A85A6E)' }}>{err}</div>
           ) : null}
         </div>
       ) : (
@@ -335,8 +366,15 @@ export function HermosaInputCard({
             gap: 16,
           }}
         >
-          <div style={{ fontSize: 13, color: accent, letterSpacing: '0.32em' }}>
-            ✦ 她的话已被收藏 ✦
+          <div
+            style={{
+              fontSize: 13,
+              color: 'var(--color-gold, #B8905A)',
+              letterSpacing: '0.32em',
+              textTransform: 'uppercase',
+            }}
+          >
+            ✦ 她说已被收藏 ✦
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -346,7 +384,7 @@ export function HermosaInputCard({
               width: '100%',
               maxWidth: 360,
               borderRadius: 14,
-              boxShadow: '0 14px 38px rgba(21,16,42,0.20)',
+              boxShadow: '0 14px 38px rgba(31,26,22,0.20)',
             }}
           />
           <div style={{ display: 'flex', gap: 10 }}>
@@ -372,14 +410,14 @@ export function HermosaInputCard({
                 padding: '8px 18px',
                 borderRadius: 999,
                 background: accent,
-                color: '#15102A',
+                color: '#FFFDF9',
                 fontSize: 12,
                 letterSpacing: '0.24em',
                 textDecoration: 'none',
                 fontWeight: 600,
               }}
             >
-              去她的话墙
+              去她说墙
             </Link>
           </div>
         </div>
@@ -388,15 +426,26 @@ export function HermosaInputCard({
       {peers.length > 0 ? (
         <div style={{ marginTop: 32 }}>
           <div
+            aria-hidden
+            style={{
+              margin: '0 auto 12px',
+              height: 1,
+              width: 32,
+              background:
+                'linear-gradient(90deg, transparent, var(--color-gold-leaf, #C9A676), transparent)',
+            }}
+          />
+          <div
             style={{
               fontSize: 11,
               letterSpacing: '0.32em',
-              opacity: 0.55,
+              color: 'var(--color-gold, #B8905A)',
+              textTransform: 'uppercase',
               textAlign: 'center',
               marginBottom: 14,
             }}
           >
-            — 同型号姐妹的话 —
+            同型号姐妹的话
           </div>
           <ul
             style={{
@@ -414,19 +463,29 @@ export function HermosaInputCard({
                 style={{
                   padding: 14,
                   borderRadius: 12,
-                  background: 'rgba(255,255,255,0.5)',
-                  border: '1px solid rgba(201,166,118,0.20)',
+                  background: 'var(--color-paper-warm, #F5EFE4)',
+                  border: '1px solid var(--color-border-subtle, #E3DCD1)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 6,
                 }}
               >
-                <div style={{ fontSize: 14, lineHeight: 1.65, fontStyle: 'italic' }}>「{m.text}」</div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    lineHeight: 1.65,
+                    fontStyle: 'italic',
+                    color: 'var(--color-text-primary, #1F1A16)',
+                    fontFamily: 'var(--font-display, "Noto Serif SC", serif)',
+                  }}
+                >
+                  「{m.text}」
+                </div>
                 <div
                   style={{
                     display: 'flex',
                     fontSize: 11,
-                    opacity: 0.55,
+                    color: 'var(--color-text-muted, #9A908A)',
                     alignItems: 'center',
                     gap: 8,
                   }}
@@ -442,7 +501,7 @@ export function HermosaInputCard({
                       borderRadius: 999,
                       border: '1px solid ' + accent,
                       background: echoed.has(m.id) ? accent : 'transparent',
-                      color: echoed.has(m.id) ? '#15102A' : accent,
+                      color: echoed.has(m.id) ? '#FFFDF9' : accent,
                       fontSize: 11,
                       letterSpacing: '0.18em',
                       cursor: echoed.has(m.id) ? 'default' : 'pointer',

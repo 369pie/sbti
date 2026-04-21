@@ -26,11 +26,21 @@ export type SinglePurchaseSku =
   | 'wtfti-deep-pantheon'      // ¥6.9 WTFTI 深度主神档案
   | 'soulti-deep-mirror'       // ¥9.9 SoulTI 灵魂深镜报告
   | 'cpti-deep-relationship'   // ¥6.9 CPTI 双人关系深档
+  | 'cpti-codex-pass-yearly'   // ¥29 CPTI 关系图鉴年卡 — archive 无限 + 年报 + 重测对比
+  | 'cpti-cosign-edition'      // ¥9.9 CPTI 双签金箔限定卡（单段）
+  | 'cpti-squad-pack'          // ¥39 CPTI 闺蜜组团购（4 人 group 报告 + 组合海报）
+  | 'cpti-seasonal-pack'       // ¥19 CPTI 季节限定皮肤年包
+  | 'cpti-seasonal-qixi-2026'  // ¥9.9 CPTI 七夕限定皮肤
+  | 'cpti-seasonal-valentines-2026' // ¥9.9 CPTI 情人节限定皮肤
+  | 'cpti-seasonal-lunar-newyear-2026' // ¥9.9 CPTI 春节限定皮肤
   | 'xpti-deep-xp'             // ¥4.9 XPTI 亲密偏好深析
   | 'xpti-couple-report'       // ¥12.9 XPTI 关系合并报告（单人全额）
   | 'xpti-couple-half'         // ¥6.9 XPTI 关系合并报告 · 双人各付一半
   | 'xpti-archive-yearly'      // ¥29 XPTI 年度档案（4 次复测对比）
-  | 'wtfcard-collector';       // ¥3.9 WTFCard 多宇宙典藏
+  | 'wtfcard-collector'        // ¥3.9 WTFCard 多宇宙典藏
+  // ── Decision Quick-Card v2 (W4-W5、32026-04-21) ──
+  | 'decision-pack'            // ¥4.9 决策快卡场景包（8 次/30 天 + 高级金句池）
+  | 'sigil-yearly';            // ¥39 Sigil 灵魂印记·年度纪章册
 
 /** 订阅类 */
 export type SubscriptionSku =
@@ -109,11 +119,22 @@ export const SKU_PRICES: Record<MystiSku, { price: number; label: string; taglin
   'wtfti-deep-pantheon': { price: 6.9, label: 'WTFTI 深度主神档案', tagline: '主神三联档 · Sigil 高清 · 月相 30 天封信' },
   'soulti-deep-mirror': { price: 9.9, label: 'SoulTI 灵魂深镜报告', tagline: '轴间交叉解读 · 修复处方 · 灵魂长信' },
   'cpti-deep-relationship': { price: 6.9, label: 'CPTI 双人关系深档', tagline: '8 维雷达 · 30 条共修建议 · 12 月主题' },
+  'cpti-codex-pass-yearly': { price: 29, label: 'CPTI 关系图鉴年卡', tagline: '档案夹无限 · 年度图鉴册 · 90 天重测对比' },
+  'cpti-cosign-edition': { price: 9.9, label: 'CPTI 双签金箔限定卡', tagline: '双方共同署名 · 金箔双线框 · 4K 海报' },
+  'cpti-squad-pack': { price: 39, label: 'CPTI 闺蜜组团购（4 人）', tagline: '4 人 6 段两两关系 · 1 张组合人格画像 · 一年 archive' },
+  'cpti-seasonal-pack': { price: 19, label: 'CPTI 季节限定皮肤年包', tagline: '七夕 / 情人节 / 春节三套皮肤全年解锁' },
+  'cpti-seasonal-qixi-2026': { price: 9.9, label: 'CPTI 七夕限定皮肤', tagline: '鹊桥金箔 · 银河印章 · 七夕角徽' },
+  'cpti-seasonal-valentines-2026': { price: 9.9, label: 'CPTI 情人节限定皮肤', tagline: '玫瑰封蜡 · 签收印章 · Valentine 角徽' },
+  'cpti-seasonal-lunar-newyear-2026': { price: 9.9, label: 'CPTI 春节限定皮肤', tagline: '朱砂福印 · 开年金边 · Lunar 角徽' },
   'xpti-deep-xp': { price: 4.9, label: 'XPTI 亲密偏好深析', tagline: 'XP 雷达 · 6 类配对 · 雷区清单' },
   'xpti-couple-report': { price: 12.9, label: 'XPTI 关系合并报告', tagline: '双人合并雷达 · 6 类张力配对 · 24 句对话脚本 · 单方一次付清' },
   'xpti-couple-half': { price: 6.9, label: 'XPTI 关系报告 · 双人各付一半', tagline: '你付 ¥6.9 · ta 付 ¥6.9 · 任一方报告解锁' },
   'xpti-archive-yearly': { price: 29, label: 'XPTI 年度档案', tagline: '4 次复测 · 张力轨迹图 · 年度 PDF' },
   'wtfcard-collector': { price: 3.9, label: 'WTFCard 多宇宙典藏', tagline: '所有宇宙合并档案 · 高清壁纸 · 印刷级 PDF' },
+
+  // ── Decision Quick-Card v2 · 2026-04-21 ──────────────────
+  'decision-pack': { price: 4.9, label: '决策快卡 · 场景包', tagline: '8 次/30 天 · 解锁全 5 场景 · 高级金句池' },
+  'sigil-yearly': { price: 39, label: 'Sigil 灵魂印记 · 年度纪章册', tagline: '全年 12 章纪章 · 年度 SVG 高清下载 · PDF 收藏卷' },
 
   // ── L2 订阅 / 通行证 ──────────────────────────────────────
   'monthly-pass': { price: 19, label: '灵魂月度通行证', tagline: '每日翻牌 + 全 Plus 分享卡 + 月报' },
@@ -143,11 +164,20 @@ export const SINGLE_PURCHASE_SKUS: SinglePurchaseSku[] = [
   'wtfti-deep-pantheon',
   'soulti-deep-mirror',
   'cpti-deep-relationship',
+  'cpti-codex-pass-yearly',
+  'cpti-cosign-edition',
+  'cpti-squad-pack',
+  'cpti-seasonal-pack',
+  'cpti-seasonal-qixi-2026',
+  'cpti-seasonal-valentines-2026',
+  'cpti-seasonal-lunar-newyear-2026',
   'xpti-deep-xp',
   'xpti-couple-report',
   'xpti-couple-half',
   'xpti-archive-yearly',
   'wtfcard-collector',
+  'decision-pack',
+  'sigil-yearly',
 ];
 
 export const ALL_SKUS: MystiSku[] = [

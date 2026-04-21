@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 
 import Link from 'next/link';
 import NextImage from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 const CptiShareImageGenerator = dynamic(
   () => import('@/components/CptiShareImageGenerator').then((m) => m.CptiShareImageGenerator),
@@ -31,6 +32,28 @@ import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
 import { CptiPairEntryPanel } from '@/components/cpti/CptiPairEntryPanel';
 import { CptiCompatibilityPredictor } from '@/components/cpti/CptiCompatibilityPredictor';
+import { isRelationshipResultIntent, parseCptiPricingIntent } from '@/lib/cpti/pricing-intents';
+
+const RESULT_INTENT_PROMPTS = {
+  deep: {
+    eyebrow: 'Pricing Intent · Deep',
+    title: '你是为关系深档而来的',
+    body: '单人结果只负责告诉你在关系里的角色。真正的深档发生在两个人完成关系测试之后，下一步就在下方发起配对。',
+    cta: '就在下方生成配对链接 →',
+  },
+  cosign: {
+    eyebrow: 'Pricing Intent · Cosign',
+    title: '双签卡会出现在关系结果页',
+    body: '先把这次单人测试变成一段真实关系，再邀请 ta 一起完成关系测试。双签金箔卡会在关系结果页里出现。',
+    cta: '先发起一段关系测试 →',
+  },
+  seasonal: {
+    eyebrow: 'Pricing Intent · Seasonal',
+    title: '季节皮肤也发生在关系结果页',
+    body: '皮肤不是单人身份卡的装饰，而是关系卡的限定外观。先完成一段关系测试，再到关系结果页挑七夕、情人节或春节皮肤。',
+    cta: '先生成关系测试入口 →',
+  },
+} as const;
 
 interface Props {
   personality: CptiPersonalityType;
@@ -38,6 +61,11 @@ interface Props {
 }
 
 export function CptiResultContent({ personality, dimensionScores }: Props) {
+  const searchParams = useSearchParams();
+  const pricingIntent = parseCptiPricingIntent(searchParams.get('intent'));
+  const resultIntentPrompt = isRelationshipResultIntent(pricingIntent)
+    ? RESULT_INTENT_PROMPTS[pricingIntent]
+    : null;
   const [copied, setCopied] = useState(false);
   const [textCopied, setTextCopied] = useState(false);
   const [heroImageMode, setHeroImageMode] = useState<'thumb' | 'medium' | 'full' | 'emoji'>('medium');
@@ -242,9 +270,40 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
         </motion.div>
       </section>
 
+      {resultIntentPrompt && (
+        <section className="max-w-2xl mx-auto px-6 pb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.22, duration: 0.5 }}
+            className="rounded-2xl border border-[#c9a676]/40 bg-[#fffaf2] p-5"
+          >
+            <p className="text-[10px] font-mono uppercase tracking-[0.32em] text-[#8a7355]">
+              {resultIntentPrompt.eyebrow}
+            </p>
+            <h2
+              className="mt-2 text-[24px] leading-[1.2] text-[#2c2620]"
+              style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}
+            >
+              {resultIntentPrompt.title}
+            </h2>
+            <p className="mt-3 text-[14px] leading-[1.8] text-[#6b5b3f]">
+              {resultIntentPrompt.body}
+            </p>
+            <a
+              href="#cpti-pair-entry-panel"
+              className="mt-4 inline-flex items-center rounded-full border border-[#c9a676]/60 px-4 py-2 text-[12.5px] font-medium text-[#6b5b3f] hover:bg-[#c9a676]/10"
+            >
+              {resultIntentPrompt.cta}
+            </a>
+          </motion.div>
+        </section>
+      )}
+
       {/* ★ Pair entry panel — promoted to second screen (Sprint 1, 2026-04-19) */}
       <section className="max-w-2xl mx-auto px-6 pb-12">
         <motion.div
+          id="cpti-pair-entry-panel"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.5 }}
