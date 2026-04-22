@@ -272,12 +272,20 @@ export function CptiRelationshipResult() {
     let cancelled = false;
     (async () => {
       try {
-        const [{ isUnlocked }, { passCoversSingleSku }] = await Promise.all([
+        const [{ isUnlocked }, { isSubscriber, passCoversSingleSku, syncSubscriptionFromServer }, { restoreMystiEntitlement }] = await Promise.all([
           import('@/lib/mysti/unlock'),
           import('@/lib/mysti/subscription'),
+          import('@/lib/mysti/entitlement-restore'),
         ]);
         const resourceId = `cpti-cosign:${data.relationship.slug}:${data.personalitySlugA}:${data.personalitySlugB}`;
-        const unlocked = isUnlocked('cpti-cosign-edition', resourceId) || passCoversSingleSku('cpti-cosign-edition');
+        await syncSubscriptionFromServer({ force: true });
+        const unlocked =
+          isUnlocked('cpti-cosign-edition', resourceId) ||
+          (await restoreMystiEntitlement({
+            sku: 'cpti-cosign-edition',
+            resourceId,
+          })).restored ||
+          (isSubscriber() && passCoversSingleSku('cpti-cosign-edition'));
         if (!cancelled) setCosignUnlocked(unlocked);
       } catch { /* best-effort */ }
     })();

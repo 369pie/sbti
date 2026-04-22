@@ -7,9 +7,14 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { findActiveSubscriptionByDevice } from '@/lib/mysti/payment-store';
+import {
+  ensureSubscriptionFromOrder,
+  findActiveSubscriptionByDevice,
+  findLatestMystiSubscriptionOrderForDevice,
+} from '@/lib/mysti/payment-store';
 import { isMystiPaymentStubMode } from '@/lib/mysti/payment-mode';
 import { hasAnyXunhupayConfig } from '@/lib/payment/xunhupay';
+import { reconcileMystiOrderFromProvider } from '@/lib/mysti/payment-reconcile';
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -26,14 +31,39 @@ export async function GET(req: NextRequest) {
 
   try {
     const sub = await findActiveSubscriptionByDevice(deviceId);
-    if (!sub) {
+    if (sub) {
+      return NextResponse.json({
+        active: true,
+        sku: sub.sku,
+        startsAt: sub.startsAt,
+        expiresAt: sub.expiresAt,
+      });
+    }
+
+    const latestOrder = await findLatestMystiSubscriptionOrderForDevice(deviceId);
+    if (!latestOrder) {
       return NextResponse.json({ active: false });
     }
+
+    const order = await reconcileMystiOrderFromProvider(latestOrder);
+    if (order.status !== 'paid') {
+      return NextResponse.json({
+        active: false,
+        pending: order.status === 'pending',
+        orderStatus: order.status,
+      });
+    }
+
+    const restored = await ensureSubscriptionFromOrder(order);
+    if (!restored || restored.expiresAt <= Date.now()) {
+      return NextResponse.json({ active: false });
+    }
+
     return NextResponse.json({
       active: true,
-      sku: sub.sku,
-      startsAt: sub.startsAt,
-      expiresAt: sub.expiresAt,
+      sku: restored.sku,
+      startsAt: restored.startsAt,
+      expiresAt: restored.expiresAt,
     });
   } catch (error) {
     return NextResponse.json(

@@ -11,7 +11,12 @@ import {
   type CptiSquadMember,
 } from '@/lib/cpti/squad';
 import { isUnlocked } from '@/lib/mysti/unlock';
-import { passCoversSingleSku } from '@/lib/mysti/subscription';
+import {
+  isSubscriber,
+  passCoversSingleSku,
+  syncSubscriptionFromServer,
+} from '@/lib/mysti/subscription';
+import { restoreMystiEntitlement } from '@/lib/mysti/entitlement-restore';
 
 const MIN = 4;
 const MAX = 4;
@@ -73,7 +78,14 @@ export default function CptiSquadClient() {
     let alive = true;
     (async () => {
       try {
-        const ok = (await isUnlocked('cpti-squad-pack', 'cpti-squad')) || (await passCoversSingleSku('cpti-squad-pack'));
+        await syncSubscriptionFromServer({ force: true });
+        const ok =
+          isUnlocked('cpti-squad-pack', 'cpti-squad') ||
+          (await restoreMystiEntitlement({
+            sku: 'cpti-squad-pack',
+            resourceId: 'cpti-squad',
+          })).restored ||
+          (isSubscriber() && passCoversSingleSku('cpti-squad-pack'));
         if (alive) setUnlocked(ok);
       } catch { /* noop */ }
     })();

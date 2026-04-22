@@ -59,6 +59,15 @@ export interface CreatePaymentResult {
   errmsg: string;
 }
 
+export interface QueryPaymentResult {
+  /** OD=paid, WP=pending, CD=cancelled/refunded, RD/UD=refund states. */
+  status: string;
+  openOrderId?: string;
+  totalFee?: number;
+  orderTitle?: string;
+  data: Record<string, unknown>;
+}
+
 /**
  * 虎皮椒 hash 签名规则：
  * 1. 把所有非空参数（除 hash 自身）按 key 升序排序
@@ -359,6 +368,100 @@ export async function createXunhupayOrder(
         orderId: json.oderno ?? json.openid ?? params.tradeOrderId,
         errcode: json.errcode,
         errmsg: json.errmsg,
+      };
+    } catch (error) {
+      const normalized =
+        error instanceof Error
+          ? error.message.startsWith('xunhupay_')
+            ? error
+            : new Error(`xunhupay_request_failed:${error.message}`)
+          : new Error('xunhupay_request_failed');
+
+      lastError = normalized;
+      if (!isRetryableXunhupayError(normalized.message)) {
+        throw normalized;
+      }
+    }
+  }
+
+  throw lastError ?? new Error('xunhupay_request_failed');
+}
+
+export async function queryXunhupayOrder(
+  cfg: XunhupayConfig,
+  params: { tradeOrderId?: string; openOrderId?: string },
+): Promise<QueryPaymentResult> {
+  if (!params.tradeOrderId && !params.openOrderId) {
+    throw new Error('xunhupay_query_missing_order_id');
+  }
+
+  const payload: Record<string, string> = {
+    appid: cfg.appid,
+    time: Math.floor(Date.now() / 1000).toString(),
+    nonce_str: Math.random().toString(36).slice(2, 12),
+  };
+  if (params.tradeOrderId) payload.out_trade_order = params.tradeOrderId;
+  if (!params.tradeOrderId && params.openOrderId) payload.open_order_id = params.openOrderId;
+
+  payload.hash = signXunhupay(payload, cfg.appsecret);
+
+  let lastError: Error | null = null;
+
+  for (const apiBase of buildApiBaseCandidates(cfg.apiBase)) {
+    const endpoint = `${apiBase}/payment/query.html`;
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(payload).toString(),
+      });
+
+      const raw = await res.text();
+
+      if (!res.ok) {
+        throw new Error(`xunhupay_http_${res.status}`);
+      }
+
+      let json: {
+        errcode: number | string;
+        errmsg?: string;
+        data?: Record<string, unknown>;
+      };
+
+      try {
+        json = JSON.parse(raw) as {
+          errcode: number | string;
+          errmsg?: string;
+          data?: Record<string, unknown>;
+        };
+      } catch {
+        throw new Error('xunhupay_invalid_response');
+      }
+
+      if (Number(json.errcode) !== 0 || !json.data) {
+        throw new Error(`xunhupay_query_${json.errcode}_${json.errmsg ?? 'failed'}`);
+      }
+
+      const status = typeof json.data.status === 'string' ? json.data.status : '';
+      if (!status) {
+        throw new Error('xunhupay_query_missing_status');
+      }
+
+      const totalFee = Number(json.data.total_fee);
+
+      return {
+        status,
+        openOrderId:
+          typeof json.data.open_order_id === 'string'
+            ? json.data.open_order_id
+            : undefined,
+        totalFee: Number.isFinite(totalFee) ? totalFee : undefined,
+        orderTitle:
+          typeof json.data.order_title === 'string'
+            ? json.data.order_title
+            : undefined,
+        data: json.data,
       };
     } catch (error) {
       const normalized =

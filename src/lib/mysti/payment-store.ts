@@ -214,7 +214,7 @@ export function getMystiOrderRedirectPath(
   return getAttachObject(order.attach_json)?.redirect ?? order.redirect_path ?? null;
 }
 
-function getMystiOrderDeviceId(
+export function getMystiOrderDeviceId(
   order: Pick<MystiOrderRow, 'device_id' | 'attach_json'>,
 ): string | null {
   return getAttachObject(order.attach_json)?.deviceId ?? order.device_id ?? null;
@@ -365,6 +365,149 @@ export async function findMystiOrder(orderId: string): Promise<MystiOrderRow | n
     throw new Error(`mysti_order_lookup_failed:${providerError.message}`);
   }
   return (byProvider as MystiOrderRow | null) ?? null;
+}
+
+export async function findLatestMystiOrderForEntitlement(input: {
+  deviceId: string;
+  sku: MystiSku;
+  resourceId: string;
+}): Promise<MystiOrderRow | null> {
+  const client = admin();
+  const statuses: MystiOrderStatus[] = ['paid', 'pending'];
+  const matches = (rows: MystiOrderRow[] | null | undefined) =>
+    (rows ?? []).find(
+      (row) =>
+        getMystiOrderSku(row) === input.sku &&
+        getMystiOrderDeviceId(row) === input.deviceId &&
+        row.resource_id === input.resourceId,
+    ) ?? null;
+
+  const { data: directRows, error: directError } = await client
+    .from('mysti_orders')
+    .select('*')
+    .eq('device_id', input.deviceId)
+    .eq('resource_id', input.resourceId)
+    .in('status', statuses)
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  if (!directError) {
+    const directMatch = matches(directRows as MystiOrderRow[] | null);
+    if (directMatch) return directMatch;
+  } else if (!isMissingColumnError(directError, 'device_id')) {
+    throw new Error(`mysti_order_entitlement_lookup_failed:${directError.message}`);
+  }
+
+  const { data: fallbackRows, error: fallbackError } = await client
+    .from('mysti_orders')
+    .select('*')
+    .eq('resource_id', input.resourceId)
+    .in('status', statuses)
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  if (fallbackError) {
+    throw new Error(`mysti_order_entitlement_lookup_failed:${fallbackError.message}`);
+  }
+
+  return matches(fallbackRows as MystiOrderRow[] | null);
+}
+
+const GIFT_ORDER_SKUS = new Set<MystiSku>([
+  'gift-card',
+  'festival-gift-card',
+  'besties-bundle',
+]);
+
+export async function findLatestMystiGiftOrderForDevice(
+  deviceId: string,
+): Promise<MystiOrderRow | null> {
+  const client = admin();
+  const statuses: MystiOrderStatus[] = ['paid', 'pending'];
+  const matches = (rows: MystiOrderRow[] | null | undefined) =>
+    (rows ?? []).find(
+      (row) =>
+        GIFT_ORDER_SKUS.has(getMystiOrderSku(row)) &&
+        getMystiOrderDeviceId(row) === deviceId,
+    ) ?? null;
+
+  const { data: directRows, error: directError } = await client
+    .from('mysti_orders')
+    .select('*')
+    .eq('device_id', deviceId)
+    .in('status', statuses)
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  if (!directError) {
+    const directMatch = matches(directRows as MystiOrderRow[] | null);
+    if (directMatch) return directMatch;
+  } else if (!isMissingColumnError(directError, 'device_id')) {
+    throw new Error(`mysti_gift_order_lookup_failed:${directError.message}`);
+  }
+
+  const { data: fallbackRows, error: fallbackError } = await client
+    .from('mysti_orders')
+    .select('*')
+    .like('resource_id', 'gift-%')
+    .in('status', statuses)
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  if (fallbackError) {
+    throw new Error(`mysti_gift_order_lookup_failed:${fallbackError.message}`);
+  }
+
+  return matches(fallbackRows as MystiOrderRow[] | null);
+}
+
+const SUBSCRIPTION_ORDER_SKUS = new Set<MystiSku>([
+  'monthly-pass',
+  'quarterly-pass',
+  'yearly-pass',
+  'creator-pass',
+]);
+
+export async function findLatestMystiSubscriptionOrderForDevice(
+  deviceId: string,
+): Promise<MystiOrderRow | null> {
+  const client = admin();
+  const statuses: MystiOrderStatus[] = ['paid', 'pending'];
+  const matches = (rows: MystiOrderRow[] | null | undefined) =>
+    (rows ?? []).find(
+      (row) =>
+        SUBSCRIPTION_ORDER_SKUS.has(getMystiOrderSku(row)) &&
+        getMystiOrderDeviceId(row) === deviceId,
+    ) ?? null;
+
+  const { data: directRows, error: directError } = await client
+    .from('mysti_orders')
+    .select('*')
+    .eq('device_id', deviceId)
+    .in('status', statuses)
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  if (!directError) {
+    const directMatch = matches(directRows as MystiOrderRow[] | null);
+    if (directMatch) return directMatch;
+  } else if (!isMissingColumnError(directError, 'device_id')) {
+    throw new Error(`mysti_subscription_order_lookup_failed:${directError.message}`);
+  }
+
+  const { data: fallbackRows, error: fallbackError } = await client
+    .from('mysti_orders')
+    .select('*')
+    .eq('resource_id', 'subscription')
+    .in('status', statuses)
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  if (fallbackError) {
+    throw new Error(`mysti_subscription_order_lookup_failed:${fallbackError.message}`);
+  }
+
+  return matches(fallbackRows as MystiOrderRow[] | null);
 }
 
 export async function markMystiOrderPaid(args: {

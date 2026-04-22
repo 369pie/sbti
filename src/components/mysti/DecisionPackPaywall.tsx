@@ -23,6 +23,7 @@ import { getActiveReferralCode } from '@/lib/mysti/creator-referral';
 import { getOrCreateDeviceId } from '@/lib/mysti/device';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 import { readApiJson } from '@/lib/api';
+import { restoreMystiEntitlement } from '@/lib/mysti/entitlement-restore';
 
 interface Props {
   /** 解锁后回调（父组件用来刷新配额状态） */
@@ -49,6 +50,34 @@ export function DecisionPackPaywall({
   const [error, setError] = useState<string | null>(null);
   const [paymentType, setPaymentType] = useState<'wechat' | 'alipay'>('wechat');
   const initiatedRef = useRef(false);
+
+  useEffect(() => {
+    if (unlocked) return;
+    let cancelled = false;
+
+    const restore = async () => {
+      try {
+        const result = await restoreMystiEntitlement({ sku: SKU, resourceId });
+        if (cancelled || !result.restored) return;
+        setUnlocked(true);
+        onUnlocked?.();
+        trackMystiEvent('mysti_paywall_success', {
+          sku: SKU,
+          resourceId,
+          brand: 'mysti',
+          source: 'restore',
+        });
+      } catch {
+        // noop
+      }
+    };
+
+    void restore();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [unlocked, resourceId, onUnlocked]);
 
   useEffect(() => {
     if (unlocked) return;

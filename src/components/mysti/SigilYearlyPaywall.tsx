@@ -18,6 +18,7 @@ import { getActiveReferralCode } from '@/lib/mysti/creator-referral';
 import { getOrCreateDeviceId } from '@/lib/mysti/device';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 import { readApiJson } from '@/lib/api';
+import { restoreMystiEntitlement } from '@/lib/mysti/entitlement-restore';
 
 const SKU = 'sigil-yearly' as const;
 
@@ -31,6 +32,33 @@ export function SigilYearlyPaywall({ resourceId = 'yearly' }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [paymentType, setPaymentType] = useState<'wechat' | 'alipay'>('wechat');
+
+  useEffect(() => {
+    if (unlocked) return;
+    let cancelled = false;
+
+    const restore = async () => {
+      try {
+        const result = await restoreMystiEntitlement({ sku: SKU, resourceId });
+        if (cancelled || !result.restored) return;
+        setUnlocked(true);
+        trackMystiEvent('mysti_paywall_success', {
+          sku: SKU,
+          resourceId,
+          brand: 'mysti',
+          source: 'restore',
+        });
+      } catch {
+        // noop
+      }
+    };
+
+    void restore();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [unlocked, resourceId]);
 
   useEffect(() => {
     if (unlocked) return;

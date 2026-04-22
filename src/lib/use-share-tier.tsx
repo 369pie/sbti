@@ -13,7 +13,7 @@
  * 通常带上 universe 前缀避免跨宇宙串号，例如 `wtfti:sage-cat`。
  */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   SHARE_CARD_TIERS,
   SHARE_CARD_TIER_LABEL,
@@ -22,6 +22,13 @@ import {
 import { isUnlocked, SKU_PRICES, type MystiSku } from '@/lib/mysti/unlock';
 import { readApiJson } from '@/lib/api';
 import { getPaymentAvailabilityStatus } from '@/lib/payment/availability';
+import { getOrCreateDeviceId } from '@/lib/mysti/device';
+import { restoreMystiEntitlement } from '@/lib/mysti/entitlement-restore';
+import {
+  isSubscriber,
+  passCoversSingleSku,
+  syncSubscriptionFromServer,
+} from '@/lib/mysti/subscription';
 
 const TIER_TO_SKU: Record<Exclude<ShareCardTier, 'free'>, MystiSku> = {
   plus: 'share-plus',
@@ -64,12 +71,49 @@ export function useShareTier({
   defaultTier = 'free',
 }: UseShareTierOptions): UseShareTierResult {
   const [tier, setTier] = useState<ShareCardTier>(defaultTier);
+  const [entitlementVersion, setEntitlementVersion] = useState(0);
 
   const tierUnlocked = useCallback(
-    (t: ShareCardTier) =>
-      t === 'free' || isUnlocked(TIER_TO_SKU[t as 'plus' | 'atelier'], resourceId),
-    [resourceId],
+    (t: ShareCardTier) => {
+      void entitlementVersion;
+      if (t === 'free') return true;
+      const sku = TIER_TO_SKU[t as 'plus' | 'atelier'];
+      return (
+        isUnlocked(sku, resourceId) ||
+        (isSubscriber() && passCoversSingleSku(sku))
+      );
+    },
+    [resourceId, entitlementVersion],
   );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const restore = async () => {
+      for (const sku of Object.values(TIER_TO_SKU)) {
+        if (cancelled || isUnlocked(sku, resourceId)) continue;
+        try {
+          const result = await restoreMystiEntitlement({ sku, resourceId });
+          if (!cancelled && result.restored) {
+            setEntitlementVersion(v => v + 1);
+          }
+        } catch {
+          // Share-card restore is best-effort; explicit purchase stays available.
+        }
+      }
+    };
+
+    void restore();
+    syncSubscriptionFromServer({ force: true })
+      .then((sub) => {
+        if (!cancelled && sub) setEntitlementVersion(v => v + 1);
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, [resourceId]);
 
   const ensurePaid = useCallback(async (): Promise<boolean> => {
     if (tier === 'free' || tierUnlocked(tier)) return false;
@@ -84,6 +128,7 @@ export function useShareTier({
 
     const sku = TIER_TO_SKU[tier as 'plus' | 'atelier'];
     try {
+      const deviceId = getOrCreateDeviceId() || undefined;
       const res = await fetch('/api/mysti/payment/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -91,6 +136,7 @@ export function useShareTier({
           sku,
           resourceId,
           paymentType: 'wechat',
+          deviceId,
           redirect: typeof window !== 'undefined' ? window.location.pathname : '/',
         }),
       });

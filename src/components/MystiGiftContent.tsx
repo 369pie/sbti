@@ -45,10 +45,38 @@ export function MystiGiftContent() {
       setHydrated(true);
     });
 
+    const restoreGift = async () => {
+      try {
+        const deviceId = getOrCreateDeviceId() || undefined;
+        if (!deviceId) return;
+        const response = await fetch('/api/mysti/gift-card/restore', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deviceId }),
+        });
+        const data = await readApiJson<{
+          restored?: boolean;
+          card?: GiftCard;
+        }>(response);
+        if (cancelled || !response.ok || !data.restored || !data.card) return;
+        const alreadyLocal = getGiftCardByCode(data.card.code);
+        upsertGiftCard(data.card);
+        setCards(getGiftCards());
+        if (!alreadyLocal && !issuedCode) {
+          setIssuedCard(data.card);
+          setTab('mine');
+        }
+      } catch {
+        // Restore is best-effort; purchase and code lookup remain available.
+      }
+    };
+
+    void restoreGift();
+
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [issuedCode]);
 
   useEffect(() => {
     if (!issuedCode) return;

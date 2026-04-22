@@ -17,7 +17,22 @@ import {
   getMystiOrderSku,
   markMystiOrderVerified,
 } from '@/lib/mysti/payment-store';
+import { reconcileMystiOrderFromProvider } from '@/lib/mysti/payment-reconcile';
 import { maybeCleanup, rateLimit, resolveRateLimitKey } from '@/lib/perf/rate-limit';
+
+function shouldProbeProvider(req: NextRequest, orderId: string): boolean {
+  const rawAttempt = req.nextUrl.searchParams.get('attempt');
+  const attempt = rawAttempt ? Number(rawAttempt) : 0;
+  if (Number.isFinite(attempt) && attempt > 0 && attempt % 4 !== 0) {
+    return false;
+  }
+
+  const probeLimit = rateLimit(`mysti:verify-provider:${orderId}`, {
+    limit: 1,
+    windowMs: 5_000,
+  });
+  return probeLimit.allowed;
+}
 
 export async function GET(req: NextRequest) {
   // Verify is hit on every payment-return. Limit to 30 polls per IP per
@@ -74,7 +89,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const order = await findMystiOrder(orderId);
+    let order = await findMystiOrder(orderId);
     if (!order) {
       return NextResponse.json({
         paid: false,
@@ -82,6 +97,10 @@ export async function GET(req: NextRequest) {
         orderId,
         stub: false,
       });
+    }
+
+    if (shouldProbeProvider(req, order.trade_order_id)) {
+      order = await reconcileMystiOrderFromProvider(order);
     }
 
     if (order.status !== 'paid') {
@@ -97,7 +116,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    await markMystiOrderVerified(orderId);
+    await markMystiOrderVerified(order.trade_order_id);
     const giftCard = await ensureGiftCardIssued(order);
     const subscription = await ensureSubscriptionFromOrder(order);
 

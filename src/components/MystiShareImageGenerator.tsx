@@ -12,6 +12,13 @@ import { getDualInterpretation } from '@/lib/mysti/dual-interpretation';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 import { readApiJson } from '@/lib/api';
 import { getPaymentAvailabilityStatus } from '@/lib/payment/availability';
+import { getOrCreateDeviceId } from '@/lib/mysti/device';
+import { restoreMystiEntitlement } from '@/lib/mysti/entitlement-restore';
+import {
+  isSubscriber,
+  passCoversSingleSku,
+  syncSubscriptionFromServer,
+} from '@/lib/mysti/subscription';
 import {
   SHARE_CARD_TIERS,
   SHARE_CARD_TIER_LABEL,
@@ -818,6 +825,7 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
     const [generating, setGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [saveHint, setSaveHint] = useState<string | null>(null);
+    const [entitlementVersion, setEntitlementVersion] = useState(0);
     const [tier, setTier] = useState<ShareCardTier>(() => {
       // 启动时如果用户已经解锁更高档位（例如刚支付完跳回），直接置顶到最高已解锁档位
       if (typeof window === 'undefined') return defaultTier;
@@ -832,9 +840,46 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
     const resourceId = partner ? `${personality.slug}-${partner.slug}` : personality.slug;
 
     const tierUnlocked = useCallback(
-      (t: ShareCardTier) => t === 'free' || isUnlocked(TIER_TO_SKU[t as 'plus' | 'atelier'], resourceId),
-      [resourceId],
+      (t: ShareCardTier) => {
+        void entitlementVersion;
+        if (t === 'free') return true;
+        const sku = TIER_TO_SKU[t as 'plus' | 'atelier'];
+        return (
+          isUnlocked(sku, resourceId) ||
+          (isSubscriber() && passCoversSingleSku(sku))
+        );
+      },
+      [resourceId, entitlementVersion],
     );
+
+    useEffect(() => {
+      let cancelled = false;
+
+      const restore = async () => {
+        for (const sku of Object.values(TIER_TO_SKU)) {
+          if (cancelled || isUnlocked(sku, resourceId)) continue;
+          try {
+            const result = await restoreMystiEntitlement({ sku, resourceId });
+            if (!cancelled && result.restored) {
+              setEntitlementVersion(v => v + 1);
+            }
+          } catch {
+            // Best-effort; paid tier buttons can still create a new order.
+          }
+        }
+      };
+
+      void restore();
+      syncSubscriptionFromServer({ force: true })
+        .then((sub) => {
+          if (!cancelled && sub) setEntitlementVersion(v => v + 1);
+        })
+        .catch(() => {});
+
+      return () => {
+        cancelled = true;
+      };
+    }, [resourceId]);
 
     const handleGenerate = useCallback(async () => {
       if (generating) return;
@@ -850,6 +895,7 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
         trackMystiEvent('mysti_share_tier_unlock_click', { tier, sku, resourceId });
         try {
           setGenerating(true);
+          const deviceId = getOrCreateDeviceId() || undefined;
           const redirect =
             typeof window !== 'undefined'
               ? `${window.location.pathname}${window.location.search}${window.location.search.includes('unlocked=') ? '' : (window.location.search ? '&' : '?') + 'unlocked=' + sku}`
@@ -857,7 +903,7 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
           const res = await fetch('/api/mysti/payment/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sku, resourceId, paymentType: 'wechat', redirect }),
+            body: JSON.stringify({ sku, resourceId, paymentType: 'wechat', deviceId, redirect }),
           });
           const data = await readApiJson<{
             url?: string;

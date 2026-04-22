@@ -115,12 +115,17 @@ export async function isSkinAvailable(id: CptiSeasonalSkinId): Promise<boolean> 
   if (!skin) return false;
   if (isSkinInWindow(skin)) return true;
   try {
-    const [{ isUnlocked }, { passCoversSingleSku }] = await Promise.all([
+    const [{ isUnlocked }, { isSubscriber, passCoversSingleSku, syncSubscriptionFromServer }, { restoreMystiEntitlement }] = await Promise.all([
       import('@/lib/mysti/unlock'),
       import('@/lib/mysti/subscription'),
+      import('@/lib/mysti/entitlement-restore'),
     ]);
-    if (isUnlocked(getSkinSku(id), id)) return true;
-    if (passCoversSingleSku(CPTI_SEASONAL_PACK_SKU)) return true;
+    const sku = getSkinSku(id);
+    if (isUnlocked(sku, id)) return true;
+    const restored = await restoreMystiEntitlement({ sku, resourceId: id });
+    if (restored.restored) return true;
+    await syncSubscriptionFromServer({ force: true });
+    if (isSubscriber() && passCoversSingleSku(CPTI_SEASONAL_PACK_SKU)) return true;
   } catch { /* noop */ }
   return false;
 }

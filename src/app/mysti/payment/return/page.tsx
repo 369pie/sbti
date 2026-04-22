@@ -17,7 +17,7 @@ function ReturnContent() {
   const search = useSearchParams();
   const { theme } = useMystiTheme();
   const hasOrderId = Boolean(search.get('orderId') || search.get('trade_order_id'));
-  const [status, setStatus] = useState<'verifying' | 'paid' | 'failed'>('verifying');
+  const [status, setStatus] = useState<'verifying' | 'paid' | 'pending' | 'failed'>('verifying');
 
   useEffect(() => {
     const orderId = search.get('orderId') || search.get('trade_order_id') || '';
@@ -32,10 +32,11 @@ function ReturnContent() {
     let cancelled = false;
 
     const run = async () => {
-      const url = `/api/mysti/payment/verify?orderId=${encodeURIComponent(orderId)}${stub ? '&stub=1' : ''}`;
-
-      for (let attempt = 0; attempt < 8; attempt += 1) {
+      for (let attempt = 0; attempt < 24; attempt += 1) {
         try {
+          const url =
+            `/api/mysti/payment/verify?orderId=${encodeURIComponent(orderId)}` +
+            `${stub ? '&stub=1' : ''}&attempt=${attempt}`;
           const response = await fetch(url, { cache: 'no-store' });
           const data = (await response.json()) as {
             paid?: boolean;
@@ -64,6 +65,15 @@ function ReturnContent() {
           };
 
           if (cancelled) return;
+
+          if (!response.ok && data.pending !== true) {
+            if (response.status === 429 || response.status >= 500) {
+              await wait(1600);
+              continue;
+            }
+            setStatus('failed');
+            return;
+          }
 
           const sku = data.sku ?? initialSku;
           const resourceId = data.resourceId ?? initialResourceId;
@@ -141,15 +151,19 @@ function ReturnContent() {
             setStatus('failed');
             return;
           }
+
+          if (attempt === 8) {
+            setStatus('pending');
+          }
         } catch {
           // retry below
         }
 
-        await wait(1200);
+        await wait(1600);
       }
 
       if (!cancelled) {
-        setStatus('failed');
+        setStatus('pending');
       }
     };
 
@@ -179,6 +193,26 @@ function ReturnContent() {
       {displayStatus === 'verifying' && <p>正在确认你的支付……</p>}
       {displayStatus === 'paid' && (
         <p style={{ color: theme.accentGold }}>支付成功，正在为你打开内容</p>
+      )}
+      {displayStatus === 'pending' && (
+        <>
+          <p style={{ color: theme.accentGold }}>支付已提交，通道仍在同步订单</p>
+          <p className="mt-3 max-w-xs text-center text-sm opacity-75">
+            如果你已经扣款，订单会自动补发解锁。可以稍后刷新本页再确认。
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-5 py-2 rounded-full text-sm"
+            style={{
+              borderWidth: 1,
+              borderStyle: 'solid',
+              borderColor: theme.accent,
+              color: theme.accent,
+            }}
+          >
+            重新确认
+          </button>
+        </>
       )}
       {displayStatus === 'failed' && (
         <>

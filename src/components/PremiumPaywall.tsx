@@ -25,11 +25,13 @@ import {
   isSubscriber,
   passCoversSingleSku,
   passDiscountForSku,
+  syncSubscriptionFromServer,
 } from '@/lib/mysti/subscription';
 import { getActiveReferralCode } from '@/lib/mysti/creator-referral';
 import { getOrCreateDeviceId } from '@/lib/mysti/device';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 import { readApiJson } from '@/lib/api';
+import { restoreMystiEntitlement } from '@/lib/mysti/entitlement-restore';
 import {
   BRAND_THEMES,
   type PaywallBrand,
@@ -95,8 +97,63 @@ export function PremiumPaywall({
         /* noop */
       }
     }
+    syncSubscriptionFromServer({ force: true })
+      .then((sub) => {
+        if (!sub) return;
+        setHasPass(true);
+        if (
+          isSubscriber() &&
+          passCoversSingleSku(sku) &&
+          !unlockedRef.current
+        ) {
+          setUnlocked(true);
+          try {
+            trackMystiEvent('mysti_paywall_pass_unlocked', { sku, resourceId, brand });
+          } catch {
+            /* noop */
+          }
+        }
+      })
+      .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Restore server-side purchases when the success return page failed before it
+  // could write the local unlock envelope.
+  useEffect(() => {
+    if (unlocked) return;
+
+    let cancelled = false;
+    const deviceId = getOrCreateDeviceId() || undefined;
+    if (!deviceId) return;
+
+    const restore = async () => {
+      try {
+        const restored = await restoreMystiEntitlement({ sku, resourceId, deviceId });
+        if (cancelled || !restored.restored) return;
+        setUnlocked(true);
+        try {
+          trackMystiEvent('mysti_paywall_success', {
+            sku,
+            resourceId,
+            brand,
+            source: 'restore',
+          });
+        } catch {
+          /* noop */
+        }
+      } catch {
+        // Restore is a quiet convenience path; the explicit purchase button
+        // remains available if no matching paid order exists.
+      }
+    };
+
+    void restore();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [unlocked, sku, resourceId, brand]);
 
   // First view tracking
   useEffect(() => {

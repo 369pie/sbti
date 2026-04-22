@@ -11,6 +11,7 @@ import {
   daysUntilExpiry,
   getActiveSubscription,
   isSubscriber,
+  syncSubscriptionFromServer,
 } from '@/lib/mysti/subscription';
 import { getActiveReferralCode } from '@/lib/mysti/creator-referral';
 import { getOrCreateDeviceId } from '@/lib/mysti/device';
@@ -86,6 +87,14 @@ function SubscribeInner() {
     setDays(daysUntilExpiry());
     const sub = getActiveSubscription();
     setActiveSku(sub?.sku ?? null);
+    syncSubscriptionFromServer({ force: true })
+      .then((serverSub) => {
+        if (!serverSub) return;
+        setHasPass(true);
+        setDays(daysUntilExpiry());
+        setActiveSku(serverSub.sku);
+      })
+      .catch(() => {});
     try {
       trackMystiEvent('mysti_subscribe_view', {
         source: 'page',
