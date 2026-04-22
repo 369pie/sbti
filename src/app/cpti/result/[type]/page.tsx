@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import { getCptiPersonalityBySlug, getAllCptiSlugs } from '@/lib/cpti/personalities';
 import { CPTI_DIMENSIONS } from '@/lib/cpti/dimensions';
 import type { DimensionLevel } from '@/lib/cpti/dimensions';
@@ -74,7 +75,9 @@ export default async function CptiResultPage({ params }: PageProps) {
           ],
         }) }}
       />
-      <CptiResultContent personality={personality} dimensionScores={dimensionScores} />
+      <Suspense fallback={<div className="min-h-screen bg-bg-primary" />}>
+        <CptiResultContent personality={personality} dimensionScores={dimensionScores} />
+      </Suspense>
     </>
   );
 }

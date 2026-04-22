@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { CptiCodexClient } from './CptiCodexClient';
 import { getSiteUrl } from '@/lib/site';
 
@@ -11,5 +12,9 @@ export const metadata: Metadata = {
 };
 
 export default function CptiCodexPage() {
-  return <CptiCodexClient />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F5F0E8]" />}>
+      <CptiCodexClient />
+    </Suspense>
+  );
 }

@@ -11,6 +11,7 @@
 
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import {
   getRelationshipBySlug,
   getAllRelationshipSlugs,
@@ -45,5 +46,9 @@ export default async function CptiDeepPage({ params }: PageProps) {
 
   const tierInfo = RELATIONSHIP_TIER_INFO[relationship.tier];
 
-  return <CptiDeepClient relationship={relationship} tierInfo={tierInfo} />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F5F0E8]" />}>
+      <CptiDeepClient relationship={relationship} tierInfo={tierInfo} />
+    </Suspense>
+  );
 }

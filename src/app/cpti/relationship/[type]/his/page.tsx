@@ -14,6 +14,7 @@
 
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import {
   getRelationshipBySlug,
   getAllRelationshipSlugs,
@@ -45,5 +46,9 @@ export default async function CptiHisPovPage({ params }: PageProps) {
   const relationship = getRelationshipBySlug(type);
   if (!relationship) notFound();
 
-  return <CptiHisPovClient relationship={relationship} />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F5F0E8]" />}>
+      <CptiHisPovClient relationship={relationship} />
+    </Suspense>
+  );
 }

@@ -13,6 +13,7 @@
  */
 
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { CptiPricingLadder } from '@/components/cpti/CptiPricingLadder';
 import { getSiteUrl } from '@/lib/site';
 
@@ -31,5 +32,9 @@ export const metadata: Metadata = {
 };
 
 export default function CptiPricingPage() {
-  return <CptiPricingLadder />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F5F0E8]" />}>
+      <CptiPricingLadder />
+    </Suspense>
+  );
 }
