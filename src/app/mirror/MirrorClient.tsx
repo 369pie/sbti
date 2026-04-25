@@ -12,7 +12,7 @@ import {
   hasCredits,
   getFreeCreditsRemaining,
   addCredits,
-  getTopUpOptions,
+
   addToHistory,
   getHistory,
   type MirrorHistoryRecord,
@@ -451,6 +451,10 @@ export default function MirrorClient() {
     message: '免费次数剩余 2 次',
   });
   const [showTopUp, setShowTopUp] = useState(false);
+  const [paymentChannel, setPaymentChannel] = useState<'wechat' | 'alipay'>('wechat');
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentPolling, setPaymentPolling] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [history, setHistory] = useState<MirrorHistoryRecord[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -462,6 +466,122 @@ export default function MirrorClient() {
     setHistory(getHistory());
     setHydrated(true);
   }, []);
+
+  // 支付回跳检测：?paid=1&orderId=xxx 或 ?stub=1&...
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('orderId');
+
+    // Stub 模式：直接成功
+    if (params.get('stub') === '1' && orderId) {
+      const pack = params.get('pack') ?? '';
+      const credits = pack === 'mirror-30' ? 30 : 10;
+      addCredits(credits);
+      setPaywall(checkPaywall());
+      // 清理 URL 参数
+      window.history.replaceState({}, '', '/mirror/');
+      return;
+    }
+
+    // 真实支付回跳：轮询 verify
+    if (params.get('paid') === '1' && orderId) {
+      setPaymentPolling(true);
+      window.history.replaceState({}, '', '/mirror/');
+
+      let attempts = 0;
+      const poll = async () => {
+        attempts++;
+        try {
+          const res = await fetch(`/api/mirror/payment/verify?orderId=${encodeURIComponent(orderId)}`);
+          const data = await res.json() as { status?: string; credits?: number };
+          if (data.status === 'paid' && data.credits) {
+            addCredits(data.credits);
+            setPaywall(checkPaywall());
+            setPaymentPolling(false);
+            return;
+          }
+        } catch {}
+        if (attempts < 15) {
+          setTimeout(poll, 2000);
+        } else {
+          setPaymentPolling(false);
+          setPaymentError('支付确认超时，如已付款请刷新页面。');
+        }
+      };
+      poll();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 发起支付
+  async function handleTopUp(pack: string) {
+    setPaymentLoading(true);
+    setPaymentError(null);
+    try {
+      const res = await fetch('/api/mirror/payment/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pack, paymentType: paymentChannel }),
+      });
+      const data = await res.json() as {
+        ok?: boolean;
+        stub?: boolean;
+        url?: string;
+        error?: string;
+        message?: string;
+        credits?: number;
+      };
+
+      if (!res.ok) {
+        setPaymentError(data.message ?? '支付创建失败，请稍后再试。');
+        return;
+      }
+
+      if (data.stub && data.url) {
+        // Stub 模式：跳转到假回跳 URL
+        window.location.href = data.url;
+        return;
+      }
+
+      if (data.url) {
+        // 真实支付：打开支付页面
+        window.open(data.url, '_blank');
+        // 开始轮询 verify
+        const orderId = new URL(data.url, window.location.origin).searchParams.get('orderId')
+          ?? data.url.match(/orderId=([^&]+)/)?.[1];
+        if (orderId) {
+          setPaymentPolling(true);
+          let attempts = 0;
+          const poll = async () => {
+            attempts++;
+            try {
+              const vRes = await fetch(`/api/mirror/payment/verify?orderId=${encodeURIComponent(orderId)}`);
+              const vData = await vRes.json() as { status?: string; credits?: number };
+              if (vData.status === 'paid' && vData.credits) {
+                addCredits(vData.credits);
+                setPaywall(checkPaywall());
+                setPaymentPolling(false);
+                setShowTopUp(false);
+                return;
+              }
+            } catch {}
+            if (attempts < 30) {
+              setTimeout(poll, 3000);
+            } else {
+              setPaymentPolling(false);
+              setPaymentError('支付确认超时，如已付款请刷新页面。');
+            }
+          };
+          // 延迟开始轮询，给用户时间完成支付
+          setTimeout(poll, 5000);
+        }
+      }
+    } catch {
+      setPaymentError('网络错误，请稍后再试。');
+    } finally {
+      setPaymentLoading(false);
+    }
+  }
   const [consentAccepted, setConsentAccepted] = useState(false);
   const [state, setState] = useState<FlowState>('idle');
   const [progress, setProgress] = useState(0);
@@ -1174,31 +1294,73 @@ export default function MirrorClient() {
               )}
             </div>
 
-            <div className="space-y-3 mb-6">
-              {getTopUpOptions().map(option => (
+            {/* 支付方式选择 */}
+            <div className="mb-4">
+              <p className="text-xs text-text-muted mb-2">选择支付方式</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(['wechat', 'alipay'] as const).map(ch => (
+                  <button
+                    key={ch}
+                    type="button"
+                    onClick={() => setPaymentChannel(ch)}
+                    className={`p-3 rounded-[14px] border text-sm font-medium transition-colors ${
+                      paymentChannel === ch
+                        ? 'border-rose-deep bg-rose-deep/10 text-text-primary'
+                        : 'border-border-subtle text-text-muted hover:border-text-muted'
+                    }`}
+                  >
+                    {ch === 'wechat' ? '微信支付' : '支付宝'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 充值档位 */}
+            <div className="space-y-3 mb-4">
+              {[
+                { pack: 'mirror-10', credits: 10, price: 10, label: '10 次', tag: '' },
+                { pack: 'mirror-30', credits: 30, price: 30, label: '30 次', tag: '划算' },
+              ].map(option => (
                 <button
-                  key={option.credits}
+                  key={option.pack}
                   type="button"
-                  onClick={() => {
-                    addCredits(option.credits);
-                    setPaywall(checkPaywall());
-                    setShowTopUp(false);
-                  }}
-                  className="w-full flex items-center justify-between p-4 rounded-[18px] border border-border-subtle hover:border-text-muted transition-colors"
+                  disabled={paymentLoading || paymentPolling}
+                  onClick={() => handleTopUp(option.pack)}
+                  className="w-full flex items-center justify-between p-4 rounded-[18px] border border-border-subtle hover:border-text-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <div>
-                    <span className="font-medium text-text-primary">{option.label}</span>
+                  <div className="text-left">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-text-primary">{option.label}</span>
+                      {option.tag && (
+                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-rose-deep/10 text-rose-deep">
+                          {option.tag}
+                        </span>
+                      )}
+                    </div>
                     <span className="block text-xs text-text-muted mt-0.5">¥{option.price / option.credits}/次</span>
                   </div>
-                  <span className="text-sm font-medium" style={{ color: 'var(--color-gold-leaf)' }}>
-                    充值 →
+                  <span className="text-sm font-medium text-rose-deep">
+                    {paymentLoading ? '创建中…' : `¥${option.price}`}
                   </span>
                 </button>
               ))}
             </div>
 
+            {/* 轮询中提示 */}
+            {paymentPolling && (
+              <div className="mb-4 p-3 rounded-[14px] bg-rose-deep/5 border border-rose-deep/20 text-center">
+                <div className="inline-block w-4 h-4 border-2 border-rose-deep/30 border-t-rose-deep rounded-full animate-spin mb-1" />
+                <p className="text-xs text-text-secondary">等待支付确认…</p>
+              </div>
+            )}
+
+            {/* 错误提示 */}
+            {paymentError && (
+              <p className="mb-4 text-xs text-red-500 text-center">{paymentError}</p>
+            )}
+
             <p className="text-xs text-text-muted text-center">
-              单次付费 ¥1/张 · 充值更划算
+              单次 ¥1/次 · 充值更划算 · 支付后自动到账
             </p>
           </div>
         </div>

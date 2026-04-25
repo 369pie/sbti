@@ -45,8 +45,8 @@ export interface MirrorHistoryRecord {
 const FREE_CREDITS = 2;
 const CREDITS_PER_GENERATION = 1;
 const TOP_UP_OPTIONS = [
-  { credits: 10, price: 10, label: '¥10 · 10 次' },
-  { credits: 30, price: 30, label: '¥30 · 30 次' },
+  { credits: 10, price: 10, label: '灵镜 10 次 · ¥10', pack: 'mirror-10' },
+  { credits: 30, price: 30, label: '灵镜 30 次 · ¥30', pack: 'mirror-30' },
 ];
 
 const HISTORY_EXPIRY_MS = 3 * 24 * 60 * 60 * 1000; // 3 days
