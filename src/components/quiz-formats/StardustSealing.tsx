@@ -130,7 +130,7 @@ export function StardustSealing({
               boxShadow: '0 0 14px rgba(201,166,118,.65)',
               display: 'grid',
               placeItems: 'center',
-              color: '#fff',
+              color: 'var(--color-bg-primary)',
               fontFamily: 'Cormorant Garamond, serif',
               fontStyle: 'italic',
               fontSize: 18,
@@ -145,7 +145,7 @@ export function StardustSealing({
             margin: 0,
             fontSize: 10,
             letterSpacing: 6,
-            color: '#C9A676',
+            color: 'var(--color-gold)',
             textTransform: 'uppercase',
             fontWeight: 600,
           }}
@@ -158,7 +158,7 @@ export function StardustSealing({
             fontFamily: 'Cormorant Garamond, Noto Serif SC, serif',
             fontStyle: 'italic',
             fontSize: 22,
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
             fontWeight: 500,
           }}
         >
@@ -174,14 +174,14 @@ export function StardustSealing({
             fontFamily: 'Noto Serif SC, serif',
           }}
         >
-          预计开启日：<strong style={{ color: '#C9A676', fontWeight: 500 }}>{dueLabel}</strong>
+          预计开启日：<strong style={{ color: 'var(--color-gold)', fontWeight: 500 }}>{dueLabel}</strong>
         </p>
         {notifGranted === false ? (
           <p style={{ fontSize: 11, color: 'rgba(245,240,232,.45)', marginTop: 6 }}>
             ✦ 没开启浏览器通知也没关系 — 30 天后访问本站会自动跳出收信箱。
           </p>
         ) : notifGranted ? (
-          <p style={{ fontSize: 11, color: '#C9A676', marginTop: 6 }}>
+          <p style={{ fontSize: 11, color: 'var(--color-gold)', marginTop: 6 }}>
             ✦ 浏览器通知已开启 · 30 天后会轻轻提醒你
           </p>
         ) : null}
@@ -203,7 +203,7 @@ export function StardustSealing({
               border: '1px solid #C9A676',
               background:
                 'linear-gradient(180deg, rgba(201,166,118,.22) 0%, rgba(201,166,118,.08) 100%)',
-              color: '#F5F0E8',
+              color: 'var(--color-bg-primary)',
               fontSize: 12.5,
               letterSpacing: 4,
               textTransform: 'uppercase',
@@ -238,7 +238,7 @@ export function StardustSealing({
             margin: '14px auto 0',
             maxWidth: 360,
             fontSize: 11,
-            color: 'rgba(245,240,232,.5)',
+            color: 'color-mix(in oklab, var(--color-bg-primary) 50%, transparent)',
             lineHeight: 1.7,
             fontStyle: 'italic',
             fontFamily: 'Cormorant Garamond, serif',
@@ -279,7 +279,7 @@ export function StardustSealing({
             background: text.trim()
               ? 'linear-gradient(180deg, rgba(201,166,118,.22) 0%, rgba(201,166,118,.10) 100%)'
               : 'rgba(245,240,232,.04)',
-            color: text.trim() ? '#F5F0E8' : 'rgba(245,240,232,.4)',
+            color: text.trim() ? 'var(--color-bg-primary)' : 'rgba(245,240,232,.4)',
             fontSize: 12.5,
             letterSpacing: 4,
             textTransform: 'uppercase',

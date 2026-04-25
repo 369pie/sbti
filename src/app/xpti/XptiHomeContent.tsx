@@ -6,7 +6,7 @@ import { XPTI_PERSONALITY_TYPES, getXptiTypeThumbnailImage } from '../../lib/xpt
 
 /* XPTI 主调：枯玫瑰 + 深酒红，作为 paper 上的 accent，与首页 editorial 系统统一。 */
 const VELVET_DARK_WINE = '#6A2A3E';
-const VELVET_ROSE = '#A85A6E';
+const VELVET_ROSE = 'var(--color-accent)';
 
 const DIMS: { key: XptiModelType; poleHigh: string; poleLow: string; question: string }[] = [
   { key: 'dominance', poleHigh: '指挥官', poleLow: '乖顺流', question: '你在亲密关系里是导演还是女主' },
@@ -110,6 +110,14 @@ function XptiRadarPreview() {
   );
 }
 
+function ArrowIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M9 7h8v8" />
+    </svg>
+  );
+}
+
 export default function XptiHomeContent() {
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-paper)' }}>
@@ -125,7 +133,7 @@ export default function XptiHomeContent() {
 
       {/* ── HERO ─────────────────────────────────────── */}
       <section className="relative overflow-hidden">
-        <div className="max-w-5xl mx-auto px-6 sm:px-10 pt-16 sm:pt-28 pb-16 sm:pb-24">
+        <div className="max-w-6xl mx-auto grid items-center gap-12 px-6 sm:px-10 pt-16 sm:pt-24 pb-16 sm:pb-24 lg:grid-cols-[0.92fr_0.78fr]">
           <div className="animate-fade-up">
             <div className="flex items-center gap-4 mb-10">
               <span className="serial-number text-sm">Issue · XPTI</span>
@@ -169,11 +177,11 @@ export default function XptiHomeContent() {
                 className="btn"
                 style={{
                   background: VELVET_DARK_WINE,
-                  color: '#FFFFFF',
+                  color: 'var(--color-bg-primary)',
                   borderColor: VELVET_DARK_WINE,
                 }}
               >
-                开始测试 <span className="opacity-70">→</span>
+                开始测试 <ArrowIcon />
               </Link>
               <Link href="/types/" prefetch={false} className="btn btn-ghost">
                 先翻翻 12 种原型
@@ -183,8 +191,23 @@ export default function XptiHomeContent() {
                 prefetch={false}
                 className="eyebrow ml-1 hover:text-text-primary transition-colors"
               >
-                ← 返回 WTFti
+                返回 WTFti
               </Link>
+            </div>
+          </div>
+          <div className="site-hero-card hidden rounded-[2rem] p-7 lg:block">
+            <div className="mb-5 flex items-center justify-between">
+              <span className="eyebrow">Nine Signals</span>
+              <span className="site-code-mark h-9 px-3 text-[10px]" style={{ color: VELVET_DARK_WINE }}>XPTI</span>
+            </div>
+            <XptiRadarPreview />
+            <div className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-[1.25rem] border border-border-subtle bg-border-subtle">
+              {DIMS.slice(0, 6).map((dim, index) => (
+                <div key={dim.key} className="bg-bg-elevated/80 px-3 py-4">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">D{index + 1}</p>
+                  <p className="mt-2 text-sm font-medium text-text-primary">{dim.poleHigh}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -245,7 +268,7 @@ export default function XptiHomeContent() {
                 style={{ borderBottom: '1px solid var(--color-rule-soft)' }}
               >
                 <span className="text-sm sm:text-base text-text-muted text-right">{row.old}</span>
-                <span className="serial-number text-xs" style={{ color: VELVET_ROSE }}>→</span>
+                <span className="serial-number text-xs" style={{ color: VELVET_ROSE }}>VS</span>
                 <span
                   className="text-sm sm:text-base"
                   style={{
@@ -335,7 +358,7 @@ export default function XptiHomeContent() {
                 12 种<span className="editorial-italic">关系原型</span>
               </h2>
             </div>
-            <span className="eyebrow hidden sm:inline">12 types ←→</span>
+            <span className="eyebrow hidden sm:inline">12 types</span>
           </div>
         </div>
 
@@ -346,7 +369,7 @@ export default function XptiHomeContent() {
                 key={`${p.slug}-${i}`}
                 href={`/xpti/result/${p.slug}/`}
                 prefetch={false}
-                className="group flex-shrink-0 w-[155px] sm:w-[185px] transition-all duration-300 hover:-translate-y-0.5"
+                className="group flex-shrink-0 w-[155px] sm:w-[185px] transition duration-300 hover:-translate-y-0.5"
                 style={{
                   background: 'var(--color-bg-elevated)',
                   border: '1px solid var(--color-rule-soft)',
@@ -370,7 +393,7 @@ export default function XptiHomeContent() {
                     style={{
                       fontFamily: 'var(--font-mono)',
                       color: p.color,
-                      background: 'rgba(255,255,255,0.85)',
+                      background: 'color-mix(in oklab, var(--color-bg-primary) 85%, transparent)',
                     }}
                   >
                     {p.code}
@@ -436,7 +459,9 @@ export default function XptiHomeContent() {
                       {type.code}
                     </span>
                   </div>
-                  <div className="text-4xl mb-5">{type.emoji}</div>
+                  <span className="site-code-mark mb-5 h-12 w-12" style={{ color: type.color }}>
+                    {type.code.slice(0, 2)}
+                  </span>
                   <div
                     className="text-lg sm:text-xl text-text-primary mb-2"
                     style={{
@@ -449,7 +474,7 @@ export default function XptiHomeContent() {
                   </div>
                   <p className="text-sm text-text-secondary leading-relaxed">{type.tagline}</p>
                   <span
-                    className="block mt-6 h-px transition-all duration-500 group-hover:w-12"
+                    className="block mt-6 h-px transition-[width] duration-500 group-hover:w-12"
                     style={{ background: type.color, width: 8, opacity: 0.6 }}
                   />
                 </Link>
@@ -531,9 +556,9 @@ export default function XptiHomeContent() {
             href="/xpti/test/"
             prefetch={false}
             className="btn"
-            style={{ background: VELVET_DARK_WINE, color: '#FFFFFF', borderColor: VELVET_DARK_WINE }}
+            style={{ background: VELVET_DARK_WINE, color: 'var(--color-bg-primary)', borderColor: VELVET_DARK_WINE }}
           >
-            测测你的靠近方式 <span className="opacity-70">→</span>
+            测测你的靠近方式 <ArrowIcon />
           </Link>
 
           <div className="mt-10 flex items-center justify-center gap-4 text-xs eyebrow">

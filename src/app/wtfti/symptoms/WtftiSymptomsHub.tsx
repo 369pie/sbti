@@ -1,45 +1,41 @@
 'use client';
 
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { motion } from 'framer-motion';
-import { WTFTI_PERSONALITIES, getWtftiSlugs } from '@/lib/wtfti-personalities';
+import { WTFTI_PERSONALITIES, getWtftiSlugs, getWtftiTypeThumbnailImage } from '@/lib/wtfti-personalities';
 import { getSymptomsHeat, getTotalSymptomsParticipants } from '@/lib/symptoms-heat';
 
 const totalParticipants = getTotalSymptomsParticipants(getWtftiSlugs());
 
 export function WtftiSymptomsHub() {
   return (
-    <div className="min-h-screen">
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 via-transparent to-transparent" />
-        <div className="relative max-w-2xl mx-auto px-6 pt-20 pb-10 text-center">
+    <div>
+      <section className="wtfti-section-tight">
+        <div className="wtfti-container max-w-3xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-block px-3 py-1 rounded-full text-xs font-mono tracking-wider bg-red-500/10 text-red-500 border border-red-500/20 mb-6">
-              📋 WTF 症状清单
-            </span>
-            <h1 className="text-3xl sm:text-4xl font-bold mb-4">
-              你中了几枪？
+            <span className="wtfti-eyebrow justify-center">WTF Symptom Atlas</span>
+            <h1 className="wtfti-display mt-5 text-4xl md:text-6xl">
+              症状清单，
+              <em>直接对照你的隐藏反应。</em>
             </h1>
-            <p className="text-text-secondary text-base sm:text-lg max-w-md mx-auto leading-relaxed">
+            <p className="wtfti-copy mx-auto mt-5 max-w-xl">
               不用做测试，直接对着症状打勾。
-              <br />
               29 种 WTF 人格，每种 5 条隐藏症状。
             </p>
-            <div className="mt-6 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-bg-elevated border border-border-subtle text-xs text-text-muted">
-              <span className="text-red-500">🔥</span>
+            <div className="wtfti-panel mt-7 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs text-text-muted">
+              <span className="wtfti-swatch" style={{ background: 'var(--color-rose)' }} />
               <span>已有 <span className="font-semibold text-text-primary">{totalParticipants}</span> 人打过勾</span>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Grid */}
-      <section className="max-w-3xl mx-auto px-6 pb-20">
+      <section className="wtfti-container max-w-4xl pb-20">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {WTFTI_PERSONALITIES.map((p, i) => (
             <motion.div
@@ -51,9 +47,18 @@ export function WtftiSymptomsHub() {
               <Link
                 href={`/wtfti/symptoms/${p.slug}/`}
                 prefetch={false}
-                className="group flex items-center gap-4 rounded-2xl border border-border-subtle bg-bg-elevated hover:border-border hover:shadow-md transition-all p-4 sm:p-5"
+                className="wtfti-card group flex items-center gap-4 rounded-2xl p-4 sm:p-5"
               >
-                <span className="text-2xl flex-shrink-0">{p.emoji}</span>
+                <span className="grid h-14 w-14 flex-shrink-0 place-items-center overflow-hidden rounded-2xl bg-bg-secondary/70 p-2">
+                  <NextImage
+                    src={getWtftiTypeThumbnailImage(p.slug)}
+                    alt={`${p.wtftiName} 症状清单入口`}
+                    width={96}
+                    height={96}
+                    loading={i < 4 ? 'eager' : 'lazy'}
+                    className="h-full w-full object-contain"
+                  />
+                </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="text-xs font-mono text-text-muted">
@@ -99,12 +104,8 @@ export function WtftiSymptomsHub() {
           <p className="text-sm text-text-muted mb-4">
             想知道你到底是哪种 WTF 人格？
           </p>
-          <Link
-            href="/wtfti/test"
-            prefetch={false}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-rose-deep to-ember text-bg-elevated text-sm font-medium hover:brightness-110 transition-all"
-          >
-            去做完整测试 →
+          <Link href="/wtfti/test" prefetch={false} className="wtfti-cta-primary">
+            去做完整测试
           </Link>
         </motion.div>
       </section>

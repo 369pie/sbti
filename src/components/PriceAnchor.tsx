@@ -42,18 +42,18 @@ export function PriceAnchor({
   return (
     <div
       className={`flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] tracking-wider ${className ?? ''}`}
-      style={{ fontFamily: 'var(--font-display)', color: '#7A6A5A' }}
+      style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text-muted)' }}
       data-price-anchor={sku}
     >
       <span className="opacity-80">{freeLabel}</span>
       <span aria-hidden style={{ opacity: 0.4 }}>·</span>
       <span>
         单次解锁{' '}
-        <span style={{ color: '#C07A8E' }}>¥{meta.price.toFixed(1)}</span>
+        <span style={{ color: 'var(--color-accent)' }}>¥{meta.price.toFixed(1)}</span>
       </span>
       <span aria-hidden style={{ opacity: 0.4 }}>·</span>
       {disablePassLink ? (
-        <span style={{ color: '#C9A676' }}>
+        <span style={{ color: 'var(--color-gold)' }}>
           {passCovers
             ? `通行证 ¥19/月 · 本档免费`
             : passDiscount > 0
@@ -64,7 +64,7 @@ export function PriceAnchor({
         <Link
           href={passHref}
           className="underline-offset-2 hover:underline"
-          style={{ color: '#C9A676' }}
+          style={{ color: 'var(--color-gold)' }}
         >
           {passCovers
             ? `通行证 ¥19/月 · 本档免费`

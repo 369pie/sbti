@@ -117,11 +117,11 @@ export function CptiPricingLadder() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] text-[#2c2620]">
+    <div className="min-h-screen bg-bg-primary text-text-primary">
       <div className="mx-auto max-w-[920px] px-5 py-12 sm:py-16">
         {/* Header */}
         <div className="mb-12 text-center">
-          <p className="mb-3 text-[10px] font-mono uppercase tracking-[0.36em] text-[#8a7355]">
+          <p className="mb-3 text-[10px] font-mono uppercase tracking-[0.36em] text-text-muted">
             CPTI · Pricing Ladder · 2026 Spring Edition
           </p>
           <h1
@@ -129,16 +129,16 @@ export function CptiPricingLadder() {
             style={{ fontFamily: '"Cormorant Garamond", "Noto Serif SC", serif', fontStyle: 'italic' }}
           >
             命名一段关系
-            <span className="text-[#C07A8E]">，</span>
+            <span className="text-accent">，</span>
             <br />
             然后留下所有关系。
           </h1>
-          <p className="mx-auto mt-5 max-w-[520px] text-[14px] leading-[1.85] text-[#6b5b3f]">
+          <p className="mx-auto mt-5 max-w-[520px] text-[14px] leading-[1.85] text-text-secondary">
             CPTI 2.0 给你 5 档清晰的方案：从一段关系的深档，到双方共同署名的限定卡，
             到你这一年里所有关系的图鉴册，到闺蜜组群像，再到一年三次会更新的季节限定皮肤。
           </p>
           {focusedTier && (
-            <p className="mx-auto mt-4 inline-flex rounded-full border border-[#c9a676]/40 bg-white/70 px-3.5 py-1.5 text-[11px] tracking-[0.08em] text-[#8a7355]">
+            <p className="mx-auto mt-4 inline-flex rounded-full border border-[var(--color-gold-leaf)]/40 bg-bg-elevated/80 px-3.5 py-1.5 text-[11px] tracking-[0.08em] text-text-secondary">
               已为你定位到这一档：{focusedTier.name}
             </p>
           )}
@@ -153,16 +153,16 @@ export function CptiPricingLadder() {
               key={tier.sku}
               className={`relative rounded-[22px] border p-6 transition ${
                 isFocused
-                  ? 'border-[#c9a676] bg-white shadow-[0_18px_44px_-22px_rgba(192,122,142,0.45)]'
-                  : 'border-[#e8d5dc] bg-white/85'
+                  ? 'border-[var(--color-gold-leaf)] bg-bg-elevated shadow-[0_18px_44px_-22px_rgba(192,122,142,0.45)]'
+                  : 'border-border-subtle bg-bg-elevated/85'
               }`}
             >
               {tier.badge && (
                 <span
                   className={`absolute -top-2 right-5 rounded-full px-2.5 py-1 text-[10px] font-medium ${
                     isFocused || tier.highlight
-                      ? 'bg-[#c9a676] text-white shadow-[0_4px_10px_rgba(201,166,118,0.35)]'
-                      : 'bg-[#e8d5dc] text-[#8a4d62]'
+                      ? 'bg-gold text-bg-primary shadow-[0_4px_10px_rgba(201,166,118,0.35)]'
+                      : 'bg-border-subtle text-accent-dim'
                   }`}
                 >
                   {tier.badge}
@@ -171,7 +171,7 @@ export function CptiPricingLadder() {
 
               <div className="mb-3 flex items-baseline gap-3">
                 <span
-                  className="text-2xl text-[#c9a676]"
+                  className="text-2xl text-gold"
                   style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: 'italic' }}
                 >
                   {tier.roman}
@@ -181,20 +181,20 @@ export function CptiPricingLadder() {
 
               <div className="mb-3 flex items-baseline gap-2">
                 <span
-                  className="text-[42px] font-light leading-none text-[#2c2620]"
+                  className="text-[42px] font-light leading-none text-text-primary"
                   style={{ fontFamily: '"Cormorant Garamond", serif' }}
                 >
                   {tier.price}
                 </span>
-                {tier.unit && <span className="text-[12px] text-[#8a7355]">{tier.unit}</span>}
+                {tier.unit && <span className="text-[12px] text-text-muted">{tier.unit}</span>}
               </div>
 
-              <p className="mb-5 text-[13.5px] leading-[1.75] text-[#5a4f3e]">{tier.tagline}</p>
+              <p className="mb-5 text-[13.5px] leading-[1.75] text-text-secondary">{tier.tagline}</p>
 
               <ul className="mb-6 space-y-2">
                 {tier.bullets.map((b, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[13px] leading-[1.7] text-[#3a342a]">
-                    <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-[#c9a676]" />
+                  <li key={i} className="flex items-start gap-2 text-[13px] leading-[1.7] text-text-secondary">
+                    <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-gold" />
                     {b}
                   </li>
                 ))}
@@ -205,8 +205,8 @@ export function CptiPricingLadder() {
                 onClick={() => trackCptiEvent('cpti_pricing_sku_clicked', { tier: tier.sku })}
                 className={`block w-full rounded-xl py-3 text-center text-[14px] font-medium transition active:scale-[0.98] ${
                   isFocused
-                    ? 'bg-[#2c2620] text-[#F5F0E8]'
-                    : 'border border-[#c9a676]/60 text-[#6b5b3f] hover:bg-[#c9a676]/8'
+                    ? 'bg-text-primary text-bg-primary'
+                    : 'border border-gold/60 text-text-secondary hover:bg-gold/8'
                 }`}
               >
                 {tier.ctaLabel}
@@ -216,29 +216,29 @@ export function CptiPricingLadder() {
         </div>
 
         {/* Pass tier */}
-        <article className="mt-8 rounded-[22px] border border-dashed border-[#c9a676]/60 bg-[#fdfaf3] p-6">
+        <article className="mt-8 rounded-[22px] border border-dashed border-gold/60 bg-bg-secondary p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="mb-2 text-[10px] font-mono uppercase tracking-[0.32em] text-[#8a7355]">
+              <p className="mb-2 text-[10px] font-mono uppercase tracking-[0.32em] text-text-muted">
                 Top Tier · 通行证覆盖
               </p>
               <h3 className="text-[16px] font-medium">{PASS_TIER.name}</h3>
-              <p className="mt-2 max-w-[480px] text-[13px] leading-[1.75] text-[#5a4f3e]">{PASS_TIER.tagline}</p>
+              <p className="mt-2 max-w-[480px] text-[13px] leading-[1.75] text-text-secondary">{PASS_TIER.tagline}</p>
             </div>
             <div className="flex items-center gap-5">
               <div className="text-right">
                 <span
-                  className="text-[36px] font-light text-[#2c2620]"
+                  className="text-[36px] font-light text-text-primary"
                   style={{ fontFamily: '"Cormorant Garamond", serif' }}
                 >
                   {PASS_TIER.price}
                 </span>
-                <span className="ml-1 text-[12px] text-[#8a7355]">{PASS_TIER.unit}</span>
+                <span className="ml-1 text-[12px] text-text-muted">{PASS_TIER.unit}</span>
               </div>
               <Link
                 href={PASS_TIER.ctaHref}
                 onClick={() => trackCptiEvent('cpti_pricing_sku_clicked', { tier: PASS_TIER.sku })}
-                className="rounded-xl border border-[#c9a676] px-4 py-2.5 text-[13px] font-medium text-[#6b5b3f] hover:bg-[#c9a676]/10"
+                className="rounded-xl border border-gold px-4 py-2.5 text-[13px] font-medium text-text-secondary hover:bg-gold/10"
               >
                 {PASS_TIER.ctaLabel}
               </Link>
@@ -247,12 +247,12 @@ export function CptiPricingLadder() {
         </article>
 
         {/* Footnote */}
-        <p className="mt-12 text-center text-[11px] text-[#8a7355]">
+        <p className="mt-12 text-center text-[11px] text-text-muted">
           所有 SKU 均一次解锁、永不复购；通行证按月续订，可随时取消。<br />
           支付方式：微信支付 · 支付宝（通过 Xunhupay 接入）。
         </p>
 
-        <footer className="mt-10 border-t border-[#c9a676]/30 pt-6 text-center text-[10px] font-mono uppercase tracking-[0.32em] text-[#8a7355]">
+        <footer className="mt-10 border-t border-gold/30 pt-6 text-center text-[10px] font-mono uppercase tracking-[0.32em] text-text-muted">
           CPTI · 关系图鉴 · v2.0
         </footer>
       </div>

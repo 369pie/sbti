@@ -388,8 +388,8 @@ export function CptiQuiz({
     </div>
   ) : isStealthMode ? (
     <div className="px-6 pt-3 max-w-2xl mx-auto w-full">
-      <div className="rounded-md border px-4 py-2.5 text-center" style={{ borderColor: '#E5DDF1', background: '#F6F1FB' }}>
-        <p className="text-xs sm:text-sm" style={{ color: '#6B4796' }}>
+      <div className="rounded-md border px-4 py-2.5 text-center" style={{ borderColor: 'var(--color-border-subtle)', background: 'var(--color-bg-secondary)' }}>
+        <p className="text-xs sm:text-sm" style={{ color: 'var(--color-accent)' }}>
           🔮 偷偷测 CP 感 · 根据你对{targetNickname || 'TA'}的了解来回答
         </p>
       </div>

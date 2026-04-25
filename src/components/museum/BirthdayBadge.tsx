@@ -110,7 +110,7 @@ export default function BirthdayBadge({ accent }: BirthdayBadgeProps) {
           style={{ borderColor: 'var(--color-border-subtle)' }}
           autoFocus
         />
-        <button onClick={onSave} className="text-xs font-semibold px-3 py-1 rounded-md text-white" style={{ background: accent }}>
+        <button onClick={onSave} className="text-xs font-semibold px-3 py-1 rounded-md text-bg-primary" style={{ background: accent }}>
           保存
         </button>
         <button onClick={() => { setEditing(false); setError(null); }} className="text-[11px] text-text-muted">

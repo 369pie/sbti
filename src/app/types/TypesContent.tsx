@@ -17,7 +17,6 @@ import { useMuseumUnlocked } from '@/lib/museum/unlocked';
 import { trackMuseum } from '@/lib/museum/analytics';
 import type { FeaturedCard } from '@/lib/museum/featured';
 import { getSeasonInfo, type SealStyle } from '@/lib/museum/season';
-import { hasSeenDailyPick } from '@/lib/museum/daily-pick';
 import { loadViewMode, saveViewMode, type ViewMode } from '@/lib/museum/view-mode';
 import { computeSetBonus } from '@/lib/museum/set-bonus';
 import { encodePairSlug } from '@/lib/museum/cp-pair';
@@ -34,6 +33,37 @@ const BinderView = dynamic(() => import('@/components/museum/BinderView'), { ssr
 const PileView = dynamic(() => import('@/components/museum/PileView'), { ssr: false });
 const ReelView = dynamic(() => import('@/components/museum/ReelView'), { ssr: false });
 const ConstellationView = dynamic(() => import('@/components/museum/ConstellationView'), { ssr: false });
+
+function compactMark(value: string | undefined, fallback: string) {
+  const source = (value || fallback).replace(/[^\dA-Za-z\u4e00-\u9fa5]/g, '');
+  return (source.slice(0, 3) || fallback.slice(0, 2) || 'TI').toUpperCase();
+}
+
+function ArrowIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M9 7h8v8" />
+    </svg>
+  );
+}
+
+function CodeGlyph({
+  code,
+  label,
+  color,
+  className = 'h-12 w-12',
+}: {
+  code?: string;
+  label: string;
+  color?: string;
+  className?: string;
+}) {
+  return (
+    <span className={`site-code-mark ${className}`} style={color ? { color } : undefined}>
+      {compactMark(code, label)}
+    </span>
+  );
+}
 
 /* ── Gallery card ───────────────────────────────────────── */
 interface GalleryCardProps {
@@ -61,12 +91,12 @@ function GalleryCard({ item, index, tabId, tabAccent, isUnlocked, sealStyle, onO
     onOpen(`${tabId}:${item.slug}`);
   }, [isUnlocked, tabId, item.slug, onOpen]);
 
-  const handlePreview = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handlePreview = useCallback((e?: React.MouseEvent | React.KeyboardEvent) => {
+    e?.stopPropagation();
     onPreview(index);
   }, [onPreview, index]);
 
-  // Long-press → preview
+  // Long-press preview
   const longPressTimerRef = useRef<number | null>(null);
   const handlePointerDown = useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -93,8 +123,8 @@ function GalleryCard({ item, index, tabId, tabAccent, isUnlocked, sealStyle, onO
       className="w-[70%] h-[70%] object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
     />
   ) : (
-    <div className="flex h-[70%] w-[70%] flex-col items-center justify-center rounded-xl border-2 border-white/30 bg-white/20 text-center backdrop-blur-sm">
-      <span className="text-3xl sm:text-4xl leading-none">{item.emoji ?? '🌿'}</span>
+    <div className="flex h-[70%] w-[70%] flex-col items-center justify-center rounded-xl border-2 border-border-subtle/30 bg-bg-elevated/20 text-center backdrop-blur-sm">
+      <CodeGlyph code={item.code} label={item.name} color={item.color} className="h-14 w-14 sm:h-16 sm:w-16" />
       <span className="mt-2 px-3 text-xs sm:text-sm font-medium text-text-primary/85 line-clamp-2">{item.name}</span>
     </div>
   );
@@ -109,7 +139,7 @@ function GalleryCard({ item, index, tabId, tabAccent, isUnlocked, sealStyle, onO
         onPointerLeave={cancelLongPress}
         onPointerCancel={cancelLongPress}
         aria-label={isUnlocked ? `查看 ${item.name}` : `${item.name}（未解锁）`}
-        className="group block w-full text-left rounded-xl sm:rounded-2xl border border-border-subtle hover:border-accent/40 bg-bg-elevated hover:shadow-lg transition-all duration-300 overflow-hidden hover:-translate-y-1 active:translate-y-0 cursor-pointer"
+        className="group block w-full text-left rounded-xl sm:rounded-2xl border border-border-subtle hover:border-accent/40 bg-bg-elevated hover:shadow-lg transition duration-300 overflow-hidden hover:-translate-y-1 active:translate-y-0 cursor-pointer"
       >
         <div
           className="relative w-full aspect-square overflow-hidden"
@@ -155,23 +185,34 @@ function GalleryCard({ item, index, tabId, tabAccent, isUnlocked, sealStyle, onO
               {item.rarity.label}
             </span>
           )}
-          {!item.rarity && item.emoji && isUnlocked && (
-            <span className="absolute top-2.5 left-2.5 text-lg sm:text-xl">{item.emoji}</span>
+          {!item.rarity && isUnlocked && (
+            <span
+              className="absolute top-2.5 left-2.5 rounded-full border px-2 py-0.5 text-[9px] font-mono tracking-[0.12em] backdrop-blur-sm"
+              style={{
+                color: item.color,
+                background: `${item.color}12`,
+                borderColor: `${item.color}35`,
+              }}
+            >
+              {compactMark(item.code, item.name)}
+            </span>
           )}
 
           {/* Preview eye (unlocked only) */}
           {isUnlocked && (
-            <button
-              type="button"
+            <div
+              role="button"
+              tabIndex={0}
               onClick={handlePreview}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handlePreview(); } }}
               aria-label="预览大图"
-              className="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-full bg-black/35 hover:bg-black/55 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-full bg-text-primary/35 hover:bg-text-primary/55 backdrop-blur-sm flex items-center justify-center text-bg-primary opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z" />
                 <circle cx="12" cy="12" r="3" />
               </svg>
-            </button>
+            </div>
           )}
         </div>
         <div className="px-3 sm:px-4 py-2.5 sm:py-3.5">
@@ -188,7 +229,7 @@ function GalleryCard({ item, index, tabId, tabAccent, isUnlocked, sealStyle, onO
               </h3>
             </div>
             <svg
-              className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 text-text-muted group-hover:text-accent group-hover:translate-x-1 transition-all"
+              className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 text-text-muted group-hover:text-accent group-hover:translate-x-1 transition-transform"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -229,8 +270,8 @@ function TabButton({ tab, isActive, onClick }: { tab: GalleryTab; isActive: bool
     <button
       onClick={onClick}
       className={`
-        relative flex items-center gap-1 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium
-        transition-all duration-200 whitespace-nowrap cursor-pointer flex-shrink-0
+        relative flex items-center gap-2 px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium
+        transition duration-200 whitespace-nowrap cursor-pointer flex-shrink-0
         ${isActive
           ? 'text-text-primary shadow-sm'
           : 'text-text-muted hover:text-text-secondary'
@@ -245,10 +286,8 @@ function TabButton({ tab, isActive, onClick }: { tab: GalleryTab; isActive: bool
         background: 'transparent',
       }}
     >
-      <span className="text-base hidden sm:inline">{tab.emoji}</span>
-      <span className="text-sm sm:text-base">{tab.emoji}</span>
-      <span className="hidden sm:inline">{tab.label}</span>
-      <span className="sm:hidden text-[10px]">{tab.label}</span>
+      <CodeGlyph code={tab.id} label={tab.label} color={tab.accent} className="h-6 w-6 text-[9px]" />
+      <span className="text-[11px] sm:text-sm">{tab.label}</span>
       <span
         className="text-[9px] sm:text-[11px] font-mono ml-0.5 tabular-nums"
         style={{ color: isActive ? tab.accent : undefined }}
@@ -287,7 +326,8 @@ export default function TypesContent({
   const [activeId, setActiveId] = useState(allTabs[0]?.id ?? 'sbti');
   const [drawerPayload, setDrawerPayload] = useState<CardDrawerPayload | null>(null);
   type FilterMode = 'all' | 'rarity' | 'special' | 'unlocked' | 'locked';
-  const [filterMode, setFilterMode] = useState<FilterMode>('all');  const [lightboxStart, setLightboxStart] = useState<number | null>(null);
+  const [filterMode, setFilterMode] = useState<FilterMode>('all');
+  const [lightboxStart, setLightboxStart] = useState<number | null>(null);
   const [dailyOpen, setDailyOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [cpPickerForKey, setCpPickerForKey] = useState<string | null>(null);
@@ -309,19 +349,15 @@ export default function TypesContent({
     trackMuseum('view_mode_switch', { mode: m });
   }, []);
 
-  // Auto-open daily pick on first visit per UTC+8 day, or via ?daily=1 query.
-  // Using a setTimeout async callback keeps us compliant with
-  // react-hooks/set-state-in-effect (no direct setState in effect body).
+  // Keep the daily pick user-initiated; ?daily=1 remains a direct-share entry.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const url = new URL(window.location.href);
     const force = url.searchParams.get('daily') === '1';
-    const today = new Date().toISOString().slice(0, 10);
+    if (!force) return;
     const t = window.setTimeout(() => {
-      if (force || !hasSeenDailyPick(today)) {
-        setDailyOpen(true);
-      }
-    }, force ? 80 : 1200);
+      setDailyOpen(true);
+    }, 80);
     return () => window.clearTimeout(t);
   }, []);
   // ── Derived ──────────────────────────────────────────────────────────
@@ -434,7 +470,7 @@ export default function TypesContent({
         <button
           type="button"
           onClick={() => setDailyOpen(true)}
-          className="group w-full rounded-2xl border px-4 sm:px-5 py-3.5 sm:py-4 flex items-center justify-between gap-4 transition-all hover:-translate-y-0.5 hover:shadow-md text-left"
+          className="group w-full rounded-2xl border px-4 sm:px-5 py-3.5 sm:py-4 flex items-center justify-between gap-4 transition hover:-translate-y-0.5 hover:shadow-md text-left"
           style={{
             background: `linear-gradient(120deg, ${season.palette.tintSoft}, var(--color-bg-elevated))`,
             borderColor: `${season.palette.tint}55`,
@@ -459,7 +495,8 @@ export default function TypesContent({
               borderColor: `${season.palette.accent}40`,
             }}
           >
-            翻开 →
+            翻开
+            <ArrowIcon className="h-3 w-3" />
           </span>
         </button>
       </div>
@@ -520,7 +557,7 @@ export default function TypesContent({
         <Link
           href={activeTab.testHref}
           prefetch={false}
-          className="inline-flex items-center justify-center sm:justify-start gap-1.5 text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl transition-all whitespace-nowrap border shrink-0"
+          className="inline-flex items-center justify-center sm:justify-start gap-1.5 text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl transition whitespace-nowrap border shrink-0"
           style={{
             color: activeTab.accent,
             background: `${activeTab.accent}08`,
@@ -570,10 +607,10 @@ export default function TypesContent({
                 key={mode}
                 type="button"
                 onClick={() => setFilterMode(mode)}
-                className="text-[10px] sm:text-xs font-mono tracking-[0.1em] px-2.5 py-1 rounded-full border transition-all duration-150"
+                className="text-[10px] sm:text-xs font-mono tracking-[0.1em] px-2.5 py-1 rounded-full border transition duration-150"
                 style={isActive ? {
                   background: activeTab.accent,
-                  color: '#fff',
+                  color: 'var(--color-bg-primary)',
                   borderColor: activeTab.accent,
                 } : {
                   background: 'transparent',
@@ -664,26 +701,26 @@ export default function TypesContent({
         <Link
           href={`/types/month/${currentYm()}/`}
           prefetch={false}
-          className="group rounded-2xl border bg-bg-elevated px-4 py-3.5 flex items-center justify-between gap-3 hover:-translate-y-0.5 transition-all"
+          className="group rounded-2xl border bg-bg-elevated px-4 py-3.5 flex items-center justify-between gap-3 hover:-translate-y-0.5 transition"
           style={{ borderColor: 'var(--color-border-subtle)' }}
         >
           <div className="min-w-0">
             <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-text-muted block">Monthly Recap</span>
             <span className="text-sm font-semibold" style={{ fontFamily: 'var(--font-serif)' }}>本月合辑 · 拼图发圈</span>
           </div>
-          <span className="text-text-muted group-hover:translate-x-0.5 transition-transform">→</span>
+          <ArrowIcon className="h-4 w-4 text-text-muted transition-transform group-hover:translate-x-0.5" />
         </Link>
         <button
           type="button"
           onClick={() => setCpPickerForKey('pick-a')}
-          className="group rounded-2xl border bg-bg-elevated px-4 py-3.5 flex items-center justify-between gap-3 hover:-translate-y-0.5 transition-all text-left"
+          className="group rounded-2xl border bg-bg-elevated px-4 py-3.5 flex items-center justify-between gap-3 hover:-translate-y-0.5 transition text-left"
           style={{ borderColor: 'var(--color-border-subtle)' }}
         >
           <div className="min-w-0">
             <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-text-muted block">CP / 配对</span>
             <span className="text-sm font-semibold" style={{ fontFamily: 'var(--font-serif)' }}>选两张卡 · 生成 CP 锐评</span>
           </div>
-          <span className="text-text-muted group-hover:translate-x-0.5 transition-transform">→</span>
+          <ArrowIcon className="h-4 w-4 text-text-muted transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
 
@@ -802,7 +839,7 @@ function CpPicker({ allTabs, unlockedKeys, onClose }: CpPickerProps) {
           {renderableTabs.map(({ tab, items }) => (
             <div key={tab.id}>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-base">{tab.emoji}</span>
+                <CodeGlyph code={tab.id} label={tab.label} color={tab.accent} className="h-7 w-7 text-[10px]" />
                 <span className="text-sm font-semibold">{tab.label}</span>
                 <span className="text-[10px] font-mono text-text-muted">{tab.items.length}</span>
               </div>
@@ -821,13 +858,15 @@ function CpPicker({ allTabs, unlockedKeys, onClose }: CpPickerProps) {
                         if (step === 'A') setPickA(k);
                         else setPickB(k);
                       }}
-                      className="group relative aspect-[3/4] rounded-lg border overflow-hidden bg-bg-elevated transition-all hover:-translate-y-0.5 disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="group relative aspect-[3/4] rounded-lg border overflow-hidden bg-bg-elevated transition hover:-translate-y-0.5 disabled:opacity-30 disabled:cursor-not-allowed"
                       style={{ borderColor: `${item.color}33`, background: `linear-gradient(135deg, ${item.color}10, ${item.color}04)` }}
                     >
                       {item.image ? (
                         <NextImage src={item.image} alt={item.name} width={140} height={186} loading="lazy" className="absolute inset-0 w-full h-full object-contain p-2" />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-2xl">{item.emoji ?? '✦'}</div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <CodeGlyph code={item.code} label={item.name} color={item.color} className="h-11 w-11 text-[10px]" />
+                        </div>
                       )}
                       {!isUnlocked && (
                         <span className="absolute top-1 right-1 text-[8px] font-mono px-1 rounded-sm" style={{ background: 'rgba(255,253,249,0.85)', color: 'var(--color-text-muted)' }}>未</span>

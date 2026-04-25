@@ -145,7 +145,7 @@ export function SoultiWishingWell({
       <div
         data-soulti-surface="cream"
         className="rounded-2xl border p-6 sm:p-7"
-        style={{ borderColor: `${accent}22`, background: '#FDFCFA' }}
+        style={{ borderColor: `${accent}22`, background: 'var(--color-bg-secondary)' }}
       >
         <div className="flex items-baseline justify-between mb-3">
           <p
@@ -157,7 +157,7 @@ export function SoultiWishingWell({
           {postedAt && (
             <span
               className="text-[10px]"
-              style={{ fontFamily: serifFont, color: '#a89f93' }}
+              style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
             >
               你 {relTime(postedAt)}留过一句
             </span>
@@ -166,7 +166,7 @@ export function SoultiWishingWell({
 
         <p
           className="text-[14px] leading-[1.95] mb-4"
-          style={{ fontFamily: serifFont, color: '#2D2A26' }}
+          style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
         >
           {headerLine}
         </p>
@@ -185,19 +185,19 @@ export function SoultiWishingWell({
                   transition={{ duration: 0.3 }}
                   className="rounded-xl px-3.5 py-2.5"
                   style={{
-                    background: '#fff',
+                    background: 'var(--color-bg-primary)',
                     border: `1px solid ${accent}15`,
                   }}
                 >
                   <p
                     className="text-[13px] leading-[1.85]"
-                    style={{ fontFamily: serifFont, color: '#3a352f' }}
+                    style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
                   >
                     {w.text}
                   </p>
                   <p
                     className="mt-1 text-[10px] tracking-[0.1em]"
-                    style={{ fontFamily: serifFont, color: '#a89f93' }}
+                    style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
                   >
                     — {w.signature ? w.signature : '匿名的同型人'} · {relTime(w.created_at)}
                   </p>
@@ -234,8 +234,8 @@ export function SoultiWishingWell({
               style={{
                 fontFamily: serifFont,
                 borderColor: `${accent}30`,
-                background: '#fff',
-                color: '#2D2A26',
+                background: 'var(--color-bg-primary)',
+                color: 'var(--color-text-primary)',
                 lineHeight: 1.85,
               }}
               maxLength={MAX_LEN}
@@ -253,8 +253,8 @@ export function SoultiWishingWell({
                 style={{
                   fontFamily: serifFont,
                   borderColor: `${accent}20`,
-                  background: '#fff',
-                  color: '#3a352f',
+                  background: 'var(--color-bg-primary)',
+                  color: 'var(--color-text-primary)',
                 }}
                 maxLength={SIG_MAX_LEN}
               />
@@ -272,7 +272,7 @@ export function SoultiWishingWell({
             {error && (
               <p
                 className="mt-3 text-[11px]"
-                style={{ color: '#b07850', fontFamily: serifFont }}
+                style={{ color: 'var(--color-text-muted)', fontFamily: serifFont }}
               >
                 {error}
               </p>
@@ -286,14 +286,14 @@ export function SoultiWishingWell({
                   setError(null);
                 }}
                 className="px-4 py-2 rounded-lg text-[12px]"
-                style={{ fontFamily: serifFont, color: '#7A6A5A' }}
+                style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)' }}
               >
                 取消
               </button>
               <button
                 type="submit"
                 disabled={!canSubmit}
-                className="px-5 py-2 rounded-lg text-white text-[12px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-5 py-2 rounded-lg text-bg-primary text-[12px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   fontFamily: serifFont,
                   background: accent,
@@ -308,7 +308,7 @@ export function SoultiWishingWell({
 
         <p
           className="mt-5 text-[10px] tracking-[0.18em]"
-          style={{ fontFamily: serifFont, color: '#a89f93' }}
+          style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
         >
           · 完全匿名 · 一小时最多 3 句 · 保护你的，也保护别人的边界 ·
         </p>

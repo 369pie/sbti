@@ -13,7 +13,7 @@ export default function FanrentiLandingContent() {
       <section className="relative">
         <div className="max-w-3xl mx-auto px-6 pt-20 pb-14 text-center">
           <div className="animate-fade-up">
-            <span className="inline-block text-[11px] tracking-[0.35em] mb-6 uppercase" style={{ color: '#5a4528' }}>
+            <span className="inline-block text-[11px] tracking-[0.35em] mb-6 uppercase" style={{ color: 'var(--color-text-secondary)' }}>
               WTFTI · 凡人修仙宇宙
             </span>
 
@@ -21,7 +21,7 @@ export default function FanrentiLandingContent() {
                 style={{ fontFamily: "'Noto Serif SC', 'Songti SC', serif" }}>
               凡人TI · 修仙
             </h1>
-            <p className="text-lg sm:text-xl mb-4" style={{ color: '#5a4528', fontFamily: "'Noto Serif SC', serif" }}>
+            <p className="text-lg sm:text-xl mb-4" style={{ color: 'var(--color-text-secondary)', fontFamily: "'Noto Serif SC', serif" }}>
               你在凡人修仙传里，是哪一号修士？
             </p>
 
@@ -29,7 +29,7 @@ export default function FanrentiLandingContent() {
               <FanrentiScrollOrnament />
             </div>
 
-            <p className="max-w-xl mx-auto text-base leading-relaxed mb-8" style={{ color: '#3a2e18' }}>
+            <p className="max-w-xl mx-auto text-base leading-relaxed mb-8" style={{ color: 'var(--color-text-primary)' }}>
               3 分钟情境题，把你对号入座到 <b>12 位正典角色 + 6 个境界</b>。
               <br className="hidden sm:inline" />
               结果卡是一张<b>入门令牌</b>，可直接发朋友圈。
@@ -40,12 +40,12 @@ export default function FanrentiLandingContent() {
                 href="/fanrenti/test/"
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-medium text-base transition-all shadow-lg"
                 style={{
-                  background: '#2a4d4f',
-                  color: '#f6f2ea',
+                  background: 'var(--color-accent)',
+                  color: 'var(--color-bg-primary)',
                   fontFamily: "'Noto Serif SC', serif",
                 }}
               >
-                🪷 开始入门试炼
+                ? 开始入门试炼
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -54,7 +54,7 @@ export default function FanrentiLandingContent() {
                 href="/wtfti/"
                 prefetch={false}
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border text-sm transition-all"
-                style={{ borderColor: 'rgba(90, 69, 40, 0.35)', color: '#5a4528' }}
+                style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
               >
                 经典 WTFTI
               </Link>
@@ -72,7 +72,7 @@ export default function FanrentiLandingContent() {
                 <div className="text-xl sm:text-2xl font-semibold fr-ink-text" style={{ fontFamily: "'Noto Serif SC', serif" }}>
                   {stat.value}
                 </div>
-                <div className="text-[11px] mt-1 tracking-widest uppercase" style={{ color: '#7a6a4a' }}>
+                <div className="text-[11px] mt-1 tracking-widest uppercase" style={{ color: 'var(--color-text-muted)' }}>
                   {stat.label}
                 </div>
               </div>
@@ -85,7 +85,7 @@ export default function FanrentiLandingContent() {
       <section className="relative py-14 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
-            <span className="text-xs tracking-[0.35em] uppercase block mb-2" style={{ color: '#8a6a2f' }}>
+            <span className="text-xs tracking-[0.35em] uppercase block mb-2" style={{ color: 'var(--color-gold)' }}>
               · Six Realms ·
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold fr-ink-text" style={{ fontFamily: "'Noto Serif SC', serif" }}>
@@ -117,7 +117,7 @@ export default function FanrentiLandingContent() {
                   >
                     {r.name}
                   </div>
-                  <p className="text-xs leading-relaxed" style={{ color: '#4a3a1e' }}>
+                  <p className="text-xs leading-relaxed" style={{ color: 'var(--color-text-primary)' }}>
                     {r.tagline}
                   </p>
                 </div>
@@ -131,7 +131,7 @@ export default function FanrentiLandingContent() {
       <section className="relative py-12 px-6 pb-24">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8 text-center">
-            <span className="text-xs tracking-[0.35em] uppercase block mb-2" style={{ color: '#8a6a2f' }}>
+            <span className="text-xs tracking-[0.35em] uppercase block mb-2" style={{ color: 'var(--color-gold)' }}>
               · Possible Matches ·
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold fr-ink-text" style={{ fontFamily: "'Noto Serif SC', serif" }}>
@@ -166,7 +166,7 @@ export default function FanrentiLandingContent() {
                   <div className="text-[10px] mt-1 tracking-widest" style={{ color: r.textAccent }}>
                     {r.name}
                   </div>
-                  <p className="text-[11px] mt-2 leading-snug" style={{ color: '#4a3a1e' }}>
+                  <p className="text-[11px] mt-2 leading-snug" style={{ color: 'var(--color-text-primary)' }}>
                     {c.traits[0]}
                   </p>
                 </div>
@@ -180,8 +180,8 @@ export default function FanrentiLandingContent() {
               href="/fanrenti/test/"
               className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-medium shadow"
               style={{
-                background: '#2a4d4f',
-                color: '#f6f2ea',
+                background: 'var(--color-accent)',
+                color: 'var(--color-bg-primary)',
                 fontFamily: "'Noto Serif SC', serif",
               }}
             >
@@ -191,8 +191,8 @@ export default function FanrentiLandingContent() {
               href="/fanrenti/gallery/"
               className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-medium border"
               style={{
-                borderColor: '#2a4d4f60',
-                color: '#2a4d4f',
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-accent)',
                 fontFamily: "'Noto Serif SC', serif",
               }}
             >

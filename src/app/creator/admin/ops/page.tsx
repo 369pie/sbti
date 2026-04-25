@@ -144,7 +144,7 @@ function AdminLoginState({ loginHref }: { loginHref: string }) {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               href={loginHref}
-              className="inline-flex items-center rounded-xl bg-accent px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-accent/90"
+              className="inline-flex items-center rounded-xl bg-accent px-5 py-3 text-sm font-medium text-bg-primary transition-colors hover:bg-accent/90"
             >
               登录管理员账号
             </Link>
@@ -190,7 +190,7 @@ function AdminForbiddenState() {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               href="/creator/studio/"
-              className="inline-flex items-center rounded-xl bg-accent px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-accent/90"
+              className="inline-flex items-center rounded-xl bg-accent px-5 py-3 text-sm font-medium text-bg-primary transition-colors hover:bg-accent/90"
             >
               去 Creator Studio
             </Link>
@@ -583,7 +583,7 @@ export default async function CreatorAdminOpsPage() {
           <div className="flex flex-wrap gap-2">
             <Link
               href="/creator/admin/ops/"
-              className="inline-flex items-center rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white"
+              className="inline-flex items-center rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-bg-primary"
             >
               总看板
             </Link>

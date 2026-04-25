@@ -73,14 +73,14 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
   const dreamP = layered ? getSoultiPersonalityBySlug(layered.dreamTendency.slug) : null;
 
   return (
-    <div className="min-h-screen" style={{ background: '#FAF8F5' }}>
+    <div className="min-h-screen" style={{ background: 'var(--color-bg-secondary)' }}>
       <PremiumFoilStyles />
 
       {/* ── Header ── */}
       <header className="max-w-2xl mx-auto px-6 pt-16 pb-4">
         <Link
           href={`/soulti/result/${personality.slug}`}
-          className="text-xs tracking-wider text-[#6A6054] hover:text-[#7A6A5A] font-medium transition-colors"
+          className="text-xs tracking-wider text-text-secondary hover:text-text-secondary font-medium transition-colors"
           style={{ fontFamily: monoFont }}
         >
           ← 返回结果页
@@ -98,7 +98,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
       >
         <p
           className="text-[10px] tracking-[0.35em] uppercase mb-6"
-          style={{ fontFamily: monoFont, color: '#8b7355', opacity: 0.5 }}
+          style={{ fontFamily: monoFont, color: 'var(--color-text-muted)', opacity: 0.5 }}
         >
           DEEP MIRROR REPORT
         </p>
@@ -107,7 +107,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
 
         <h1
           className="text-2xl sm:text-3xl mb-2"
-          style={{ fontFamily: serifFont, fontWeight: 400, color: '#2D2A26', letterSpacing: '0.02em' }}
+          style={{ fontFamily: serifFont, fontWeight: 400, color: 'var(--color-text-primary)', letterSpacing: '0.02em' }}
         >
           {personality.name}的深度镜像
         </h1>
@@ -120,7 +120,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
         </p>
 
         <p
-          className="text-sm leading-relaxed text-[#6A6054] max-w-md mx-auto"
+          className="text-sm leading-relaxed text-text-secondary max-w-md mx-auto"
           style={{ fontFamily: serifFont, fontStyle: 'italic' }}
         >
           {personality.tagline}
@@ -143,12 +143,12 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
           transition={{ delay: 0.15, duration: 0.6 }}
         >
           <h2
-            className="text-[11px] tracking-[0.3em] text-[#8b7355] font-medium uppercase mb-2"
+            className="text-[11px] tracking-[0.3em] text-text-muted font-medium uppercase mb-2"
             style={{ fontFamily: serifFont }}
           >
             THREE MIRRORS · 三面镜子
           </h2>
-          <p className="text-xs text-[#7A6A5A] mb-8 font-medium" style={{ fontFamily: serifFont }}>
+          <p className="text-xs text-text-secondary mb-8 font-medium" style={{ fontFamily: serifFont }}>
             同一个你，在不同时刻呈现的自然力
           </p>
 
@@ -161,22 +161,22 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
               <div
                 key={label}
                 className="rounded-2xl border p-4 sm:p-5 text-center"
-                style={{ borderColor: `${p.color}20`, background: p.slug === personality.slug ? `${p.color}08` : '#FDFCFA' }}
+                style={{ borderColor: `${p.color}20`, background: p.slug === personality.slug ? `${p.color}08` : 'var(--color-bg-primary)' }}
               >
-                <p className="text-[10px] tracking-[0.2em] text-[#8b7355] font-medium uppercase mb-3" style={{ fontFamily: serifFont }}>
+                <p className="text-[10px] tracking-[0.2em] text-text-muted font-medium uppercase mb-3" style={{ fontFamily: serifFont }}>
                   {label}
                 </p>
                 <div className="text-2xl mb-2">{emoji}</div>
                 <p className="text-sm tracking-[0.15em] mb-1" style={{ fontFamily: serifFont, color: p.color }}>
                   {p.name}
                 </p>
-                <p className="text-[10px] text-[#6A6054] font-semibold tracking-wider font-mono mb-2">
+                <p className="text-[10px] text-text-secondary font-semibold tracking-wider font-mono mb-2">
                   {p.code}
                 </p>
                 <p className="text-[11px] leading-relaxed text-text-primary line-clamp-2 text-[12px] font-medium" style={{ fontFamily: serifFont }}>
                   {p.tagline}
                 </p>
-                <p className="text-[10px] text-[#6A6054] font-medium mt-2" style={{ fontFamily: serifFont }}>
+                <p className="text-[10px] text-text-secondary font-medium mt-2" style={{ fontFamily: serifFont }}>
                   {name}
                 </p>
               </div>
@@ -195,7 +195,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
                 TENSION · 张力解读
               </p>
               <p
-                className="text-sm leading-[2] text-[#6A6054]"
+                className="text-sm leading-[2] text-text-secondary"
                 style={{ fontFamily: serifFont }}
               >
                 白天你是<span style={{ color: dayP.color }}>{dayP.name}</span>，
@@ -231,18 +231,18 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
         ]}
         preview={(
           <div className="py-2">
-            <p className="text-[10px] tracking-[0.3em] text-[#8b7355] uppercase mb-2" style={{ fontFamily: serifFont }}>
+            <p className="text-[10px] tracking-[0.3em] text-text-muted uppercase mb-2" style={{ fontFamily: serifFont }}>
               AXIS CROSS · 轴间交叉解读
             </p>
-            <p className="text-xs text-[#7A6A5A] mb-6" style={{ fontFamily: serifFont }}>
+            <p className="text-xs text-text-secondary mb-6" style={{ fontFamily: serifFont }}>
               单一维度只能看到轮廓，交叉才能看到你的模式
             </p>
             {crossReadings[0] && (
-              <div className="rounded-2xl border p-6" style={{ borderColor: `${personality.color}18`, background: '#FDFCFA' }}>
-                <h3 className="text-base mb-2" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+              <div className="rounded-2xl border p-6" style={{ borderColor: `${personality.color}18`, background: 'var(--color-bg-secondary)' }}>
+                <h3 className="text-base mb-2" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
                   {crossReadings[0].label} · {crossReadings[0].tagline}
                 </h3>
-                <p className="text-sm leading-[2] text-[#7A6A5A]" style={{ fontFamily: serifFont }}>
+                <p className="text-sm leading-[2] text-text-secondary" style={{ fontFamily: serifFont }}>
                   {crossReadings[0].interpretation.slice(0, 140)}…
                 </p>
               </div>
@@ -265,7 +265,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
         >
           AXIS CROSS · 轴间交叉解读
         </h2>
-        <p className="text-xs text-[#7A6A5A] mb-10 font-medium" style={{ fontFamily: serifFont }}>
+        <p className="text-xs text-text-secondary mb-10 font-medium" style={{ fontFamily: serifFont }}>
           单一维度只能看到轮廓，交叉才能看到你的模式
         </p>
 
@@ -274,7 +274,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
             <motion.div
               key={reading.axes + reading.label}
               className="rounded-2xl border p-6 sm:p-8"
-              style={{ borderColor: `${personality.color}12`, background: '#FDFCFA' }}
+              style={{ borderColor: `${personality.color}12`, background: 'var(--color-bg-secondary)' }}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
@@ -286,20 +286,20 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
                 >
                   {reading.axes}
                 </span>
-                <span className="text-xs text-[#6A6054]" style={{ fontFamily: serifFont }}>
+                <span className="text-xs text-text-secondary" style={{ fontFamily: serifFont }}>
                   {reading.title}
                 </span>
               </div>
 
               <h3
                 className="text-lg mb-1"
-                style={{ fontFamily: serifFont, color: '#2D2A26' }}
+                style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
               >
                 {reading.label} · {reading.tagline}
               </h3>
 
               <p
-                className="text-sm leading-[2] text-[#7A6A5A] mb-4 font-medium"
+                className="text-sm leading-[2] text-text-secondary mb-4 font-medium"
                 style={{ fontFamily: serifFont }}
               >
                 {reading.interpretation}
@@ -343,7 +343,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
           >
             REPAIR · 修复处方
           </h2>
-          <p className="text-xs text-[#7A6A5A] mb-4 font-medium" style={{ fontFamily: serifFont }}>
+          <p className="text-xs text-text-secondary mb-4 font-medium" style={{ fontFamily: serifFont }}>
             基于你的蜕变轴：{repair.typeLabel}
           </p>
 
@@ -352,7 +352,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
             style={{ borderColor: `${personality.color}15`, background: `${personality.color}04` }}
           >
             <p
-              className="text-sm leading-[2] text-[#6A6054]"
+              className="text-sm leading-[2] text-text-secondary"
               style={{ fontFamily: serifFont, fontStyle: 'italic' }}
             >
               {repair.metaphor}
@@ -364,7 +364,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
               <motion.div
                 key={strategy.title}
                 className="rounded-2xl border p-5 sm:p-6"
-                style={{ borderColor: `${personality.color}10`, background: '#FDFCFA' }}
+                style={{ borderColor: `${personality.color}10`, background: 'var(--color-bg-secondary)' }}
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.45 + i * 0.06, duration: 0.4 }}
@@ -379,12 +379,12 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
                   <div>
                     <h4
                       className="text-sm mb-2"
-                      style={{ fontFamily: serifFont, color: '#2D2A26' }}
+                      style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
                     >
                       {strategy.title}
                     </h4>
                     <p
-                      className="text-[13px] leading-[2] text-[#6A6054]"
+                      className="text-[13px] leading-[2] text-text-secondary"
                       style={{ fontFamily: serifFont }}
                     >
                       {strategy.description}
@@ -438,7 +438,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
               {soulLetter.body.map((para, i) => (
                 <p
                   key={i}
-                  className="text-[15px] leading-[2.2] text-[#6A6054]"
+                  className="text-[15px] leading-[2.2] text-text-secondary"
                   style={{ fontFamily: serifFont }}
                 >
                   {para}
@@ -478,7 +478,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
           transition={{ delay: 0.55, duration: 0.6 }}
         >
           <h2
-            className="text-[11px] tracking-[0.3em] text-[#8b7355] font-medium uppercase mb-8"
+            className="text-[11px] tracking-[0.3em] text-text-muted font-medium uppercase mb-8"
             style={{ fontFamily: serifFont }}
           >
             DEEP RESONANCE · 灵魂共振深度版
@@ -548,18 +548,18 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
         transition={{ delay: 0.6, duration: 0.6 }}
       >
         <h2
-          className="text-[11px] tracking-[0.3em] text-[#8b7355] font-medium uppercase mb-2"
+          className="text-[11px] tracking-[0.3em] text-text-muted font-medium uppercase mb-2"
           style={{ fontFamily: serifFont }}
         >
           THIS WEEK&apos;S MIRROR · 本周镜像
         </h2>
-        <p className="text-xs text-[#7A6A5A] mb-8 font-medium" style={{ fontFamily: serifFont }}>
+        <p className="text-xs text-text-secondary mb-8 font-medium" style={{ fontFamily: serifFont }}>
           每周一个问题，照见你的变化
         </p>
 
         <div
           className="rounded-2xl border p-6 sm:p-8 text-center"
-          style={{ borderColor: `${personality.color}12`, background: '#FDFCFA' }}
+          style={{ borderColor: `${personality.color}12`, background: 'var(--color-bg-secondary)' }}
         >
           <span
             className="text-[10px] tracking-[0.2em] px-2 py-1 rounded-md inline-block mb-4"
@@ -569,12 +569,12 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
           </span>
           <p
             className="text-base leading-[2]"
-            style={{ fontFamily: serifFont, color: '#2D2A26' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
           >
             {weeklyPrompt.prompt}
           </p>
           <p
-            className="text-[10px] text-[#6A6054] font-medium mt-4"
+            className="text-[10px] text-text-secondary font-medium mt-4"
             style={{ fontFamily: serifFont }}
           >
             WEEK {weeklyPrompt.week} · 每周更新
@@ -592,13 +592,13 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
         transition={{ delay: 0.65, duration: 0.5 }}
       >
         <h3
-          className="text-[11px] tracking-[0.3em] text-[#8b7355] font-medium uppercase mb-6"
+          className="text-[11px] tracking-[0.3em] text-text-muted font-medium uppercase mb-6"
           style={{ fontFamily: serifFont }}
         >
           {personality.code} · 五轴画像
         </h3>
 
-        <div className="rounded-2xl border border-border-subtle/60 p-6 sm:p-8 space-y-6" style={{ background: '#FDFCFA' }}>
+        <div className="rounded-2xl border border-border-subtle/60 p-6 sm:p-8 space-y-6" style={{ background: 'var(--color-bg-secondary)' }}>
           {dimensionScores.map(ds => {
             const dim = SOULTI_DIMENSIONS.find(d => d.id === ds.id);
             if (!dim) return null;
@@ -611,7 +611,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
                     <span className="text-xs font-mono" style={{ color: color.base }}>{ds.id}</span>
                     <span className="text-sm text-text-primary">{SOULTI_MODEL_NAMES[dim.model]}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-[#7A6A5A] font-medium">
+                  <div className="flex items-center gap-2 text-xs text-text-secondary font-medium">
                     <span>{dim.poleALabel}</span>
                     <span className="font-mono">{ds.level}</span>
                     <span>{dim.poleBLabel}</span>
@@ -626,7 +626,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
                     transition={{ delay: 0.7, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
                   />
                 </div>
-                <p className="text-xs text-[#7A6A5A] font-medium mt-1.5">{dim.levels[ds.level]}</p>
+                <p className="text-xs text-text-secondary font-medium mt-1.5">{dim.levels[ds.level]}</p>
               </div>
             );
           })}
@@ -644,7 +644,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
           <div className="border-t border-border-subtle/40" />
         </div>
         <p
-          className="text-sm leading-[2] text-[#7A6A5A] mb-8 font-medium"
+          className="text-sm leading-[2] text-text-secondary mb-8 font-medium"
           style={{ fontFamily: serifFont, fontStyle: 'italic' }}
         >
           这份报告不是一个答案，<br />
@@ -654,14 +654,14 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             href={`/soulti/result/${personality.slug}`}
-            className="px-8 py-3 rounded-full text-sm border border-border-subtle text-[#7A6A5A] font-medium hover:bg-bg-secondary/30 transition-all"
+            className="px-8 py-3 rounded-full text-sm border border-border-subtle text-text-secondary font-medium hover:bg-bg-secondary/30 transition-all"
             style={{ fontFamily: serifFont }}
           >
             ← 返回结果
           </Link>
           <Link
             href="/soulti/test"
-            className="px-8 py-3 rounded-full text-sm text-white transition-all hover:scale-[1.02]"
+            className="px-8 py-3 rounded-full text-sm text-bg-primary transition-all hover:scale-[1.02]"
             style={{
               background: `linear-gradient(135deg, ${personality.color}cc, ${personality.color})`,
               fontFamily: serifFont,

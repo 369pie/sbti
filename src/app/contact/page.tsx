@@ -32,7 +32,7 @@ export default function ContactPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <section className="rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm p-6 text-center">
           <h2 className="text-lg font-medium text-text-primary mb-4">微信群</h2>
-          <div className="rounded-xl overflow-hidden bg-white p-2 inline-block">
+          <div data-keep-white className="rounded-xl overflow-hidden bg-white p-2 inline-block">
             <NextImage
               src={withBasePath('/images/qr-wechat.png')}
               alt="WTFTI 微信交流群二维码"

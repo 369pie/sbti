@@ -375,7 +375,7 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
                       checked ? 'border-pink-500 bg-pink-500' : 'border-border'
                     }`}>
                       {checked && (
-                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <svg className="w-3 h-3 text-bg-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       )}
@@ -452,7 +452,7 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
             </p>
             <button
               onClick={copyChallenge}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-medium text-sm hover:from-pink-600 hover:to-rose-600 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-bg-primary font-medium text-sm hover:from-pink-600 hover:to-rose-600 transition-all cursor-pointer"
             >
               {challengeCopied ? (
                 '已复制挑战链接 ✓'

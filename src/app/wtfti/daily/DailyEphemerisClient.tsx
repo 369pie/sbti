@@ -94,11 +94,11 @@ export function DailyEphemerisClient() {
   return (
     <main
       style={{
-        minHeight: '100vh',
+        minHeight: '100dvh',
         background:
-          'radial-gradient(ellipse 100% 60% at 50% 0%, #2a1c4d 0%, #1a1530 38%, #0F0A22 100%)',
-        color: '#F5F0E8',
-        fontFamily: 'Cormorant Garamond, Noto Serif SC, serif',
+          'var(--galaxy-bg-hero)',
+        color: 'var(--galaxy-cream)',
+        fontFamily: 'var(--font-display)',
         padding: '64px 20px 96px',
       }}
     >
@@ -106,11 +106,11 @@ export function DailyEphemerisClient() {
         <p
           style={{
             margin: 0,
-            fontFamily: 'Inter, sans-serif',
+            fontFamily: 'var(--font-mono)',
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.42em',
-            color: '#C9A676',
+            color: 'var(--galaxy-gold)',
             textAlign: 'center',
             textTransform: 'uppercase',
           }}
@@ -121,11 +121,11 @@ export function DailyEphemerisClient() {
           style={{
             margin: '12px 0 8px',
             textAlign: 'center',
-            fontFamily: 'Cormorant Garamond, Noto Serif SC, serif',
+            fontFamily: 'var(--font-display)',
             fontStyle: 'italic',
             fontSize: 36,
             fontWeight: 500,
-            color: '#F5F0E8',
+            color: 'var(--galaxy-cream)',
             lineHeight: 1.15,
           }}
         >
@@ -137,7 +137,7 @@ export function DailyEphemerisClient() {
             textAlign: 'center',
             maxWidth: 380,
             fontSize: 13,
-            color: 'rgba(245,240,232,0.7)',
+            color: 'var(--galaxy-mist)',
             lineHeight: 1.7,
           }}
         >
@@ -151,13 +151,13 @@ export function DailyEphemerisClient() {
             style={{
               minHeight: 320,
               borderRadius: 22,
-              border: '1px solid rgba(245,240,232,0.08)',
-              background: 'rgba(20,12,60,0.4)',
+              border: '1px solid var(--color-border-subtle)',
+              background: 'color-mix(in oklab, var(--galaxy-ink) 50%, transparent)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: 12,
-              color: 'rgba(245,240,232,0.45)',
+              color: 'var(--galaxy-mist-faint)',
               letterSpacing: '0.32em',
               textTransform: 'uppercase',
             }}
@@ -172,11 +172,11 @@ export function DailyEphemerisClient() {
               marginTop: 22,
               padding: '14px 16px',
               borderRadius: 14,
-              border: '1px dashed rgba(201,166,118,0.45)',
-              background: 'rgba(201,166,118,0.06)',
+              border: '1px dashed var(--galaxy-gold-faint)',
+              background: 'color-mix(in oklab, var(--galaxy-gold) 8%, transparent)',
               textAlign: 'center',
               fontSize: 12.5,
-              color: 'rgba(245,240,232,0.78)',
+              color: 'var(--galaxy-mist)',
               lineHeight: 1.7,
             }}
           >
@@ -190,8 +190,8 @@ export function DailyEphemerisClient() {
                 display: 'inline-block',
                 padding: '8px 18px',
                 borderRadius: 999,
-                background: 'linear-gradient(135deg, #C9A676 0%, #B08D5C 100%)',
-                color: '#1a1530',
+                background: 'linear-gradient(135deg, var(--galaxy-gold) 0%, var(--color-gold) 100%)',
+                color: '#4D2C2F',
                 fontSize: 11.5,
                 fontWeight: 700,
                 letterSpacing: '0.32em',
@@ -211,8 +211,8 @@ export function DailyEphemerisClient() {
                   display: 'inline-block',
                   padding: '8px 18px',
                   borderRadius: 999,
-                  border: '1px solid rgba(245,240,232,0.25)',
-                  color: 'rgba(245,240,232,0.85)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--galaxy-mist)',
                   fontSize: 11,
                   fontWeight: 600,
                   letterSpacing: '0.32em',
@@ -233,7 +233,7 @@ export function DailyEphemerisClient() {
             fontSize: 10.5,
             fontWeight: 600,
             letterSpacing: '0.32em',
-            color: 'rgba(245,240,232,0.4)',
+            color: 'var(--galaxy-mist-faint)',
             textTransform: 'uppercase',
           }}
         >

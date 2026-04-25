@@ -151,7 +151,7 @@ export default async function CptiScenarioPage({ params }: PageProps) {
         <p className="text-sm text-text-secondary italic mb-6">{config.heroSub}</p>
         <Link
           href="/cpti/test/"
-          className="inline-block px-7 py-3 rounded-full text-white font-semibold shadow-lg hover:shadow-xl transition-shadow"
+          className="inline-block px-7 py-3 rounded-full text-bg-primary font-semibold shadow-lg hover:shadow-xl transition-shadow"
           style={{ background: config.color }}
         >
           {config.cta}
@@ -244,7 +244,7 @@ export default async function CptiScenarioPage({ params }: PageProps) {
       <section className="max-w-2xl mx-auto px-6 pb-16 text-center">
         <Link
           href="/cpti/test/"
-          className="inline-block px-8 py-3.5 rounded-full text-white font-semibold shadow-lg hover:shadow-xl transition-shadow"
+          className="inline-block px-8 py-3.5 rounded-full text-bg-primary font-semibold shadow-lg hover:shadow-xl transition-shadow"
           style={{ background: config.color }}
         >
           {config.cta}

@@ -399,7 +399,7 @@ export function MystiGachaContent() {
                         className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium"
                         style={{
                           background: 'rgba(34,197,94,0.2)',
-                          color: '#22c55e',
+                          color: 'var(--color-sage)',
                         }}
                       >
                         ✨ 新卡牌！
@@ -542,7 +542,7 @@ export function MystiGachaContent() {
           <Link
             href="/mysti/"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium transition-all hover:brightness-110"
-            style={{ background: `linear-gradient(90deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`, color: '#fff' }}
+            style={{ background: `linear-gradient(90deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`, color: 'var(--color-bg-primary)' }}
           >
             🔮 返回灵鉴首页
           </Link>
@@ -584,23 +584,23 @@ function CardBack({ theme }: { theme: MystiTheme }) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <circle cx="100" cy="150" r="60" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.4" />
-        <circle cx="100" cy="150" r="40" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.3" />
-        <circle cx="100" cy="150" r="20" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.2" />
-        <line x1="100" y1="90" x2="100" y2="210" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.3" />
-        <line x1="40" y1="150" x2="160" y2="150" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.3" />
-        <line x1="58" y1="108" x2="142" y2="192" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.25" />
-        <line x1="58" y1="192" x2="142" y2="108" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.25" />
-        <circle cx="100" cy="80" r="2" fill={isCelestial ? '#C9A86C' : '#A85C64'} opacity="0.5" />
-        <circle cx="100" cy="220" r="2" fill={isCelestial ? '#C9A86C' : '#A85C64'} opacity="0.5" />
-        <circle cx="40" cy="150" r="2" fill={isCelestial ? '#C9A86C' : '#A85C64'} opacity="0.5" />
-        <circle cx="160" cy="150" r="2" fill={isCelestial ? '#C9A86C' : '#A85C64'} opacity="0.5" />
+        <circle cx="100" cy="150" r="60" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.4" />
+        <circle cx="100" cy="150" r="40" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.3" />
+        <circle cx="100" cy="150" r="20" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.2" />
+        <line x1="100" y1="90" x2="100" y2="210" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.3" />
+        <line x1="40" y1="150" x2="160" y2="150" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.3" />
+        <line x1="58" y1="108" x2="142" y2="192" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.25" />
+        <line x1="58" y1="192" x2="142" y2="108" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.25" />
+        <circle cx="100" cy="80" r="2" fill={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} opacity="0.5" />
+        <circle cx="100" cy="220" r="2" fill={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} opacity="0.5" />
+        <circle cx="40" cy="150" r="2" fill={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} opacity="0.5" />
+        <circle cx="160" cy="150" r="2" fill={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} opacity="0.5" />
       </svg>
 
       {/* Center symbol */}
       <div
         className="text-5xl font-serif relative z-10"
-        style={{ color: isCelestial ? '#C9A86C' : '#A85C64', opacity: 0.6 }}
+        style={{ color: isCelestial ? 'var(--color-gold)' : 'var(--color-accent)', opacity: 0.6 }}
       >
         ✦
       </div>
@@ -608,7 +608,7 @@ function CardBack({ theme }: { theme: MystiTheme }) {
       {/* Top accent line */}
       <div
         className="absolute inset-x-0 top-0 h-px"
-        style={{ background: `linear-gradient(90deg, transparent, ${isCelestial ? '#C9A86C' : '#A85C64'}, transparent)` }}
+        style={{ background: `linear-gradient(90deg, transparent, ${isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'}, transparent)` }}
       />
     </div>
   );
@@ -645,7 +645,7 @@ function GachaCardFront({ card, theme, isNew }: GachaCardFrontProps) {
         background: isLegendary
           ? `linear-gradient(135deg, #1a1520 0%, #2d1f35 30%, #1a1520 60%, #251a2d 100%)`
           : `linear-gradient(135deg, ${theme.gradientCard[0]} 0%, ${theme.gradientCard[1]} 100%)`,
-        borderColor: variant === 'gold' ? '#FFD700' : variant === 'holographic' ? '#a78bfa' : rarityColor,
+        borderColor: variant === 'gold' ? 'var(--color-gold)' : variant === 'holographic' ? 'var(--color-accent)' : rarityColor,
         borderWidth: isHighRarity || isSpecialVariant ? '2px' : '1px',
         boxShadow: isSpecialVariant
           ? variantShadow
@@ -662,7 +662,7 @@ function GachaCardFront({ card, theme, isNew }: GachaCardFrontProps) {
             background: variant === 'gold'
               ? 'linear-gradient(135deg, #FFD700, #FFA500)'
               : 'linear-gradient(135deg, #8b5cf6, #3b82f6, #06b6d4)',
-            color: variant === 'gold' ? '#1a1520' : '#fff',
+            color: variant === 'gold' ? '#1a1520' : 'var(--color-bg-primary)',
             boxShadow: variant === 'gold'
               ? '0 0 8px rgba(255,215,0,0.4)'
               : '0 0 8px rgba(139,92,246,0.4)',
@@ -716,7 +716,7 @@ function GachaCardFront({ card, theme, isNew }: GachaCardFrontProps) {
       <div
         className="text-xl font-medium mb-2"
         style={{
-          color: isLegendary ? '#FFD700' : theme.text,
+          color: isLegendary ? 'var(--color-gold)' : theme.text,
           textShadow: isLegendary ? '0 0 20px rgba(255,215,0,0.3)' : undefined,
         }}
       >
@@ -767,7 +767,7 @@ function GachaCardFront({ card, theme, isNew }: GachaCardFrontProps) {
           className="absolute top-4 right-4 px-2 py-1 rounded-full text-[10px] font-medium"
           style={{
             background: 'rgba(34,197,94,0.2)',
-            color: '#22c55e',
+            color: 'var(--color-sage)',
           }}
         >
           NEW
@@ -777,8 +777,8 @@ function GachaCardFront({ card, theme, isNew }: GachaCardFrontProps) {
       {/* Legendary corner decorations */}
       {isLegendary && (
         <>
-          <div className="absolute top-3 left-3 text-xs" style={{ color: '#FFD700', opacity: 0.4 }}>✦</div>
-          <div className="absolute bottom-3 left-3 text-xs" style={{ color: '#FFD700', opacity: 0.4 }}>✦</div>
+          <div className="absolute top-3 left-3 text-xs" style={{ color: 'var(--color-gold)', opacity: 0.4 }}>✦</div>
+          <div className="absolute bottom-3 left-3 text-xs" style={{ color: 'var(--color-gold)', opacity: 0.4 }}>✦</div>
         </>
       )}
 

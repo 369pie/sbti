@@ -190,7 +190,7 @@ export function WeeklySoulContent() {
           <p className="text-sm text-text-muted mb-3">完成 WTFTI 测试解锁个性化频率</p>
           <Link
             href="/wtfti/test/"
-            className="inline-block px-5 py-2 rounded-full bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"
+            className="inline-block px-5 py-2 rounded-full bg-accent text-bg-primary text-sm font-medium hover:bg-accent/90 transition-colors"
           >
             去测试 →
           </Link>

@@ -96,7 +96,7 @@ export default function SoulProbeStandalone() {
         minHeight: '100vh',
         background:
           'radial-gradient(ellipse 100% 60% at 50% 0%, #2a1c4d 0%, #1a1530 38%, #0F0A22 100%)',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         fontFamily: 'var(--font-display), "Cormorant Garamond", "Noto Serif SC", serif',
         padding: '64px 20px 96px',
       }}
@@ -108,7 +108,7 @@ export default function SoulProbeStandalone() {
             fontFamily: 'Inter, sans-serif',
             fontSize: 11,
             letterSpacing: '0.42em',
-            color: '#C9A676',
+            color: 'var(--color-gold)',
             textTransform: 'uppercase',
           }}
         >
@@ -125,7 +125,7 @@ export default function SoulProbeStandalone() {
         >
           你听见的频率，
           <br />
-          <em style={{ fontStyle: 'italic', color: '#C07A8E' }}>就是你的灵魂签</em>
+          <em style={{ fontStyle: 'italic', color: 'var(--color-accent)' }}>就是你的灵魂签</em>
         </h1>
         <p
           style={{
@@ -139,7 +139,7 @@ export default function SoulProbeStandalone() {
           凭直觉选 · 60 秒 · 不影响你的人格判定
           <br />
           但当你和 ta 配对时，
-          <span style={{ color: '#C9A676' }}>这 6 道签会算出你们的「灵魂频率 S」</span>
+          <span style={{ color: 'var(--color-gold)' }}>这 6 道签会算出你们的「灵魂频率 S」</span>
         </p>
       </header>
 
@@ -160,7 +160,7 @@ export default function SoulProbeStandalone() {
                 margin: 0,
                 fontSize: 10,
                 letterSpacing: '0.42em',
-                color: '#C07A8E',
+                color: 'var(--color-accent)',
                 textTransform: 'uppercase',
               }}
             >
@@ -173,7 +173,7 @@ export default function SoulProbeStandalone() {
                 fontStyle: 'italic',
                 fontSize: 30,
                 letterSpacing: 10,
-                color: '#F5F0E8',
+                color: 'var(--color-bg-primary)',
               }}
             >
               {friendCode}
@@ -189,7 +189,7 @@ export default function SoulProbeStandalone() {
             >
               你的朋友的灵魂频率码已经到了。
               <br />
-              答完这 6 题，下面就会显示你们的 <span style={{ color: '#C9A676' }}>灵魂频率 S</span>。
+              答完这 6 题，下面就会显示你们的 <span style={{ color: 'var(--color-gold)' }}>灵魂频率 S</span>。
             </p>
           </section>
         )}
@@ -220,7 +220,7 @@ export default function SoulProbeStandalone() {
               margin: 0,
               fontSize: 10,
               letterSpacing: '0.42em',
-              color: '#C9A676',
+              color: 'var(--color-gold)',
               textTransform: 'uppercase',
             }}
           >
@@ -232,7 +232,7 @@ export default function SoulProbeStandalone() {
               fontFamily: 'var(--font-display), serif',
               fontStyle: 'italic',
               fontSize: 64,
-              color: sScore >= 0.5 ? '#C9A676' : '#9C7CFF',
+              color: sScore >= 0.5 ? 'var(--color-gold)' : '#9C7CFF',
               lineHeight: 1,
             }}
           >
@@ -276,7 +276,7 @@ export default function SoulProbeStandalone() {
               borderRadius: 999,
               border: '1px solid #C9A676',
               background: 'transparent',
-              color: '#C9A676',
+              color: 'var(--color-gold)',
               fontFamily: '"Noto Serif SC", serif',
               fontSize: 13,
               letterSpacing: '0.08em',
@@ -306,7 +306,7 @@ export default function SoulProbeStandalone() {
               margin: 0,
               fontSize: 10,
               letterSpacing: '0.42em',
-              color: '#C9A676',
+              color: 'var(--color-gold)',
               textTransform: 'uppercase',
             }}
           >
@@ -319,7 +319,7 @@ export default function SoulProbeStandalone() {
               fontStyle: 'italic',
               fontSize: 42,
               letterSpacing: 12,
-              color: '#F5F0E8',
+              color: 'var(--color-bg-primary)',
             }}
           >
             {code}
@@ -335,7 +335,7 @@ export default function SoulProbeStandalone() {
           >
             这是你这 6 题的灵魂指纹，已经存在你的浏览器里。
             <br />
-            把它发给 ta，看看你们是不是「<span style={{ color: '#C9A676' }}>灵魂双星</span>」。
+            把它发给 ta，看看你们是不是「<span style={{ color: 'var(--color-gold)' }}>灵魂双星</span>」。
           </p>
 
           <div
@@ -353,7 +353,7 @@ export default function SoulProbeStandalone() {
                 padding: '12px 22px',
                 borderRadius: 999,
                 border: '1px solid #C9A676',
-                background: '#C9A676',
+                background: 'var(--color-gold)',
                 color: '#1a1530',
                 fontFamily: '"Noto Serif SC", serif',
                 fontSize: 13,
@@ -371,7 +371,7 @@ export default function SoulProbeStandalone() {
                 borderRadius: 999,
                 border: '1px solid rgba(245,240,232,0.35)',
                 background: 'transparent',
-                color: '#F5F0E8',
+                color: 'var(--color-bg-primary)',
                 fontFamily: '"Noto Serif SC", serif',
                 fontSize: 13,
                 letterSpacing: '0.08em',
@@ -402,7 +402,7 @@ export default function SoulProbeStandalone() {
               textAlign: 'center',
               fontSize: 10,
               letterSpacing: '0.42em',
-              color: '#C9A676',
+              color: 'var(--color-gold)',
               textTransform: 'uppercase',
             }}
           >
@@ -415,7 +415,7 @@ export default function SoulProbeStandalone() {
               fontFamily: 'var(--font-display), serif',
               fontStyle: 'italic',
               fontSize: 22,
-              color: '#F5F0E8',
+              color: 'var(--color-bg-primary)',
               fontWeight: 500,
             }}
           >

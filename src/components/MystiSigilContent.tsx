@@ -37,17 +37,17 @@ const ROMAN: readonly string[] = [
 
 const MONTH_THEMES: Array<{ name: string; tagline: string; accent: string }> = [
   { name: '寒节', tagline: '把去年还没吐完的火吐完', accent: '#9C7CFF' },
-  { name: '醒章', tagline: '让身体先于决心醒来', accent: '#C07A8E' },
+  { name: '醒章', tagline: '让身体先于决心醒来', accent: 'var(--color-accent)' },
   { name: '出芽', tagline: '允许羞耻地长出新枝', accent: '#88B69F' },
   { name: '雨纹', tagline: '冲洗那些没被流出来的话', accent: '#7CBADC' },
-  { name: '蔷薇', tagline: '靠近那个让你脸热的人', accent: '#C07A8E' },
-  { name: '中场', tagline: '把今年砍成两半重新数', accent: '#C9A676' },
+  { name: '蔷薇', tagline: '靠近那个让你脸热的人', accent: 'var(--color-accent)' },
+  { name: '中场', tagline: '把今年砍成两半重新数', accent: 'var(--color-gold)' },
   { name: '夏火', tagline: '不要避开你的高光', accent: '#E0894A' },
   { name: '潮信', tagline: '该回的信现在都得回', accent: '#9C7CFF' },
-  { name: '秋分', tagline: '把得失放在同一架秤上', accent: '#C9A676' },
+  { name: '秋分', tagline: '把得失放在同一架秤上', accent: 'var(--color-gold)' },
   { name: '霜痕', tagline: '允许第一次说不', accent: '#A8B2C4' },
   { name: '银息', tagline: '把今年的人重新分类', accent: '#7CBADC' },
-  { name: '岁阙', tagline: '替明年留一格空白', accent: '#C9A676' },
+  { name: '岁阙', tagline: '替明年留一格空白', accent: 'var(--color-gold)' },
 ];
 
 const RESOURCE_ID = 'yearly';
@@ -76,7 +76,7 @@ export function MystiSigilContent() {
         minHeight: '100vh',
         background:
           'radial-gradient(ellipse 80% 60% at 30% 20%, rgba(192,122,142,0.16) 0%, transparent 60%), radial-gradient(ellipse 90% 60% at 80% 90%, rgba(156,124,255,0.14) 0%, transparent 60%), #1a1530',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         padding: '72px 20px 120px',
         fontFamily:
           'var(--font-display, "Cormorant Garamond"), "Noto Serif SC", serif',
@@ -87,7 +87,7 @@ export function MystiSigilContent() {
           style={{
             fontSize: 12,
             letterSpacing: '0.42em',
-            color: '#C9A676',
+            color: 'var(--color-gold)',
             textTransform: 'uppercase',
             fontWeight: 700,
           }}
@@ -104,7 +104,7 @@ export function MystiSigilContent() {
           }}
         >
           一整年的暮光，
-          <em style={{ fontStyle: 'italic', color: '#C07A8E' }}>
+          <em style={{ fontStyle: 'italic', color: 'var(--color-accent)' }}>
             被收进十二枚纪章
           </em>
           。
@@ -213,7 +213,7 @@ export function MystiSigilContent() {
                       marginTop: 'auto',
                       fontSize: 10,
                       letterSpacing: '0.32em',
-                      color: '#C9A676',
+                      color: 'var(--color-gold)',
                       textTransform: 'uppercase',
                     }}
                   >
@@ -244,7 +244,7 @@ export function MystiSigilContent() {
                 style={{
                   fontSize: 11,
                   letterSpacing: '0.42em',
-                  color: '#C9A676',
+                  color: 'var(--color-gold)',
                   textTransform: 'uppercase',
                   fontWeight: 700,
                 }}
@@ -262,14 +262,14 @@ export function MystiSigilContent() {
                 每月在
                 <Link
                   href="/mysti/mood/"
-                  style={{ color: '#C9A676', marginLeft: 4, marginRight: 4 }}
+                  style={{ color: 'var(--color-gold)', marginLeft: 4, marginRight: 4 }}
                 >
                   心情打卡
                 </Link>
                 与
                 <Link
                   href="/mysti/decision/"
-                  style={{ color: '#C9A676', marginLeft: 4, marginRight: 4 }}
+                  style={{ color: 'var(--color-gold)', marginLeft: 4, marginRight: 4 }}
                 >
                   决策快卡
                 </Link>

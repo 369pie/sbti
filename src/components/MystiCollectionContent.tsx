@@ -38,18 +38,18 @@ const WTFTI_NAMES: Record<string, { name: string; emoji: string; color: string }
   simp: { name: '倒贴甲方', emoji: '🐕', color: '#f59e0b' },
   solo: { name: '一米结界', emoji: '🐺', color: '#475569' },
   sleep: { name: '再睡五分钟', emoji: '😴', color: '#6366f1' },
-  'game-r': { name: '再来一把', emoji: '🎮', color: '#8b5cf6' },
-  drunk: { name: '酒后真人', emoji: '🍺', color: '#a855f7' },
+  'game-r': { name: '再来一把', emoji: '🎮', color: 'var(--color-accent)' },
+  drunk: { name: '酒后真人', emoji: '🍺', color: 'var(--color-accent)' },
   rebel: { name: '反骨仔', emoji: '🔥', color: '#dc2626' },
   'oh-no': { name: '我早说了吧', emoji: '😱', color: '#f97316' },
   'thin-k': { name: '内耗永动机', emoji: '🧠', color: '#6366f1' },
   drama: { name: '情绪核弹', emoji: '🎭', color: '#d946ef' },
   chill: { name: '佛到没电', emoji: '🧘', color: '#64748b' },
   emo: { name: '碎了又粘', emoji: '🌧️', color: '#7c3aed' },
-  'atm-er': { name: '行走提款机', emoji: '💸', color: '#22c55e' },
-  'dior-s': { name: '躺平先驱', emoji: '🐸', color: '#78716c' },
+  'atm-er': { name: '行走提款机', emoji: '💸', color: 'var(--color-sage)' },
+  'dior-s': { name: '躺平先驱', emoji: '🐸', color: 'var(--color-text-muted)' },
   sexy: { name: '被动钓鱼', emoji: '✨', color: '#e11d48' },
-  fake: { name: '下班发疯', emoji: '🎭', color: '#a78bfa' },
+  fake: { name: '下班发疯', emoji: '🎭', color: 'var(--color-accent)' },
   malo: { name: '班味永存', emoji: '🐒', color: '#a16207' },
   'luck-y': { name: '欧气溢出', emoji: '🐟', color: '#f97316' },
   joker: { name: '陪笑护法', emoji: '🤡', color: '#facc15' },
@@ -183,7 +183,7 @@ const UNIVERSES: UniverseConfig[] = [
     resultPrefix: '/wtfti/result',
     getName: (s) => WTFTI_NAMES[s]?.name ?? s,
     getEmoji: (s) => WTFTI_NAMES[s]?.emoji ?? '❓',
-    getColor: (s) => WTFTI_NAMES[s]?.color ?? '#666',
+    getColor: (s) => WTFTI_NAMES[s]?.color ?? 'var(--color-text-muted)',
   },
   {
     id: 'banti',
@@ -195,7 +195,7 @@ const UNIVERSES: UniverseConfig[] = [
     resultPrefix: '/wtfti/work/result',
     getName: (s) => BANTI_NAMES[s] ?? s,
     getEmoji: (s) => WTFTI_NAMES[s]?.emoji ?? '❓',
-    getColor: (s) => WTFTI_NAMES[s]?.color ?? '#666',
+    getColor: (s) => WTFTI_NAMES[s]?.color ?? 'var(--color-text-muted)',
   },
   {
     id: 'bird',
@@ -280,12 +280,12 @@ const UNIVERSES: UniverseConfig[] = [
     name: '灵鉴',
     shortName: '灵鉴',
     emoji: '🔮',
-    accent: '#8b5cf6',
+    accent: 'var(--color-accent)',
     testPath: '/wtfti/test/?mode=mysti',
     resultPrefix: '/mysti/result',
     getName: (s) => MYSTI_NAMES[s] ?? s,
     getEmoji: (s) => MYSTI_EMOJI[s] ?? '🔮',
-    getColor: () => '#8b5cf6',
+    getColor: () => 'var(--color-accent)',
   },
 ];
 
@@ -369,13 +369,13 @@ function CollectionCard({ universe, slug, collected, index }: CollectionCardProp
             </div>
 
             {/* Name */}
-            <p className={`text-[11px] leading-tight font-medium truncate ${collected ? 'text-white/90' : 'text-white/20'}`}>
+            <p className={`text-[11px] leading-tight font-medium truncate ${collected ? 'text-bg-primary/90' : 'text-bg-primary/20'}`}>
               {collected ? name : '???'}
             </p>
 
             {/* Number badge for WTFTI */}
             {universe.id === 'wtfti' && collected && (
-              <p className="text-[9px] text-white/40 mt-0.5">
+              <p className="text-[9px] text-bg-primary/40 mt-0.5">
                 #{(ALL_SLUGS.indexOf(slug) + 1).toString().padStart(3, '0')}
               </p>
             )}
@@ -416,7 +416,7 @@ function UniverseSection({ universe, collectedSlugs }: UniverseSectionProps) {
       >
         <div className="flex items-center gap-2">
           <span className="text-lg">{universe.emoji}</span>
-          <h2 className="text-base font-semibold text-white/90">{universe.name}</h2>
+          <h2 className="text-base font-semibold text-bg-primary/90">{universe.name}</h2>
           <span
             className="text-xs px-2 py-0.5 rounded-full"
             style={{ background: `${universe.accent}20`, color: universe.accent }}
@@ -427,7 +427,7 @@ function UniverseSection({ universe, collectedSlugs }: UniverseSectionProps) {
         <motion.svg
           animate={{ rotate: expanded ? 180 : 0 }}
           transition={{ duration: 0.2 }}
-          className="w-5 h-5 text-white/40 group-hover:text-white/60"
+          className="w-5 h-5 text-bg-primary/40 group-hover:text-bg-primary/60"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -509,7 +509,7 @@ export function MystiCollectionContent() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="min-h-screen bg-bg-primary text-bg-primary">
       {/* Background effects */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full opacity-20"
@@ -529,16 +529,16 @@ export function MystiCollectionContent() {
           <div className="flex items-center gap-2 mb-2">
             <Link
               href={withBasePath('/mysti/')}
-              className="text-sm text-white/40 hover:text-white/60 transition-colors"
+              className="text-sm text-bg-primary/40 hover:text-bg-primary/60 transition-colors"
             >
               ← 灵鉴
             </Link>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-bold text-white/95 mb-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-bg-primary/95 mb-1">
             我的图鉴墙
           </h1>
-          <p className="text-sm text-white/40">
+          <p className="text-sm text-bg-primary/40">
             你的专属人格资产 · 跨宇宙全收集
           </p>
         </motion.div>
@@ -556,14 +556,14 @@ export function MystiCollectionContent() {
                 📊
               </div>
               <div>
-                <p className="text-sm font-medium text-white/80">图鉴进度</p>
-                <p className="text-xs text-white/40">
+                <p className="text-sm font-medium text-bg-primary/80">图鉴进度</p>
+                <p className="text-xs text-bg-primary/40">
                   {mounted ? `已收集 ${totalCount}` : '...'} / {TOTAL_POSSIBLE} 种人格
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold" style={{ color: progressPct > 50 ? '#8b5cf6' : '#666' }}>
+              <p className="text-2xl font-bold" style={{ color: progressPct > 50 ? 'var(--color-accent)' : 'var(--color-text-muted)' }}>
                 {mounted ? Math.round(progressPct) : 0}%
               </p>
             </div>
@@ -580,7 +580,7 @@ export function MystiCollectionContent() {
           </div>
 
           {/* Milestone hints */}
-          <div className="flex justify-between mt-2 text-[10px] text-white/20">
+          <div className="flex justify-between mt-2 text-[10px] text-bg-primary/20">
             <span>0</span>
             <span className={totalCount >= 29 ? 'text-violet-400/60' : ''}>29 初窥</span>
             <span className={totalCount >= 100 ? 'text-violet-400/60' : ''}>100 小成</span>
@@ -605,8 +605,8 @@ export function MystiCollectionContent() {
                 className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.04] text-center"
               >
                 <p className="text-lg mb-0.5">{u.emoji}</p>
-                <p className="text-xs font-medium text-white/60">{u.shortName ?? u.name}</p>
-                <p className="text-xs text-white/30 mt-0.5">
+                <p className="text-xs font-medium text-bg-primary/60">{u.shortName ?? u.name}</p>
+                <p className="text-xs text-bg-primary/30 mt-0.5">
                   {count}/{ALL_SLUGS.length}
                 </p>
               </div>
@@ -642,11 +642,11 @@ export function MystiCollectionContent() {
                   🎴
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white/90">每日抽卡</p>
-                  <p className="text-xs text-white/40">免费抽取来自不同宇宙的灵魂卡牌</p>
+                  <p className="text-sm font-medium text-bg-primary/90">每日抽卡</p>
+                  <p className="text-xs text-bg-primary/40">免费抽取来自不同宇宙的灵魂卡牌</p>
                 </div>
               </div>
-              <svg className="w-5 h-5 text-white/30 group-hover:text-white/60 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-5 h-5 text-bg-primary/30 group-hover:text-bg-primary/60 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </div>
@@ -664,7 +664,7 @@ export function MystiCollectionContent() {
             href={withBasePath('/')}
             className="block p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-white/10 transition-all group text-center"
           >
-            <p className="text-sm text-white/50 group-hover:text-white/70 transition-colors">
+            <p className="text-sm text-bg-primary/50 group-hover:text-bg-primary/70 transition-colors">
               去做测试解锁更多人格 →
             </p>
           </Link>

@@ -112,7 +112,7 @@ export function SoultiPairTearPK({ a, b }: Props) {
       </p>
       <p
         className="text-[11px] tracking-[0.18em] mb-5"
-        style={{ fontFamily: serifFont, color: '#8a7f72' }}
+        style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
       >
         你们的灵魂之间 · 隔了多远
       </p>
@@ -171,19 +171,19 @@ export function SoultiPairTearPK({ a, b }: Props) {
           >
             <p
               className="text-[10px] tracking-[0.15em]"
-              style={{ fontFamily: monoFont, color: d.same ? '#5b8a72' : '#b07850' }}
+              style={{ fontFamily: monoFont, color: d.same ? 'var(--color-sage)' : 'var(--color-text-muted)' }}
             >
               {d.id}
             </p>
             <p
               className="text-[11px]"
-              style={{ fontFamily: serifFont, color: '#3a352f' }}
+              style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
             >
               {d.aLetter}
               <span style={{ opacity: 0.4, margin: '0 2px' }}>/</span>
               {d.bLetter}
             </p>
-            <p className="text-[9px]" style={{ fontFamily: serifFont, color: '#8a7f72' }}>
+            <p className="text-[9px]" style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}>
               {d.name}
             </p>
           </li>
@@ -192,14 +192,14 @@ export function SoultiPairTearPK({ a, b }: Props) {
 
       <p
         className="mt-5 text-[13px] leading-[1.95] max-w-md mx-auto"
-        style={{ fontFamily: serifFont, color: '#5a5550', fontStyle: 'italic' }}
+        style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)', fontStyle: 'italic' }}
       >
         {line}
       </p>
 
       <p
         className="mt-5 text-[10px] tracking-[0.18em]"
-        style={{ fontFamily: serifFont, color: '#a89f93' }}
+        style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
       >
         · 撕裂度高，不一定是坏事；同频低，不一定是好事 ·
       </p>

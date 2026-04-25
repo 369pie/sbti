@@ -211,7 +211,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
               <span className="font-mono text-[10px] tracking-[0.4em] uppercase text-text-muted">
                 № {personality.number}
               </span>
-              <span className="block w-px h-3 bg-[#A3526E]/40" aria-hidden />
+              <span className="block w-px h-3 bg-accent/40" aria-hidden />
               <span
                 className="font-mono text-xs tracking-[0.42em] uppercase"
                 style={{ color: personality.color }}
@@ -347,7 +347,7 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
             <Link
               href={`/xpti/couple/`}
               className="inline-flex items-center justify-center px-4 py-2.5 rounded-full text-xs font-mono tracking-[0.18em] uppercase whitespace-nowrap"
-              style={{ background: personality.color, color: '#FFFDF9' }}
+              style={{ background: personality.color, color: 'var(--color-bg-primary)' }}
             >
               邀请伴侣 →
             </Link>

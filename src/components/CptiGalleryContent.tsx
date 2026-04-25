@@ -137,7 +137,7 @@ export function CptiGalleryContent() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -80, opacity: 0 }}
             transition={{ type: 'spring', damping: 20 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-2xl text-sm font-semibold flex items-center gap-2"
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 text-bg-primary shadow-2xl text-sm font-semibold flex items-center gap-2"
           >
             <span className="text-lg">🎉</span>
             {milestoneToast === 25
@@ -287,7 +287,7 @@ export function CptiGalleryContent() {
         >
           <Link
             href="/cpti/join"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-rose-500 text-white font-medium text-base hover:bg-rose-500/90 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-rose-500 text-bg-primary font-medium text-base hover:bg-rose-500/90 transition-all"
           >
             邀请朋友测试
           </Link>
@@ -418,7 +418,7 @@ function RelationshipDetail({
         <div className="space-y-2">
           <Link
             href="/cpti/test/"
-            className="block w-full text-center px-6 py-3 rounded-xl bg-rose-500 text-white font-medium hover:bg-rose-500/90 transition-colors"
+            className="block w-full text-center px-6 py-3 rounded-xl bg-rose-500 text-bg-primary font-medium hover:bg-rose-500/90 transition-colors"
           >
             测一个新的人 · 有机会点亮这一格
           </Link>

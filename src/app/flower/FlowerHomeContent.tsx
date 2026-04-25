@@ -12,7 +12,7 @@ const AXES: { key: FlowerModelType; poleA: string; poleB: string; question: stri
 
 export default function FlowerHomeContent() {
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #FFFAF5 0%, #FFF5F0 40%, #FFFAF5 100%)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--galaxy-bg-section)' }}>
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="max-w-2xl mx-auto px-6 pt-28 pb-24 text-center relative">
@@ -53,7 +53,7 @@ export default function FlowerHomeContent() {
 
             <Link
               href="/flower/test"
-              className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-white font-medium text-base transition-all duration-300 hover:brightness-110"
+              className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-bg-primary font-medium text-base transition-all duration-300 hover:brightness-110"
               style={{
                 background: 'linear-gradient(135deg, #f59e0b, #ec4899)',
                 boxShadow: '0 8px 32px rgba(236,72,153,0.25)',
@@ -236,7 +236,7 @@ export default function FlowerHomeContent() {
       <section className="py-16 px-6 text-center">
         <Link
           href="/flower/test"
-          className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-white font-medium text-base transition-all duration-300 hover:brightness-110"
+          className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-bg-primary font-medium text-base transition-all duration-300 hover:brightness-110"
           style={{
             background: 'linear-gradient(135deg, #f59e0b, #ec4899)',
             boxShadow: '0 8px 32px rgba(236,72,153,0.25)',

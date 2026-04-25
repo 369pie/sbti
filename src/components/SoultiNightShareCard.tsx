@@ -54,7 +54,7 @@ export function SoultiNightShareCard({
             'radial-gradient(120% 80% at 50% 0%, rgba(139,159,212,0.12) 0%, transparent 60%), linear-gradient(180deg, #1a1722 0%, #14121b 60%, #0f0d16 100%)',
           border: `1px solid ${accent}40`,
           boxShadow: '0 30px 80px -30px rgba(0,0,0,0.6)',
-          color: '#e8e3d6',
+          color: 'var(--color-bg-primary)',
         }}
       >
         {/* Top ribbon */}
@@ -66,7 +66,7 @@ export function SoultiNightShareCard({
             className="px-2.5 py-1 rounded-full text-[10px] tracking-[0.15em]"
             style={{
               background: 'rgba(232,227,214,0.06)',
-              color: '#e8e3d6',
+              color: 'var(--color-bg-primary)',
               border: '1px solid rgba(232,227,214,0.18)',
               fontFamily: mono,
             }}
@@ -86,7 +86,7 @@ export function SoultiNightShareCard({
           >
             TEAR RATE
           </p>
-          <div className="leading-none" style={{ color: '#fff' }}>
+          <div className="leading-none" style={{ color: 'var(--color-bg-primary)' }}>
             <span
               style={{
                 fontFamily: serif,
@@ -124,7 +124,7 @@ export function SoultiNightShareCard({
           >
             <p
               className="text-[14px] leading-[2.1]"
-              style={{ fontFamily: serif, color: '#e8e3d6' }}
+              style={{ fontFamily: serif, color: 'var(--color-bg-primary)' }}
             >
               白天我是
               <span style={{ color: accent, marginLeft: 4, marginRight: 4 }}>
@@ -149,7 +149,7 @@ export function SoultiNightShareCard({
           >
             <p
               className="text-[12px] leading-[1.95]"
-              style={{ fontFamily: serif, color: '#d8d3c6', fontStyle: 'italic' }}
+              style={{ fontFamily: serif, color: 'var(--color-text-secondary)', fontStyle: 'italic' }}
             >
               &ldquo;{quote}&rdquo;
             </p>
@@ -174,7 +174,7 @@ export function SoultiNightShareCard({
           </p>
           <p
             className="text-[14px]"
-            style={{ fontFamily: serif, color: '#fff' }}
+            style={{ fontFamily: serif, color: 'var(--color-bg-primary)' }}
           >
             {personality.emoji} {personality.name}
           </p>
@@ -210,7 +210,7 @@ export function SoultiNightShareCard({
 
       <p
         className="mt-3 text-center text-[11px]"
-        style={{ fontFamily: mono, color: '#9a918a' }}
+        style={{ fontFamily: mono, color: 'var(--color-text-muted)' }}
       >
         手机端长按卡片保存图片 · 桌面端请截图
       </p>

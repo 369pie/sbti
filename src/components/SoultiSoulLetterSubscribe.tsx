@@ -129,7 +129,7 @@ export function SoultiSoulLetterSubscribe({
         <div
           data-soulti-surface="cream"
           className="rounded-2xl border p-6 sm:p-7 text-center"
-          style={{ borderColor: `${accent}22`, background: '#FDFCFA' }}
+          style={{ borderColor: `${accent}22`, background: 'var(--color-bg-secondary)' }}
         >
           <p
             className="text-[10px] tracking-[0.3em] uppercase mb-3"
@@ -137,12 +137,12 @@ export function SoultiSoulLetterSubscribe({
           >
             SOUL LETTER · 灵魂来信
           </p>
-          <p className="text-sm leading-[1.9]" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+          <p className="text-sm leading-[1.9]" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
             已订阅 · 明天这个时间，第一封信会寄到 {maskEmail(existing.email)}
           </p>
           <p
             className="mt-2 text-[11px]"
-            style={{ fontFamily: serifFont, color: '#8a7f72' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
           >
             {existing.optedExtended
               ? 'D+3 镜像信 · D+7 修复信 已加入队列'
@@ -165,7 +165,7 @@ export function SoultiSoulLetterSubscribe({
         onSubmit={submit}
         data-soulti-surface="cream"
         className="rounded-2xl border p-6 sm:p-7"
-        style={{ borderColor: `${accent}22`, background: '#FDFCFA' }}
+        style={{ borderColor: `${accent}22`, background: 'var(--color-bg-secondary)' }}
       >
         <p
           className="text-[10px] tracking-[0.3em] uppercase mb-3"
@@ -175,13 +175,13 @@ export function SoultiSoulLetterSubscribe({
         </p>
         <p
           className="text-base leading-[1.9] mb-2"
-          style={{ fontFamily: serifFont, color: '#2D2A26' }}
+          style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
         >
           明天这个时间，让一封专属于「{personalityName}」的信，寄到你的邮箱。
         </p>
         <p
           className="text-[12px] leading-[1.9] mb-5"
-          style={{ fontFamily: serifFont, color: '#7A6A5A' }}
+          style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)' }}
         >
           D+1 复盘信 · 免费<br />
           D+3 镜像信 / D+7 修复信 · 解锁 ¥19.9（在第一封信里再决定）
@@ -203,14 +203,14 @@ export function SoultiSoulLetterSubscribe({
             style={{
               fontFamily: serifFont,
               borderColor: error ? '#b07850' : `${accent}30`,
-              background: '#fff',
-              color: '#2D2A26',
+              background: 'var(--color-bg-primary)',
+              color: 'var(--color-text-primary)',
             }}
           />
           <button
             type="submit"
             disabled={status === 'loading'}
-            className="px-6 py-3 rounded-xl text-sm text-white transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-6 py-3 rounded-xl text-sm text-bg-primary transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
             style={{
               fontFamily: serifFont,
               background: `linear-gradient(135deg, ${accent}cc, ${accent})`,
@@ -223,7 +223,7 @@ export function SoultiSoulLetterSubscribe({
 
         <label
           className="mt-4 flex items-start gap-2 text-[11px] cursor-pointer"
-          style={{ fontFamily: serifFont, color: '#7A6A5A' }}
+          style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)' }}
         >
           <input
             type="checkbox"
@@ -238,19 +238,19 @@ export function SoultiSoulLetterSubscribe({
         </label>
 
         {error && (
-          <p className="mt-3 text-[11px]" style={{ color: '#b07850', fontFamily: serifFont }}>
+          <p className="mt-3 text-[11px]" style={{ color: 'var(--color-text-muted)', fontFamily: serifFont }}>
             {error}
           </p>
         )}
         {status === 'error' && !error && (
-          <p className="mt-3 text-[11px]" style={{ color: '#b07850', fontFamily: serifFont }}>
+          <p className="mt-3 text-[11px]" style={{ color: 'var(--color-text-muted)', fontFamily: serifFont }}>
             网络好像睡了，稍后再试一次。
           </p>
         )}
 
         <p
           className="mt-4 text-[10px] tracking-[0.18em]"
-          style={{ fontFamily: serifFont, color: '#a89f93' }}
+          style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
         >
           · 邮箱只用于寄这几封信 · 不会出现在任何分享物料里 ·
         </p>

@@ -228,7 +228,7 @@ export function ResultClosureEngine({
                 {!cardState.saved ? (
                   <button
                     onClick={handleSave}
-                    className="px-4 py-2 rounded-xl text-xs font-medium text-white transition-all cursor-pointer hover:brightness-110"
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-bg-primary transition-all cursor-pointer hover:brightness-110"
                     style={{ background: accent }}
                   >
                     收藏此结果

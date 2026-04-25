@@ -131,7 +131,7 @@ export default function CptiConstellationClient() {
         <div className="max-w-xl mx-auto text-center space-y-4 pt-16">
           <h1 className="text-3xl font-display">关系星图</h1>
           <p className="text-text-secondary text-sm">你还没有归档过任何关系。先去测一个，回来这里就会有星座。</p>
-          <Link href="/cpti/" className="inline-block px-4 py-2 rounded-lg bg-rose-500 text-white text-sm">去测试 →</Link>
+          <Link href="/cpti/" className="inline-block px-4 py-2 rounded-lg bg-accent text-bg-primary text-sm">去测试 →</Link>
         </div>
       </main>
     );
@@ -223,7 +223,7 @@ export default function CptiConstellationClient() {
 
         <div className="flex gap-2 justify-center text-xs">
           <Link href="/cpti/me/codex/" className="px-3 py-2 rounded-lg border border-border text-text-secondary hover:bg-bg-secondary/40">回到 Codex</Link>
-          <Link href="/cpti/" className="px-3 py-2 rounded-lg bg-rose-500/90 text-white hover:bg-rose-500">再测一段</Link>
+          <Link href="/cpti/" className="px-3 py-2 rounded-lg bg-accent/90 text-bg-primary hover:bg-accent">再测一段</Link>
         </div>
       </div>
     </main>

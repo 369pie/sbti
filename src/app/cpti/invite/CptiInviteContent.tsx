@@ -109,7 +109,7 @@ function InviteInner() {
             <p className="text-text-muted text-sm mb-6">{pairError || '这个配对码无效或已过期。'}</p>
             <Link
               href="/cpti/"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-rose-500 text-white font-medium hover:bg-rose-600 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-rose-deep transition-all"
             >
               自己去做CPTI测试
             </Link>
@@ -150,7 +150,7 @@ function InviteInner() {
             {/* Inviter avatar */}
             <div className="relative">
               <div
-                className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-semibold text-white"
+                className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-semibold text-bg-primary"
                 style={{ background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)` }}
               >
                 {initial}
@@ -239,7 +239,7 @@ function InviteInner() {
             transition={{ delay: 0.5, duration: 0.4 }}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-white font-medium text-base transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-bg-primary font-medium text-base transition-all cursor-pointer"
             style={{
               background: `linear-gradient(135deg, ${accentColor}, ${accentColor}dd)`,
               boxShadow: `0 8px 24px -4px ${accentColor}40`,
@@ -279,7 +279,7 @@ function InviteInner() {
           <p className="text-text-muted text-sm mb-6">这个邀请链接缺少必要的参数，可能已失效。</p>
           <Link
             href="/cpti/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-rose-500 text-white font-medium hover:bg-rose-600 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-rose-deep transition-all"
           >
             自己去做CPTI测试
           </Link>
@@ -299,7 +299,7 @@ function InviteInner() {
           <p className="text-text-muted text-sm mb-6">无法解析这个邀请链接的数据。</p>
           <Link
             href="/cpti/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-rose-500 text-white font-medium hover:bg-rose-600 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-rose-deep transition-all"
           >
             自己去做CPTI测试
           </Link>
@@ -352,7 +352,7 @@ function InviteLanding({ inviteData, personality }: InviteLandingProps) {
         >
           <div className="relative">
             <div
-              className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-semibold text-white"
+              className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-semibold text-bg-primary"
               style={{ background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)` }}
             >
               {initial}
@@ -435,7 +435,7 @@ function InviteLanding({ inviteData, personality }: InviteLandingProps) {
           transition={{ delay: 0.5, duration: 0.4 }}
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
-          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-white font-medium text-base transition-all cursor-pointer"
+          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-bg-primary font-medium text-base transition-all cursor-pointer"
           style={{
             background: `linear-gradient(135deg, ${accentColor}, ${accentColor}dd)`,
             boxShadow: `0 8px 24px -4px ${accentColor}40`,

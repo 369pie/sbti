@@ -173,14 +173,14 @@ export function SigilYearlyPaywall({ resourceId = 'yearly' }: Props) {
         display: 'flex',
         flexDirection: 'column',
         gap: 14,
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
       }}
     >
       <div
         style={{
           fontSize: 11,
           letterSpacing: '0.42em',
-          color: '#C9A676',
+          color: 'var(--color-gold)',
           textTransform: 'uppercase',
           fontWeight: 700,
         }}
@@ -198,7 +198,7 @@ export function SigilYearlyPaywall({ resourceId = 'yearly' }: Props) {
         }}
       >
         把今年的暮光，
-        <em style={{ fontStyle: 'italic', color: '#C07A8E' }}>
+        <em style={{ fontStyle: 'italic', color: 'var(--color-accent)' }}>
           装进同一本册子
         </em>
         。
@@ -239,7 +239,7 @@ export function SigilYearlyPaywall({ resourceId = 'yearly' }: Props) {
             fontFamily:
               'var(--font-display, "Cormorant Garamond"), serif',
             fontWeight: 600,
-            color: '#C9A676',
+            color: 'var(--color-gold)',
           }}
         >
           ¥{meta.price}
@@ -268,7 +268,7 @@ export function SigilYearlyPaywall({ resourceId = 'yearly' }: Props) {
               background:
                 paymentType === p ? 'rgba(201,166,118,0.14)' : 'transparent',
               color:
-                paymentType === p ? '#F5F0E8' : 'rgba(245,240,232,0.55)',
+                paymentType === p ? 'var(--color-bg-primary)' : 'rgba(245,240,232,0.55)',
               cursor: 'pointer',
               textTransform: 'uppercase',
             }}
@@ -303,7 +303,7 @@ export function SigilYearlyPaywall({ resourceId = 'yearly' }: Props) {
         <p
           style={{
             fontSize: 12,
-            color: '#C07A8E',
+            color: 'var(--color-accent)',
             textAlign: 'center',
             marginTop: 4,
           }}

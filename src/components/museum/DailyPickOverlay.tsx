@@ -340,7 +340,7 @@ export default function DailyPickOverlay({
           onClick={handleShare}
           disabled={sharing}
           className="btn w-full"
-          style={{ background: accent, color: '#fff', border: `1px solid ${accent}`, opacity: sharing ? 0.6 : 1 }}
+          style={{ background: accent, color: 'var(--color-bg-primary)', border: `1px solid ${accent}`, opacity: sharing ? 0.6 : 1 }}
         >
           {sharing ? '生成中…' : '📲 截图发小红书'}
         </button>
@@ -360,7 +360,7 @@ export default function DailyPickOverlay({
             className="btn btn-ghost w-full"
             style={{
               borderColor: favOn ? accent : `${accent}40`,
-              color: favOn ? '#fff' : accent,
+              color: favOn ? 'var(--color-bg-primary)' : accent,
               background: favOn ? accent : 'transparent',
             }}
           >
@@ -428,7 +428,7 @@ export default function DailyPickOverlay({
           type="button"
           onClick={onClose}
           aria-label="关闭"
-          className="absolute top-2 right-2 sm:top-3 sm:right-3 w-9 h-9 rounded-full bg-black/35 hover:bg-black/50 flex items-center justify-center text-white/90 transition-colors"
+          className="absolute top-2 right-2 sm:top-3 sm:right-3 w-9 h-9 rounded-full bg-black/35 hover:bg-black/50 flex items-center justify-center text-bg-primary/90 transition-colors"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2}>
             <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />

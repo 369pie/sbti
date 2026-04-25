@@ -8,6 +8,11 @@ import { Navigation } from "@/components/Navigation";
 import { AuthProvider } from "@/components/AuthProvider";
 import { FollowMeInline } from '@/components/FollowMeLinks';
 import { WebVitalsReporter } from '@/components/WebVitalsReporter';
+import {
+  WtftiThemeProvider,
+} from '@/components/wtfti/WtftiThemeProvider';
+import { WtftiThemeNoFlashScript } from '@/components/wtfti/WtftiThemeScript';
+import { WtftiThemeToggle } from '@/components/wtfti/WtftiThemeToggle';
 import { getLegacyRedirectScript, getSiteLabel, getSiteOrigin, getSiteUrl, isLegacyPagesBuild } from "@/lib/site";
 
 // ─── Typography system v3: Editorial Feminine ──────────────────────────────
@@ -121,8 +126,15 @@ export default function RootLayout({
       lang="zh-CN"
       data-scroll-behavior="smooth"
       className={`${notoSerifSC.variable} ${notoSansSC.variable} ${cormorant.variable} ${fraunces.variable} ${jetbrains.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col paper-texture">
+      <body
+        className="min-h-full flex flex-col paper-texture"
+        data-theme="wtfti-light"
+        data-wtfti-theme="light"
+        suppressHydrationWarning
+      >
+        <WtftiThemeNoFlashScript />
         <Script
           id="root-schema-json"
           type="application/ld+json"
@@ -159,15 +171,15 @@ export default function RootLayout({
             <div
               style={{
                 padding: '12px 16px',
-                background: '#e06088',
-                color: '#FFFFFF',
+                background: 'var(--color-accent)',
+                color: 'var(--color-bg-primary)',
                 textAlign: 'center',
                 fontSize: '14px',
                 lineHeight: '1.6',
               }}
             >
               旧地址已迁移，请访问{' '}
-              <a href={getSiteUrl('/')} style={{ color: '#FFFFFF', fontWeight: 700, textDecoration: 'underline' }}>
+              <a href={getSiteUrl('/')} style={{ color: 'var(--color-bg-primary)', fontWeight: 700, textDecoration: 'underline' }}>
                 {getSiteLabel()}
               </a>{' '}
               查看最新内容。
@@ -175,13 +187,16 @@ export default function RootLayout({
           </noscript>
         )}
         <AuthProvider>
-          <Navigation />
-          <main className="flex-1">{children}</main>
+          <WtftiThemeProvider>
+            <WtftiThemeToggle />
+            <Navigation />
+            <main className="flex-1">{children}</main>
           <footer className="border-t border-border-subtle py-8 px-6 text-center text-text-muted text-sm">
             <div className="max-w-5xl mx-auto">
               <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
                 <Link href="/card/" prefetch={false} className="hover:text-text-primary transition-colors">我的 WTF Card</Link>
                 <Link href="/types/" prefetch={false} className="hover:text-text-primary transition-colors">人设图鉴</Link>
+                <Link href="/mirror/" prefetch={false} className="hover:text-text-primary transition-colors">灵镜实验室</Link>
                 <Link href="/guide/" prefetch={false} className="hover:text-text-primary transition-colors">测试说明</Link>
                 <Link href="/about/" prefetch={false} className="hover:text-text-primary transition-colors">关于测试</Link>
                 <Link href="/creator/" prefetch={false} className="hover:text-text-primary transition-colors">创作者中心</Link>
@@ -195,6 +210,7 @@ export default function RootLayout({
               <p className="mt-2 opacity-50">SBTI 主题原创作者：B站 @Q肉儿串儿、如有侵权请联系</p>
             </div>
           </footer>
+          </WtftiThemeProvider>
         </AuthProvider>
         <Analytics />
         <WebVitalsReporter />

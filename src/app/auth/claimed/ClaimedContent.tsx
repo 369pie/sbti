@@ -164,7 +164,7 @@ export function ClaimedContent() {
             <button
               onClick={handleSendMagicLink}
               disabled={pageState === 'sending' || email.trim().length === 0}
-              className="w-full rounded-2xl bg-rose-500 px-4 py-3 text-sm font-medium text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-2xl bg-rose-500 px-4 py-3 text-sm font-medium text-bg-primary transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {pageState === 'sending' ? '发送中…' : '发送认领链接'}
             </button>
@@ -174,7 +174,7 @@ export function ClaimedContent() {
         {(pageState === 'done' || (pageState === 'ready' && isAnonymous === false)) && (
           <button
             onClick={handleContinue}
-            className="mt-6 w-full rounded-2xl bg-rose-500 px-4 py-3 text-sm font-medium text-white transition hover:bg-rose-600"
+            className="mt-6 w-full rounded-2xl bg-rose-500 px-4 py-3 text-sm font-medium text-bg-primary transition hover:bg-rose-600"
           >
             继续前往我的 WTF CARD
           </button>

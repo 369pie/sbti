@@ -180,7 +180,7 @@ export function SymptomsContent({ personality: p }: Props) {
                       <motion.svg
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="w-3 h-3 text-white"
+                        className="w-3 h-3 text-bg-primary"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -269,7 +269,7 @@ export function SymptomsContent({ personality: p }: Props) {
           <Link
             href="/wtfti/test"
             prefetch={false}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium text-white transition-all hover:brightness-110"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium text-bg-primary transition-all hover:brightness-110"
             style={{ background: p.color }}
           >
             去做完整 WTF 测试 →

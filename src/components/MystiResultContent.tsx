@@ -515,7 +515,7 @@ function SingleModeContent({
         <Link
           href="/wtfti/test/"
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium transition-all hover:brightness-110"
-          style={{ background: `linear-gradient(90deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`, color: '#fff' }}
+          style={{ background: `linear-gradient(90deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`, color: 'var(--color-bg-primary)' }}
         >
           重新测试
         </Link>
@@ -849,7 +849,7 @@ function DualModeContent({
         <Link
           href="/wtfti/test/"
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium transition-all hover:brightness-110"
-          style={{ background: `linear-gradient(90deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`, color: '#fff' }}
+          style={{ background: `linear-gradient(90deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`, color: 'var(--color-bg-primary)' }}
         >
           重新测试
         </Link>
@@ -935,30 +935,30 @@ function CardBack({ theme, compact }: { theme: MystiTheme; compact?: boolean }) 
         xmlns="http://www.w3.org/2000/svg"
       >
         {/* Geometric star pattern */}
-        <circle cx="100" cy="150" r="60" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.4" />
-        <circle cx="100" cy="150" r="40" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.3" />
-        <circle cx="100" cy="150" r="20" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.2" />
+        <circle cx="100" cy="150" r="60" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.4" />
+        <circle cx="100" cy="150" r="40" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.3" />
+        <circle cx="100" cy="150" r="20" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.2" />
         {/* Star lines */}
-        <line x1="100" y1="90" x2="100" y2="210" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.3" />
-        <line x1="40" y1="150" x2="160" y2="150" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.3" />
-        <line x1="58" y1="108" x2="142" y2="192" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.25" />
-        <line x1="58" y1="192" x2="142" y2="108" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.25" />
+        <line x1="100" y1="90" x2="100" y2="210" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.3" />
+        <line x1="40" y1="150" x2="160" y2="150" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.3" />
+        <line x1="58" y1="108" x2="142" y2="192" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.25" />
+        <line x1="58" y1="192" x2="142" y2="108" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.25" />
         {/* Small stars */}
-        <circle cx="100" cy="80" r="2" fill={isCelestial ? '#C9A86C' : '#A85C64'} opacity="0.5" />
-        <circle cx="100" cy="220" r="2" fill={isCelestial ? '#C9A86C' : '#A85C64'} opacity="0.5" />
-        <circle cx="40" cy="150" r="2" fill={isCelestial ? '#C9A86C' : '#A85C64'} opacity="0.5" />
-        <circle cx="160" cy="150" r="2" fill={isCelestial ? '#C9A86C' : '#A85C64'} opacity="0.5" />
+        <circle cx="100" cy="80" r="2" fill={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} opacity="0.5" />
+        <circle cx="100" cy="220" r="2" fill={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} opacity="0.5" />
+        <circle cx="40" cy="150" r="2" fill={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} opacity="0.5" />
+        <circle cx="160" cy="150" r="2" fill={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} opacity="0.5" />
         {/* Corner decorations */}
-        <path d="M20,20 L40,20 L20,40 Z" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.3" />
-        <path d="M180,20 L160,20 L180,40 Z" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.3" />
-        <path d="M20,280 L40,280 L20,260 Z" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.3" />
-        <path d="M180,280 L160,280 L180,260 Z" stroke={isCelestial ? '#C9A86C' : '#A85C64'} strokeWidth="0.5" opacity="0.3" />
+        <path d="M20,20 L40,20 L20,40 Z" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.3" />
+        <path d="M180,20 L160,20 L180,40 Z" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.3" />
+        <path d="M20,280 L40,280 L20,260 Z" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.3" />
+        <path d="M180,280 L160,280 L180,260 Z" stroke={isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'} strokeWidth="0.5" opacity="0.3" />
       </svg>
       
       {/* Center symbol */}
       <div
         className={`${size} font-serif relative z-10`}
-        style={{ color: isCelestial ? '#C9A86C' : '#A85C64', opacity: 0.6 }}
+        style={{ color: isCelestial ? 'var(--color-gold)' : 'var(--color-accent)', opacity: 0.6 }}
       >
         ✦
       </div>
@@ -966,7 +966,7 @@ function CardBack({ theme, compact }: { theme: MystiTheme; compact?: boolean }) 
       {/* Top accent line */}
       <div
         className="absolute inset-x-0 top-0 h-px"
-        style={{ background: `linear-gradient(90deg, transparent, ${isCelestial ? '#C9A86C' : '#A85C64'}, transparent)` }}
+        style={{ background: `linear-gradient(90deg, transparent, ${isCelestial ? 'var(--color-gold)' : 'var(--color-accent)'}, transparent)` }}
       />
     </div>
   );

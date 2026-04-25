@@ -115,7 +115,7 @@ export default function CreatorApplyPage() {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               href={loginHref}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-white font-medium hover:bg-accent/90 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-accent/90 transition-colors"
             >
               登录后申请
             </Link>
@@ -256,7 +256,7 @@ export default function CreatorApplyPage() {
           <button
             type="submit"
             disabled={!canSubmit || loading}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-bg-primary font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? '提交中...' : '提交申请'}
           </button>

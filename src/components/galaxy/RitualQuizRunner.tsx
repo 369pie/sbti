@@ -349,7 +349,7 @@ export function RitualQuizRunner({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
           fontFamily: '"Cormorant Garamond", "Noto Serif SC", serif',
           fontStyle: 'italic',
           fontSize: 22,
@@ -458,7 +458,7 @@ export function RitualQuizRunner({
               margin: '0 0 14px',
               fontSize: 16,
               lineHeight: 1.7,
-              color: '#F5F0E8',
+              color: 'var(--color-bg-primary)',
               fontFamily: '"Noto Serif SC", serif',
             }}
           >
@@ -484,10 +484,10 @@ export function RitualQuizRunner({
                 }}
                 style={memeButtonStyle}
               >
-                <span style={{ color: '#D4B58A', fontWeight: 600, marginRight: 8 }}>
+                <span style={{ color: 'var(--color-gold)', fontWeight: 600, marginRight: 8 }}>
                   {opt.key}
                 </span>
-                <span style={{ color: '#F5F0E8', fontSize: 14 }}>{opt.label}</span>
+                <span style={{ color: 'var(--color-bg-primary)', fontSize: 14 }}>{opt.label}</span>
                 <span
                   style={{
                     display: 'block',
@@ -748,7 +748,7 @@ function RitualPageShell({ children }: { children: React.ReactNode }) {
               width: s.size,
               height: s.size,
               borderRadius: '50%',
-              background: i % 3 === 0 ? '#C9A676' : '#F5F0E8',
+              background: i % 3 === 0 ? 'var(--color-gold)' : 'var(--color-bg-primary)',
               boxShadow: `0 0 ${s.size * 4}px rgba(245,240,232,0.6)`,
               opacity: Number(s.opacity),
               animation: `wtfti-stardust-drift ${s.dur}s linear ${s.delay}s infinite`,
@@ -777,7 +777,7 @@ function RitualPageShell({ children }: { children: React.ReactNode }) {
             display: 'inline-flex',
             alignItems: 'baseline',
             gap: 6,
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
             textDecoration: 'none',
             fontFamily: '"Cormorant Garamond", "Noto Serif SC", serif',
             letterSpacing: '0.32em',
@@ -786,7 +786,7 @@ function RitualPageShell({ children }: { children: React.ReactNode }) {
             textShadow: '0 0 18px rgba(192,122,142,0.4)',
           }}
         >
-          <span style={{ color: '#C07A8E' }}>✦</span>
+          <span style={{ color: 'var(--color-accent)' }}>✦</span>
           WTFTI
           <span
             style={{
@@ -853,9 +853,9 @@ function RitualPageShell({ children }: { children: React.ReactNode }) {
 
 function RitualStepper({ currentChapter }: { currentChapter: 0 | 1 | 2 | 3 }) {
   const steps = [
-    { label: 'I', tone: '#C07A8E' },
+    { label: 'I', tone: 'var(--color-accent)' },
     { label: 'II', tone: '#9C7CFF' },
-    { label: 'III', tone: '#C9A676' },
+    { label: 'III', tone: 'var(--color-gold)' },
     { label: 'IV', tone: '#7AA3B0' },
   ];
   return (
@@ -969,8 +969,8 @@ function QuestionRenderer({
     return (
       <EitherOrPlanets
         prompt={question.text}
-        left={{ key: left.key, label: left.label, glyph: '☾', accent: '#C07A8E' }}
-        right={{ key: right.key, label: right.label, glyph: '☉', accent: '#C9A676' }}
+        left={{ key: left.key, label: left.label, glyph: '☾', accent: 'var(--color-accent)' }}
+        right={{ key: right.key, label: right.label, glyph: '☉', accent: 'var(--color-gold)' }}
         onPick={(key) => {
           const opt = opts.find((o) => o.key === key);
           onAnswer((opt?.value ?? 2) as Answer);
@@ -1056,7 +1056,7 @@ function QuestionRenderer({
           margin: '0 0 14px',
           fontSize: 16,
           lineHeight: 1.7,
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
           fontFamily: '"Noto Serif SC", serif',
         }}
       >
@@ -1070,10 +1070,10 @@ function QuestionRenderer({
             onClick={() => onAnswer(o.value as Answer)}
             style={classicButtonStyle}
           >
-            <span style={{ color: '#D4B58A', fontWeight: 600, marginRight: 10 }}>
+            <span style={{ color: 'var(--color-gold)', fontWeight: 600, marginRight: 10 }}>
               {o.key}
             </span>
-            <span style={{ color: '#F5F0E8', fontSize: 14 }}>{o.label}</span>
+            <span style={{ color: 'var(--color-bg-primary)', fontSize: 14 }}>{o.label}</span>
           </button>
         ))}
       </div>

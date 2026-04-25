@@ -50,14 +50,14 @@ export function WtfCardCTA({ variant = 'default' }: Props) {
         href="/card/"
         className={`group block rounded-2xl border transition-all p-5 ${
           isXpti
-            ? 'border-[#A3526E]/20 hover:border-[#A3526E]/35 bg-[#1A0C11] hover:bg-[#20181A]'
+            ? 'border-accent/20 hover:border-accent/35 bg-text-primary hover:bg-text-primary'
             : 'border-border-subtle hover:border-accent/30 bg-bg-secondary/40 hover:bg-accent-dim'
         }`}
       >
         <div className="flex items-center gap-3 mb-3">
           <span className="text-2xl">🃏</span>
           <div className="flex-1">
-            <p className={`text-sm font-semibold ${isXpti ? 'text-[#F3E8EB]' : 'text-text-primary'}`}>我的 WTF Card</p>
+            <p className={`text-sm font-semibold ${isXpti ? 'text-bg-primary' : 'text-text-primary'}`}>我的 WTF Card</p>
             {lit != null && lit > 0 ? (
               <p className={`text-xs ${isXpti ? 'text-text-muted' : 'text-text-muted'}`}>
                 已点亮 {lit} / {total} 个宇宙 · {lit < total ? '继续收集' : '🎉 全部点亮'}
@@ -68,7 +68,7 @@ export function WtfCardCTA({ variant = 'default' }: Props) {
               </p>
             )}
           </div>
-          <svg className={`w-4 h-4 group-hover:translate-x-0.5 transition-all flex-shrink-0 ${isXpti ? 'text-[#A38A90] group-hover:text-[#E6CDD5]' : 'text-text-muted group-hover:text-accent'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className={`w-4 h-4 group-hover:translate-x-0.5 transition-all flex-shrink-0 ${isXpti ? 'text-text-muted group-hover:text-text-secondary' : 'text-text-muted group-hover:text-accent'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </div>
@@ -76,12 +76,12 @@ export function WtfCardCTA({ variant = 'default' }: Props) {
         {/* Mini progress bar */}
         {lit != null && lit > 0 && (
           <div className="mb-3">
-            <div className={`h-1.5 rounded-full overflow-hidden ${isXpti ? 'bg-[#3D1A25]/60' : 'bg-bg-tertiary'}`}>
+            <div className="h-1.5 rounded-full overflow-hidden bg-bg-tertiary">
               <div
                 className="h-full rounded-full transition-all duration-700"
                 style={{
                   width: `${(lit / total) * 100}%`,
-                  background: isXpti ? 'linear-gradient(90deg, #C2485E, #A3526E)' : 'linear-gradient(90deg, #ff4d6d, #e06088)',
+                  background: 'linear-gradient(90deg, var(--color-accent), var(--color-accent))',
                 }}
               />
             </div>
@@ -94,14 +94,14 @@ export function WtfCardCTA({ variant = 'default' }: Props) {
             {recentBadges.map((b, i) => (
               <span
                 key={i}
-                className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs ${isXpti ? 'bg-[#20181A] border border-[#A3526E]/20' : 'bg-bg-elevated'}`}
+                className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs ${isXpti ? 'bg-bg-secondary border border-accent/20' : 'bg-bg-elevated'}`}
               >
                 <span>{b.emoji}</span>
                 <span className={`font-medium ${isXpti ? 'text-text-secondary' : 'text-text-secondary'}`}>{b.name}</span>
               </span>
             ))}
             {lit != null && lit > recentBadges.length && (
-              <span className={`text-[11px] ${isXpti ? 'text-[#A38A90]' : 'text-text-muted'}`}>
+              <span className="text-[11px] text-text-muted">
                 +{lit - recentBadges.length} 更多
               </span>
             )}

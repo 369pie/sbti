@@ -7,21 +7,21 @@ const SOCIAL_LINKS = [
     label: '小红书',
     href: 'https://www.xiaohongshu.com/user/profile/6761e6040000000018014ab4',
     icon: '/images/social/xiaohongshu.svg',
-    bg: 'rgba(255, 36, 66, 0.12)',
+    bg: 'color-mix(in oklab, var(--color-rose) 15%, transparent)',
   },
   {
     key: 'douyin',
     label: '抖音',
     href: 'https://www.douyin.com/user/MS4wLjABAAAAtsrKQ9rw2FSwJZozySt8QVlx-CpL2FnQqX0WyxwlwLyXDMkYXwqKNYnzjVENHc8L?from_tab_name=main',
     icon: '/images/social/douyin.svg',
-    bg: 'rgba(0, 0, 0, 0.08)',
+    bg: 'color-mix(in oklab, var(--color-text-primary) 10%, transparent)',
   },
   {
     key: 'x',
     label: 'X',
     href: 'https://x.com/369pie',
     icon: '/images/social/x.svg',
-    bg: 'rgba(0, 0, 0, 0.08)',
+    bg: 'color-mix(in oklab, var(--color-text-primary) 10%, transparent)',
   },
 ] as const;
 
@@ -84,7 +84,7 @@ export function FollowMeCard() {
 
 export function FollowMeFloating() {
   return (
-    <div className="hidden md:block fixed right-4 bottom-5 z-40 animate-fade-up-delay-2">
+    <div className="hidden md:block fixed right-4 bottom-20 z-40 animate-fade-up-delay-2">
       <div className="rounded-2xl border border-border-subtle bg-bg-elevated/95 backdrop-blur px-3 py-3 shadow-lg">
         <p className="text-[11px] font-mono tracking-widest uppercase text-text-muted mb-2">关注我</p>
         <div className="flex items-center gap-2">

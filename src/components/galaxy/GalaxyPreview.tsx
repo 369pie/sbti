@@ -58,7 +58,7 @@ export default function GalaxyPreview({
         minHeight: '100vh',
         background:
           'radial-gradient(ellipse 100% 60% at 50% 0%, #2a1c4d 0%, #1a1530 38%, #0F0A22 100%)',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         fontFamily:
           'var(--font-display), "Cormorant Garamond", "Noto Serif SC", serif',
         position: 'relative',
@@ -78,7 +78,7 @@ export default function GalaxyPreview({
         </h1>
         <Divider center style={{ marginTop: 28, marginBottom: 20 }} />
         <p style={heroSubtitle}>
-          下方是属于你的 <span style={{ color: '#D4B58A' }}>6 重</span> 神性切片
+          下方是属于你的 <span style={{ color: 'var(--color-gold)' }}>6 重</span> 神性切片
           <br />
           <span style={{ opacity: 0.7 }}>主神化身 · 随侍三神 · 暗面化身 · 命运织线 · 灵魂印记 · 签名香水</span>
         </p>
@@ -110,7 +110,7 @@ export default function GalaxyPreview({
       <SectionFrame eyebrow="COMPANIONS · 随侍三神" title="你召唤哪三位神侍？" numeral="III">
         <p style={sectionLead}>
           每一个情境都会唤醒你身边的一位神侍。下面是你在
-          <span style={{ color: '#C9A676' }}> 三个时辰 </span>里召唤的三位侍神。
+          <span style={{ color: 'var(--color-gold)' }}> 三个时辰 </span>里召唤的三位侍神。
         </p>
         <div style={moonScroller}>
           {result.moons.map((m, i) => (
@@ -242,7 +242,7 @@ function Eyebrow({ children, gold }: { children: React.ReactNode; gold?: boolean
         fontWeight: 500,
         letterSpacing: '0.42em',
         textTransform: 'uppercase',
-        color: gold ? '#D4B58A' : 'rgba(245,240,232,0.55)',
+        color: gold ? 'var(--color-gold)' : 'rgba(245,240,232,0.55)',
       }}
     >
       {children}
@@ -262,7 +262,7 @@ function SerifNumeral({ roman, small }: { roman: string; small?: boolean }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: '#D4B58A',
+        color: 'var(--color-gold)',
         fontFamily: 'var(--font-display), serif',
         fontStyle: 'italic',
         fontSize: small ? 14 : 18,
@@ -353,7 +353,7 @@ function PlanetCard({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            color: '#D4B58A',
+            color: 'var(--color-gold)',
             fontSize: 10,
             letterSpacing: '0.4em',
             fontFamily: 'Inter, sans-serif',
@@ -441,7 +441,7 @@ function PlanetCard({
               lineHeight: 1.65,
             }}
           >
-            <span style={{ color: '#D4B58A', marginRight: 6 }}>{shadowAvatar.iconGlyph}</span>
+            <span style={{ color: 'var(--color-gold)', marginRight: 6 }}>{shadowAvatar.iconGlyph}</span>
             {shadowAvatar.archetype} · 「{shadowAvatar.power}」
           </p>
           <p
@@ -480,7 +480,7 @@ function PlanetCard({
             fontFamily: '"Noto Serif SC", serif',
           }}
         >
-          <summary style={{ cursor: 'pointer', color: '#D4B58A' }}>
+          <summary style={{ cursor: 'pointer', color: 'var(--color-gold)' }}>
             ✦ 一段不重要的科学注解
           </summary>
           <p style={{ marginTop: 8, lineHeight: 1.7 }}>{tooltip}</p>
@@ -585,7 +585,7 @@ function Sparkles() {
             width: d.size,
             height: d.size,
             borderRadius: '50%',
-            background: '#fff',
+            background: 'var(--color-bg-primary)',
             opacity: d.op,
             boxShadow: '0 0 6px rgba(255,255,255,0.7)',
           }}
@@ -622,7 +622,7 @@ function AxesBars({
                   width: 18,
                   fontFamily: 'var(--font-display), serif',
                   fontStyle: 'italic',
-                  color: '#D4B58A',
+                  color: 'var(--color-gold)',
                   fontSize: 14,
                 }}
               >
@@ -721,7 +721,7 @@ function MoonCard({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          color: '#D4B58A',
+          color: 'var(--color-gold)',
           fontSize: 10,
           letterSpacing: '0.32em',
           fontFamily: 'Inter, sans-serif',
@@ -735,7 +735,7 @@ function MoonCard({
 
       {(() => {
         const moonEntry = MOON_PLANET_CATALOG.find((e) => e.slug === moon.slug);
-        const moonAccent = moonEntry?.accent ?? '#C07A8E';
+        const moonAccent = moonEntry?.accent ?? 'var(--color-accent)';
         const moonAccentHex = moonAccent;
         const companion = getCompanionForMoon(moon.slug);
         return (
@@ -833,7 +833,7 @@ function MoonCard({
         style={{
           margin: 0,
           fontSize: 14,
-          color: '#C07A8E',
+          color: 'var(--color-accent)',
           fontStyle: 'italic',
           fontFamily: '"Cormorant Garamond", serif',
         }}
@@ -873,10 +873,10 @@ function CompanionOverlay({ moonSlug, fallbackName }: { moonSlug: string; fallba
           fontSize: 21,
           fontFamily: 'var(--font-display), serif',
           letterSpacing: '0.04em',
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
         }}
       >
-        <span style={{ marginRight: 8, color: '#D4B58A' }}>{companion.iconGlyph}</span>
+        <span style={{ marginRight: 8, color: 'var(--color-gold)' }}>{companion.iconGlyph}</span>
         {companion.name}
       </h4>
       <p
@@ -944,7 +944,7 @@ function ShadowGate({ onUnlock }: { onUnlock: () => void }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#D4B58A',
+            color: 'var(--color-gold)',
             fontSize: 28,
             fontFamily: 'var(--font-display), serif',
             textShadow: '0 0 16px rgba(212,181,138,0.7)',
@@ -975,7 +975,7 @@ function ShadowGate({ onUnlock }: { onUnlock: () => void }) {
       >
         你还没给自己
         <br />
-        <em style={{ fontStyle: 'italic', color: '#D4B58A' }}>召唤暗面化身</em>
+        <em style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>召唤暗面化身</em>
       </h3>
       <p
         style={{
@@ -991,7 +991,7 @@ function ShadowGate({ onUnlock }: { onUnlock: () => void }) {
         <br />
         吸血鬼、狼人、女巫、塞壬、狐仙，
         <br />
-        <span style={{ color: '#D4B58A' }}>你今夜会是哪一位？</span>
+        <span style={{ color: 'var(--color-gold)' }}>你今夜会是哪一位？</span>
       </p>
       <button onClick={onUnlock} style={primaryButton}>
         ✦ 召唤你的异能者 ✦
@@ -1095,7 +1095,7 @@ function OrbitMap({ result }: { result: GalaxyResult }) {
                   y1={cy}
                   x2={x}
                   y2={y}
-                  stroke={d.tone === 'shadow' ? '#9C7CFF' : '#D4B58A'}
+                  stroke={d.tone === 'shadow' ? '#9C7CFF' : 'var(--color-gold)'}
                   strokeWidth="0.4"
                   strokeDasharray="1 4"
                   opacity={0.65}
@@ -1150,7 +1150,7 @@ function OrbitMap({ result }: { result: GalaxyResult }) {
           >
             <span
               style={{
-                color: d.tone === 'shadow' ? '#C9B6FF' : '#D4B58A',
+                color: d.tone === 'shadow' ? '#C9B6FF' : 'var(--color-gold)',
                 fontFamily: 'var(--font-display), serif',
                 fontStyle: 'italic',
                 fontSize: 13,
@@ -1191,14 +1191,14 @@ function ConstellationCard({ result }: { result: GalaxyResult }) {
     >
       <Sparkles />
       <div aria-hidden style={{ position: 'relative', margin: '0 auto 20px', width: 160, height: 100 }}>
-        <div style={miniOrb({ left: 8, accent: '#C07A8E' })} />
+        <div style={miniOrb({ left: 8, accent: 'var(--color-accent)' })} />
         <div style={miniOrb({ left: 80, accent: '#9C7CFF' })} />
         <div
           style={{
             position: 'absolute',
             top: 32,
             left: 56,
-            color: '#D4B58A',
+            color: 'var(--color-gold)',
             fontFamily: 'var(--font-display), serif',
             fontStyle: 'italic',
             fontSize: 32,
@@ -1211,7 +1211,7 @@ function ConstellationCard({ result }: { result: GalaxyResult }) {
 
       <Eyebrow gold>Two Galaxies · Compatibility</Eyebrow>
       <h3 style={{ fontFamily: 'var(--font-display), serif', fontSize: 24, margin: '10px 0 10px', letterSpacing: '0.04em' }}>
-        想看你和 ta 的<em style={{ color: '#C07A8E' }}>星系兼容度</em>吗？
+        想看你和 ta 的<em style={{ color: 'var(--color-accent)' }}>星系兼容度</em>吗？
       </h3>
       <p
         style={{
@@ -1287,7 +1287,7 @@ function ConstellationPanel({
       <summary
         style={{
           cursor: 'pointer',
-          color: '#D4B58A',
+          color: 'var(--color-gold)',
           fontFamily: '"Inter", system-ui, sans-serif',
           fontSize: 11,
           letterSpacing: '0.32em',
@@ -1303,7 +1303,7 @@ function ConstellationPanel({
             fontFamily: 'var(--font-display), serif',
             fontStyle: 'italic',
             fontSize: 18,
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
             letterSpacing: '0.04em',
           }}
         >
@@ -1359,7 +1359,7 @@ function PanelRow({
     <li style={{ display: 'grid', gridTemplateColumns: '40px 1fr', gap: 10 }}>
       <span
         style={{
-          color: '#D4B58A',
+          color: 'var(--color-gold)',
           fontSize: 10,
           letterSpacing: '0.3em',
           fontFamily: 'Inter, sans-serif',
@@ -1422,7 +1422,7 @@ function StardustCarousel({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          color: '#D4B58A',
+          color: 'var(--color-gold)',
           fontSize: 10,
           letterSpacing: '0.32em',
           fontFamily: 'Inter, sans-serif',
@@ -1441,7 +1441,7 @@ function StardustCarousel({
           fontStyle: 'italic',
           fontSize: 17,
           lineHeight: 1.55,
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
           letterSpacing: '0.02em',
         }}
       >
@@ -1557,7 +1557,7 @@ function GravityPreview({
           style={{
             fontSize: 10,
             letterSpacing: '0.32em',
-            color: '#D4B58A',
+            color: 'var(--color-gold)',
             fontFamily: 'Inter, sans-serif',
           }}
         >
@@ -1582,7 +1582,7 @@ function GravityPreview({
           fontFamily: 'var(--font-display), serif',
           fontSize: 22,
           letterSpacing: '0.05em',
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
         }}
       >
         {band.name}
@@ -1754,7 +1754,7 @@ function Footer({ version }: { version: string }) {
   return (
     <footer style={{ marginTop: 96, padding: '40px 24px 64px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
       <Divider center style={{ marginBottom: 24 }} />
-      <p style={{ fontFamily: 'var(--font-display), serif', fontStyle: 'italic', fontSize: 16, color: '#D4B58A', margin: '0 0 8px' }}>
+      <p style={{ fontFamily: 'var(--font-display), serif', fontStyle: 'italic', fontSize: 16, color: 'var(--color-gold)', margin: '0 0 8px' }}>
         WTFTI · Personality Atlas
       </p>
       <p style={{ fontSize: 11, letterSpacing: '0.32em', color: 'rgba(245,240,232,0.4)', fontFamily: 'Inter, sans-serif' }}>
@@ -1787,12 +1787,12 @@ const heroTitle: CSSProperties = {
   lineHeight: 1.25,
   margin: '24px 0 0',
   letterSpacing: '0.04em',
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
 };
 
 const heroEm: CSSProperties = {
   fontStyle: 'italic',
-  color: '#D4B58A',
+  color: 'var(--color-gold)',
   padding: '0 4px',
 };
 
@@ -1810,7 +1810,7 @@ const sectionTitle: CSSProperties = {
   fontSize: 26,
   margin: '12px 0 0',
   letterSpacing: '0.04em',
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
   position: 'relative',
   zIndex: 1,
 };
@@ -1866,7 +1866,7 @@ const ghostButton: CSSProperties = {
   textTransform: 'uppercase',
   background: 'transparent',
   border: '1px solid rgba(212,181,138,0.7)',
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
   cursor: 'pointer',
   fontFamily: 'Inter, sans-serif',
 };
@@ -1901,7 +1901,7 @@ function EphemerisPanel({ ephemeris, accent }: { ephemeris: DailyEphemeris; acce
             fontFamily: 'Inter, sans-serif',
             fontSize: 9.5,
             letterSpacing: '0.42em',
-            color: '#D4B58A',
+            color: 'var(--color-gold)',
             textTransform: 'uppercase',
           }}
         >
@@ -1923,7 +1923,7 @@ function EphemerisPanel({ ephemeris, accent }: { ephemeris: DailyEphemeris; acce
           margin: '10px 0 6px',
           fontFamily: 'var(--font-display), serif',
           fontSize: 18,
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
           letterSpacing: '0.04em',
           position: 'relative',
         }}

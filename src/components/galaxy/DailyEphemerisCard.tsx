@@ -29,9 +29,9 @@ export function DailyEphemerisCard({ ephemeris, streak = 1 }: Props) {
         borderRadius: 22,
         padding: '28px 24px 30px',
         background:
-          'linear-gradient(170deg, rgba(192,122,142,0.10) 0%, rgba(26,21,48,0) 60%), radial-gradient(ellipse at top, rgba(20,12,60,0.85), rgba(8,5,18,0.95))',
+          'linear-gradient(170deg, rgba(192,122,142,0.10) 0%, rgba(26,21,48,0) 60%), radial-gradient(ellipse at top, rgba(20,12,60,0.85), color-mix(in oklab, var(--galaxy-ink-deep) 95%, transparent))',
         border: `1px solid ${accent}33`,
-        boxShadow: `0 16px 60px ${accent}22, inset 0 0 0 1px rgba(245,240,232,0.04)`,
+        boxShadow: `0 16px 60px ${accent}22, inset 0 0 0 1px var(--color-accent-dim)`,
         overflow: 'hidden',
       }}
     >
@@ -70,7 +70,7 @@ export function DailyEphemerisCard({ ephemeris, streak = 1 }: Props) {
             fontStyle: 'italic',
             fontSize: 28,
             fontWeight: 500,
-            color: '#F5F0E8',
+            color: 'var(--galaxy-cream)',
             lineHeight: 1.2,
           }}
         >
@@ -81,7 +81,7 @@ export function DailyEphemerisCard({ ephemeris, streak = 1 }: Props) {
             margin: '6px auto 0',
             maxWidth: 360,
             fontSize: 13.5,
-            color: 'rgba(245,240,232,0.78)',
+            color: 'var(--galaxy-mist)',
             lineHeight: 1.7,
             fontFamily: 'Noto Serif SC, serif',
           }}
@@ -98,7 +98,7 @@ export function DailyEphemerisCard({ ephemeris, streak = 1 }: Props) {
             marginTop: 22,
             padding: '18px 18px 16px',
             borderRadius: 16,
-            background: 'rgba(245,240,232,0.04)',
+            background: 'var(--color-accent-dim)',
             border: '1px solid rgba(201,166,118,0.28)',
           }}
         >
@@ -108,7 +108,7 @@ export function DailyEphemerisCard({ ephemeris, streak = 1 }: Props) {
               fontSize: 9.5,
               fontWeight: 700,
               letterSpacing: '0.32em',
-              color: '#C9A676',
+              color: 'var(--galaxy-gold)',
               textTransform: 'uppercase',
             }}
           >
@@ -118,7 +118,7 @@ export function DailyEphemerisCard({ ephemeris, streak = 1 }: Props) {
             style={{
               margin: '8px 0 0',
               fontSize: 14.5,
-              color: '#F5F0E8',
+              color: 'var(--galaxy-cream)',
               lineHeight: 1.7,
               fontFamily: 'Noto Serif SC, serif',
               fontStyle: 'italic',
@@ -132,7 +132,7 @@ export function DailyEphemerisCard({ ephemeris, streak = 1 }: Props) {
               fontSize: 11,
               fontWeight: 600,
               letterSpacing: '0.18em',
-              color: 'rgba(245,240,232,0.6)',
+              color: 'var(--galaxy-mist-faint)',
               textTransform: 'uppercase',
               textAlign: 'right',
             }}
@@ -159,7 +159,7 @@ export function DailyEphemerisCard({ ephemeris, streak = 1 }: Props) {
             width: 40,
             height: 40,
             borderRadius: '50%',
-            background: `radial-gradient(circle at 35% 30%, ${accent}cc 0%, ${accent}55 50%, rgba(8,5,18,0.95) 100%)`,
+            background: `radial-gradient(circle at 35% 30%, ${accent}cc 0%, ${accent}55 50%, color-mix(in oklab, var(--galaxy-ink-deep) 95%, transparent) 100%)`,
             boxShadow: `0 0 20px ${accent}55`,
           }}
         />
@@ -170,7 +170,7 @@ export function DailyEphemerisCard({ ephemeris, streak = 1 }: Props) {
               fontSize: 9.5,
               fontWeight: 700,
               letterSpacing: '0.32em',
-              color: 'rgba(245,240,232,0.6)',
+              color: 'var(--galaxy-mist-faint)',
               textTransform: 'uppercase',
             }}
           >
@@ -180,7 +180,7 @@ export function DailyEphemerisCard({ ephemeris, streak = 1 }: Props) {
             style={{
               margin: '2px 0 0',
               fontSize: 14,
-              color: '#F5F0E8',
+              color: 'var(--galaxy-cream)',
               fontFamily: 'Cormorant Garamond, Noto Serif SC, serif',
               fontStyle: 'italic',
             }}

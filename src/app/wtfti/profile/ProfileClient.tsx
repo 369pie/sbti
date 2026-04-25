@@ -71,8 +71,8 @@ export function ProfileClient() {
     ? HOME_PLANET_CATALOG.find((p) => p.slug === planetSlug) ?? null
     : null;
   const deity = planet ? getDeity(planet.slug) : null;
-  const accent = planet?.accent ?? '#C9A676';
-  const accentSoft = accent === '#C9A676'
+  const accent = planet?.accent ?? 'var(--color-gold)';
+  const accentSoft = accent === 'var(--color-gold)'
     ? 'rgba(201,166,118,0.18)'
     : `${accent}2e`;
 
@@ -82,7 +82,7 @@ export function ProfileClient() {
         minHeight: '100vh',
         background:
           'radial-gradient(ellipse 120% 55% at 50% 0%, #2d1e52 0%, #1a1530 42%, #0F0A22 100%)',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         fontFamily: 'Cormorant Garamond, Noto Serif SC, serif',
         position: 'relative',
         overflow: 'hidden',
@@ -318,7 +318,7 @@ export function ProfileClient() {
               fontSize: 9,
               fontWeight: 700,
               letterSpacing: '0.34em',
-              color: '#C07A8E',
+              color: 'var(--color-accent)',
               textTransform: 'uppercase',
             }}>
               ✦ 灵魂香水
@@ -327,7 +327,7 @@ export function ProfileClient() {
               margin: '0 0 6px',
               fontSize: 20,
               fontWeight: 600,
-              color: '#F5F0E8',
+              color: 'var(--color-bg-primary)',
               fontFamily: 'Noto Serif SC, serif',
               lineHeight: 1.3,
             }}>
@@ -362,7 +362,7 @@ export function ProfileClient() {
               fontSize: 9,
               fontWeight: 700,
               letterSpacing: '0.34em',
-              color: '#C9A676',
+              color: 'var(--color-gold)',
               textTransform: 'uppercase',
             }}>
               ✦ 灵魂质地
@@ -371,7 +371,7 @@ export function ProfileClient() {
               margin: '0 0 6px',
               fontSize: 20,
               fontWeight: 600,
-              color: '#F5F0E8',
+              color: 'var(--color-bg-primary)',
               fontFamily: 'Noto Serif SC, serif',
               lineHeight: 1.3,
             }}>
@@ -417,7 +417,7 @@ export function ProfileClient() {
                 <p style={{ margin: '0 0 3px', fontSize: 10, fontFamily: 'Inter, sans-serif', fontWeight: 700, letterSpacing: '0.32em', color: accent, textTransform: 'uppercase' }}>
                   主星 · 主神
                 </p>
-                <p style={{ margin: '0 0 3px', fontSize: 17, fontWeight: 600, fontFamily: 'Noto Serif SC, serif', color: '#F5F0E8' }}>
+                <p style={{ margin: '0 0 3px', fontSize: 17, fontWeight: 600, fontFamily: 'Noto Serif SC, serif', color: 'var(--color-bg-primary)' }}>
                   {planet.name}
                 </p>
                 <p style={{ margin: 0, fontSize: 12, fontFamily: 'Noto Serif SC, serif', color: 'rgba(245,240,232,0.65)', lineHeight: 1.55 }}>
@@ -485,7 +485,7 @@ export function ProfileClient() {
                 fontSize: 12,
                 fontWeight: 700,
                 letterSpacing: '0.3em',
-                color: '#F5F0E8',
+                color: 'var(--color-bg-primary)',
                 background: `linear-gradient(135deg, ${accent}22 0%, ${accent}10 100%)`,
                 border: `1px solid ${accent}55`,
                 borderRadius: 14,

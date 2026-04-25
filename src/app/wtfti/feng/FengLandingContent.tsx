@@ -12,7 +12,7 @@ const bsodHex = ['0x0000007B', '0xC000021A', '0x80070057', '0xDEADBEEF', '0xBADF
 
 export default function FengLandingContent() {
   return (
-    <div className="min-h-screen bg-[#050505] text-white relative overflow-x-hidden">
+    <div className="min-h-screen bg-bg-primary text-bg-primary relative overflow-x-hidden">
       {/* Noise / scanline overlay */}
       <div
         className="pointer-events-none fixed inset-0 z-50 opacity-[0.07] mix-blend-overlay"
@@ -77,7 +77,7 @@ export default function FengLandingContent() {
                 left: `${15 + i * 7}%`,
                 top: `${55 + (i % 3) * 12}%`,
                 animationDelay: `${i * 0.3}s`,
-                color: i % 2 === 0 ? '#ff0055' : '#00ffff',
+                color: i % 2 === 0 ? 'var(--color-accent)' : '#00ffff',
                 opacity: 0.25,
               }}
             >
@@ -91,7 +91,7 @@ export default function FengLandingContent() {
           {[...Array(6)].map((_, i) => (
             <div
               key={`errblk-${i}`}
-              className="absolute font-mono text-[10px] sm:text-xs text-white/10 border border-white/5 px-2 py-1 rounded feng-jitter"
+              className="absolute font-mono text-[10px] sm:text-xs text-bg-primary/10 border border-white/5 px-2 py-1 rounded feng-jitter"
               style={{
                 left: `${5 + i * 16}%`,
                 top: `${15 + (i % 3) * 28}%`,
@@ -115,7 +115,7 @@ export default function FengLandingContent() {
                 <span className="w-3 h-3 rounded-full bg-yellow-500/80 text-[6px] flex items-center justify-center">−</span>
                 <span className="w-3 h-3 rounded-full bg-green-500/80 text-[6px] flex items-center justify-center">□</span>
               </div>
-              <div className="text-[10px] font-mono text-white/40 tracking-wider">疯TI.exe — 未响应</div>
+              <div className="text-[10px] font-mono text-bg-primary/40 tracking-wider">疯TI.exe — 未响应</div>
               <div className="w-12" />
             </div>
 
@@ -141,7 +141,7 @@ export default function FengLandingContent() {
                   <span
                     className="block text-6xl sm:text-7xl md:text-8xl font-black tracking-tighter leading-[1.05]"
                     style={{
-                      color: '#fff',
+                      color: 'var(--color-bg-primary)',
                       textShadow: `0 0 28px ${NEON_ACCENT}40`,
                     }}
                   >
@@ -159,11 +159,11 @@ export default function FengLandingContent() {
 
                 <p
                   className="text-base sm:text-lg leading-relaxed max-w-lg mx-auto mb-6"
-                  style={{ color: '#ffffffa0' }}
+                  style={{ color: 'color-mix(in oklab, var(--color-bg-primary) 63%, transparent)' }}
                 >
                   同一个你，在互联网上的发疯译本。
                   <br />
-                  <span className="text-white/60">
+                  <span className="text-bg-primary/60">
                     15 维度人格测试，测完直达 29 张纯文本发疯图鉴卡。
                   </span>
                 </p>
@@ -182,7 +182,7 @@ export default function FengLandingContent() {
                       className="h-full feng-progress-throb rounded-full"
                       style={{
                         width: '99%',
-                        background: 'linear-gradient(90deg, #ff0000, #ff3333, #ff0000)',
+                        background: 'linear-gradient(90deg, var(--color-accent), #ff3333, var(--color-accent))',
                       }}
                     />
                   </div>
@@ -192,7 +192,7 @@ export default function FengLandingContent() {
                   <Link
                     href="/wtfti/feng/test/"
                     className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-full font-black text-base transition-all duration-200 overflow-hidden feng-explode"
-                    style={{ background: '#ff0033', color: '#fff', boxShadow: '0 0 30px rgba(255,0,51,0.5)' }}
+                    style={{ background: 'var(--color-accent)', color: 'var(--color-bg-primary)', boxShadow: '0 0 30px color-mix(in oklab, var(--color-accent) 50%, transparent)' }}
                   >
                     <span className="absolute inset-0 opacity-0 group-hover:opacity-25 transition-opacity bg-white" />
                     <span className="relative inline-block">🚨 开始发疯测试</span>
@@ -204,7 +204,7 @@ export default function FengLandingContent() {
                     href="/wtfti/"
                     prefetch={false}
                     className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border text-sm transition-all hover:bg-white/5 feng-tilt-n1"
-                    style={{ borderColor: '#ffffff20', color: '#ffffff90' }}
+                    style={{ borderColor: 'color-mix(in oklab, var(--color-bg-primary) 12%, transparent)', color: 'color-mix(in oklab, var(--color-bg-primary) 56%, transparent)' }}
                   >
                     经典 WTFTI 版
                   </Link>
@@ -221,7 +221,7 @@ export default function FengLandingContent() {
                   <div
                     key={stat.label}
                     className={`relative rounded-2xl border px-3 py-5 text-center overflow-hidden group ${idx === 1 ? 'feng-tilt-n1' : idx === 2 ? 'feng-tilt-1' : ''}`}
-                    style={{ borderColor: '#ffffff10', background: 'rgba(255,255,255,0.02)' }}
+                    style={{ borderColor: 'color-mix(in oklab, var(--color-bg-primary) 6%, transparent)', background: 'color-mix(in oklab, var(--color-bg-primary) 2%, transparent)' }}
                   >
                     <div
                       className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -237,7 +237,7 @@ export default function FengLandingContent() {
                         {stat.value}
                         <span className="text-sm ml-0.5 opacity-70">{stat.unit}</span>
                       </div>
-                      <div className="text-[10px] mt-1 font-mono tracking-wider uppercase" style={{ color: '#ffffff50' }}>
+                      <div className="text-[10px] mt-1 font-mono tracking-wider uppercase" style={{ color: 'color-mix(in oklab, var(--color-bg-primary) 31%, transparent)' }}>
                         {stat.label}
                       </div>
                       <div className="mt-2 text-[9px] font-mono text-red-400/80 tracking-widest">
@@ -266,17 +266,17 @@ export default function FengLandingContent() {
           </div>
 
           {/* Fake BSOD snippet */}
-          <div className="mt-4 rounded-lg border border-[#0033aa]/40 feng-bsod-block px-4 py-3 font-mono text-xs sm:text-sm">
-            <div className="flex items-center gap-2 mb-2 text-[10px] text-[#5599ff]/80">
+          <div className="mt-4 rounded-lg border border-accent/40 feng-bsod-block px-4 py-3 font-mono text-xs sm:text-sm">
+            <div className="flex items-center gap-2 mb-2 text-[10px] text-text-secondary">
               <span>◆</span>
               <span>SYSTEM_DUMP_0x7F3A</span>
             </div>
-            <div className="space-y-0.5 text-[#88bbff]/90">
+            <div className="space-y-0.5 text-text-muted">
               <div>A problem has been detected and Windows has been shut down to prevent damage to your sanity.</div>
-              <div className="text-[10px] text-[#5599ff]/60 mt-2">
+              <div className="text-[10px] text-text-muted mt-2">
                 {bsodHex.join(' ')} ▓▒░ 0x00000000 0xFFFFFFFF 0xDEADBEEF
               </div>
-              <div className="text-[10px] text-[#5599ff]/40">
+              <div className="text-[10px] text-text-muted">
                 Collecting data for crash dump ...
                 <span className="feng-blink">_</span>
               </div>
@@ -287,7 +287,7 @@ export default function FengLandingContent() {
 
       {/* Middle ticker */}
       <div className="relative z-20 overflow-hidden border-y border-white/5 py-2 bg-white/[0.02] mt-8">
-        <div className="whitespace-nowrap feng-marquee flex items-center gap-10 text-[11px] font-mono tracking-widest text-white/40">
+        <div className="whitespace-nowrap feng-marquee flex items-center gap-10 text-[11px] font-mono tracking-widest text-bg-primary/40">
           <span>SYS_FAILURE ────────────────────</span>
           <span style={{ color: NEON_ACCENT }}>29 TYPES LOADED</span>
           <span>──────────────────── STACK_OVERFLOW</span>
@@ -315,11 +315,11 @@ export default function FengLandingContent() {
             </span>
             <h2
               className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight"
-              style={{ color: '#fff', textShadow: `0 0 20px ${NEON_ACCENT}25` }}
+              style={{ color: 'var(--color-bg-primary)', textShadow: `0 0 20px ${NEON_ACCENT}25` }}
             >
               同一个你，发疯翻译版
             </h2>
-            <p className="mt-3 leading-relaxed max-w-md" style={{ color: '#ffffff80' }}>
+            <p className="mt-3 leading-relaxed max-w-md" style={{ color: 'color-mix(in oklab, var(--color-bg-primary) 50%, transparent)' }}>
               同样的 15 维度测试，全新的互联网发疯解读。
             </p>
           </div>
@@ -358,7 +358,7 @@ export default function FengLandingContent() {
                     }}
                   />
                   {/* Random error code badge */}
-                  <div className="absolute top-3 right-3 text-[9px] font-mono text-white/25 rotate-6">
+                  <div className="absolute top-3 right-3 text-[9px] font-mono text-bg-primary/25 rotate-6">
                     {errorCodes[i % errorCodes.length]}
                   </div>
                   <div className="relative flex gap-4 items-start">
@@ -370,18 +370,18 @@ export default function FengLandingContent() {
                     </span>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-mono text-white/30">0{i + 1}</span>
-                        <h3 className="text-base font-bold" style={{ color: '#fff' }}>
+                        <span className="text-[10px] font-mono text-bg-primary/30">0{i + 1}</span>
+                        <h3 className="text-base font-bold" style={{ color: 'var(--color-bg-primary)' }}>
                           {item.title}
                         </h3>
                       </div>
-                      <p className="text-sm leading-relaxed" style={{ color: '#ffffff90' }}>
+                      <p className="text-sm leading-relaxed" style={{ color: 'color-mix(in oklab, var(--color-bg-primary) 56%, transparent)' }}>
                         {item.desc}
                       </p>
                     </div>
                   </div>
                   {/* Decorative corner */}
-                  <div className="absolute bottom-3 right-3 text-[10px] font-mono text-white/20 rotate-90">◢</div>
+                  <div className="absolute bottom-3 right-3 text-[10px] font-mono text-bg-primary/20 rotate-90">◢</div>
                   {/* Scribble line */}
                   <div
                     className="absolute bottom-8 right-8 w-10 h-px opacity-20"
@@ -398,7 +398,7 @@ export default function FengLandingContent() {
       </section>
 
       {/* Featured types preview */}
-      <section className="py-14 px-6 border-t relative" style={{ borderColor: '#ffffff08' }}>
+      <section className="py-14 px-6 border-t relative" style={{ borderColor: 'color-mix(in oklab, var(--color-bg-primary) 3%, transparent)' }}>
         <div className="max-w-4xl mx-auto">
           <div className="mb-8 animate-fade-up flex items-end justify-between">
             <div>
@@ -410,12 +410,12 @@ export default function FengLandingContent() {
               </span>
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight"
-                style={{ color: '#fff', textShadow: `0 0 20px ${NEON_ACCENT}20` }}
+                style={{ color: 'var(--color-bg-primary)', textShadow: `0 0 20px ${NEON_ACCENT}20` }}
               >
                 先看看你可能是谁
               </h2>
             </div>
-            <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-white/30">
+            <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-bg-primary/30">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-current feng-blink" />
               SCROLL →
             </div>
@@ -431,7 +431,7 @@ export default function FengLandingContent() {
                   className={`group relative rounded-2xl border overflow-hidden transition-all hover:-translate-y-1 ${tilt}`}
                   style={{
                     borderColor: `${p.color}35`,
-                    background: '#080808',
+                    background: 'var(--color-bg-primary)',
                   }}
                 >
                   {/* Animated glow border */}
@@ -448,7 +448,7 @@ export default function FengLandingContent() {
                     }}
                   >
                     {/* Rotated code label */}
-                    <div className="absolute top-2 left-2 text-[9px] font-mono tracking-widest text-white/40 -rotate-12">
+                    <div className="absolute top-2 left-2 text-[9px] font-mono tracking-widest text-bg-primary/40 -rotate-12">
                       {p.code}
                     </div>
                     <span
@@ -470,10 +470,10 @@ export default function FengLandingContent() {
                     <span className="text-[10px] font-mono tracking-widest block mb-0.5" style={{ color: p.color }}>
                       {p.number}
                     </span>
-                    <h3 className="text-sm font-bold truncate" style={{ color: '#fff' }}>
+                    <h3 className="text-sm font-bold truncate" style={{ color: 'var(--color-bg-primary)' }}>
                       {p.fengName}
                     </h3>
-                    <p className="text-[11px] line-clamp-1 mt-0.5" style={{ color: '#ffffff60' }}>
+                    <p className="text-[11px] line-clamp-1 mt-0.5" style={{ color: 'color-mix(in oklab, var(--color-bg-primary) 38%, transparent)' }}>
                       {p.tagline}
                     </p>
                   </div>
@@ -486,7 +486,7 @@ export default function FengLandingContent() {
 
       {/* Slash-through divider */}
       <div className="max-w-4xl mx-auto px-6">
-        <div className="h-px w-full relative overflow-hidden" style={{ background: '#ffffff08' }}>
+        <div className="h-px w-full relative overflow-hidden" style={{ background: 'color-mix(in oklab, var(--color-bg-primary) 3%, transparent)' }}>
           <div
             className="absolute inset-y-0 left-0 w-1/3 feng-skew"
             style={{
@@ -496,7 +496,7 @@ export default function FengLandingContent() {
           <div
             className="absolute inset-y-0 left-1/3 w-1/3 feng-skew"
             style={{
-              background: `linear-gradient(90deg, transparent, #ff005550, transparent)`,
+              background: `linear-gradient(90deg, transparent, color-mix(in oklab, var(--color-accent) 31%, transparent), transparent)`,
               animationDelay: '0.5s',
             }}
           />
@@ -523,15 +523,15 @@ export default function FengLandingContent() {
           </div>
           <div className="flex items-center justify-center gap-2 mb-3">
             <span className="text-[10px] font-mono text-red-400 border border-red-400/40 px-2 py-0.5 rounded">⚠ WARNING</span>
-            <span className="text-[10px] font-mono text-white/40 border border-white/10 px-2 py-0.5 rounded">CONTAGIOUS</span>
+            <span className="text-[10px] font-mono text-bg-primary/40 border border-white/10 px-2 py-0.5 rounded">CONTAGIOUS</span>
           </div>
-          <p className="text-sm mb-6" style={{ color: '#ffffff60' }}>
+          <p className="text-sm mb-6" style={{ color: 'color-mix(in oklab, var(--color-bg-primary) 38%, transparent)' }}>
             29 种发疯人格，总有一种是你。
           </p>
           <Link
             href="/wtfti/feng/test/"
             className="group relative inline-flex items-center gap-2 px-10 py-4 rounded-full font-black text-base transition-all overflow-hidden feng-explode"
-            style={{ background: '#ff0033', color: '#fff', boxShadow: '0 0 40px rgba(255,0,51,0.45)' }}
+            style={{ background: 'var(--color-accent)', color: 'var(--color-bg-primary)', boxShadow: '0 0 40px color-mix(in oklab, var(--color-accent) 45%, transparent)' }}
           >
             <span className="absolute inset-0 opacity-0 group-hover:opacity-25 transition-opacity bg-white" />
             <span className="relative inline-block">🚨 开始发疯人格测试</span>
@@ -539,7 +539,7 @@ export default function FengLandingContent() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </Link>
-          <div className="mt-5 text-[10px] font-mono tracking-widest text-white/20 flex items-center justify-center gap-2">
+          <div className="mt-5 text-[10px] font-mono tracking-widest text-bg-primary/20 flex items-center justify-center gap-2">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 feng-flash" />
             [ WARNING: RESULTS MAY BE TOO REAL ]
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 feng-flash" />

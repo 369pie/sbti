@@ -39,15 +39,15 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#FAF8F5' }}>
+    <div className="min-h-screen" style={{ background: 'var(--color-bg-secondary)' }}>
       <header className="max-w-3xl mx-auto px-6 pt-16 pb-10 text-center">
-        <p className="text-[10px] tracking-[0.4em] uppercase mb-4" style={{ fontFamily: monoFont, color: '#8b7355', opacity: 0.7 }}>
+        <p className="text-[10px] tracking-[0.4em] uppercase mb-4" style={{ fontFamily: monoFont, color: 'var(--color-text-muted)', opacity: 0.7 }}>
           NATURE FIRST
         </p>
-        <h1 className="text-3xl sm:text-4xl mb-3" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+        <h1 className="text-3xl sm:text-4xl mb-3" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
           从自然开始
         </h1>
-        <p className="text-sm" style={{ fontFamily: serifFont, color: '#6a6054', lineHeight: 2 }}>
+        <p className="text-sm" style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)', lineHeight: 2 }}>
           不从测试题开始。<br />
           先看 32 种自然力——找到那种你一眼认出的，<br />
           再揭示和你同频的她。
@@ -56,7 +56,7 @@ export default function Page() {
           <Link
             href="/soulti/"
             className="px-4 py-1.5 rounded-full text-xs border"
-            style={{ borderColor: 'rgba(139,115,85,0.3)', color: '#6a6054', fontFamily: serifFont }}
+            style={{ borderColor: 'rgba(139,115,85,0.3)', color: 'var(--color-text-secondary)', fontFamily: serifFont }}
           >
             也可以直接测
           </Link>
@@ -68,15 +68,15 @@ export default function Page() {
           <section
             key={g.key}
             className="rounded-3xl p-6 sm:p-7"
-            style={{ background: '#FDFCFA', border: '1px solid rgba(139,115,85,0.15)' }}
+            style={{ background: 'var(--color-bg-secondary)', border: '1px solid rgba(139,115,85,0.15)' }}
           >
             <div className="flex items-baseline gap-3 mb-5">
               <span className="text-2xl" aria-hidden>{g.emoji}</span>
               <div>
-                <h2 className="text-lg" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+                <h2 className="text-lg" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
                   {g.label}
                 </h2>
-                <p className="text-xs" style={{ fontFamily: serifFont, color: '#9a918a' }}>
+                <p className="text-xs" style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}>
                   {g.desc} · {g.items.length} 种
                 </p>
               </div>
@@ -96,11 +96,11 @@ export default function Page() {
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-lg" aria-hidden>{p.emoji}</span>
-                      <p className="text-sm truncate" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+                      <p className="text-sm truncate" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
                         {p.name}
                       </p>
                     </div>
-                    <p className="text-[10px] truncate" style={{ fontFamily: serifFont, color: '#6a6054' }}>
+                    <p className="text-[10px] truncate" style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)' }}>
                       {p.tagline}
                     </p>
                   </Link>

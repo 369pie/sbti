@@ -73,7 +73,7 @@ export function FanrentiResultContent({ personality: p }: Props) {
         <div className="max-w-2xl mx-auto px-6 pt-14 pb-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] tracking-[0.25em] uppercase mb-6"
-                 style={{ background: 'rgba(90, 69, 40, 0.08)', color: '#5a4528', border: '1px solid rgba(90, 69, 40, 0.18)' }}>
+                 style={{ background: 'rgba(90, 69, 40, 0.08)', color: 'var(--color-text-secondary)', border: '1px solid rgba(90, 69, 40, 0.18)' }}>
               凡人TI · 修仙 · {p.number}
             </div>
 
@@ -105,12 +105,12 @@ export function FanrentiResultContent({ personality: p }: Props) {
 
             <div
               className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-5"
-              style={{ background: realm.accent, color: '#f6f2ea' }}
+              style={{ background: realm.accent, color: 'var(--color-bg-primary)' }}
             >
               {character.archetype}
             </div>
 
-            <p className="text-base sm:text-lg leading-relaxed max-w-md mx-auto italic" style={{ color: '#3a2e18' }}>
+            <p className="text-base sm:text-lg leading-relaxed max-w-md mx-auto italic" style={{ color: 'var(--color-text-primary)' }}>
               &ldquo;{p.tagline}&rdquo;
             </p>
           </motion.div>
@@ -174,7 +174,7 @@ export function FanrentiResultContent({ personality: p }: Props) {
              style={{ fontFamily: "'Noto Serif SC', serif" }}>
             {character.essence}
           </p>
-          <p className="text-sm leading-[1.95] whitespace-pre-line" style={{ color: '#3a2e18' }}>
+          <p className="text-sm leading-[1.95] whitespace-pre-line" style={{ color: 'var(--color-text-primary)' }}>
             {character.narrative}
           </p>
         </motion.section>
@@ -189,7 +189,7 @@ export function FanrentiResultContent({ personality: p }: Props) {
           <h2 className="text-xs tracking-[0.3em] uppercase mb-4" style={{ color: realm.textAccent }}>
             📜 你在凡修里的 OS
           </h2>
-          <p className="text-sm leading-[1.95] whitespace-pre-line" style={{ color: '#3a2e18' }}>
+          <p className="text-sm leading-[1.95] whitespace-pre-line" style={{ color: 'var(--color-text-primary)' }}>
             {p.copy.osTranslation}
           </p>
         </motion.section>
@@ -213,7 +213,7 @@ export function FanrentiResultContent({ personality: p }: Props) {
                 >
                   {i + 1}
                 </span>
-                <span className="text-sm leading-relaxed" style={{ color: '#3a2e18' }}>{s}</span>
+                <span className="text-sm leading-relaxed" style={{ color: 'var(--color-text-primary)' }}>{s}</span>
               </li>
             ))}
           </ul>
@@ -236,7 +236,7 @@ export function FanrentiResultContent({ personality: p }: Props) {
             {character.dialogueMarker}
           </p>
           <div className="fr-divider w-20 mx-auto mt-4" />
-          <p className="text-sm mt-4 italic" style={{ color: '#3a2e18' }}>{p.copy.closer}</p>
+          <p className="text-sm mt-4 italic" style={{ color: 'var(--color-text-primary)' }}>{p.copy.closer}</p>
         </motion.section>
 
         {/* Share */}
@@ -252,7 +252,7 @@ export function FanrentiResultContent({ personality: p }: Props) {
               style={{ fontFamily: "'Noto Serif SC', serif" }}>
             发一张你的入门令牌
           </h3>
-          <p className="text-xs mb-5" style={{ color: '#4a3a1e' }}>{character.socialShare}</p>
+          <p className="text-xs mb-5" style={{ color: 'var(--color-text-primary)' }}>{character.socialShare}</p>
 
 
           {/* Share card image */}
@@ -276,7 +276,7 @@ export function FanrentiResultContent({ personality: p }: Props) {
             <button
               onClick={quickShare}
               className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer shadow"
-              style={{ background: realm.accent, color: '#f6f2ea' }}
+              style={{ background: realm.accent, color: 'var(--color-bg-primary)' }}
             >
               {copied ? '已复制 ✓' : '复制链接'}
             </button>
@@ -290,7 +290,7 @@ export function FanrentiResultContent({ personality: p }: Props) {
 
         {/* Other characters */}
         <section className="mb-8">
-          <h3 className="text-xs tracking-[0.3em] uppercase mb-4 text-center" style={{ color: '#8a6a2f' }}>
+          <h3 className="text-xs tracking-[0.3em] uppercase mb-4 text-center" style={{ color: 'var(--color-gold)' }}>
             · 其他修士 ·
           </h3>
           <div className="grid grid-cols-2 gap-3">
@@ -336,7 +336,7 @@ export function FanrentiResultContent({ personality: p }: Props) {
               className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-medium text-sm shadow-lg"
               style={{
                 background: realm.accent,
-                color: '#f6f2ea',
+                color: 'var(--color-bg-primary)',
                 fontFamily: "'Noto Serif SC', serif",
               }}
             >

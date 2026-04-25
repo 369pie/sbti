@@ -133,7 +133,7 @@ export default function FreePathPanel({ report, accent }: FreePathPanelProps) {
       {justEarned && (
         <div
           role="status"
-          className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[55] px-4 py-2.5 rounded-xl text-sm font-semibold text-white shadow-lg animate-fade-up"
+          className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[55] px-4 py-2.5 rounded-xl text-sm font-semibold text-bg-primary shadow-lg animate-fade-up"
           style={{ background: accent }}
         >
           🎉 解锁装饰：{justEarned}

@@ -143,7 +143,7 @@ export function XptiDeepClient({ personality }: Props) {
       style={{
         minHeight: '100vh',
         background: 'radial-gradient(ellipse at 50% 0%, #1f1830 0%, #14101e 60%, #0a0810 100%)',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         paddingBlock: '64px 96px',
       }}
     >
@@ -171,7 +171,7 @@ export function XptiDeepClient({ personality }: Props) {
             fontFamily: mono,
             fontSize: 10,
             letterSpacing: '0.42em',
-            color: '#C9A676',
+            color: 'var(--color-gold)',
             margin: 0,
           }}
         >
@@ -204,7 +204,7 @@ export function XptiDeepClient({ personality }: Props) {
             fontFamily: mono,
             fontSize: 10,
             letterSpacing: '0.32em',
-            color: '#C9A676',
+            color: 'var(--color-gold)',
             marginTop: 16,
           }}
         >
@@ -260,7 +260,7 @@ export function XptiDeepClient({ personality }: Props) {
                   fontFamily: mono,
                   fontSize: 10,
                   letterSpacing: '0.32em',
-                  color: '#D4B58A',
+                  color: 'var(--color-gold)',
                   textAlign: 'center',
                   margin: '0 0 16px',
                 }}
@@ -327,7 +327,7 @@ export function XptiDeepClient({ personality }: Props) {
                       fontFamily: mono,
                       fontSize: 10,
                       letterSpacing: '0.32em',
-                      color: '#C9A676',
+                      color: 'var(--color-gold)',
                       margin: '0 0 6px',
                     }}
                   >
@@ -433,7 +433,7 @@ export function XptiDeepClient({ personality }: Props) {
                           fontFamily: mono,
                           fontSize: 10,
                           letterSpacing: '0.32em',
-                          color: '#C9A676',
+                          color: 'var(--color-gold)',
                         }}
                       >
                         {p.badge} · {String(i + 1).padStart(2, '0')}
@@ -491,7 +491,7 @@ export function XptiDeepClient({ personality }: Props) {
                         fontFamily: mono,
                         fontSize: 10,
                         letterSpacing: '0.32em',
-                        color: '#E89BA8',
+                        color: 'var(--color-accent-light)',
                         marginRight: 10,
                       }}
                     >
@@ -526,7 +526,7 @@ export function XptiDeepClient({ personality }: Props) {
                           fontFamily: mono,
                           fontSize: 10,
                           letterSpacing: '0.32em',
-                          color: '#C9A676',
+                          color: 'var(--color-gold)',
                           margin: '0 0 6px',
                         }}
                       >
@@ -538,7 +538,7 @@ export function XptiDeepClient({ personality }: Props) {
                           fontSize: 19,
                           fontWeight: 500,
                           fontStyle: 'italic',
-                          color: '#F5F0E8',
+                          color: 'var(--color-bg-primary)',
                           margin: '0 0 6px',
                         }}
                       >
@@ -747,7 +747,7 @@ function CrossLink({
         borderRadius: 6,
         border: '1px solid rgba(201,166,118,0.25)',
         background: 'rgba(245,240,232,0.04)',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 4 }}>
@@ -756,13 +756,13 @@ function CrossLink({
             fontFamily: mono,
             fontSize: 10,
             letterSpacing: '0.32em',
-            color: '#C9A676',
+            color: 'var(--color-gold)',
           }}
         >
           {eyebrow}
         </span>
         <span style={{ flex: 1 }} />
-        <span style={{ color: '#C9A676', fontSize: 14 }}>→</span>
+        <span style={{ color: 'var(--color-gold)', fontSize: 14 }}>→</span>
       </div>
       <p
         style={{
@@ -822,7 +822,7 @@ function PartnerInviteCta() {
           margin: 0,
         }}
       >
-        让 ta 也测一份 XPTI · 在当前链接末尾追加 <code style={{ color: '#C9A676' }}>?partner=ta-的-slug</code>，
+        让 ta 也测一份 XPTI · 在当前链接末尾追加 <code style={{ color: 'var(--color-gold)' }}>?partner=ta-的-slug</code>，
         自动叠加 ta 的画像与你们的相容度评分。
       </p>
     </div>

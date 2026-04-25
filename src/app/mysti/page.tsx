@@ -474,12 +474,12 @@ function MystiLandingContent() {
             </span>
             <div className="relative">
               <div
-                className="text-base mb-1 text-white tracking-wide"
+                className="text-base mb-1 text-bg-primary tracking-wide"
                 style={{ fontFamily: 'var(--font-serif)' }}
               >
                 {partnerPersonality ? '✦ 为我们的合盘洗牌' : '✦ 为我洗牌'}
               </div>
-              <div className="text-xs text-white/70">
+              <div className="text-xs text-bg-primary/70">
                 {partnerPersonality ? '抽出你的灵魂牌，自动配对合盘' : '塔罗仪式 · 大约 30 秒'}
               </div>
             </div>
@@ -638,7 +638,7 @@ export default function MystiLandingPage() {
           className="min-h-screen flex items-center justify-center"
           style={{ background: 'linear-gradient(180deg, #1a1530 0%, #231A3A 100%)' }}
         >
-          <div className="text-sm" style={{ color: '#B8AEC2' }}>
+          <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
             ✦ 加载中
           </div>
         </div>

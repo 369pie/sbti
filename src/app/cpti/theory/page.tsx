@@ -191,7 +191,7 @@ export default function CptiTheoryPage() {
 
         {/* CPTI 准不准？— 评论区锚点 */}
         <section className="max-w-3xl mx-auto px-6 pb-16">
-          <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-6 sm:p-8">
+          <div className="rounded-2xl border border-accent/20 bg-accent/5 p-6 sm:p-8">
             <h2 className="text-xl font-semibold mb-3">「CPTI 准不准？」</h2>
             <p className="text-text-secondary leading-[1.85] text-base mb-3">
               诚实地说：CPTI 不是一个科学心理学量表，没有信效度验证。
@@ -212,7 +212,7 @@ export default function CptiTheoryPage() {
         <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
           <Link
             href="/cpti/test/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-rose-500 text-white font-semibold hover:bg-rose-600 transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent text-bg-primary font-semibold hover:bg-rose-600 transition-colors"
           >
             开始测试 <span>→</span>
           </Link>

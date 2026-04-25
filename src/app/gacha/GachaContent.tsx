@@ -105,7 +105,7 @@ export default function GachaContent() {
           type="button"
           onClick={onDraw}
           disabled={!available || flipping}
-          className="mt-8 w-full py-4 rounded-2xl font-medium transition disabled:opacity-40 disabled:cursor-not-allowed bg-gradient-to-r from-pink-400 to-violet-400 text-white shadow-lg"
+          className="mt-8 w-full py-4 rounded-2xl font-medium transition disabled:opacity-40 disabled:cursor-not-allowed bg-gradient-to-r from-pink-400 to-violet-400 text-bg-primary shadow-lg"
         >
           {available ? '翻开今日卡 ✧' : '今天已经抽过了 · 明天再来'}
         </button>

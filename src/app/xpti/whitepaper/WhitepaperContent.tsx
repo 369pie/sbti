@@ -9,11 +9,11 @@ import { XPTI_PERSONALITY_TYPES, getXptiTensionSignature } from '@/lib/xpti/pers
 const display = '"Cormorant Garamond", "Noto Serif SC", serif';
 const mono = '"SF Mono", ui-monospace, "Menlo", monospace';
 const PALETTE = {
-  paper: '#FFFDF9',
-  paperDeep: '#F5F0E8',
-  ink: '#1F1A16',
-  inkMute: '#5B524B',
-  rule: '#D6CDBE',
+  paper: 'var(--color-bg-primary)',
+  paperDeep: 'var(--color-bg-secondary)',
+  ink: 'var(--color-text-primary)',
+  inkMute: 'var(--color-text-muted)',
+  rule: 'var(--color-border)',
   rose: '#A85A6E',
   wine: '#6A2A3E',
   gold: '#C9A676',
@@ -51,7 +51,6 @@ export function WhitepaperContent() {
         @media print {
           .no-print { display: none !important; }
           @page { size: A4; margin: 18mm 16mm; }
-          body { background: #fff !important; }
           h1, h2, h3 { page-break-after: avoid; }
           table { page-break-inside: avoid; }
         }

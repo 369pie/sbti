@@ -166,7 +166,7 @@ export function IdentifyHistoryPanel({
           </p>
           <Link
             href="/auth/claimed?next=/identify/"
-            className="inline-flex mt-3 px-4 py-2 rounded-full bg-rose-500 text-white text-sm font-medium hover:bg-rose-600 transition-colors"
+            className="inline-flex mt-3 px-4 py-2 rounded-full bg-rose-500 text-bg-primary text-sm font-medium hover:bg-rose-600 transition-colors"
           >
             登录查看谁鉴定了你
           </Link>

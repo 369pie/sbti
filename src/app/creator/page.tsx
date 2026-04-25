@@ -101,7 +101,7 @@ export default function CreatorPage() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/creator/apply/"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-white font-medium hover:bg-accent/90 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-accent/90 transition-colors"
             >
               申请内测席位
             </Link>
@@ -208,7 +208,7 @@ export default function CreatorPage() {
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link
               href="/creator/apply/"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-white font-medium hover:bg-accent/90 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-accent/90 transition-colors"
             >
               立即申请内测
             </Link>

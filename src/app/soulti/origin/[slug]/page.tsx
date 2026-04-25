@@ -36,41 +36,41 @@ export default async function Page({ params }: PageProps) {
   if (!o) notFound();
 
   return (
-    <div className="min-h-screen" style={{ background: '#FAF8F5' }}>
+    <div className="min-h-screen" style={{ background: 'var(--color-bg-secondary)' }}>
       <header className="max-w-2xl mx-auto px-6 pt-16 pb-8 text-center">
-        <p className="text-[10px] tracking-[0.4em] uppercase mb-4" style={{ fontFamily: monoFont, color: '#8b7355', opacity: 0.7 }}>
+        <p className="text-[10px] tracking-[0.4em] uppercase mb-4" style={{ fontFamily: monoFont, color: 'var(--color-text-muted)', opacity: 0.7 }}>
           SOUL ORIGIN · {o.era}
         </p>
-        <h1 className="text-3xl sm:text-4xl mb-2" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+        <h1 className="text-3xl sm:text-4xl mb-2" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
           {o.zhName}
         </h1>
-        <p className="text-sm mb-8" style={{ fontFamily: monoFont, color: '#9a918a' }}>
+        <p className="text-sm mb-8" style={{ fontFamily: monoFont, color: 'var(--color-text-muted)' }}>
           {o.name}
         </p>
 
         <blockquote
           className="mx-auto max-w-xl px-6 py-5 rounded-2xl"
-          style={{ background: '#FDFCFA', border: '1px solid rgba(139,115,85,0.18)', fontFamily: serifFont, color: '#2D2A26' }}
+          style={{ background: 'var(--color-bg-secondary)', border: '1px solid rgba(139,115,85,0.18)', fontFamily: serifFont, color: 'var(--color-text-primary)' }}
         >
           <p className="text-base leading-[2]" style={{ whiteSpace: 'pre-line' }}>&ldquo;{o.quote}&rdquo;</p>
-          <p className="mt-3 text-[11px] tracking-[0.2em]" style={{ color: '#8b7355', fontFamily: monoFont }}>
+          <p className="mt-3 text-[11px] tracking-[0.2em]" style={{ color: 'var(--color-text-muted)', fontFamily: monoFont }}>
             — {o.quoteSource}
           </p>
         </blockquote>
       </header>
 
       <main className="max-w-2xl mx-auto px-6 pb-16">
-        <section className="rounded-3xl p-6 sm:p-8" style={{ background: '#FDFCFA', border: '1px solid rgba(139,115,85,0.15)' }}>
-          <p className="text-[10px] tracking-[0.3em] uppercase mb-3" style={{ fontFamily: monoFont, color: '#8b7355' }}>
+        <section className="rounded-3xl p-6 sm:p-8" style={{ background: 'var(--color-bg-secondary)', border: '1px solid rgba(139,115,85,0.15)' }}>
+          <p className="text-[10px] tracking-[0.3em] uppercase mb-3" style={{ fontFamily: monoFont, color: 'var(--color-text-muted)' }}>
             Her Story
           </p>
-          <p className="text-[15px] leading-[2.1]" style={{ fontFamily: serifFont, color: '#3a352f' }}>
+          <p className="text-[15px] leading-[2.1]" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
             {o.description}
           </p>
         </section>
 
         <section className="mt-8">
-          <p className="text-[10px] tracking-[0.3em] uppercase mb-4 text-center" style={{ fontFamily: monoFont, color: '#8b7355' }}>
+          <p className="text-[10px] tracking-[0.3em] uppercase mb-4 text-center" style={{ fontFamily: monoFont, color: 'var(--color-text-muted)' }}>
             Resonates with · 共振的自然力
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -95,18 +95,18 @@ export default async function Page({ params }: PageProps) {
                       <p className="text-[10px] tracking-[0.25em]" style={{ fontFamily: monoFont, color: p.color }}>
                         {p.code}
                       </p>
-                      <p className="text-base" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+                      <p className="text-base" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
                         {p.name}
                       </p>
                     </div>
                   </div>
-                  <p className="text-xs leading-[1.8] mb-2" style={{ fontFamily: serifFont, color: '#6a6054' }}>
+                  <p className="text-xs leading-[1.8] mb-2" style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)' }}>
                     {p.tagline}
                   </p>
                   <p className="text-[10px]" style={{ fontFamily: monoFont, color: rarity.color }}>
                     {rarity.label} · 仅 {rarity.populationPct.toFixed(1)}% 的人是这种
                   </p>
-                  <p className="mt-2 text-[10px]" style={{ fontFamily: serifFont, color: '#8a7f72' }}>
+                  <p className="mt-2 text-[10px]" style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}>
                     {t.tags.slice(0, 4).join(' · ')}
                   </p>
                 </Link>
@@ -116,10 +116,10 @@ export default async function Page({ params }: PageProps) {
         </section>
 
         <nav className="mt-10 flex flex-wrap justify-center gap-3 text-sm" style={{ fontFamily: serifFont }}>
-          <Link href="/soulti/origin/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: '#6a6054' }}>
+          <Link href="/soulti/origin/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: 'var(--color-text-secondary)' }}>
             ← 返回 32 位
           </Link>
-          <Link href="/soulti/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: '#6a6054' }}>
+          <Link href="/soulti/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: 'var(--color-text-secondary)' }}>
             开启共振
           </Link>
         </nav>

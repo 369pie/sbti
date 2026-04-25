@@ -479,7 +479,7 @@ function BuyTab({ onPurchased, presetGiftSku }: { onPurchased: (card: GiftCard) 
         className="w-full py-3.5 rounded-xl text-sm tracking-wider transition-all hover:scale-[1.01] disabled:opacity-50"
         style={{
           background: `linear-gradient(135deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`,
-          color: '#fff',
+          color: 'var(--color-bg-primary)',
           fontFamily: 'var(--font-serif)',
           boxShadow: `0 8px 24px ${theme.cardGlow}`,
         }}
@@ -494,7 +494,7 @@ function BuyTab({ onPurchased, presetGiftSku }: { onPurchased: (card: GiftCard) 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="mt-3 text-xs text-center"
-            style={{ color: '#FFB1B1' }}
+            style={{ color: 'var(--color-accent-light)' }}
           >
             {error}
           </motion.p>
@@ -580,7 +580,7 @@ function IssuedCardView({ card }: { card: GiftCard }) {
         className="w-full py-3 rounded-xl text-sm"
         style={{
           background: `linear-gradient(135deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`,
-          color: '#fff',
+          color: 'var(--color-bg-primary)',
         }}
       >
         {copied ? '已复制 ✓' : '复制兑换链接'}
@@ -781,7 +781,7 @@ function RedeemTab({
           className="inline-block px-6 py-3 rounded-xl text-sm"
           style={{
             background: `linear-gradient(135deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`,
-            color: '#fff',
+            color: 'var(--color-bg-primary)',
           }}
         >
           ✦ 去查看你的{opt?.label ?? '礼物'}
@@ -811,14 +811,14 @@ function RedeemTab({
         className="mt-4 w-full py-3 rounded-xl text-sm"
         style={{
           background: `linear-gradient(135deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`,
-          color: '#fff',
+          color: 'var(--color-bg-primary)',
         }}
       >
         查找礼品卡
       </button>
 
       {error && (
-        <p className="mt-3 text-xs text-center" style={{ color: '#FFB1B1' }}>
+        <p className="mt-3 text-xs text-center" style={{ color: 'var(--color-accent-light)' }}>
           {error}
         </p>
       )}
@@ -851,7 +851,7 @@ function RedeemTab({
               className="mt-4 w-full py-2.5 rounded-lg text-sm"
               style={{
                 background: `linear-gradient(135deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`,
-                color: '#fff',
+                color: 'var(--color-bg-primary)',
               }}
             >
               立即兑换

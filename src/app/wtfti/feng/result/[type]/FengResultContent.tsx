@@ -139,7 +139,7 @@ function ShockwaveRings({ color }: { color: string }) {
 function HandwriteNote({ children, className = '', style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
   return (
     <span
-      className={`feng-handwrite text-sm sm:text-base text-white/70 absolute pointer-events-none ${className}`}
+      className={`feng-handwrite text-sm sm:text-base text-bg-primary/70 absolute pointer-events-none ${className}`}
       style={{ ...style }}
     >
       {children}
@@ -205,7 +205,7 @@ function SymptomRow({ s, i, total, color }: { s: string; i: number; total: numbe
         {String(i + 1).padStart(2, '0')}
       </span>
       <div className="flex-1 relative">
-        <span className="text-white/85 text-sm sm:text-base leading-relaxed pt-0.5">{s}</span>
+        <span className="text-bg-primary/85 text-sm sm:text-base leading-relaxed pt-0.5">{s}</span>
         <div className="mt-1.5 flex items-center gap-2">
           <span
             className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded"
@@ -217,7 +217,7 @@ function SymptomRow({ s, i, total, color }: { s: string; i: number; total: numbe
             {badge}
           </span>
           {isCritical && (
-            <span className="text-[9px] font-mono text-white/40">
+            <span className="text-[9px] font-mono text-bg-primary/40">
               SEVERITY: {getSeverityPercent(s, i)}%
             </span>
           )}
@@ -285,7 +285,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
   const typeImageUrl = getFengTypeImage(p.slug);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white relative overflow-x-hidden">
+    <div className="min-h-screen bg-bg-primary text-bg-primary relative overflow-x-hidden">
       {/* Glitch scan sweep */}
       <div className="pointer-events-none fixed inset-0 z-[60] feng-scan-sweep" />
 
@@ -377,7 +377,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
           <div className="absolute top-12 right-6 flex items-center gap-2">
             <button
               onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
-              className="p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all cursor-pointer feng-shake-lite"
+              className="p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-bg-primary/70 hover:text-bg-primary transition-all cursor-pointer feng-shake-lite"
               title="生成分享图片"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -388,7 +388,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
 
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-[10px] text-white/60 font-mono tracking-wider mb-5 feng-jitter">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-[10px] text-bg-primary/60 font-mono tracking-wider mb-5 feng-jitter">
               <span style={{ color: p.color }}>●</span>
               疯TI · 发疯宇宙 · {p.number}
             </div>
@@ -426,7 +426,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
             <CorruptName name={p.fengName} color={p.color} />
 
             {/* Tagline */}
-            <p className="text-lg sm:text-xl max-w-md mx-auto mb-2 font-bold" style={{ color: '#ffffff', textShadow: `0 0 16px ${p.color}35` }}>
+            <p className="text-lg sm:text-xl max-w-md mx-auto mb-2 font-bold" style={{ color: 'var(--color-bg-primary)', textShadow: `0 0 16px ${p.color}35` }}>
               &ldquo;{p.tagline}&rdquo;
             </p>
 
@@ -450,10 +450,10 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
       {/* 发疯一击 - premium card */}
       <section className="max-w-2xl mx-auto px-6 pb-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-          <CardFrame color={p.color} className="p-6 sm:p-8" style={{ background: 'rgba(255,255,255,0.015)' }} tilt>
+          <CardFrame color={p.color} className="p-6 sm:p-8" style={{ background: 'color-mix(in oklab, var(--color-bg-primary) 1.5%, transparent)' }} tilt>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-xl">💥</span>
-              <h2 className="text-xs font-mono tracking-[0.2em] text-white/40 uppercase">{'// Wtf_Hit'}</h2>
+              <h2 className="text-xs font-mono tracking-[0.2em] text-bg-primary/40 uppercase">{'// Wtf_Hit'}</h2>
             </div>
             <p className="text-xl sm:text-2xl font-bold leading-relaxed" style={{ color: p.color, textShadow: `0 0 14px ${p.color}30` }}>
               &ldquo;{p.copy.wtfHit}&rdquo;
@@ -465,7 +465,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
                 style={{ background: `linear-gradient(90deg, transparent, ${p.color}, transparent)` }}
               />
             </div>
-            <div className="mt-3 flex items-center gap-2 text-[10px] font-mono text-white/30">
+            <div className="mt-3 flex items-center gap-2 text-[10px] font-mono text-bg-primary/30">
               <span>[</span>
               <span className="text-red-400">DAMAGE_MULTIPLIER: ∞</span>
               <span>]</span>
@@ -476,29 +476,29 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
 
       {/* 隐藏症状清单 - diagnostic report with escalating severity */}
       <section className="max-w-2xl mx-auto px-6 pb-10 relative">
-        <HandwriteNote className="-top-2 right-8 rotate-6 text-yellow-300/80" style={{ textShadow: '0 0 8px rgba(255,200,0,0.3)' }}>
+        <HandwriteNote className="-top-2 right-8 rotate-6 text-yellow-300/80" style={{ textShadow: '0 0 8px color-mix(in oklab, var(--color-gold) 30%, transparent)' }}>
           确诊了
         </HandwriteNote>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
-          <CardFrame color={p.color} className="p-6 sm:p-8" style={{ background: 'rgba(255,255,255,0.015)' }}>
+          <CardFrame color={p.color} className="p-6 sm:p-8" style={{ background: 'color-mix(in oklab, var(--color-bg-primary) 1.5%, transparent)' }}>
             <div className="flex items-center gap-3 mb-5">
               <span className="text-xl">📋</span>
-              <h2 className="text-xs font-mono tracking-[0.2em] text-white/40 uppercase">{'// Diagnostic_Report'}</h2>
+              <h2 className="text-xs font-mono tracking-[0.2em] text-bg-primary/40 uppercase">{'// Diagnostic_Report'}</h2>
               <span className="ml-auto text-[9px] font-mono text-red-400 border border-red-400/30 px-2 py-0.5 rounded">CONFIRMED</span>
             </div>
             <ul className="space-y-3 relative">
               {p.copy.symptoms.map((s, i) => (
                 <SymptomRow key={i} s={s} i={i} total={p.copy.symptoms.length} color={p.color} />
               ))}
-              <HandwriteNote className="bottom-16 right-2 rotate-[-3deg] text-pink-300/80" style={{ textShadow: '0 0 8px rgba(255,100,200,0.3)' }}>
+              <HandwriteNote className="bottom-16 right-2 rotate-[-3deg] text-pink-300/80" style={{ textShadow: '0 0 8px color-mix(in oklab, var(--color-accent) 30%, transparent)' }}>
                 太真实了
               </HandwriteNote>
-              <HandwriteNote className="bottom-40 -left-4 rotate-[4deg] text-cyan-300/70" style={{ textShadow: '0 0 8px rgba(0,255,255,0.2)' }}>
+              <HandwriteNote className="bottom-40 -left-4 rotate-[4deg] text-cyan-300/70" style={{ textShadow: '0 0 8px color-mix(in oklab, var(--color-accent) 20%, transparent)' }}>
                 我妈也这么说
               </HandwriteNote>
             </ul>
             {/* Footer decoration */}
-            <div className="mt-5 flex items-center justify-between text-[10px] font-mono text-white/25">
+            <div className="mt-5 flex items-center justify-between text-[10px] font-mono text-bg-primary/25">
               <span>────────────────────────────────────────────────────</span>
               <span>END OF REPORT</span>
             </div>
@@ -509,14 +509,14 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
       {/* Fake system log console */}
       <section className="max-w-2xl mx-auto px-6 pb-6">
         <div className="rounded-lg border border-white/10 bg-black/60 px-4 py-3 font-mono text-xs">
-          <div className="flex items-center justify-between mb-2 text-[10px] text-white/40">
+          <div className="flex items-center justify-between mb-2 text-[10px] text-bg-primary/40">
             <span>system_log.txt</span>
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 feng-flash" />
               LIVE
             </span>
           </div>
-          <div className="space-y-1 text-white/70">
+          <div className="space-y-1 text-bg-primary/70">
             <div><span className="text-green-400/80">&gt;</span> personality.exe has stopped responding</div>
             <div><span className="text-green-400/80">&gt;</span> sanity check: <span className="text-red-400">FAILED</span></div>
             <div><span className="text-green-400/80">&gt;</span> meme_density threshold exceeded (99.9%)</div>
@@ -532,7 +532,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
           <CardFrame
             color={p.color}
             className="p-6 sm:p-8 text-center relative"
-            style={{ background: `linear-gradient(180deg, ${p.color}0a, rgba(255,255,255,0.01))` }}
+                style={{ background: `linear-gradient(180deg, ${p.color}0a, color-mix(in oklab, var(--color-bg-primary) 1%, transparent))` }}
             tilt
           >
             {/* Classified overlay stamps */}
@@ -550,15 +550,15 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
             {/* Viral badges */}
             <div className="flex items-center justify-center gap-2 mb-2 flex-wrap">
               <span className="text-[9px] font-mono text-red-400 border border-red-400/40 px-2 py-0.5 rounded">⚠ VIRAL</span>
-              <span className="text-[9px] font-mono text-white/60 border border-white/10 px-2 py-0.5 rounded">
+              <span className="text-[9px] font-mono text-bg-primary/60 border border-white/10 px-2 py-0.5 rounded">
                 传播指数 99.9%
               </span>
-              <span className="text-[9px] font-mono text-white/60 border border-white/10 px-2 py-0.5 rounded">
+              <span className="text-[9px] font-mono text-bg-primary/60 border border-white/10 px-2 py-0.5 rounded">
                 CONTAGIOUS: MAX
               </span>
             </div>
-            <h3 className="text-lg font-bold mb-2 text-white">分享你的疯TI人格</h3>
-            <p className="text-sm text-white/55 mb-5 max-w-sm mx-auto">截图发给朋友，看看谁才是最疯的那个。</p>
+            <h3 className="text-lg font-bold mb-2 text-bg-primary">分享你的疯TI人格</h3>
+            <p className="text-sm text-bg-primary/55 mb-5 max-w-sm mx-auto">截图发给朋友，看看谁才是最疯的那个。</p>
 
             {/* Share image generator */}
             <div className="max-w-sm mx-auto mb-5">
@@ -569,7 +569,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
             <div className="flex gap-3 max-w-sm mx-auto">
               <button
                 onClick={copyShareText}
-                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer text-white feng-tilt-n1"
+                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer text-bg-primary feng-tilt-n1"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -589,7 +589,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
             </div>
 
             {/* Poster footer text */}
-            <div className="mt-5 text-[10px] font-mono tracking-widest text-white/20 uppercase">
+            <div className="mt-5 text-[10px] font-mono tracking-widest text-bg-primary/20 uppercase">
               【 {p.code} 】 · {p.number} · 疯TI ARCHIVE
             </div>
           </CardFrame>
@@ -605,7 +605,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
       <section className="max-w-2xl mx-auto px-6 pb-12">
         <div className="flex items-center gap-3 mb-5">
           <div className="h-px flex-1 bg-white/10" />
-          <h3 className="text-[10px] font-mono tracking-[0.2em] text-white/40 uppercase">其他发疯人格</h3>
+          <h3 className="text-[10px] font-mono tracking-[0.2em] text-bg-primary/40 uppercase">其他发疯人格</h3>
           <div className="h-px flex-1 bg-white/10" />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -617,7 +617,7 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
                 key={o.slug}
                 href={`/wtfti/feng/result/${o.slug}/`}
                 className={`group relative rounded-2xl border border-white/10 p-4 transition-all hover:border-white/20 flex flex-col items-center text-center overflow-hidden ${offsets[idx]} ${rotations[idx]}`}
-                style={{ background: 'rgba(255,255,255,0.02)' }}
+                style={{ background: 'color-mix(in oklab, var(--color-bg-primary) 2%, transparent)' }}
               >
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ boxShadow: `inset 0 0 24px ${o.color}12` }} />
                 <div
@@ -632,8 +632,8 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
                   </span>
                 </div>
                 <div className="relative w-full">
-                  <div className="font-bold text-sm text-white truncate">{o.fengName}</div>
-                  <div className="text-[10px] text-white/40 font-mono mt-0.5 tracking-wider">
+                  <div className="font-bold text-sm text-bg-primary truncate">{o.fengName}</div>
+                  <div className="text-[10px] text-bg-primary/40 font-mono mt-0.5 tracking-wider">
                     {o.number} · {o.code}
                   </div>
                 </div>
@@ -649,14 +649,14 @@ export function FengResultContent({ fengPersonality: p, dimensionScores }: Props
           <Link
             href="/wtfti/feng/test/"
             className="group relative inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-base overflow-hidden transition-all hover:brightness-110 feng-danger-pulse"
-            style={{ background: p.color, color: '#000', boxShadow: `0 0 28px ${p.color}45` }}
+            style={{ background: p.color, color: 'var(--color-text-primary)', boxShadow: `0 0 28px ${p.color}45` }}
           >
             <span className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity bg-white" />
             <span className="relative">重新测试</span>
           </Link>
           <Link
             href="/wtfti/feng/"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-white/10 text-white/60 text-sm hover:text-white hover:border-white/20 transition-all hover:bg-white/5 feng-tilt-n1"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-white/10 text-bg-primary/60 text-sm hover:text-bg-primary hover:border-white/20 transition-all hover:bg-white/5 feng-tilt-n1"
           >
             返回疯TI 首页
           </Link>

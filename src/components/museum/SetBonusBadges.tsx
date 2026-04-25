@@ -83,7 +83,7 @@ export default function SetBonusBadges({ badges, accent }: SetBonusBadgesProps) 
               {isOn && (
                 <span
                   className="absolute -top-1.5 -right-1.5 text-[8px] font-mono tracking-widest px-1.5 py-0.5 rounded-full"
-                  style={{ background: accent, color: '#fff' }}
+                  style={{ background: accent, color: 'var(--color-bg-primary)' }}
                 >
                   ✓
                 </span>

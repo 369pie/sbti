@@ -147,7 +147,7 @@ export function SoultiMonthlyRetestNudge({
           </p>
           <p
             className="text-[13px] leading-[1.85]"
-            style={{ fontFamily: serifFont, color: '#2D2A26' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
           >
             上一次是 {deltaDays} 天前 · 撕裂度 {previous.tearRatePercent}%
             <span className="mx-1.5 opacity-40">→</span>
@@ -157,7 +157,7 @@ export function SoultiMonthlyRetestNudge({
         <div className="flex flex-col gap-1.5 shrink-0">
           <a
             href="/soulti/test/"
-            className="px-3 py-1.5 rounded-full text-[11px] text-white text-center"
+            className="px-3 py-1.5 rounded-full text-[11px] text-bg-primary text-center"
             style={{
               fontFamily: serifFont,
               background: accent,
@@ -179,7 +179,7 @@ export function SoultiMonthlyRetestNudge({
               if (node) (node as HTMLElement).style.display = 'none';
             }}
             className="px-3 py-1.5 text-[10px]"
-            style={{ fontFamily: serifFont, color: '#a89f93' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
           >
             下次再说
           </button>

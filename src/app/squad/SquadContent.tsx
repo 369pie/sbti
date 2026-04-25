@@ -70,7 +70,7 @@ function GroupNameStep({
       <button
         onClick={onNext}
         disabled={!value.trim()}
-        className="mt-6 px-8 py-2.5 rounded-xl bg-accent text-white font-medium text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-accent/90 transition-all cursor-pointer"
+        className="mt-6 px-8 py-2.5 rounded-xl bg-accent text-bg-primary font-medium text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-accent/90 transition-all cursor-pointer"
       >
         下一步
       </button>
@@ -197,7 +197,7 @@ function AddMembersStep({
         <button
           onClick={onDone}
           disabled={members.length < 2}
-          className="px-8 py-2.5 rounded-xl bg-accent text-white font-medium text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-accent/90 transition-all cursor-pointer"
+          className="px-8 py-2.5 rounded-xl bg-accent text-bg-primary font-medium text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-accent/90 transition-all cursor-pointer"
         >
           生成群像 →
         </button>
@@ -432,7 +432,7 @@ function SquadResultDisplay({
       <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
         <button
           onClick={onShare}
-          className="px-6 py-2.5 rounded-xl bg-accent text-white font-medium text-sm hover:bg-accent/90 transition-all cursor-pointer"
+          className="px-6 py-2.5 rounded-xl bg-accent text-bg-primary font-medium text-sm hover:bg-accent/90 transition-all cursor-pointer"
         >
           保存群像卡 🖼️
         </button>

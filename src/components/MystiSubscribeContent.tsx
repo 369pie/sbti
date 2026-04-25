@@ -332,7 +332,7 @@ function SubscribeInner() {
                   className="mt-5 py-3 rounded-xl text-sm tracking-wider transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
                     background: `linear-gradient(135deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`,
-                    color: '#fff',
+                    color: 'var(--color-bg-primary)',
                     fontFamily: 'var(--font-serif)',
                     boxShadow: `0 8px 24px ${theme.cardGlow}`,
                   }}
@@ -351,7 +351,7 @@ function SubscribeInner() {
         {error && (
           <p
             className="mt-4 text-center text-xs"
-            style={{ color: '#FFB1B1' }}
+            style={{ color: 'var(--color-accent-light)' }}
           >
             {error}
           </p>
@@ -454,7 +454,7 @@ export function MystiSubscribeContent() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-[#0B0D17] text-[#F3EFE6]">
+        <div className="min-h-screen flex items-center justify-center bg-bg-primary text-text-primary">
           加载中…
         </div>
       }

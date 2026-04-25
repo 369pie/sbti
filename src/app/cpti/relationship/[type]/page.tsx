@@ -193,7 +193,7 @@ export default async function CptiRelationshipTypePage({ params }: PageProps) {
             </p>
             <Link
               href="/cpti/test/"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-white font-semibold hover:scale-105 transition-transform"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-bg-primary font-semibold hover:scale-105 transition-transform"
               style={{ background: relationship.color }}
             >
               开始测试 <span>→</span>

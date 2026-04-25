@@ -47,7 +47,7 @@ export default async function CptiDeepPage({ params }: PageProps) {
   const tierInfo = RELATIONSHIP_TIER_INFO[relationship.tier];
 
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#F5F0E8]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-bg-primary" />}>
       <CptiDeepClient relationship={relationship} tierInfo={tierInfo} />
     </Suspense>
   );

@@ -25,10 +25,10 @@ import { getOrCreateDeviceId } from '@/lib/mysti/device';
 const display = '"Cormorant Garamond", "Noto Serif SC", serif';
 const mono = '"SF Mono", ui-monospace, "Menlo", monospace';
 const PALETTE = {
-  paper: '#F5F0E8',
-  ink: '#1F1A16',
-  inkMute: '#5B524B',
-  rule: '#D6CDBE',
+  paper: 'var(--color-bg-primary)',
+  ink: 'var(--color-text-primary)',
+  inkMute: 'var(--color-text-muted)',
+  rule: 'var(--color-border)',
   rose: '#A85A6E',
   wine: '#6A2A3E',
   gold: '#C9A676',
@@ -450,7 +450,7 @@ function InviterWaitingView({
   useEffect(() => {
     if (!inviteLink) return;
     let cancelled = false;
-    toQrDataUrl(inviteLink, { margin: 1, width: 220, color: { dark: PALETTE.wine, light: '#FFFDF9' } })
+    toQrDataUrl(inviteLink, { margin: 1, width: 220, color: { dark: PALETTE.wine, light: '#FFFFFF' } })
       .then((url) => {
         if (!cancelled) setQrDataUrl(url);
       })
@@ -510,7 +510,7 @@ function InviterWaitingView({
               fontSize: 12,
               border: `1px solid ${PALETTE.rule}`,
               borderRadius: 6,
-              background: '#FFFDF9',
+              background: 'var(--color-bg-elevated)',
               color: PALETTE.ink,
               resize: 'none',
               marginTop: 14,
@@ -528,7 +528,7 @@ function InviterWaitingView({
               style={{
                 marginTop: 28,
                 padding: 24,
-                background: '#FFFDF9',
+                background: 'var(--color-bg-elevated)',
                 border: `1px solid ${PALETTE.rule}`,
                 borderRadius: 12,
                 display: 'flex',
@@ -543,7 +543,7 @@ function InviterWaitingView({
                 alt="邀请二维码"
                 width={180}
                 height={180}
-                style={{ width: 180, height: 180, borderRadius: 6, background: '#FFFDF9' }}
+                style={{ width: 180, height: 180, borderRadius: 6, background: 'var(--color-bg-elevated)' }}
               />
               <div style={{ flex: 1, minWidth: 200 }}>
                 <div style={{ fontFamily: mono, fontSize: 10, letterSpacing: '0.32em', color: PALETTE.gold, textTransform: 'uppercase' }}>
@@ -561,7 +561,7 @@ function InviterWaitingView({
             style={{
               marginTop: 28,
               padding: 16,
-              background: partnerArrived ? `${PALETTE.gold}18` : '#FFFDF9',
+              background: partnerArrived ? `${PALETTE.gold}18` : 'var(--color-bg-elevated)',
               border: `1px solid ${partnerArrived ? PALETTE.gold : PALETTE.rule}`,
               borderRadius: 8,
               fontSize: 13,
@@ -633,7 +633,7 @@ function PartnerQuizView({
             style={{
               textAlign: 'left',
               padding: '16px 18px',
-              background: '#FFFDF9',
+              background: 'var(--color-bg-elevated)',
               border: `1px solid ${PALETTE.rule}`,
               borderRadius: 8,
               cursor: submitting ? 'wait' : 'pointer',
@@ -648,7 +648,7 @@ function PartnerQuizView({
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = PALETTE.rule;
-              e.currentTarget.style.background = '#FFFDF9';
+              e.currentTarget.style.background = 'var(--color-bg-elevated)';
             }}
           >
             {opt.label}
@@ -822,13 +822,13 @@ function MergedView({
             '24 句对话脚本 · 拿来就能发',
           ]}
           preview={
-            <div style={{ marginTop: 14, padding: 22, background: '#FFFDF9', border: `1px solid ${PALETTE.rule}`, borderRadius: 8, filter: 'blur(2px)', opacity: 0.5 }}>
+            <div style={{ marginTop: 14, padding: 22, background: 'var(--color-bg-elevated)', border: `1px solid ${PALETTE.rule}`, borderRadius: 8, filter: 'blur(2px)', opacity: 0.5 }}>
               <p style={{ ...pStyle, marginTop: 0 }}>—— 付费后可见 ——</p>
               <p style={pStyle}>付费后可见关于&ldquo;甜 / 痛 / 长走&rdquo;的完整脚本。</p>
             </div>
           }
         >
-          <div style={{ marginTop: 14, padding: 22, background: '#FFFDF9', border: `1px solid ${PALETTE.rule}`, borderRadius: 8 }}>
+          <div style={{ marginTop: 14, padding: 22, background: 'var(--color-bg-elevated)', border: `1px solid ${PALETTE.rule}`, borderRadius: 8 }}>
             <p style={{ ...pStyle, marginTop: 0 }}>
               <strong style={{ color: PALETTE.wine }}>最常发生的甜：</strong>
               {pairing.notes.fit}

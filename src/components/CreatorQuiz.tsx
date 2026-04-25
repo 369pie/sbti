@@ -147,7 +147,7 @@ export function CreatorQuiz({
 
   if (!mounted) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0a0a' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-bg-primary)' }}>
         <div className="text-2xl">{emoji}</div>
       </div>
     );
@@ -155,7 +155,7 @@ export function CreatorQuiz({
 
   if (isFinishing) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-6" style={{ background: '#0a0a0a' }}>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6" style={{ background: 'var(--color-bg-primary)' }}>
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -167,7 +167,7 @@ export function CreatorQuiz({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-lg text-white/60"
+          className="text-lg text-bg-primary/60"
         >
           正在揭示你的真实面目…
         </motion.p>
@@ -178,7 +178,7 @@ export function CreatorQuiz({
   if (!currentQ) return null;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#0a0a0a' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--color-bg-primary)' }}>
       {/* Progress bar */}
       <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-white/10">
         <motion.div
@@ -191,7 +191,7 @@ export function CreatorQuiz({
 
       {/* Header */}
       <div className="pt-12 pb-4 px-6 text-center">
-        <p className="text-white/40 text-sm">
+        <p className="text-bg-primary/40 text-sm">
           {currentIndex + 1} / {questions.length}
         </p>
       </div>
@@ -208,7 +208,7 @@ export function CreatorQuiz({
             transition={{ duration: 0.25 }}
             className="flex-1 flex flex-col justify-center"
           >
-            <h2 className="text-xl font-bold text-white mb-8 text-center leading-relaxed">
+            <h2 className="text-xl font-bold text-bg-primary mb-8 text-center leading-relaxed">
               {currentQ.text}
             </h2>
 
@@ -222,8 +222,8 @@ export function CreatorQuiz({
                     whileTap={{ scale: 0.97 }}
                     className={`w-full p-4 rounded-2xl text-left transition-all duration-200 ${
                       isSelected
-                        ? 'text-white border'
-                        : 'bg-white/5 text-white/80 hover:bg-white/10'
+                        ? 'text-bg-primary border'
+                        : 'bg-white/5 text-bg-primary/80 hover:bg-white/10'
                     }`}
                     style={isSelected ? {
                       background: `${primaryColor}20`,
@@ -244,7 +244,7 @@ export function CreatorQuiz({
           <div className="pb-8 pt-4">
             <button
               onClick={goBack}
-              className="text-white/30 hover:text-white/60 text-sm transition-colors"
+              className="text-bg-primary/30 hover:text-bg-primary/60 text-sm transition-colors"
             >
               ← 上一题
             </button>

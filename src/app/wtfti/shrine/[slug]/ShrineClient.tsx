@@ -61,7 +61,7 @@ export function ShrineClient({ slug }: Props) {
         minHeight: '100vh',
         background:
           'radial-gradient(ellipse 100% 60% at 50% 0%, #2a1c4d 0%, #1a1530 38%, #0F0A22 100%)',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         fontFamily: 'Cormorant Garamond, Noto Serif SC, serif',
         padding: '56px 20px 96px',
       }}
@@ -91,7 +91,7 @@ export function ShrineClient({ slug }: Props) {
             fontStyle: 'italic',
             fontSize: 38,
             fontWeight: 500,
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
             lineHeight: 1.1,
           }}
         >
@@ -236,7 +236,7 @@ export function ShrineClient({ slug }: Props) {
                 margin: 0,
                 fontSize: 11.5,
                 fontWeight: 700,
-                color: '#C9A676',
+                color: 'var(--color-gold)',
                 letterSpacing: '0.16em',
               }}
             >
@@ -288,7 +288,7 @@ export function ShrineClient({ slug }: Props) {
                 fontFamily: 'Noto Serif SC, serif',
               }}
             >
-              再访 <strong style={{ color: '#C9A676' }}>{nextUnlock.unlockAt - (state?.visitCount ?? 0)} 日</strong>{' '}
+              再访 <strong style={{ color: 'var(--color-gold)' }}>{nextUnlock.unlockAt - (state?.visitCount ?? 0)} 日</strong>{' '}
               神龛会赠你「{nextUnlock.name}」。
             </p>
           ) : (
@@ -296,7 +296,7 @@ export function ShrineClient({ slug }: Props) {
               style={{
                 margin: '14px 0 0',
                 fontSize: 12,
-                color: '#C9A676',
+                color: 'var(--color-gold)',
                 fontWeight: 600,
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
@@ -324,7 +324,7 @@ export function ShrineClient({ slug }: Props) {
               fontSize: 10.5,
               fontWeight: 700,
               letterSpacing: '0.32em',
-              color: '#C9A676',
+              color: 'var(--color-gold)',
               textTransform: 'uppercase',
             }}
           >
@@ -346,7 +346,7 @@ export function ShrineClient({ slug }: Props) {
                   fontFamily: 'Noto Serif SC, serif',
                 }}
               >
-                <span style={{ color: c.by === 'guest' ? '#C07A8E' : '#C9A676', fontWeight: 600 }}>
+                <span style={{ color: c.by === 'guest' ? 'var(--color-accent)' : 'var(--color-gold)', fontWeight: 600 }}>
                   {c.nickname || (c.by === 'guest' ? '一位访客' : '我')}：
                 </span>{' '}
                 {c.note}
@@ -379,7 +379,7 @@ export function ShrineClient({ slug }: Props) {
                 borderRadius: 10,
                 border: '1px solid rgba(245,240,232,0.18)',
                 background: 'rgba(8,5,18,0.5)',
-                color: '#F5F0E8',
+                color: 'var(--color-bg-primary)',
                 fontFamily: 'inherit',
               }}
             />
@@ -399,7 +399,7 @@ export function ShrineClient({ slug }: Props) {
                 borderRadius: 10,
                 border: '1px solid rgba(245,240,232,0.18)',
                 background: 'rgba(8,5,18,0.5)',
-                color: '#F5F0E8',
+                color: 'var(--color-bg-primary)',
                 fontFamily: 'inherit',
               }}
             />
@@ -455,7 +455,7 @@ export function ShrineClient({ slug }: Props) {
               borderRadius: 999,
               border: `1px solid ${planet.accent}66`,
               background: `${planet.accent}22`,
-              color: '#F5F0E8',
+              color: 'var(--color-bg-primary)',
               fontSize: 11.5,
               fontWeight: 700,
               letterSpacing: '0.32em',

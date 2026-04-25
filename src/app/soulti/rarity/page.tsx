@@ -37,15 +37,15 @@ export default function Page() {
   }));
 
   return (
-    <div className="min-h-screen" style={{ background: '#FAF8F5' }}>
+    <div className="min-h-screen" style={{ background: 'var(--color-bg-secondary)' }}>
       <header className="max-w-3xl mx-auto px-6 pt-16 pb-10 text-center">
-        <p className="text-[10px] tracking-[0.4em] uppercase mb-4" style={{ fontFamily: monoFont, color: '#8b7355', opacity: 0.7 }}>
+        <p className="text-[10px] tracking-[0.4em] uppercase mb-4" style={{ fontFamily: monoFont, color: 'var(--color-text-muted)', opacity: 0.7 }}>
           RARITY LEADERBOARD
         </p>
-        <h1 className="text-3xl sm:text-4xl mb-3" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+        <h1 className="text-3xl sm:text-4xl mb-3" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
           稀有度榜
         </h1>
-        <p className="text-sm" style={{ fontFamily: serifFont, color: '#6a6054', lineHeight: 2 }}>
+        <p className="text-sm" style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)', lineHeight: 2 }}>
           全部 32 种自然力按 populationPct 由稀到常排列。<br />
           看看你是不是那个 1.2% 的星核。
         </p>
@@ -56,18 +56,18 @@ export default function Page() {
           <section
             key={g.tier}
             className="rounded-3xl p-6 sm:p-7"
-            style={{ background: '#FDFCFA', border: '1px solid rgba(139,115,85,0.15)' }}
+            style={{ background: 'var(--color-bg-secondary)', border: '1px solid rgba(139,115,85,0.15)' }}
           >
             <div className="flex items-baseline justify-between mb-5">
               <div>
                 <p className="text-[10px] tracking-[0.3em] uppercase" style={{ fontFamily: monoFont, color: getSoultiRarity(g.items[0]?.p.slug ?? '').color }}>
                   {g.tier}
                 </p>
-                <h2 className="text-xl" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+                <h2 className="text-xl" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
                   {TIER_INFO[g.tier].zh}
                 </h2>
               </div>
-              <p className="text-[11px]" style={{ fontFamily: monoFont, color: '#9a918a' }}>
+              <p className="text-[11px]" style={{ fontFamily: monoFont, color: 'var(--color-text-muted)' }}>
                 {TIER_INFO[g.tier].blurb} · {g.items.length} 种
               </p>
             </div>
@@ -90,7 +90,7 @@ export default function Page() {
                         <p className="text-[10px] tracking-[0.2em]" style={{ fontFamily: monoFont, color: p.color }}>
                           {p.code}
                         </p>
-                        <p className="text-sm truncate" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+                        <p className="text-sm truncate" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
                           {p.name}
                         </p>
                       </div>
@@ -106,13 +106,13 @@ export default function Page() {
         ))}
 
         <nav className="flex flex-wrap justify-center gap-3 text-sm pt-4" style={{ fontFamily: serifFont }}>
-          <Link href="/soulti/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: '#6a6054' }}>
+          <Link href="/soulti/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: 'var(--color-text-secondary)' }}>
             ← 开启测试
           </Link>
-          <Link href="/soulti/map/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: '#6a6054' }}>
+          <Link href="/soulti/map/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: 'var(--color-text-secondary)' }}>
             自然图谱
           </Link>
-          <Link href="/soulti/origin/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: '#6a6054' }}>
+          <Link href="/soulti/origin/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: 'var(--color-text-secondary)' }}>
             32 位女性
           </Link>
         </nav>

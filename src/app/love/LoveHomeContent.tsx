@@ -41,7 +41,7 @@ export default function LoveHomeContent() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/love/test"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-pink-500 text-white font-medium text-base hover:bg-pink-600 transition-all duration-200"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base hover:brightness-110 transition-all duration-200"
               >
                 开始测试
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -159,7 +159,7 @@ export default function LoveHomeContent() {
           <p className="text-text-muted text-sm mb-6">准备好了吗？</p>
           <Link
             href="/love/test"
-            className="inline-flex items-center gap-2 px-10 py-4 rounded-xl bg-pink-500 text-white font-medium text-lg hover:brightness-110 transition-all duration-200 shadow-[0_0_40px_rgba(236,72,153,0.2)]"
+            className="inline-flex items-center gap-2 px-10 py-4 rounded-xl bg-accent text-bg-primary font-medium text-lg hover:brightness-110 transition-all duration-200"
           >
             开始测恋爱人设
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

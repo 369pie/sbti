@@ -87,7 +87,7 @@ export default async function PairPage({ params }: Props) {
         minHeight: '100vh',
         background:
           'radial-gradient(ellipse 100% 60% at 50% 0%, #2a1c4d 0%, #1a1530 38%, #0F0A22 100%)',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         fontFamily: 'var(--font-display), "Cormorant Garamond", "Noto Serif SC", serif',
         padding: '64px 24px 96px',
       }}
@@ -99,7 +99,7 @@ export default async function PairPage({ params }: Props) {
             fontFamily: 'Inter, sans-serif',
             fontSize: 11,
             letterSpacing: '0.42em',
-            color: '#D4B58A',
+            color: 'var(--color-gold)',
             textTransform: 'uppercase',
           }}
         >
@@ -114,7 +114,7 @@ export default async function PairPage({ params }: Props) {
             lineHeight: 1.25,
           }}
         >
-          {pa.name} <em style={{ fontStyle: 'italic', color: '#D4B58A' }}>⚭</em> {pb.name}
+          {pa.name} <em style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>⚭</em> {pb.name}
         </h1>
         <p
           style={{
@@ -134,7 +134,7 @@ export default async function PairPage({ params }: Props) {
             margin: '6px 0 28px',
             fontFamily: 'var(--font-display), serif',
             fontSize: 30,
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
             letterSpacing: '0.04em',
           }}
         >
@@ -152,7 +152,7 @@ export default async function PairPage({ params }: Props) {
           }}
         >
           <PlanetThumb planet={pa} />
-          <span style={{ color: '#D4B58A', fontSize: 28, fontFamily: 'var(--font-display), serif', fontStyle: 'italic' }}>
+          <span style={{ color: 'var(--color-gold)', fontSize: 28, fontFamily: 'var(--font-display), serif', fontStyle: 'italic' }}>
             ⚭
           </span>
           <PlanetThumb planet={pb} />
@@ -173,7 +173,7 @@ export default async function PairPage({ params }: Props) {
               fontFamily: '"Noto Serif SC", serif',
               fontSize: 14,
               lineHeight: 1.85,
-              color: 'rgba(245,240,232,0.85)',
+              color: 'color-mix(in oklab, var(--color-bg-primary) 85%, transparent)',
             }}
           >
             {gravity.band.narration}
@@ -184,7 +184,7 @@ export default async function PairPage({ params }: Props) {
               fontFamily: '"Noto Serif SC", serif',
               fontSize: 12.5,
               lineHeight: 1.75,
-              color: 'rgba(245,240,232,0.55)',
+              color: 'color-mix(in oklab, var(--color-bg-primary) 55%, transparent)',
             }}
           >
             {gravity.leadingAxisExplain}
@@ -210,7 +210,7 @@ export default async function PairPage({ params }: Props) {
                 fontFamily: 'Inter, sans-serif',
                 fontSize: 11,
                 letterSpacing: '0.2em',
-                color: 'rgba(245,240,232,0.55)',
+                color: 'color-mix(in oklab, var(--color-bg-primary) 55%, transparent)',
               }}
             >
               — {gravity.quote.author}
@@ -229,7 +229,7 @@ export default async function PairPage({ params }: Props) {
               textAlign: 'left',
             }}
           >
-            <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.42em', color: '#D4B58A', textTransform: 'uppercase', textAlign: 'center' }}>
+            <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.42em', color: 'var(--color-gold)', textTransform: 'uppercase', textAlign: 'center' }}>
               ✦ Two Tutelary Deities · 双主神同位
             </p>
             <div style={{ display: 'flex', justifyContent: 'space-around', gap: 12, marginTop: 14, flexWrap: 'wrap' }}>
@@ -244,7 +244,7 @@ export default async function PairPage({ params }: Props) {
                   fontFamily: '"Cormorant Garamond", serif',
                   fontStyle: 'italic',
                   fontSize: 16,
-                  color: '#F5F0E8',
+                  color: 'var(--color-bg-primary)',
                   lineHeight: 1.6,
                 }}
               >
@@ -268,7 +268,7 @@ export default async function PairPage({ params }: Props) {
             textAlign: 'left',
           }}
         >
-          <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.42em', color: '#D4B58A', textTransform: 'uppercase', textAlign: 'center' }}>
+          <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.42em', color: 'var(--color-gold)', textTransform: 'uppercase', textAlign: 'center' }}>
             ✦ G ⊕ S · 双层叙事 · {gs.rare ? '稀有相遇' : '常见相遇'}
           </p>
           <h3
@@ -278,7 +278,7 @@ export default async function PairPage({ params }: Props) {
               fontFamily: 'var(--font-display), serif',
               fontStyle: 'italic',
               fontSize: 26,
-              color: '#F5F0E8',
+              color: 'var(--color-bg-primary)',
               letterSpacing: '0.04em',
             }}
           >
@@ -291,7 +291,7 @@ export default async function PairPage({ params }: Props) {
               textAlign: 'center',
               fontFamily: '"Noto Serif SC", serif',
               fontSize: 13.5,
-              color: 'rgba(245,240,232,0.85)',
+              color: 'color-mix(in oklab, var(--color-bg-primary) 85%, transparent)',
               lineHeight: 1.85,
             }}
           >
@@ -310,7 +310,7 @@ export default async function PairPage({ params }: Props) {
               fontFamily: '"Cormorant Garamond", serif',
               fontStyle: 'italic',
               fontSize: 14,
-              color: 'rgba(245,240,232,0.85)',
+              color: 'color-mix(in oklab, var(--color-bg-primary) 85%, transparent)',
               lineHeight: 1.6,
             }}
           >
@@ -329,7 +329,7 @@ export default async function PairPage({ params }: Props) {
               textAlign: 'left',
             }}
           >
-            <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.42em', color: '#D4B58A', textTransform: 'uppercase', textAlign: 'center' }}>
+            <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.42em', color: 'var(--color-gold)', textTransform: 'uppercase', textAlign: 'center' }}>
               ✦ Shared Mirror Fragments · 共照碎片 · {kindred.shared.length} 枚
             </p>
             <p
@@ -373,7 +373,7 @@ export default async function PairPage({ params }: Props) {
                       fontFamily: '"Cormorant Garamond", serif',
                       fontStyle: 'italic',
                       fontSize: 16,
-                      color: '#C9A676',
+                      color: 'var(--color-gold)',
                     }}
                   >
                     {frag.sigil} {frag.nameZh}
@@ -396,7 +396,7 @@ export default async function PairPage({ params }: Props) {
               fontSize: 12,
               letterSpacing: '0.32em',
               textTransform: 'uppercase',
-              background: '#F5F0E8',
+              background: 'var(--color-bg-primary)',
               color: '#1a1530',
               fontFamily: 'Inter, sans-serif',
               textDecoration: 'none',
@@ -481,7 +481,7 @@ function PlanetThumb({ planet }: { planet: HomePlanetEntry }) {
           fontFamily: 'var(--font-display), serif',
           fontSize: 14,
           letterSpacing: '0.04em',
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
         }}
       >
         {planet.name}

@@ -47,7 +47,7 @@ export default async function CptiHisPovPage({ params }: PageProps) {
   if (!relationship) notFound();
 
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#F5F0E8]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-bg-primary" />}>
       <CptiHisPovClient relationship={relationship} />
     </Suspense>
   );

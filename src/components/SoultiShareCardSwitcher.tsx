@@ -68,7 +68,7 @@ export function SoultiShareCardSwitcher({
           role="tablist"
           aria-label="选择分享卡风格"
           style={{
-            background: '#F4EFE7',
+            background: 'var(--color-bg-secondary)',
             border: `1px solid ${accent}20`,
           }}
         >

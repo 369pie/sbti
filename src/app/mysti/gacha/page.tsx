@@ -41,8 +41,8 @@ export default function MystiGachaPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center" style={{ background: '#0B0D17' }}>
-          <div className="text-sm" style={{ color: '#A7B0C8' }}>加载中…</div>
+        <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-bg-primary)' }}>
+          <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>加载中…</div>
         </div>
       }
     >

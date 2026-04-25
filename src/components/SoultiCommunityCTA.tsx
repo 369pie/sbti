@@ -37,7 +37,7 @@ export function SoultiCommunityCTA({ personalityName, rarity, accentColor }: Pro
     >
       <div
         className="rounded-2xl border p-6 sm:p-8"
-        style={{ borderColor: `${accentColor}20`, background: '#FDFCFA' }}
+        style={{ borderColor: `${accentColor}20`, background: 'var(--color-bg-secondary)' }}
       >
         <p
           className="text-[10px] tracking-[0.35em] font-medium uppercase mb-4"
@@ -47,13 +47,13 @@ export function SoultiCommunityCTA({ personalityName, rarity, accentColor }: Pro
         </p>
 
         <p
-          className="text-sm leading-[1.9] text-[#2D2A26] mb-5"
+          className="text-sm leading-[1.9] text-text-primary mb-5"
           style={{ fontFamily: serifFont }}
         >
           {welcomeLine}
         </p>
 
-        <ul className="space-y-1.5 text-xs text-[#6A6054] mb-6" style={{ fontFamily: serifFont }}>
+        <ul className="space-y-1.5 text-xs text-text-secondary mb-6" style={{ fontFamily: serifFont }}>
           <li>· 每周一位灵魂共振女性的深度故事</li>
           <li>· 同类型的人在一起聊"白天和深夜的我"</li>
           <li>· 提名你心中的下一位灵魂共振女性</li>
@@ -78,7 +78,7 @@ export function SoultiCommunityCTA({ personalityName, rarity, accentColor }: Pro
           加入灵魂共振社群 →
         </a>
 
-        <p className="mt-4 text-[10px] text-[#998F84]" style={{ fontFamily: serifFont }}>
+        <p className="mt-4 text-[10px] text-text-muted" style={{ fontFamily: serifFont }}>
           点击跳转至入群说明页（微信群 · 按人格分群 · 无营销）
         </p>
       </div>

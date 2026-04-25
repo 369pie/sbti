@@ -41,7 +41,7 @@ export default function MystiDecisionHubPage() {
         minHeight: '100vh',
         background:
           'radial-gradient(ellipse 80% 60% at 30% 20%, rgba(192,122,142,0.15) 0%, transparent 60%), radial-gradient(ellipse 90% 60% at 80% 90%, rgba(156,124,255,0.12) 0%, transparent 60%), #1a1530',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         padding: '80px 24px 120px',
         fontFamily: 'var(--font-display, "Cormorant Garamond"), "Noto Serif SC", serif',
       }}
@@ -51,7 +51,7 @@ export default function MystiDecisionHubPage() {
           style={{
             fontSize: 12,
             letterSpacing: '0.42em',
-            color: '#C9A676',
+            color: 'var(--color-gold)',
             textTransform: 'uppercase',
             fontWeight: 700,
           }}
@@ -67,7 +67,7 @@ export default function MystiDecisionHubPage() {
             letterSpacing: '0.02em',
           }}
         >
-          今夜，<em style={{ fontStyle: 'italic', color: '#C07A8E' }}>暮光</em>
+          今夜，<em style={{ fontStyle: 'italic', color: 'var(--color-accent)' }}>暮光</em>
           替你抽一张。
         </h1>
         <p

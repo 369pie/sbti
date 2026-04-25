@@ -93,7 +93,7 @@ export function SoulProbeQuiz({
           textAlign: 'center',
           letterSpacing: 6,
           fontSize: 10.5,
-          color: '#C9A676',
+          color: 'var(--color-gold)',
           textTransform: 'uppercase',
           fontWeight: 600,
         }}
@@ -107,7 +107,7 @@ export function SoulProbeQuiz({
           fontFamily: 'Cormorant Garamond, Noto Serif SC, serif',
           fontStyle: 'italic',
           fontSize: 24,
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
           fontWeight: 500,
         }}
       >
@@ -126,7 +126,7 @@ export function SoulProbeQuiz({
         这 6 道签不影响你的人格判定。
         <br />
         但当你和 ta 配对时，
-        <strong style={{ color: '#C9A676', fontWeight: 600 }}>
+        <strong style={{ color: 'var(--color-gold)', fontWeight: 600 }}>
           答案越像，你们的灵魂频率越接近。
         </strong>
       </p>
@@ -153,7 +153,7 @@ export function SoulProbeQuiz({
                       label: opt.label,
                       blurb: opt.blurb,
                       centerGlyph: ['♪', '♫', '♬', '◯'][idx] ?? '♪',
-                      accent: ['#C9A676', '#C07A8E', '#9C7CFF', '#7AA3B0'][idx],
+                      accent: ['var(--color-gold)', 'var(--color-accent)', '#9C7CFF', '#7AA3B0'][idx],
                     }))}
                     initial={
                       picked === 'A' || picked === 'B' || picked === 'C' || picked === 'D'
@@ -169,7 +169,7 @@ export function SoulProbeQuiz({
                     prompt={q.prompt}
                     hint={q.hint}
                     options={q.options.map((opt) => {
-                      const hex = opt.blurb.match(/#[0-9A-Fa-f]{6}/)?.[0] ?? '#C07A8E';
+                      const hex = opt.blurb.match(/#[0-9A-Fa-f]{6}/)?.[0] ?? 'var(--color-accent)';
                       return {
                         key: opt.key,
                         label: opt.label,
@@ -208,7 +208,7 @@ export function SoulProbeQuiz({
                   fontSize: 9.5,
                   fontWeight: 700,
                   letterSpacing: 4,
-                  color: '#F5F0E8',
+                  color: 'var(--color-bg-primary)',
                   background: 'rgba(26,21,48,0.85)',
                   padding: '3px 8px',
                   borderRadius: 999,
@@ -222,7 +222,7 @@ export function SoulProbeQuiz({
                 style={{
                   margin: '0 0 10px',
                   fontSize: 15,
-                  color: '#F5F0E8',
+                  color: 'var(--color-bg-primary)',
                   lineHeight: 1.5,
                   fontFamily: 'Noto Serif SC, serif',
                 }}
@@ -253,7 +253,7 @@ export function SoulProbeQuiz({
                         background: isPicked
                           ? 'rgba(201,166,118,0.12)'
                           : 'transparent',
-                        color: '#F5F0E8',
+                        color: 'var(--color-bg-primary)',
                         cursor: 'pointer',
                         display: 'flex',
                         flexDirection: 'column',
@@ -265,7 +265,7 @@ export function SoulProbeQuiz({
                           fontSize: 12.5,
                           fontWeight: 500,
                           letterSpacing: 0.5,
-                          color: isPicked ? '#C9A676' : '#F5F0E8',
+                          color: isPicked ? 'var(--color-gold)' : 'var(--color-bg-primary)',
                         }}
                       >
                         {opt.key} · {opt.label}
@@ -292,7 +292,7 @@ export function SoulProbeQuiz({
                   border: 'none',
                   color:
                     picked === 'SKIP'
-                      ? '#C9A676'
+                      ? 'var(--color-gold)'
                       : 'rgba(245,240,232,0.4)',
                   fontSize: 11,
                   cursor: 'pointer',
@@ -313,7 +313,7 @@ export function SoulProbeQuiz({
             textAlign: 'center',
             fontFamily: 'Cormorant Garamond, Noto Serif SC, serif',
             fontStyle: 'italic',
-            color: '#C9A676',
+            color: 'var(--color-gold)',
             fontSize: 14,
           }}
         >
@@ -366,7 +366,7 @@ function SkipButton({
         marginTop: 8,
         background: 'transparent',
         border: 'none',
-        color: picked === 'SKIP' ? '#C9A676' : 'rgba(245,240,232,0.4)',
+        color: picked === 'SKIP' ? 'var(--color-gold)' : 'rgba(245,240,232,0.4)',
         fontSize: 11,
         cursor: 'pointer',
         padding: 0,

@@ -222,7 +222,7 @@ export function MeContent() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-10"
         >
-          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-pink-500 to-fuchsia-500 text-white text-3xl font-bold flex items-center justify-center shadow-md">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-accent to-rose-deep text-bg-primary text-3xl font-bold flex items-center justify-center shadow-md">
             {avatarChar}
           </div>
 
@@ -243,7 +243,7 @@ export function MeContent() {
               <button
                 onClick={handleSaveNickname}
                 disabled={saving}
-                className="px-3 py-1.5 rounded-lg bg-accent text-white text-xs font-medium hover:bg-accent/90 transition-colors"
+                className="px-3 py-1.5 rounded-lg bg-accent text-bg-primary text-xs font-medium hover:bg-accent/90 transition-colors"
               >
                 {saving ? '保存中' : '保存'}
               </button>
@@ -452,7 +452,7 @@ export function MeContent() {
                 <span>创作者身份已开通，可直接进入创作工作台。</span>
                 <Link
                   href="/creator/studio/"
-                  className="shrink-0 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition-colors"
+                  className="shrink-0 px-3 py-1.5 rounded-lg bg-sage text-bg-primary text-xs font-medium hover:bg-sage/90 transition-colors"
                 >
                   进入工作台
                 </Link>

@@ -249,7 +249,7 @@ export default function JoinContent() {
               <button
                 onClick={handleDirectMatch}
                 disabled={directMatching}
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-rose-500 text-white font-medium text-base hover:bg-rose-600 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base hover:bg-rose-600 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {directMatching ? '配对中...' : '直接配对'}
               </button>
@@ -267,7 +267,7 @@ export default function JoinContent() {
           ) : (
             <button
               onClick={handleStartTest}
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-rose-500 text-white font-medium text-base hover:bg-rose-600 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base hover:bg-rose-600 transition-all cursor-pointer"
             >
               开始测试
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -364,11 +364,11 @@ export default function JoinContent() {
         <button
           onClick={handleSubmit}
           disabled={code.length !== 6 || loading}
-          className="inline-flex items-center justify-center gap-2 w-full max-w-xs mx-auto px-8 py-3.5 rounded-xl bg-rose-500 text-white font-medium text-base hover:bg-rose-600 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center justify-center gap-2 w-full max-w-xs mx-auto px-8 py-3.5 rounded-xl bg-accent text-bg-primary font-medium text-base hover:bg-rose-600 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {loading ? (
             <>
-              <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+              <div className="w-4 h-4 rounded-full border-2 border-bg-primary/30 border-t-bg-primary animate-spin" />
               验证中...
             </>
           ) : (

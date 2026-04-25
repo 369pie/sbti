@@ -41,7 +41,7 @@ export default function SoultiLandingContent() {
   }));
 
   return (
-    <div className="min-h-screen" style={{ background: '#FAF8F5' }}>
+    <div className="min-h-screen" style={{ background: 'var(--color-bg-secondary)' }}>
 
       {/* ═══════════════════════════════════════════════
           HERO — abstract nature aesthetic
@@ -70,23 +70,23 @@ export default function SoultiLandingContent() {
 
             <p
               className="text-xs tracking-[0.35em] uppercase mb-8"
-              style={{ fontFamily: monoFont, color: '#8b7355', opacity: 0.6 }}
+              style={{ fontFamily: monoFont, color: 'var(--color-text-muted)', opacity: 0.6 }}
             >
               SoulTI
             </p>
 
             <h1
               className="text-[2rem] sm:text-[2.5rem] md:text-[3rem] leading-[1.5] mb-6"
-              style={{ fontFamily: serifFont, fontWeight: 400, color: '#2D2A26', letterSpacing: '0.02em' }}
+              style={{ fontFamily: serifFont, fontWeight: 400, color: 'var(--color-text-primary)', letterSpacing: '0.02em' }}
             >
               深夜的你，<br />需要 8 分钟
             </h1>
 
-            <DecoLine className="text-[#8b7355] opacity-30 mb-6" />
+            <DecoLine className="text-text-muted opacity-30 mb-6" />
 
             <p
               className="text-base sm:text-lg leading-[2.2] max-w-md mx-auto mb-3"
-              style={{ fontFamily: serifFont, color: '#5a5550' }}
+              style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)' }}
             >
               白天的你，和深夜的你，
               <br />
@@ -95,23 +95,23 @@ export default function SoultiLandingContent() {
 
             <p
               className="text-base sm:text-lg leading-[3] max-w-md mx-auto mb-10"
-              style={{ fontFamily: serifFont, color: '#2D2A26' }}
+              style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
             >
               测出你的「撕裂度」，
               <br />
-              <span style={{ color: '#8b7355' }}>看见你今晚为什么睡不着。</span>
+              <span style={{ color: 'var(--color-text-muted)' }}>看见你今晚为什么睡不着。</span>
             </p>
 
             <p
               className="text-sm mb-12"
-              style={{ fontFamily: serifFont, color: '#9a918a', fontStyle: 'italic' }}
+              style={{ fontFamily: serifFont, color: 'var(--color-text-muted)', fontStyle: 'italic' }}
             >
               5 轴 · 32 种自然力 · 三层镜像 · 撕裂度算法
             </p>
 
             <Link
               href="/soulti/test"
-              className="group inline-flex items-center gap-3 px-10 py-4 rounded-full text-white text-base transition-all duration-300 hover:scale-[1.02]"
+              className="group inline-flex items-center gap-3 px-10 py-4 rounded-full text-bg-primary text-base transition-all duration-300 hover:scale-[1.02]"
               style={{
                 background: 'linear-gradient(135deg, #6b5d4d, #8b7355, #a89070)',
                 boxShadow: '0 4px 24px rgba(107,93,77,0.20)',
@@ -125,7 +125,7 @@ export default function SoultiLandingContent() {
 
             <p
               className="mt-6 text-xs tracking-[0.15em]"
-              style={{ fontFamily: monoFont, color: '#a09890' }}
+              style={{ fontFamily: monoFont, color: 'var(--color-text-muted)' }}
             >
               25 questions · different each time
             </p>
@@ -142,12 +142,12 @@ export default function SoultiLandingContent() {
                   key={link.href}
                   href={link.href}
                   className="block rounded-2xl border p-4 text-center transition-all hover:-translate-y-0.5"
-                  style={{ borderColor: 'rgba(139,115,85,0.2)', background: '#FDFCFA' }}
+                  style={{ borderColor: 'rgba(139,115,85,0.2)', background: 'var(--color-bg-secondary)' }}
                 >
-                  <p className="text-sm mb-1" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+                  <p className="text-sm mb-1" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
                     {link.label}
                   </p>
-                  <p className="text-[10px]" style={{ fontFamily: serifFont, color: '#8a7f72' }}>
+                  <p className="text-[10px]" style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}>
                     {link.desc}
                   </p>
                 </Link>
@@ -166,20 +166,20 @@ export default function SoultiLandingContent() {
             <div>
               <p
                 className="text-[10px] tracking-[0.35em] uppercase mb-3"
-                style={{ fontFamily: monoFont, color: '#8b7355', opacity: 0.5 }}
+                style={{ fontFamily: monoFont, color: 'var(--color-text-muted)', opacity: 0.5 }}
               >
                 NATURE MAP
               </p>
               <h2
                 className="text-xl sm:text-2xl"
-                style={{ fontFamily: serifFont, color: '#2D2A26' }}
+                style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
               >
                 万物地图
               </h2>
             </div>
             <p
               className="text-xs"
-              style={{ fontFamily: monoFont, color: '#a09890' }}
+              style={{ fontFamily: monoFont, color: 'var(--color-text-muted)' }}
             >
               32 types ←→
             </p>
@@ -242,7 +242,7 @@ export default function SoultiLandingContent() {
                 </div>
 
                 {/* Info area */}
-                <div className="px-4 py-4" style={{ background: '#FDFCFA' }}>
+                <div className="px-4 py-4" style={{ background: 'var(--color-bg-secondary)' }}>
                   <p
                     className="text-base mb-1 tracking-[0.1em]"
                     style={{ fontFamily: serifFont, color: type.color }}
@@ -252,14 +252,14 @@ export default function SoultiLandingContent() {
                   {resonance && (
                     <p
                       className="text-[11px] leading-relaxed"
-                      style={{ fontFamily: serifFont, color: '#8a8078' }}
+                      style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
                     >
                       共振 · {resonance.soulOrigin.zhName}
                     </p>
                   )}
                   <p
                     className="text-[11px] mt-2 line-clamp-2 leading-relaxed"
-                    style={{ color: '#a09890' }}
+                    style={{ color: 'var(--color-text-muted)' }}
                   >
                     {type.tagline}
                   </p>
@@ -272,7 +272,7 @@ export default function SoultiLandingContent() {
         {/* Hover hint */}
         <p
           className="text-center mt-4 text-[11px]"
-          style={{ fontFamily: monoFont, color: '#b0a89e' }}
+          style={{ fontFamily: monoFont, color: 'var(--color-text-muted)' }}
         >
           hover to pause · click to explore
         </p>
@@ -283,32 +283,32 @@ export default function SoultiLandingContent() {
          ═══════════════════════════════════════════════ */}
       <section className="py-20 px-6">
         <div className="max-w-2xl mx-auto">
-          <DecoLine className="text-[#8b7355] opacity-20 mb-12" />
+          <DecoLine className="text-text-muted opacity-20 mb-12" />
 
           <p
             className="text-[10px] tracking-[0.35em] uppercase mb-4"
-            style={{ fontFamily: monoFont, color: '#8b7355', opacity: 0.5 }}
+            style={{ fontFamily: monoFont, color: 'var(--color-text-muted)', opacity: 0.5 }}
           >
             SOUL RESONANCE
           </p>
 
           <h2
             className="text-xl sm:text-2xl leading-[1.8] mb-4"
-            style={{ fontFamily: serifFont, color: '#2D2A26' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
           >
             灵魂共振
           </h2>
 
           <p
             className="text-sm leading-[1.9] mb-14"
-            style={{ fontFamily: serifFont, color: '#7a7068' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)' }}
           >
             你不只会得到一个名字——你会遇见一个人。
             <br />
             她的伤口和你相似，她的燃烧方式和你一样。
             <br />
             <br />
-            <span style={{ color: '#8b7355' }}>跨越时空，你们分享着同一种自然法则，而你将去写下只属于你的生生不息。</span>
+            <span style={{ color: 'var(--color-text-muted)' }}>跨越时空，你们分享着同一种自然法则，而你将去写下只属于你的生生不息。</span>
           </p>
 
           {/* Featured pairings — nature card style */}
@@ -353,19 +353,19 @@ export default function SoultiLandingContent() {
                   {/* Resonance figure */}
                   <p
                     className="text-sm mb-1"
-                    style={{ fontFamily: serifFont, color: '#3d3832' }}
+                    style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
                   >
                     {resonance.soulOrigin.zhName}
                   </p>
                   <p
                     className="text-[11px] mb-3"
-                    style={{ fontFamily: monoFont, color: '#a09890' }}
+                    style={{ fontFamily: monoFont, color: 'var(--color-text-muted)' }}
                   >
                     {resonance.soulOrigin.era}
                   </p>
                   <p
                     className="text-sm leading-[1.8]"
-                    style={{ fontFamily: serifFont, fontStyle: 'italic', color: '#7a7068' }}
+                    style={{ fontFamily: serifFont, fontStyle: 'italic', color: 'var(--color-text-secondary)' }}
                   >
                     &ldquo;{resonance.quote.split('\n')[0]}&rdquo;
                   </p>
@@ -389,18 +389,18 @@ export default function SoultiLandingContent() {
          ═══════════════════════════════════════════════ */}
       <section className="py-20 px-6">
         <div className="max-w-2xl mx-auto">
-          <DecoLine className="text-[#8b7355] opacity-20 mb-12" />
+          <DecoLine className="text-text-muted opacity-20 mb-12" />
 
           <p
             className="text-[10px] tracking-[0.35em] uppercase mb-10"
-            style={{ fontFamily: monoFont, color: '#8b7355', opacity: 0.5 }}
+            style={{ fontFamily: monoFont, color: 'var(--color-text-muted)', opacity: 0.5 }}
           >
             ABOUT
           </p>
 
           <blockquote
             className="text-lg sm:text-xl leading-[2.2] mb-10"
-            style={{ fontFamily: serifFont, color: '#4a443e' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
           >
             别的测试分析你的行为，
             <br />
@@ -411,7 +411,7 @@ export default function SoultiLandingContent() {
             <br />
             五个轴，不是给你一个标签，
             <br />
-            <span style={{ color: '#8b7355' }}>是让你看见：那股一直在你体内燃烧的自然之力。</span>
+            <span style={{ color: 'var(--color-text-muted)' }}>是让你看见：那股一直在你体内燃烧的自然之力。</span>
           </blockquote>
         </div>
       </section>
@@ -423,13 +423,13 @@ export default function SoultiLandingContent() {
         <div className="max-w-2xl mx-auto">
           <p
             className="text-[10px] tracking-[0.35em] uppercase mb-3"
-            style={{ fontFamily: monoFont, color: '#8b7355', opacity: 0.5 }}
+            style={{ fontFamily: monoFont, color: 'var(--color-text-muted)', opacity: 0.5 }}
           >
             FIVE AXES
           </p>
           <h2
             className="text-xl sm:text-2xl mb-8"
-            style={{ fontFamily: serifFont, color: '#2D2A26' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
           >
             五轴觉察
           </h2>
@@ -443,7 +443,7 @@ export default function SoultiLandingContent() {
                   className="animate-fade-up rounded-xl p-5 sm:p-6 transition-shadow hover:shadow-md"
                   style={{
                     animationDelay: `${i * 60}ms`,
-                    background: '#FDFCFA',
+                    background: 'var(--color-bg-secondary)',
                     border: `1px solid ${color.base}12`,
                   }}
                 >
@@ -475,7 +475,7 @@ export default function SoultiLandingContent() {
                       </div>
                       <p
                         className="text-sm leading-relaxed"
-                        style={{ fontFamily: serifFont, color: '#7a7068' }}
+                        style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)' }}
                       >
                         {ax.question}
                       </p>
@@ -495,13 +495,13 @@ export default function SoultiLandingContent() {
         <div className="max-w-2xl mx-auto">
           <p
             className="text-[10px] tracking-[0.35em] uppercase mb-3"
-            style={{ fontFamily: monoFont, color: '#8b7355', opacity: 0.5 }}
+            style={{ fontFamily: monoFont, color: 'var(--color-text-muted)', opacity: 0.5 }}
           >
             THREE ACTS
           </p>
           <h2
             className="text-xl sm:text-2xl mb-8"
-            style={{ fontFamily: serifFont, color: '#2D2A26' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
           >
             三幕自问
           </h2>
@@ -529,12 +529,12 @@ export default function SoultiLandingContent() {
                 <div>
                   <h3
                     className="text-base mb-1"
-                    style={{ fontFamily: serifFont, color: '#2D2A26' }}
+                    style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
                   >
                     {item.title}
                   </h3>
-                  <p className="text-sm leading-relaxed" style={{ fontFamily: serifFont, color: '#7a7068' }}>
-                    {item.desc}——<span style={{ color: '#8b7355' }}>{item.sub}</span>
+                  <p className="text-sm leading-relaxed" style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)' }}>
+                    {item.desc}——<span style={{ color: 'var(--color-text-muted)' }}>{item.sub}</span>
                   </p>
                 </div>
               </div>
@@ -572,7 +572,7 @@ export default function SoultiLandingContent() {
                   </span>
                   <span
                     className="text-xs"
-                    style={{ color: '#8b735560' }}
+                    style={{ color: 'color-mix(in oklab, var(--color-text-muted) 38%, transparent)' }}
                   >
                     →
                   </span>
@@ -594,41 +594,41 @@ export default function SoultiLandingContent() {
          ═══════════════════════════════════════════════ */}
       <section className="py-24 px-6">
         <div className="max-w-md mx-auto text-center">
-          <DecoLine className="text-[#8b7355] opacity-20 mb-12" />
+          <DecoLine className="text-text-muted opacity-20 mb-12" />
 
           <p
             className="text-lg sm:text-xl leading-[2] mb-2"
-            style={{ fontFamily: serifFont, color: '#3d3832' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
           >
             你的灵魂里，
             <br />
-            <span style={{ color: '#8b7355' }}>藏着哪种自然力？</span>
+            <span style={{ color: 'var(--color-text-muted)' }}>藏着哪种自然力？</span>
           </p>
           <p
             className="text-sm mb-6"
-            style={{ fontFamily: serifFont, fontStyle: 'italic', color: '#9a918a' }}
+            style={{ fontFamily: serifFont, fontStyle: 'italic', color: 'var(--color-text-muted)' }}
           >
             而历史上的哪个她，正以你的频率震动？
           </p>
 
           <p
             className="text-base sm:text-lg leading-[2] mb-3"
-            style={{ fontFamily: serifFont, color: '#2D2A26' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
           >
             你不需要成为她们。
             <br />
-            你只需要，<span style={{ color: '#8b7355' }}>成为你自己</span>。
+            你只需要，<span style={{ color: 'var(--color-text-muted)' }}>成为你自己</span>。
           </p>
           <p
             className="text-sm mb-12"
-            style={{ fontFamily: serifFont, color: '#9a918a' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
           >
             而这一切，从看见开始。
           </p>
 
           <Link
             href="/soulti/test"
-            className="group inline-flex items-center gap-3 px-10 py-4 rounded-full text-white text-lg transition-all duration-300 hover:scale-[1.02]"
+            className="group inline-flex items-center gap-3 px-10 py-4 rounded-full text-bg-primary text-lg transition-all duration-300 hover:scale-[1.02]"
             style={{
               background: 'linear-gradient(135deg, #6b5d4d, #8b7355, #a89070)',
               boxShadow: '0 4px 24px rgba(107,93,77,0.20)',
@@ -640,16 +640,16 @@ export default function SoultiLandingContent() {
             <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </Link>
 
-          <div className="mt-10 flex items-center justify-center gap-4 text-xs" style={{ color: '#b0a89e' }}>
-            <Link href="/test/" className="hover:text-[#8b7355] transition-colors" style={{ fontFamily: serifFont }}>
+          <div className="mt-10 flex items-center justify-center gap-4 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+            <Link href="/test/" className="hover:text-text-muted transition-colors" style={{ fontFamily: serifFont }}>
               经典人格版
             </Link>
             <span>·</span>
-            <Link href="/xpti/" className="hover:text-[#8b7355] transition-colors" style={{ fontFamily: serifFont }}>
+            <Link href="/xpti/" className="hover:text-text-muted transition-colors" style={{ fontFamily: serifFont }}>
               恋爱XP
             </Link>
             <span>·</span>
-            <Link href="/wtfti/" className="hover:text-[#8b7355] transition-colors" style={{ fontFamily: serifFont }}>
+            <Link href="/wtfti/" className="hover:text-text-muted transition-colors" style={{ fontFamily: serifFont }}>
               WTF 毒舌版
             </Link>
           </div>

@@ -59,7 +59,7 @@ export function ShrineLongCardV2({ result, personalitySlug, scale = 1 }: Props) 
         transformOrigin: 'top left',
         background:
           'radial-gradient(ellipse 120% 70% at 50% 0%, #3F2F6B 0%, #1A1530 42%, #0F0A22 100%)',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         fontFamily:
           '"Cormorant Garamond", "Noto Serif SC", "Songti SC", serif',
         padding: '96px 80px 80px',
@@ -273,16 +273,16 @@ export function ShrineLongCardV2({ result, personalitySlug, scale = 1 }: Props) 
                 boxShadow: '0 10px 40px -10px rgba(0,0,0,0.4)',
               }}
             >
-              <div style={{ fontSize: 42, color: '#C07A8E', marginBottom: 20 }}>
+              <div style={{ fontSize: 42, color: 'var(--color-accent)', marginBottom: 20 }}>
                 {frag.sigil}
               </div>
-              <h3 style={{ fontSize: 28, color: '#F5F0E8', margin: '0 0 8px', fontWeight: 600, letterSpacing: 1 }}>
+              <h3 style={{ fontSize: 28, color: 'var(--color-bg-primary)', margin: '0 0 8px', fontWeight: 600, letterSpacing: 1 }}>
                 {frag.nameZh}
               </h3>
               <div style={{ fontSize: 16, color: 'rgba(245,240,232,0.6)', marginBottom: 16, letterSpacing: 2, textTransform: 'uppercase' }}>
                 {frag.name}
               </div>
-              <p style={{ fontSize: 15, color: '#D4B58A', margin: '0 0 24px', letterSpacing: 1, borderTop: '1px solid rgba(245,240,232,0.1)', borderBottom: '1px solid rgba(245,240,232,0.1)', padding: '6px 0' }}>
+              <p style={{ fontSize: 15, color: 'var(--color-gold)', margin: '0 0 24px', letterSpacing: 1, borderTop: '1px solid rgba(245,240,232,0.1)', borderBottom: '1px solid rgba(245,240,232,0.1)', padding: '6px 0' }}>
                 {frag.fields.slice(0, 2).join(' · ')}
               </p>
               <p style={{ fontSize: 20, fontStyle: 'italic', color: 'rgba(245,240,232,0.9)', margin: 0, lineHeight: 1.6 }}>
@@ -341,7 +341,7 @@ function RomanBadge({ numeral, label }: { numeral: string; label: string }) {
           fontFamily: '"Cormorant Garamond", serif',
           fontStyle: 'italic',
           fontSize: 46,
-          color: '#C9A676',
+          color: 'var(--color-gold)',
           letterSpacing: '0.08em',
         }}
       >
@@ -352,7 +352,7 @@ function RomanBadge({ numeral, label }: { numeral: string; label: string }) {
           textTransform: 'uppercase',
           letterSpacing: '0.42em',
           fontSize: 18,
-          color: '#D4B58A',
+          color: 'var(--color-gold)',
           fontWeight: 500,
         }}
       >
@@ -435,7 +435,7 @@ function TriCardEnhanced({
           fontFamily: '"Noto Serif SC", serif',
           fontSize: 26,
           margin: '4px 0 6px',
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
           fontWeight: 500,
         }}
       >
@@ -482,7 +482,7 @@ function CompanionCardEnhanced({
   tone: 'rose' | 'gold' | 'violet';
 }) {
   const toneColor =
-    tone === 'rose' ? '#C07A8E' : tone === 'gold' ? '#C9A676' : '#9C7CFF';
+    tone === 'rose' ? 'var(--color-accent)' : tone === 'gold' ? 'var(--color-gold)' : '#9C7CFF';
 
   return (
     <div
@@ -522,7 +522,7 @@ function CompanionCardEnhanced({
           fontFamily: '"Noto Serif SC", serif',
           fontSize: 22,
           margin: '0 0 6px',
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
           fontWeight: 500,
         }}
       >
@@ -609,7 +609,7 @@ function StardustDots() {
             width: d.size,
             height: d.size,
             borderRadius: '50%',
-            background: i % 3 === 0 ? '#C9A676' : '#F5F0E8',
+            background: i % 3 === 0 ? 'var(--color-gold)' : 'var(--color-bg-primary)',
             opacity: d.op,
             boxShadow: `0 0 ${d.size * 3}px rgba(245,240,232,0.5)`,
           }}
@@ -630,7 +630,7 @@ const eyebrowStyle: CSSProperties = {
   textTransform: 'uppercase',
   letterSpacing: '0.4em',
   fontSize: 14,
-  color: '#D4B58A',
+  color: 'var(--color-gold)',
   margin: 0,
   fontWeight: 500,
 };
@@ -660,7 +660,7 @@ const heroQuoteStyle: CSSProperties = {
   fontSize: 30,
   lineHeight: 1.5,
   margin: '0 0 18px',
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
 };
 
 const heroBodyStyle: CSSProperties = {
@@ -695,7 +695,7 @@ const triGridStyle: CSSProperties = {
 const decorStarStyle: CSSProperties = {
   textAlign: 'center',
   fontSize: 16,
-  color: '#C9A676',
+  color: 'var(--color-gold)',
   opacity: 0.6,
   margin: '20px 0 0',
   letterSpacing: '0.2em',
@@ -707,7 +707,7 @@ const deityLineStyle: CSSProperties = {
   fontStyle: 'italic',
   fontSize: 24,
   margin: '0 0 10px',
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
 };
 
 const domainLineStyle: CSSProperties = {
@@ -756,7 +756,7 @@ const shadowTitleStyle: CSSProperties = {
   fontFamily: '"Cormorant Garamond", "Noto Serif SC", serif',
   fontSize: 52,
   margin: '16px 0 24px',
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
 };
 
 const shadowGlyphStyle: CSSProperties = {
@@ -771,7 +771,7 @@ const shadowQuoteStyle: CSSProperties = {
   fontStyle: 'italic',
   fontSize: 24,
   lineHeight: 1.6,
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
   margin: '0 0 10px',
 };
 
@@ -793,7 +793,7 @@ const shadowAttrLabelStyle: CSSProperties = {
 
 const shadowAttrValueStyle: CSSProperties = {
   fontSize: 14,
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
   margin: '4px 0 0',
 };
 
@@ -824,7 +824,7 @@ const constellationTitleStyle: CSSProperties = {
   textAlign: 'center',
   fontFamily: '"Noto Serif SC", serif',
   fontSize: 34,
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
   margin: '0 0 16px',
   fontWeight: 500,
 };
@@ -859,7 +859,7 @@ const literaryQuoteStyle: CSSProperties = {
   fontSize: 22,
   textAlign: 'center',
   lineHeight: 1.6,
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
   margin: 0,
 };
 
@@ -882,7 +882,7 @@ const ephemerisDateStyle: CSSProperties = {
   textAlign: 'center',
   fontSize: 14,
   letterSpacing: '0.3em',
-  color: '#D4B58A',
+  color: 'var(--color-gold)',
   margin: 0,
   fontWeight: 500,
 };
@@ -891,7 +891,7 @@ const ephemerisTitleStyle: CSSProperties = {
   textAlign: 'center',
   fontFamily: '"Noto Serif SC", serif',
   fontSize: 32,
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
   margin: '12px 0 14px',
   fontWeight: 500,
 };
@@ -951,7 +951,7 @@ const footerEyebrowStyle: CSSProperties = {
   textTransform: 'uppercase',
   letterSpacing: '0.4em',
   fontSize: 12,
-  color: '#D4B58A',
+  color: 'var(--color-gold)',
   margin: 0,
   fontWeight: 600,
 };
@@ -960,14 +960,14 @@ const footerTitleStyle: CSSProperties = {
   fontFamily: '"Cormorant Garamond", serif',
   fontStyle: 'italic',
   fontSize: 28,
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
   margin: '10px 0 6px',
 };
 
 const footerUrlStyle: CSSProperties = {
   fontFamily: '"Cormorant Garamond", serif',
   fontSize: 16,
-  color: '#C9A676',
+  color: 'var(--color-gold)',
   margin: 0,
 };
 

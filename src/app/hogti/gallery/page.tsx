@@ -42,23 +42,23 @@ export default function HogtiGalleryPage() {
         />
         <div className="relative max-w-4xl mx-auto px-6 py-16 text-center">
           <div className="text-4xl mb-3">⚡</div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3" style={{ fontFamily: 'Georgia, serif' }}>
+          <h1 className="text-3xl sm:text-4xl font-bold text-bg-primary mb-3" style={{ fontFamily: 'Georgia, serif' }}>
             霍格沃茨 · 人格图鉴
           </h1>
-          <p className="text-white/70 text-base mb-6">
+          <p className="text-bg-primary/70 text-base mb-6">
             29 种人格档案 · 按学院分类 · 点击查看完整分析
           </p>
           <div className="flex justify-center gap-3 flex-wrap">
             <Link
               href="/hogti/test/"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all"
-              style={{ background: '#f5c842', color: '#1a1535' }}
+              style={{ background: 'var(--color-gold)', color: 'var(--color-text-primary)' }}
             >
               ⚡ 测测我是谁
             </Link>
             <Link
               href="/hogti/"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border border-white/20 text-white/80 hover:border-white/40 hover:text-white transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border border-white/20 text-bg-primary/80 hover:border-white/40 hover:text-bg-primary transition-all"
             >
               ← 返回首页
             </Link>
@@ -150,7 +150,7 @@ export default function HogtiGalleryPage() {
         <p className="text-text-muted text-sm mb-4">还不知道你是哪一型？</p>
         <Link
           href="/hogti/test/"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white transition-all hover:opacity-90"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-bg-primary transition-all hover:opacity-90"
           style={{ background: 'linear-gradient(135deg, #3a2f6b, #7c3aed)' }}
         >
           ⚡ 分院帽测测我

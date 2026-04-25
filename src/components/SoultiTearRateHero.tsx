@@ -93,7 +93,7 @@ export function SoultiTearRateHero({ layered, accent }: Props) {
           </p>
           <p
             className="text-[11px] tracking-[0.18em] mb-5"
-            style={{ fontFamily: serifFont, color: '#8a7f72' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
           >
             白天的你 与 深夜的你 · 之间的距离
           </p>
@@ -163,7 +163,7 @@ export function SoultiTearRateHero({ layered, accent }: Props) {
           {dayP && nightP && layered.daySelf.slug !== layered.nightSelf.slug && (
             <p
               className="mt-6 text-[15px] sm:text-base leading-[2] max-w-sm mx-auto"
-              style={{ fontFamily: serifFont, color: '#2D2A26' }}
+              style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
             >
               白天你是<span style={{ color: ringColor }}>{dayP.name}</span>，
               <br className="sm:hidden" />
@@ -173,7 +173,7 @@ export function SoultiTearRateHero({ layered, accent }: Props) {
           {dayP && nightP && layered.daySelf.slug === layered.nightSelf.slug && (
             <p
               className="mt-6 text-[15px] sm:text-base leading-[2] max-w-sm mx-auto"
-              style={{ fontFamily: serifFont, color: '#2D2A26' }}
+              style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
             >
               白天和深夜的你都是<span style={{ color: ringColor }}>{dayP.name}</span>。
               <br />
@@ -184,7 +184,7 @@ export function SoultiTearRateHero({ layered, accent }: Props) {
           {divergentNames && (
             <p
               className="mt-3 text-[11px] tracking-[0.2em]"
-              style={{ fontFamily: serifFont, color: '#8a7f72' }}
+              style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
             >
               差异最大 · {divergentNames}
             </p>
@@ -192,7 +192,7 @@ export function SoultiTearRateHero({ layered, accent }: Props) {
 
           <p
             className="mt-5 text-[13px] leading-[1.95] max-w-md mx-auto"
-            style={{ fontFamily: serifFont, color: '#6A6054', fontStyle: 'italic' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)', fontStyle: 'italic' }}
           >
             {tear.narrative}
           </p>
@@ -200,7 +200,7 @@ export function SoultiTearRateHero({ layered, accent }: Props) {
           {/* Anti-clinical disclaimer — always present, soft */}
           <p
             className="mt-5 text-[10px] tracking-[0.18em]"
-            style={{ fontFamily: serifFont, color: '#a89f93' }}
+            style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
           >
             · 你不是有问题，你是在适应 ·
           </p>

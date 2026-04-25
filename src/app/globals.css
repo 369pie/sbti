@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@theme inline {
+@theme {
   /* ─── Font families (v3 Editorial Feminine) ─────────────────────────── */
   /* Display / hero — Chinese serif paired with English transitional serif */
   --font-display: var(--font-cormorant), var(--font-serif-sc), "Noto Serif SC",
@@ -19,51 +19,50 @@
   --font-heading: var(--font-sans-sc), "Noto Sans SC", "PingFang SC",
     system-ui, sans-serif;
 
-  /* ─── Paper palette — v3 老钱米 ───────────────────────────────────── */
-  --color-bg-primary: #FAF8F5;
-  --color-bg-secondary: #F3EEE6;
-  --color-bg-tertiary: #ECE5D9;
-  --color-bg-elevated: #FFFDF9;
-  --color-paper: #FAF8F5;
-  --color-paper-deep: #F0EBE2;
-  --color-paper-warm: #F5EFE4;
+  /* ─── Paper palette — Warm Oat（默认浅色 · 与 wtfti-light 同源）───── */
+  --color-bg-primary: #FBF6F0;       /* Warm Oat · 暖燕麦色 */
+  --color-bg-secondary: #F4E9DF;     /* Soft Sand · 柔沙色 */
+  --color-bg-tertiary: #EBDFD1;      /* Dusty Beige · 尘米色 */
+  --color-bg-elevated: #FFFFFF;
+  --color-paper: #FBF6F0;
+  --color-paper-deep: #F4E9DF;
+  --color-paper-warm: #F5EEE4;
 
   /* Ink / text */
-  --color-text-primary: #1F1A16;
-  --color-text-secondary: #5B524B;
-  --color-text-muted: #9A908A;
-  --color-ink: #1F1A16;
-  --color-ink-soft: #5B524B;
-  --color-ink-mute: #9A908A;
-  --color-stone: #857A70;
+  --color-text-primary: #3D2C23;     /* Deep Espresso · 深浓缩棕色 */
+  --color-text-secondary: #5C4035;
+  --color-text-muted: #8B6D5E;
+  --color-ink: #3D2C23;
+  --color-ink-soft: #5C4035;
+  --color-ink-mute: #8B6D5E;
+  --color-stone: #A88B7D;
 
   /* Rules & borders */
-  --color-border: #CFC6BB;
-  --color-border-subtle: #E3DCD1;
-  --color-rule: #CFC6BB;
-  --color-rule-soft: #E3DCD1;
+  --color-border: #E0D0C0;
+  --color-border-subtle: #F0E4D8;
+  --color-rule: #E0D0C0;
+  --color-rule-soft: #F0E4D8;
 
-  /* Accent system v4 — Editorial Atelier (desaturated rose-clay + gold + gem) */
-  /* Rose降饱和 #D26A87 → #C07A8E (clay rose) · 女性向顶级审美分水岭 */
-  --color-accent: #C07A8E;
-  --color-accent-light: #E6D1D6;
-  --color-accent-dim: rgba(192, 122, 142, 0.10);
-  --color-rose: #C07A8E;
-  --color-rose-dust: #E6D1D6;
-  --color-rose-deep: #A85A6E;
-  --color-gold: #B8905A;
-  --color-gold-soft: #D4B58A;
+  /* Accent system — Warm Rose（Warm Rose 唯一主色 + Copper Gold + Matcha Leaf 三色奏鸣） */
+  --color-accent: #C9867D;
+  --color-accent-light: #E7C6C0;
+  --color-accent-dim: rgba(201, 134, 125, 0.12);
+  --color-rose: #C9867D;
+  --color-rose-dust: #E7C6C0;
+  --color-rose-deep: #A86B63;
+  --color-gold: #C9A676;             /* Copper Gold · 铜金（取代古典 gold） */
+  --color-gold-soft: #DDBFA3;
   --color-gold-leaf: #C9A676;
-  --color-ember: #8C3E3E;
-  --color-sage: #7A8A82;
-  --color-gem: #5B6E6A;
+  --color-ember: #9C5C52;            /* deep rose · warning */
+  --color-sage: #B7C7A2;             /* Matcha Leaf · success / CTA-2 */
+  --color-gem: #9AB37A;              /* Matcha Leaf 深一档 */
 
-  /* Model colors — kept but desaturated */
-  --color-model-self: #C9882A;
-  --color-model-emotion: #B85470;
-  --color-model-attitude: #3D8062;
-  --color-model-action: #6A4DBB;
-  --color-model-social: #3B8699;
+  /* Model colors — 跟随 Warm Oat 暖棕光谱 */
+  --color-model-self: #C9867D;
+  --color-model-emotion: #A86B63;
+  --color-model-attitude: #B7C7A2;
+  --color-model-action: #C9A676;
+  --color-model-social: #E7C6C0;
 
   /* Radius scale v3 */
   --radius-sharp: 0px;
@@ -95,7 +94,32 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  /* huashu-design 正向手法：段落自动美化断字，避免孤行/破行 */
+  text-wrap: pretty;
+  transition:
+    background-color 480ms var(--ease-quiet, ease),
+    color 320ms var(--ease-quiet, ease);
 }
+
+/* 标题用 balance — 让 h1/h2/.editorial-display/.section-headline 折行更优雅 */
+h1, h2, h3,
+.editorial-display,
+.section-headline,
+.brand-wtf {
+  text-wrap: balance;
+}
+
+/* 中文段落：避免半角 punct 紧贴字符；统一引号语义 */
+p, li, blockquote {
+  hanging-punctuation: allow-end;
+}
+
+/* huashu rule: link accent must come from brand spec, not from default browser blue */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+a:hover { color: var(--color-accent); }
 
 /* ── Paper texture (v3 signature material layer) ── */
 .paper-texture {
@@ -167,21 +191,274 @@ header.sticky {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   人格神域 · 主题域 — 挂在 body[data-theme='galaxy']
-   在 /wtfti/galaxy/** 和需要神域视觉的页面启用；
-   默认米白主题 token 被暮紫覆盖，解决主站与神域的视觉割裂。
+   人格神域 · 主题域 — 挂在 body[data-theme='galaxy' | 'wtfti-dark' | 'wtfti-light']
+   - galaxy / wtfti-dark : LUMINA RITUAL (女性感性的宇宙仪式感品牌, dark)
+   - wtfti-light         : BE TRUE (温柔的奶油玫瑰编辑式品牌, light)
+   两套配色都重映射 --galaxy-* token，所有现有 WTFTI 组件无需改动即可切换。
    ───────────────────────────────────────────────────────────────────────── */
-body[data-theme='galaxy'] {
+
+/* ── LUMINA RITUAL · Dark theme (site-wide) ─────────────────────────────── */
+body[data-theme='galaxy'],
+body[data-theme='wtfti-dark'] {
+  /* ── Galaxy / cosmic tokens ────────────────────────────────────────── */
+  /* Ink layers — 干净的深灰/炭黑配色 */
+  --galaxy-ink-deep: #0B0B0F;
+  --galaxy-ink: #12121A;
+  --galaxy-ink-soft: #1E1E28;
+  --galaxy-twilight: #2D2D3A;
+
+  /* Cream / parchment — 干净的米白/灰 */
+  --galaxy-cream: #F2F2F5;
+  --galaxy-parchment: #D8D8DF;
+  --galaxy-mist: rgba(242, 242, 245, 0.64);
+  --galaxy-mist-faint: rgba(242, 242, 245, 0.32);
+
+  /* Accents — 干净的玫瑰金/铜金/冷金 */
+  --galaxy-rose: #D4A59A;
+  --galaxy-rose-soft: rgba(212, 165, 154, 0.18);
+  --galaxy-rose-glow: rgba(212, 165, 154, 0.28);
+  --galaxy-gold: #D4B889;
+  --galaxy-gold-soft: #E8D7BC;
+  --galaxy-gold-faint: rgba(212, 184, 137, 0.28);
+  --galaxy-violet: #9DB4D4;
+  --galaxy-violet-soft: rgba(157, 180, 212, 0.18);
+  --galaxy-violet-glow: rgba(157, 180, 212, 0.28);
+  --galaxy-moon: #B8C7D8;
+  --galaxy-nebula: #D4A59A;
+
+  /* Backgrounds — 干净的深色渐变 */
+  --galaxy-bg-hero: radial-gradient(
+    ellipse 120% 70% at 50% 0%,
+    #2D2D3A 0%,
+    #12121A 45%,
+    #0B0B0F 100%
+  );
+  --galaxy-bg-section: radial-gradient(
+    ellipse 100% 60% at 50% 30%,
+    #1E1E28 0%,
+    #12121A 70%
+  );
+  --galaxy-bg-paper: linear-gradient(180deg, #12121A 0%, #1E1E28 100%);
+
+  --galaxy-hairline: linear-gradient(90deg, transparent, #D4B889 50%, transparent);
+  --galaxy-divider-gold: 1px solid rgba(212, 184, 137, 0.28);
+
+  --galaxy-rose-halo: 0 0 60px rgba(212, 165, 154, 0.22),
+    0 0 120px rgba(212, 165, 154, 0.11);
+  --galaxy-violet-halo: 0 0 80px rgba(157, 180, 212, 0.20);
+
+  /* ── SITE-WIDE paper-token overrides ────────────────────────────────
+     翻转主站米白 paper token，让 Navigation / footer / 卡片 / 按钮 也跟随 dark
+     - bg: 三层深灰（外->内 越浅）
+     - text: Cream → Parchment → Mist
+     - rule: 半透明金
+     - accent: 玫瑰金（干净高级）
+     对比度校验：
+       Cream #F2F2F5 on #12121A  → 14.8:1 (AAA)
+       Parchment #D8D8DF on #12121A  → 11.5:1 (AAA)
+       Mist #B8C7D8 on #12121A    → 7.6:1  (AAA)
+  */
+  --color-bg-primary: #12121A;
+  --color-bg-secondary: #1E1E28;
+  --color-bg-tertiary: #282836;
+  --color-bg-elevated: #1E1E28;
+  --color-paper: #12121A;
+  --color-paper-deep: #0B0B0F;
+  --color-paper-warm: #1E1E28;
+
+  --color-text-primary: #F2F2F5;
+  --color-text-secondary: #D8D8DF;
+  --color-text-muted: #B8C7D8;
+  --color-ink: #F2F2F5;
+  --color-ink-soft: #D8D8DF;
+  --color-ink-mute: #B8C7D8;
+  --color-stone: #B8C7D8;
+
+  --color-border: rgba(212, 184, 137, 0.22);
+  --color-border-subtle: rgba(212, 184, 137, 0.11);
+  --color-rule: rgba(212, 184, 137, 0.22);
+  --color-rule-soft: rgba(212, 184, 137, 0.10);
+
+  --color-accent: #D4A59A;
+  --color-accent-light: rgba(212, 165, 154, 0.14);
+  --color-accent-dim: rgba(212, 165, 154, 0.08);
+  --color-rose: #D4A59A;
+  --color-rose-dust: rgba(212, 165, 154, 0.18);
+  --color-rose-deep: #B8877A;
+  --color-gold: #D4B889;
+  --color-gold-soft: #E8D7BC;
+  --color-gold-leaf: #D4B889;
+  --color-ember: #A86F62;
+  --color-sage: #9DB4D4;
+  --color-gem: #B8C7D8;
+
+  /* Model 配色 */
+  --color-model-self: #D4A59A;
+  --color-model-emotion: #B8877A;
+  --color-model-attitude: #9DB4D4;
+  --color-model-action: #D4B889;
+  --color-model-social: rgba(201, 134, 125, 0.22);
+
   background: var(--galaxy-ink-deep);
   background-image: none;
   color: var(--galaxy-cream);
 }
-body[data-theme='galaxy'] ::selection {
-  background: rgba(192, 122, 142, 0.38);
-  color: var(--galaxy-cream);
+body[data-theme='galaxy'] ::selection,
+body[data-theme='wtfti-dark'] ::selection {
+  background: rgba(201, 134, 125, 0.42);
+  color: #F8F3ED;
 }
-body[data-theme='galaxy'] :focus-visible {
+body[data-theme='galaxy'] :focus-visible,
+body[data-theme='wtfti-dark'] :focus-visible {
   outline-color: var(--galaxy-gold);
+}
+
+/* paper-texture 在 dark 下会叠白色高光、把深棕染成暖调；改成深棕细网点 */
+body[data-theme='galaxy'].paper-texture,
+body[data-theme='wtfti-dark'].paper-texture {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(184, 199, 216, 0.025) 0.7px, transparent 0.9px),
+    radial-gradient(circle at 9px 7px, rgba(184, 199, 216, 0.015) 0.65px, transparent 0.8px);
+  background-size: 18px 18px, 24px 24px;
+}
+
+/* paper-texture 在 Warm Oat 下：用 Deep Espresso 极淡点 + Warm Rose 一缕暖光 */
+body[data-theme='wtfti-light'].paper-texture {
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.40), rgba(244, 233, 223, 0.18)),
+    radial-gradient(circle at 1px 1px, rgba(61, 44, 35, 0.045) 0.7px, transparent 0.9px),
+    radial-gradient(circle at 9px 7px, rgba(201, 134, 125, 0.045) 0.65px, transparent 0.8px);
+  background-size: 100% 100%, 18px 18px, 24px 24px;
+}
+
+/* ── DARK 兜底层 · "rescue valve" for legacy hardcoded surfaces ─────────────
+   策略：暗色态下，硬编码的纯白/灰白底色会撕裂画面节奏。
+   下面规则只挑「视觉权重大、易出戏」的 bg-white 类做柔化重映射 — 不动「需要保持
+   功能性白底的元素」（QR 二维码、生成中的 share canvas 等，按 data-keep-white 标识保护）。
+   遵从 huashu「禁止凭空发明颜色」 — 所有替代色都从 token 里来。
+   ──────────────────────────────────────────────────────────────────────── */
+body[data-theme='galaxy'] .bg-white:not([data-keep-white]),
+body[data-theme='wtfti-dark'] .bg-white:not([data-keep-white]) {
+  background-color: var(--color-bg-elevated) !important;
+}
+body[data-theme='galaxy'] .bg-white\/95:not([data-keep-white]),
+body[data-theme='wtfti-dark'] .bg-white\/95:not([data-keep-white]),
+body[data-theme='galaxy'] .bg-white\/90:not([data-keep-white]),
+body[data-theme='wtfti-dark'] .bg-white\/90:not([data-keep-white]),
+body[data-theme='galaxy'] .bg-white\/85:not([data-keep-white]),
+body[data-theme='wtfti-dark'] .bg-white\/85:not([data-keep-white]),
+body[data-theme='galaxy'] .bg-white\/80:not([data-keep-white]),
+body[data-theme='wtfti-dark'] .bg-white\/80:not([data-keep-white]),
+body[data-theme='galaxy'] .bg-white\/70:not([data-keep-white]),
+body[data-theme='wtfti-dark'] .bg-white\/70:not([data-keep-white]) {
+  background-color: color-mix(in oklab, var(--color-bg-elevated) 88%, transparent) !important;
+}
+
+/* ── WARM OAT · Light theme ─────────────────────────────────────────
+   2026-04-24 · 中性暖棕配色，避免性别刻板印象
+   关键词：中性 · 高级 · 包容 · 温暖 · 燕麦感
+   --------------------------------------------------------------------- */
+body[data-theme='wtfti-light'] {
+  /* ── Galaxy ink layers → 全部翻译成燕麦/柔沙/尘棕 三层光带 ───────── */
+  --galaxy-ink-deep: #FBF6F0;       /* Warm Oat — 外层画布 */
+  --galaxy-ink: #F4E9DF;            /* Soft Sand — 中段背景 */
+  --galaxy-ink-soft: #EBDFD1;       /* Dusty Beige — 浮层 */
+  --galaxy-twilight: #DDBFA3;       /* Warm Taupe — 强调浮层 */
+
+  /* "Cream" 在 dark 用作主文字色名义 → light 下接 Deep Espresso，保持原组件文字可读 */
+  --galaxy-cream: #3D2C23;          /* Deep Espresso — 主文字 */
+  --galaxy-parchment: #5C4035;      /* Espresso softer — 副文字 */
+  --galaxy-mist: rgba(61, 44, 35, 0.66);
+  --galaxy-mist-faint: rgba(61, 44, 35, 0.34);
+
+  /* Accents — Warm Rose / Copper Gold / Matcha Leaf 三色奏鸣 */
+  --galaxy-rose: #C9867D;                              /* Warm Rose */
+  --galaxy-rose-soft: rgba(201, 134, 125, 0.20);
+  --galaxy-rose-glow: rgba(201, 134, 125, 0.34);
+  --galaxy-gold: #C9A676;                              /* Copper Gold — 高级金 */
+  --galaxy-gold-soft: #DDBFA3;                         /* Warm Taupe */
+  --galaxy-gold-faint: rgba(201, 166, 118, 0.30);
+  --galaxy-violet: #B7C7A2;                            /* Matcha Leaf → 第二 accent */
+  --galaxy-violet-soft: rgba(183, 199, 162, 0.22);
+  --galaxy-violet-glow: rgba(183, 199, 162, 0.30);
+  --galaxy-moon: #F4E9DF;                              /* Soft Sand */
+  --galaxy-nebula: #EBDFD1;                            /* Dusty Beige */
+
+  /* Hero / Section / Paper — 三段暖棕光带 */
+  --galaxy-bg-hero: radial-gradient(
+    ellipse 120% 80% at 50% 0%,
+    #F4E9DF 0%,
+    #FBF6F0 55%,
+    #FFFFFF 100%
+  );
+  --galaxy-bg-section: radial-gradient(
+    ellipse 110% 70% at 50% 25%,
+    #FBF6F0 0%,
+    #F4E9DF 70%
+  );
+  --galaxy-bg-paper: linear-gradient(180deg, #FFFFFF 0%, #FBF6F0 100%);
+
+  /* Hairline · 浅色态用 Warm Rose 半透明做发丝细线 */
+  --galaxy-hairline: linear-gradient(90deg, transparent, rgba(201, 134, 125, 0.55) 50%, transparent);
+  --galaxy-divider-gold: 1px solid rgba(201, 134, 125, 0.30);
+
+  /* 光晕 · 极轻、无 bloom */
+  --galaxy-rose-halo: 0 12px 36px rgba(201, 134, 125, 0.20),
+    0 2px 8px rgba(201, 134, 125, 0.10);
+  --galaxy-violet-halo: 0 12px 36px rgba(183, 199, 162, 0.18);
+
+  /* ── 全站 paper token 覆写（Navigation / footer / 卡片 / 按钮 全部跟随）── */
+  --color-bg-primary: #FBF6F0;       /* Warm Oat */
+  --color-bg-secondary: #F4E9DF;     /* Soft Sand */
+  --color-bg-tertiary: #EBDFD1;      /* Dusty Beige */
+  --color-bg-elevated: #FFFFFF;      /* 真白卡片 */
+  --color-paper: #FBF6F0;
+  --color-paper-deep: #F4E9DF;
+  --color-paper-warm: #F5EEE4;       /* Warm Oat + Warm Sand 混合 */
+
+  --color-text-primary: #3D2C23;     /* Deep Espresso — 高对比度 AAA */
+  --color-text-secondary: #5C4035;   /* Espresso softer — AA body */
+  --color-text-muted: #8B6D5E;       /* Muted Espresso — 仅限 ≥18px */
+  --color-ink: #3D2C23;
+  --color-ink-soft: #5C4035;
+  --color-ink-mute: #8B6D5E;
+  --color-stone: #A88B7D;             /* 装饰用暖棕 */
+
+  --color-border: #E0D0C0;            /* 中性棕边框 */
+  --color-border-subtle: #F0E4D8;     /* 柔和棕边线 */
+  --color-rule: #E0D0C0;
+  --color-rule-soft: #F0E4D8;
+
+  --color-accent: #C9867D;            /* 唯一主 accent · Warm Rose */
+  --color-accent-light: #E7C6C0;
+  --color-accent-dim: rgba(201, 134, 125, 0.12);
+  --color-rose: #C9867D;
+  --color-rose-dust: #E7C6C0;
+  --color-rose-deep: #A86B63;         /* hover / pressed — 更深更易读 */
+  --color-gold: #C9A676;              /* Copper Gold — 真铜金 */
+  --color-gold-soft: #DDBFA3;
+  --color-gold-leaf: #C9A676;
+  --color-ember: #9C5C52;             /* deep rose · 错误/警告色 */
+  --color-sage: #B7C7A2;              /* Matcha Leaf · 成功/CTA-2 */
+  --color-gem: #9AB37A;               /* Matcha Leaf 深一档 */
+
+  /* Model 配色 · 中性暖棕光谱 */
+  --color-model-self: #C9867D;        /* Warm Rose */
+  --color-model-emotion: #A86B63;     /* Rose Deep */
+  --color-model-attitude: #B7C7A2;    /* Matcha */
+  --color-model-action: #C9A676;      /* Copper Gold */
+  --color-model-social: #E7C6C0;      /* Warm Taupe */
+
+  background: var(--color-bg-primary);
+  background-image: none;
+  color: var(--color-text-primary);
+}
+body[data-theme='wtfti-light'] ::selection {
+  background: rgba(201, 134, 125, 0.36);
+  color: var(--color-text-primary);
+}
+body[data-theme='wtfti-light'] :focus-visible {
+  outline-color: var(--galaxy-rose);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -204,6 +481,292 @@ body[data-wtfti-ritual='1'] > main {
 /* 章节卡片内部的 <header> 不能被误伤 */
 body[data-wtfti-ritual='1'] section header {
   display: revert !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   WTFTI Visual System · Summer Blush / Lumina Ritual
+   全 /wtfti 路由共享的女性向编辑视觉外壳：奶油玫瑰浅色与暮紫仪式深色同源。
+   ───────────────────────────────────────────────────────────────────────── */
+.wtfti-site-shell {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  color: var(--color-text-primary);
+}
+.wtfti-site-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 16% 10%, color-mix(in oklab, var(--color-rose) 22%, transparent), transparent 34%),
+    radial-gradient(circle at 86% 18%, color-mix(in oklab, var(--color-gold) 18%, transparent), transparent 32%),
+    radial-gradient(circle at 54% 88%, color-mix(in oklab, var(--color-sage, var(--galaxy-violet)) 12%, transparent), transparent 36%),
+    linear-gradient(180deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 46%, var(--color-bg-primary) 100%);
+}
+.wtfti-site-shell::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.32;
+  background-image:
+    linear-gradient(115deg, transparent 0 46%, color-mix(in oklab, var(--color-rose) 14%, transparent) 46.2% 46.4%, transparent 46.6%),
+    radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--color-text-primary) 7%, transparent) 0.7px, transparent 0.9px);
+  background-size: 100% 100%, 22px 22px;
+  mask-image: linear-gradient(180deg, black, transparent 88%);
+}
+body[data-theme='wtfti-dark'] .wtfti-site-shell::before,
+body[data-theme='galaxy'] .wtfti-site-shell::before {
+  background:
+    radial-gradient(circle at 18% 8%, color-mix(in oklab, var(--galaxy-rose) 30%, transparent), transparent 34%),
+    radial-gradient(circle at 78% 16%, color-mix(in oklab, var(--galaxy-violet) 25%, transparent), transparent 36%),
+    radial-gradient(ellipse at 50% 102%, color-mix(in oklab, var(--galaxy-gold) 22%, transparent), transparent 42%),
+    var(--galaxy-bg-hero);
+}
+body[data-theme='wtfti-dark'] .wtfti-site-shell::after,
+body[data-theme='galaxy'] .wtfti-site-shell::after {
+  opacity: 0.42;
+  background-image:
+    radial-gradient(circle at 50% 100%, color-mix(in oklab, var(--galaxy-gold) 26%, transparent), transparent 20%),
+    radial-gradient(circle at 1px 1px, rgba(245, 238, 233, 0.12) 0.6px, transparent 0.8px);
+  background-size: 100% 100%, 24px 24px;
+}
+body[data-wtfti-ritual='1'] .wtfti-site-shell::before,
+body[data-wtfti-ritual='1'] .wtfti-site-shell::after {
+  display: none;
+}
+
+.wtfti-container {
+  width: min(100% - 2rem, 1180px);
+  margin-inline: auto;
+}
+.wtfti-wide-container {
+  width: min(100% - 2rem, 1360px);
+  margin-inline: auto;
+}
+.wtfti-section {
+  position: relative;
+  padding-block: clamp(4.5rem, 9vw, 8.5rem);
+}
+.wtfti-section-tight {
+  position: relative;
+  padding-block: clamp(3rem, 7vw, 6rem);
+}
+.wtfti-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.wtfti-eyebrow::before,
+.wtfti-eyebrow::after {
+  content: '';
+  width: 1.9rem;
+  height: 1px;
+  background: var(--galaxy-hairline);
+}
+.wtfti-display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+.wtfti-display em {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-rose);
+}
+.wtfti-copy {
+  color: var(--color-text-secondary);
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  line-height: 1.9;
+  text-wrap: pretty;
+}
+.wtfti-panel {
+  border: 1px solid var(--color-border-subtle);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--color-bg-elevated) 92%, transparent), color-mix(in oklab, var(--color-bg-secondary) 72%, transparent));
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 52%, transparent),
+    0 24px 70px -46px color-mix(in oklab, var(--color-rose) 55%, transparent);
+  backdrop-filter: blur(18px) saturate(1.04);
+  -webkit-backdrop-filter: blur(18px) saturate(1.04);
+}
+body[data-theme='wtfti-dark'] .wtfti-panel,
+body[data-theme='galaxy'] .wtfti-panel {
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--galaxy-ink-soft) 64%, transparent), color-mix(in oklab, var(--galaxy-ink) 76%, transparent));
+  box-shadow:
+    0 28px 90px -54px color-mix(in oklab, var(--galaxy-rose) 70%, transparent);
+}
+.wtfti-card {
+  border: 1px solid var(--color-border-subtle);
+  background: color-mix(in oklab, var(--color-bg-elevated) 86%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 52%, transparent),
+    0 18px 42px -34px color-mix(in oklab, var(--color-text-primary) 34%, transparent);
+  transition:
+    transform 320ms var(--ease-editorial),
+    border-color 320ms var(--ease-editorial),
+    background-color 320ms var(--ease-editorial),
+    box-shadow 320ms var(--ease-editorial);
+}
+.wtfti-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in oklab, var(--color-rose) 40%, var(--color-border-subtle));
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 58%, transparent),
+    0 26px 60px -40px color-mix(in oklab, var(--color-rose) 56%, transparent);
+}
+.wtfti-card:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+body[data-theme='wtfti-dark'] .wtfti-card,
+body[data-theme='galaxy'] .wtfti-card {
+  background: color-mix(in oklab, var(--color-bg-elevated) 86%, transparent);
+  box-shadow:
+    0 18px 42px -34px color-mix(in oklab, var(--galaxy-rose) 34%, transparent);
+}
+
+body[data-theme='wtfti-dark'] .wtfti-card:hover,
+body[data-theme='galaxy'] .wtfti-card:hover {
+  border-color: color-mix(in oklab, var(--galaxy-rose) 40%, var(--color-border-subtle));
+  box-shadow:
+    0 26px 60px -40px color-mix(in oklab, var(--galaxy-rose) 56%, transparent);
+}
+.wtfti-cta-primary,
+.wtfti-cta-secondary {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  border-radius: var(--radius-pill);
+  padding: 0.86rem 1.45rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+  transition:
+    transform 260ms var(--ease-editorial),
+    background-color 260ms var(--ease-editorial),
+    border-color 260ms var(--ease-editorial),
+    color 260ms var(--ease-editorial),
+    box-shadow 260ms var(--ease-editorial);
+  touch-action: manipulation;
+}
+.wtfti-cta-primary {
+  border: 1px solid color-mix(in oklab, var(--color-rose-deep) 70%, var(--color-gold-leaf));
+  color: var(--color-bg-primary);
+  background: linear-gradient(135deg, var(--color-rose-deep) 0%, var(--color-gold-leaf) 100%);
+  box-shadow: 0 18px 42px -28px color-mix(in oklab, var(--color-rose-deep) 80%, transparent);
+}
+body[data-theme='wtfti-light'] .wtfti-cta-primary {
+  color: var(--color-bg-primary);
+}
+
+body[data-theme='wtfti-dark'] .wtfti-cta-primary,
+body[data-theme='galaxy'] .wtfti-cta-primary {
+  border: 1px solid color-mix(in oklab, var(--galaxy-rose) 70%, var(--galaxy-gold));
+  color: #0B0B0F;
+  background: linear-gradient(135deg, var(--galaxy-rose) 0%, var(--galaxy-gold) 100%);
+  box-shadow: 0 18px 42px -28px color-mix(in oklab, var(--galaxy-rose) 80%, transparent);
+}
+.wtfti-cta-secondary {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  background: color-mix(in oklab, var(--color-bg-elevated) 66%, transparent);
+}
+.wtfti-cta-primary:hover,
+.wtfti-cta-secondary:hover {
+  transform: translateY(-2px);
+}
+.wtfti-cta-primary:active,
+.wtfti-cta-secondary:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 90ms;
+}
+.wtfti-arrow {
+  display: inline-grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklab, var(--color-bg-elevated) 38%, transparent);
+}
+.wtfti-orbit-field {
+  border: 1px solid color-mix(in oklab, var(--color-gold) 28%, transparent);
+  background:
+    radial-gradient(circle at 50% 45%, color-mix(in oklab, var(--color-rose) 24%, transparent), transparent 34%),
+    radial-gradient(circle at 50% 100%, color-mix(in oklab, var(--color-gold) 18%, transparent), transparent 40%),
+    color-mix(in oklab, var(--color-bg-elevated) 56%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 36%, transparent),
+    var(--galaxy-rose-halo);
+}
+.wtfti-orbit-ring {
+  position: absolute;
+  inset: 9%;
+  border: 1px solid color-mix(in oklab, var(--color-gold) 45%, transparent);
+  border-radius: 50%;
+  transform: rotate(-18deg) scaleX(1.18);
+}
+.wtfti-orbit-ring:nth-child(2) {
+  inset: 20%;
+  transform: rotate(28deg) scaleX(1.35);
+  border-color: color-mix(in oklab, var(--color-rose) 34%, transparent);
+}
+.wtfti-mini-card {
+  border: 1px solid color-mix(in oklab, var(--color-gold) 24%, transparent);
+  background: color-mix(in oklab, var(--color-bg-elevated) 82%, transparent);
+  box-shadow: 0 20px 48px -32px color-mix(in oklab, var(--color-rose) 62%, transparent);
+}
+.wtfti-roman {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-rose);
+}
+.wtfti-swatch {
+  display: inline-block;
+  width: 0.72rem;
+  height: 0.72rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--color-bg-elevated) 70%, transparent);
+}
+.wtfti-quiet-link {
+  color: var(--color-text-secondary);
+  transition: color 220ms var(--ease-editorial), transform 220ms var(--ease-editorial);
+}
+.wtfti-quiet-link:hover {
+  color: var(--color-rose);
+  transform: translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wtfti-card,
+  .wtfti-card:hover,
+  .wtfti-cta-primary,
+  .wtfti-cta-secondary,
+  .wtfti-cta-primary:hover,
+  .wtfti-cta-secondary:hover,
+  .wtfti-quiet-link,
+  .wtfti-quiet-link:hover {
+    transform: none !important;
+    transition-duration: 0ms !important;
+  }
 }
 
 @keyframes wtfti-orbit-spin {
@@ -244,10 +807,10 @@ body[data-wtfti-ritual='1'] section header {
   }
 }
 
-/* Custom selection */
+/* Custom selection · 默认走当前主题 accent；dark/galaxy 仍由 body[data-theme=…] ::selection 覆盖 */
 ::selection {
-  background: rgba(210, 106, 135, 0.22);
-  color: #1F1A16;
+  background: color-mix(in oklab, var(--color-accent) 32%, transparent);
+  color: var(--color-text-primary);
 }
 
 /* Focus ring */
@@ -262,34 +825,35 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Gradient text — kept for rare decorative use (v4 clay-rose + gold-leaf) */
+/* Gradient text — Summer Blush 三色奏鸣（粉 → 桃 → 玫瑰深）。
+   暗色主题下自动重映射到 LUMINA 配色（见 body[data-theme='wtfti-dark'] 覆写）。 */
 .gradient-text {
-  background: linear-gradient(135deg, #C07A8E, #B8905A, #8C3E3E);
+  background: linear-gradient(135deg, var(--color-rose), var(--color-gold), var(--color-rose-deep));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .wtfti-gradient-text {
-  background: linear-gradient(135deg, #C07A8E 0%, #A85A6E 50%, #8C3E3E 100%);
+  background: linear-gradient(135deg, var(--color-rose) 0%, var(--color-rose-deep) 55%, var(--color-ember, #C2596F) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Gold-leaf text — 烫金字符, 重要数字/N°编号/一击金句 */
+/* "Gold-leaf" text — 在 Summer Blush 下变成「桃乳奶霜」描金感；dark 下仍是真金箔。
+   走 token 让两套主题各取所需。 */
 .gold-leaf-text {
   background: linear-gradient(
     135deg,
-    #D4B58A 0%,
-    #B8905A 40%,
-    #C9A676 55%,
-    #9A7140 100%
+    var(--color-gold-soft) 0%,
+    var(--color-gold) 45%,
+    var(--color-rose) 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 0 1px rgba(184, 144, 90, 0.15);
+  text-shadow: 0 0 1px color-mix(in oklab, var(--color-accent) 18%, transparent);
 }
 
 /* ── Brand typography v3 ── */
@@ -403,55 +967,164 @@ html {
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
+  min-height: 44px;
   padding: 0.9rem 1.8rem;
   font-family: var(--font-sans);
   font-size: 0.95rem;
   font-weight: 500;
   letter-spacing: 0.02em;
-  border-radius: var(--radius-soft);
+  border-radius: var(--radius-pill);
   transition: transform 320ms var(--ease-editorial),
     background-color 320ms var(--ease-editorial),
     color 320ms var(--ease-editorial),
-    border-color 320ms var(--ease-editorial);
+    border-color 320ms var(--ease-editorial),
+    box-shadow 320ms var(--ease-editorial);
   cursor: pointer;
   line-height: 1;
   white-space: nowrap;
 }
 .btn-ink {
   background: var(--color-ink);
-  color: #FAF8F5;
+  color: var(--color-bg-primary);
   border: 1px solid var(--color-ink);
+  box-shadow: 0 14px 34px -24px color-mix(in oklab, var(--color-ink) 58%, transparent);
 }
 .btn-ink:hover {
-  background: #0F0A07;
+  background: color-mix(in oklab, var(--color-ink) 85%, var(--color-rose-deep) 15%);
   transform: translateY(-1px);
 }
 .btn-rose {
-  background: var(--color-rose);
-  color: #FFFFFF;
-  border: 1px solid var(--color-rose);
+  background: var(--color-rose-deep);
+  color: var(--color-bg-primary);
+  border: 1px solid var(--color-rose-deep);
+  box-shadow: 0 16px 34px -24px color-mix(in oklab, var(--color-rose-deep) 70%, transparent);
 }
 .btn-rose:hover {
-  background: var(--color-rose-deep);
-  border-color: var(--color-rose-deep);
+  background: var(--color-ember);
+  border-color: var(--color-ember);
   transform: translateY(-1px);
 }
 .btn-ghost {
-  background: transparent;
+  background: color-mix(in oklab, var(--color-bg-elevated) 74%, transparent);
   color: var(--color-ink);
   border: 1px solid var(--color-rule);
 }
 .btn-ghost:hover {
   border-color: var(--color-ink);
+  box-shadow: 0 12px 28px -24px color-mix(in oklab, var(--color-ink) 45%, transparent);
 }
 .btn-gold {
-  background: var(--color-gold);
-  color: #FFFDF9;
-  border: 1px solid var(--color-gold);
+  background: var(--color-gold-leaf);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-gold-leaf);
 }
 .btn-gold:hover {
-  background: #A37D4A;
+  background: var(--color-gold);
   transform: translateY(-1px);
+}
+
+body[data-theme='wtfti-dark'] .btn-ink,
+body[data-theme='galaxy'] .btn-ink {
+  background: var(--galaxy-rose);
+  border-color: var(--galaxy-rose);
+  color: #0B0B0F;
+}
+
+body[data-theme='wtfti-dark'] .btn-ink:hover,
+body[data-theme='galaxy'] .btn-ink:hover {
+  background: var(--color-ember);
+  border-color: var(--color-ember);
+}
+
+body[data-theme='wtfti-dark'] .btn-rose,
+body[data-theme='galaxy'] .btn-rose {
+  background: var(--color-rose-deep);
+  border-color: var(--color-rose-deep);
+  color: #0B0B0F;
+}
+
+body[data-theme='wtfti-dark'] .btn-rose:hover,
+body[data-theme='galaxy'] .btn-rose:hover {
+  background: var(--color-ember);
+  border-color: var(--color-ember);
+}
+
+body[data-theme='wtfti-dark'] .btn-gold,
+body[data-theme='galaxy'] .btn-gold {
+  background: var(--galaxy-gold);
+  border-color: var(--galaxy-gold);
+  color: #0B0B0F;
+}
+
+body[data-theme='wtfti-dark'] .btn-gold:hover,
+body[data-theme='galaxy'] .btn-gold:hover {
+  background: var(--galaxy-gold-soft);
+  border-color: var(--galaxy-gold-soft);
+}
+
+/* ── Site-wide visual repair primitives ───────────────────────────────── */
+.site-hero-card {
+  border: 1px solid var(--color-border-subtle);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in oklab, var(--color-bg-elevated) 86%, transparent),
+      color-mix(in oklab, var(--color-bg-secondary) 62%, transparent)
+    );
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, #fff 58%, transparent),
+    0 28px 80px -54px color-mix(in oklab, var(--color-rose) 55%, transparent);
+}
+
+body[data-theme='wtfti-dark'] .site-hero-card,
+body[data-theme='galaxy'] .site-hero-card {
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in oklab, var(--color-bg-elevated) 82%, transparent),
+      color-mix(in oklab, var(--color-bg-secondary) 64%, transparent)
+    );
+  box-shadow:
+    0 28px 80px -54px color-mix(in oklab, var(--galaxy-rose) 55%, transparent);
+}
+
+.site-code-mark {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--color-border-subtle);
+  background: color-mix(in oklab, var(--color-bg-elevated) 78%, transparent);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: inset 0 1px 0 color-mix(in oklab, #fff 54%, transparent);
+}
+body[data-theme='wtfti-dark'] .site-code-mark,
+body[data-theme='galaxy'] .site-code-mark {
+  box-shadow: none;
+}
+
+.site-skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-bg-secondary) 75%, transparent);
+}
+
+.site-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, #fff 52%, transparent), transparent);
+  animation: site-skeleton-sweep 1.4s var(--ease-editorial) infinite;
+}
+
+@keyframes site-skeleton-sweep {
+  to { transform: translateX(100%); }
 }
 
 /* ── Tactile feedback v3 (2026-04-18 perf pass) ────────────────────────────
@@ -622,20 +1295,58 @@ html {
 }
 
 /* ── Navigation dropdown & link styles ── */
+.wtfti-global-nav {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-bg-elevated) 92%, transparent),
+      color-mix(in oklab, var(--color-bg-elevated) 84%, transparent)
+    );
+  border-color: var(--color-border-subtle);
+  color: var(--color-text-secondary);
+}
+
+.wtfti-global-nav-pill {
+  background: color-mix(in oklab, var(--color-bg-secondary) 82%, transparent);
+  border-color: var(--color-border-subtle);
+}
+
+.wtfti-mobile-menu {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-subtle);
+}
+
+body[data-theme='wtfti-dark'] .wtfti-global-nav {
+  background: var(--color-bg-elevated);
+  background-image: none;
+  box-shadow: 0 18px 48px -32px rgba(0, 0, 0, 0.72);
+}
+
+body[data-theme='wtfti-dark'] .wtfti-global-nav-pill {
+  background: color-mix(in oklab, var(--color-bg-secondary) 95%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--color-border) 40%, transparent),
+    0 14px 34px -24px rgba(0, 0, 0, 0.72);
+}
+
+body[data-theme='wtfti-light'] .wtfti-global-nav {
+  box-shadow: 0 10px 28px -24px rgba(77, 44, 47, 0.32);
+}
+
 .nav-link {
-  @apply px-4 py-2 rounded-full text-[15px] whitespace-nowrap transition-all duration-200 shrink-0 text-text-secondary hover:text-text-primary hover:bg-white/80 cursor-pointer select-none;
+  @apply px-4 py-2 rounded-full text-[15px] whitespace-nowrap transition-[background-color,color,box-shadow,transform] duration-200 shrink-0 text-text-secondary hover:text-text-primary hover:bg-bg-elevated/85 cursor-pointer select-none;
 }
 
 .nav-link-active {
   @apply bg-bg-elevated text-text-primary shadow-sm;
-  box-shadow: 0 8px 22px rgba(45, 42, 38, 0.08);
+  box-shadow: 0 8px 22px color-mix(in oklab, var(--color-text-primary) 8%, transparent);
 }
 
 .nav-dropdown {
   @apply absolute top-full z-50 rounded-[28px] border border-border-subtle bg-bg-elevated shadow-lg backdrop-blur-sm;
   box-shadow:
-    0 24px 60px rgba(45, 42, 38, 0.12),
-    0 8px 20px rgba(45, 42, 38, 0.05);
+    0 24px 60px color-mix(in oklab, var(--color-text-primary) 12%, transparent),
+    0 8px 20px color-mix(in oklab, var(--color-text-primary) 5%, transparent);
   animation: nav-dropdown-in 150ms ease-out;
 }
 
@@ -649,19 +1360,31 @@ html {
 }
 
 .nav-dropdown-item {
-  @apply flex items-start gap-3 rounded-[18px] px-4 py-3 text-sm transition-all duration-200 hover:bg-bg-secondary;
+  @apply flex items-start gap-3 rounded-[18px] px-4 py-3 text-sm transition-[background-color,color,transform] duration-200 hover:bg-bg-secondary;
 }
 
 .featured-nav-item {
-  @apply border border-pink-100 bg-gradient-to-r from-rose-50 via-white to-fuchsia-50 text-text-primary transition-all duration-200;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--color-rose-dust);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-light) 0%,
+    var(--color-bg-elevated) 50%,
+    var(--color-accent-light) 100%
+  );
+  color: var(--color-text-primary);
+  transition:
+    transform 200ms var(--ease-editorial),
+    background-color 200ms var(--ease-editorial),
+    border-color 200ms var(--ease-editorial),
+    box-shadow 200ms var(--ease-editorial);
+  box-shadow: inset 0 1px 0 var(--color-bg-elevated);
 }
 
 .featured-nav-item:hover {
   transform: translateY(-1px);
   box-shadow:
-    0 14px 28px rgba(224, 96, 136, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    0 14px 28px var(--color-accent-dim),
+    inset 0 1px 0 var(--color-bg-elevated);
 }
 
 @keyframes nav-dropdown-in {
@@ -680,12 +1403,12 @@ html {
   @apply opacity-60 cursor-not-allowed;
 }
 .auth-button {
-  @apply w-full py-3 rounded-xl bg-accent text-white font-medium text-sm transition-all hover:bg-accent/90 disabled:opacity-60 disabled:cursor-not-allowed;
+  @apply w-full py-3 rounded-xl bg-accent text-white font-medium text-sm transition-[background-color,opacity,transform] hover:bg-accent/90 disabled:opacity-60 disabled:cursor-not-allowed;
 }
 
 /* ── User avatar button ── */
 .user-avatar {
-  @apply w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shrink-0;
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-[box-shadow,transform] shrink-0;
   background: linear-gradient(135deg, var(--color-accent), #c084fc);
   color: white;
 }
@@ -1685,4 +2408,3 @@ html {
     animation: none;
   }
 }
-

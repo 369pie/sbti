@@ -125,7 +125,7 @@ export default function SnapshotShareButton({ unlockedKeys, badgeIds, accent }: 
                 <button
                   type="button"
                   onClick={onGenerate}
-                  className="w-full text-sm font-semibold px-4 py-2.5 rounded-xl text-white"
+                  className="w-full text-sm font-semibold px-4 py-2.5 rounded-xl text-bg-primary"
                   style={{ background: accent }}
                 >
                   生成链接 →
@@ -141,7 +141,7 @@ export default function SnapshotShareButton({ unlockedKeys, badgeIds, accent }: 
                     <button
                       type="button"
                       onClick={onCopy}
-                      className="flex-1 text-xs font-semibold px-3 py-2 rounded-lg text-white"
+                      className="flex-1 text-xs font-semibold px-3 py-2 rounded-lg text-bg-primary"
                       style={{ background: accent }}
                     >
                       {copied ? '已复制 ✓' : '复制链接'}

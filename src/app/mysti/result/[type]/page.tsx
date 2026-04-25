@@ -62,7 +62,7 @@ export default async function MystiResultPage({ params }: PageProps) {
           }),
         }}
       />
-      <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(180deg, #0B0D17 0%, #12152B 100%)' }}><div className="text-sm" style={{ color: '#A7B0C8' }}>加载中…</div></div>}>
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(180deg, #0B0D17 0%, #12152B 100%)' }}><div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>加载中…</div></div>}>
         <MystiResultContent wtftiPersonality={wtftiPersonality} />
       </Suspense>
     </>

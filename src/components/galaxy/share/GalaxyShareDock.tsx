@@ -283,10 +283,10 @@ function ShareCardViewport({
                   height: 32,
                   borderRadius: '50%',
                   border: '2px solid rgba(201,166,118,0.2)',
-                  borderTopColor: '#C9A676',
+                  borderTopColor: 'var(--color-gold)',
                 }}
               />
-              <div style={{ color: '#D4B58A', fontSize: 13, letterSpacing: 4, textAlign: 'center' }}>
+              <div style={{ color: 'var(--color-gold)', fontSize: 13, letterSpacing: 4, textAlign: 'center' }}>
                 RENDERING SHRINE
               </div>
               <div style={{ color: 'rgba(245,240,232,0.6)', fontSize: 12, textAlign: 'center', lineHeight: 1.5 }}>

@@ -27,7 +27,7 @@ export default async function CouplePosterPage({ params }: PosterPageProps) {
       style={{
         minHeight: '100vh',
         background: '#1a1530',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         padding: '48px 20px',
         display: 'flex',
         flexDirection: 'column',
@@ -35,7 +35,7 @@ export default async function CouplePosterPage({ params }: PosterPageProps) {
         gap: 24,
       }}
     >
-      <div style={{ fontSize: 12, letterSpacing: '0.32em', color: '#C9A676', textTransform: 'uppercase' }}>
+      <div style={{ fontSize: 12, letterSpacing: '0.32em', color: 'var(--color-gold)', textTransform: 'uppercase' }}>
         Couple Poster · 1080 × 1440
       </div>
       <h1 style={{ fontSize: 24, fontWeight: 600, margin: 0, textAlign: 'center' }}>

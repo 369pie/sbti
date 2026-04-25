@@ -73,11 +73,11 @@ function PairSigil({
       <circle cx={cx - r * 0.45} cy={cy} r={r} fill="url(#leftGrad)" />
       <circle cx={cx + r * 0.45} cy={cy} r={r} fill="url(#rightGrad)" />
       {/* outer ring */}
-      <circle cx={cx} cy={cy} r={r * 1.4} fill="none" stroke="#C9A676" strokeWidth={0.8} opacity={0.6} />
-      <circle cx={cx} cy={cy} r={r * 1.55} fill="none" stroke="#C9A676" strokeWidth={0.4} opacity={0.35} />
+      <circle cx={cx} cy={cy} r={r * 1.4} fill="none" stroke="var(--galaxy-gold)" strokeWidth={0.8} opacity={0.6} />
+      <circle cx={cx} cy={cy} r={r * 1.55} fill="none" stroke="var(--galaxy-gold)" strokeWidth={0.4} opacity={0.35} />
       {/* center spark */}
-      <circle cx={cx} cy={cy} r={3} fill="#F5F0E8" />
-      <circle cx={cx} cy={cy} r={6} fill="none" stroke="#F5F0E8" strokeWidth={0.6} opacity={0.5} />
+      <circle cx={cx} cy={cy} r={3} fill="var(--galaxy-cream)" />
+      <circle cx={cx} cy={cy} r={6} fill="none" stroke="var(--galaxy-cream)" strokeWidth={0.6} opacity={0.5} />
     </svg>
   );
 }
@@ -197,11 +197,11 @@ export function DuetClient() {
   return (
     <main
       style={{
-        minHeight: '100vh',
+        minHeight: '100dvh',
         background:
-          'radial-gradient(ellipse 100% 60% at 50% 0%, #2a1c4d 0%, #1a1530 38%, #0F0A22 100%)',
-        color: '#F5F0E8',
-        fontFamily: 'Cormorant Garamond, Noto Serif SC, serif',
+          'var(--galaxy-bg-hero)',
+        color: 'var(--galaxy-cream)',
+        fontFamily: 'var(--font-display)',
         padding: '56px 20px 96px',
       }}
     >
@@ -209,11 +209,11 @@ export function DuetClient() {
         <p
           style={{
             margin: 0,
-            fontFamily: 'Inter, sans-serif',
+            fontFamily: 'var(--font-mono)',
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.42em',
-            color: '#C9A676',
+            color: 'var(--galaxy-gold)',
             textAlign: 'center',
             textTransform: 'uppercase',
           }}
@@ -237,9 +237,9 @@ export function DuetClient() {
             maxWidth: 420,
             textAlign: 'center',
             fontSize: 13,
-            color: 'rgba(245,240,232,0.7)',
+            color: 'var(--galaxy-mist)',
             lineHeight: 1.7,
-            fontFamily: 'Noto Serif SC, serif',
+            fontFamily: 'var(--font-serif)',
           }}
         >
           你和 ta 各召唤一位主神 ——
@@ -251,7 +251,7 @@ export function DuetClient() {
           <div
             style={{
               padding: 16,
-              border: '1px dashed rgba(201,166,118,0.4)',
+              border: '1px dashed var(--galaxy-gold-faint)',
               borderRadius: 12,
               textAlign: 'center',
             }}
@@ -260,8 +260,8 @@ export function DuetClient() {
               style={{
                 margin: '0 0 12px',
                 fontSize: 13,
-                color: 'rgba(245,240,232,0.78)',
-                fontFamily: 'Noto Serif SC, serif',
+                color: 'var(--galaxy-mist)',
+                fontFamily: 'var(--font-serif)',
               }}
             >
               要先做一次 90 秒主神召唤，
@@ -276,8 +276,8 @@ export function DuetClient() {
                 fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: 4,
-                color: '#1a1530',
-                background: 'linear-gradient(135deg, #C9A676 0%, #C07A8E 100%)',
+                color: '#4D2C2F',
+                background: 'linear-gradient(135deg, var(--galaxy-gold) 0%, var(--color-rose) 100%)',
                 border: 'none',
                 borderRadius: 999,
                 textTransform: 'uppercase',
@@ -295,8 +295,8 @@ export function DuetClient() {
             style={{
               padding: 18,
               borderRadius: 14,
-              border: '1px solid rgba(201,166,118,0.35)',
-              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid var(--galaxy-gold-faint)',
+              background: 'color-mix(in oklab, var(--color-bg-elevated) 10%, transparent)',
               display: 'grid',
               gap: 12,
             }}
@@ -305,7 +305,7 @@ export function DuetClient() {
               style={{
                 margin: 0,
                 fontSize: 14,
-                fontFamily: 'Noto Serif SC, serif',
+                fontFamily: 'var(--font-serif)',
                 lineHeight: 1.6,
               }}
             >
@@ -324,11 +324,11 @@ export function DuetClient() {
               style={{
                 padding: '10px 12px',
                 borderRadius: 10,
-                border: '1px solid rgba(245,240,232,0.18)',
-                background: 'rgba(26,21,48,0.5)',
-                color: '#F5F0E8',
+                border: '1px solid var(--color-border)',
+                background: 'color-mix(in oklab, var(--galaxy-ink) 60%, transparent)',
+                color: 'var(--galaxy-cream)',
                 fontSize: 13,
-                fontFamily: 'Noto Serif SC, serif',
+                fontFamily: 'var(--font-serif)',
               }}
             />
             <button
@@ -338,8 +338,8 @@ export function DuetClient() {
                 padding: '12px',
                 borderRadius: 999,
                 border: 'none',
-                background: 'linear-gradient(135deg, #C9A676 0%, #C07A8E 100%)',
-                color: '#1a1530',
+                background: 'linear-gradient(135deg, var(--galaxy-gold) 0%, var(--color-rose) 100%)',
+                color: '#4D2C2F',
                 fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: 4,
@@ -355,11 +355,11 @@ export function DuetClient() {
                   style={{
                     margin: 0,
                     fontSize: 11,
-                    color: 'rgba(245,240,232,0.7)',
-                    fontFamily: 'Noto Serif SC, serif',
+                    color: 'var(--galaxy-mist)',
+                    fontFamily: 'var(--font-serif)',
                     wordBreak: 'break-all',
                     padding: '10px 12px',
-                    background: 'rgba(0,0,0,0.25)',
+                    background: 'color-mix(in oklab, var(--color-text-primary) 25%, transparent)',
                     borderRadius: 8,
                     lineHeight: 1.5,
                   }}
@@ -372,9 +372,9 @@ export function DuetClient() {
                   style={{
                     padding: '10px',
                     borderRadius: 999,
-                    border: '1px solid #C9A676',
+                    border: '1px solid var(--galaxy-gold)',
                     background: 'transparent',
-                    color: '#C9A676',
+                    color: 'var(--galaxy-gold)',
                     fontSize: 11,
                     fontWeight: 700,
                     letterSpacing: 4,
@@ -390,9 +390,9 @@ export function DuetClient() {
               style={{
                 margin: 0,
                 fontSize: 11,
-                color: 'rgba(245,240,232,0.5)',
+                color: 'var(--galaxy-mist-faint)',
                 lineHeight: 1.55,
-                fontFamily: 'Noto Serif SC, serif',
+                fontFamily: 'var(--font-serif)',
               }}
             >
               ✦ ta 打开链接 → 也做一次召唤 → 双方屏幕显示同一枚 Pair Sigil。
@@ -424,7 +424,7 @@ export function DuetClient() {
             href="/wtfti/profile/"
             style={{
               fontSize: 11,
-              color: '#9C7CFF',
+              color: 'var(--galaxy-violet)',
               fontWeight: 700,
               letterSpacing: 4,
               textDecoration: 'none',
@@ -437,7 +437,7 @@ export function DuetClient() {
             href="/wtfti/moon/"
             style={{
               fontSize: 11,
-              color: '#C9A676',
+              color: 'var(--galaxy-gold)',
               fontWeight: 700,
               letterSpacing: 4,
               textDecoration: 'none',
@@ -476,8 +476,8 @@ function RevealView({
         padding: 18,
         borderRadius: 16,
         background:
-          'radial-gradient(ellipse at center, rgba(255,255,255,0.05) 0%, transparent 70%)',
-        border: '1px solid rgba(245,240,232,0.1)',
+          'radial-gradient(ellipse at center, color-mix(in oklab, var(--color-bg-elevated) 12%, transparent) 0%, transparent 70%)',
+        border: '1px solid var(--color-border-subtle)',
       }}
     >
       <div style={{ display: 'grid', placeItems: 'center', marginBottom: 12 }}>
@@ -509,8 +509,8 @@ function RevealView({
           style={{
             padding: 10,
             borderRadius: 12,
-            border: '1px solid rgba(201,166,118,0.4)',
-            background: 'rgba(201,166,118,0.08)',
+            border: '1px solid var(--galaxy-gold-faint)',
+            background: 'color-mix(in oklab, var(--galaxy-gold) 10%, transparent)',
           }}
         >
           <p
@@ -519,9 +519,9 @@ function RevealView({
               fontSize: 9,
               fontWeight: 700,
               letterSpacing: '0.32em',
-              color: '#C9A676',
+              color: 'var(--galaxy-gold)',
               textTransform: 'uppercase',
-              fontFamily: 'Inter, sans-serif',
+              fontFamily: 'var(--font-mono)',
             }}
           >
             ✦ Gravity
@@ -531,7 +531,7 @@ function RevealView({
               margin: '6px 0 0',
               fontSize: 28,
               fontWeight: 600,
-              color: '#F5F0E8',
+              color: 'var(--galaxy-cream)',
               fontFamily: 'Cormorant Garamond, serif',
             }}
           >
@@ -542,8 +542,8 @@ function RevealView({
           style={{
             padding: 10,
             borderRadius: 12,
-            border: '1px solid rgba(192,122,142,0.4)',
-            background: 'rgba(192,122,142,0.08)',
+            border: '1px solid color-mix(in oklab, var(--color-rose) 40%, transparent)',
+            background: 'color-mix(in oklab, var(--color-rose) 10%, transparent)',
           }}
         >
           <p
@@ -552,9 +552,9 @@ function RevealView({
               fontSize: 9,
               fontWeight: 700,
               letterSpacing: '0.32em',
-              color: '#C07A8E',
+              color: 'var(--color-rose)',
               textTransform: 'uppercase',
-              fontFamily: 'Inter, sans-serif',
+              fontFamily: 'var(--font-mono)',
             }}
           >
             ✦ Soul
@@ -564,7 +564,7 @@ function RevealView({
               margin: '6px 0 0',
               fontSize: 28,
               fontWeight: 600,
-              color: '#F5F0E8',
+              color: 'var(--galaxy-cream)',
               fontFamily: 'Cormorant Garamond, serif',
             }}
           >
@@ -577,8 +577,8 @@ function RevealView({
         style={{
           padding: '14px 16px',
           borderRadius: 12,
-          background: 'rgba(26,21,48,0.5)',
-          border: '1px solid rgba(245,240,232,0.08)',
+          background: 'color-mix(in oklab, var(--galaxy-ink) 60%, transparent)',
+          border: '1px solid var(--color-border-subtle)',
           marginBottom: 12,
         }}
       >
@@ -588,9 +588,9 @@ function RevealView({
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.32em',
-            color: reading.rare ? '#C07A8E' : '#9C7CFF',
+            color: reading.rare ? 'var(--color-rose)' : 'var(--galaxy-violet)',
             textTransform: 'uppercase',
-            fontFamily: 'Inter, sans-serif',
+            fontFamily: 'var(--font-mono)',
           }}
         >
           ✦ {reading.rare ? '稀有相会' : '相处坐标'}
@@ -600,8 +600,8 @@ function RevealView({
             margin: '6px 0 8px',
             fontSize: 22,
             fontWeight: 600,
-            color: '#F5F0E8',
-            fontFamily: 'Cormorant Garamond, Noto Serif SC, serif',
+            color: 'var(--galaxy-cream)',
+            fontFamily: 'var(--font-display)',
           }}
         >
           {reading.title}
@@ -610,9 +610,9 @@ function RevealView({
           style={{
             margin: '0 0 8px',
             fontSize: 13,
-            color: '#F5F0E8',
+            color: 'var(--galaxy-cream)',
             lineHeight: 1.7,
-            fontFamily: 'Noto Serif SC, serif',
+            fontFamily: 'var(--font-serif)',
           }}
         >
           {reading.narration}
@@ -621,9 +621,9 @@ function RevealView({
           style={{
             margin: 0,
             fontSize: 12,
-            color: 'rgba(245,240,232,0.65)',
+            color: 'var(--galaxy-mist)',
             lineHeight: 1.55,
-            fontFamily: 'Noto Serif SC, serif',
+            fontFamily: 'var(--font-serif)',
             fontStyle: 'italic',
           }}
         >
@@ -636,13 +636,13 @@ function RevealView({
           margin: 0,
           textAlign: 'center',
           fontSize: 11,
-          color: 'rgba(245,240,232,0.55)',
-          fontFamily: 'Noto Serif SC, serif',
+          color: 'var(--galaxy-mist-faint)',
+          fontFamily: 'var(--font-serif)',
           lineHeight: 1.6,
         }}
       >
         把这一页截图 — 这是仅属于你和{' '}
-        <strong style={{ color: '#C9A676' }}>{hostNick ?? 'ta'}</strong> 的 Pair Sigil。
+        <strong style={{ color: 'var(--galaxy-gold)' }}>{hostNick ?? 'ta'}</strong> 的 Pair Sigil。
       </p>
 
       <p
@@ -650,8 +650,8 @@ function RevealView({
           margin: '14px 0 0',
           textAlign: 'center',
           fontSize: 10,
-          color: 'rgba(245,240,232,0.4)',
-          fontFamily: 'Inter, sans-serif',
+          color: 'var(--galaxy-mist-faint)',
+          fontFamily: 'var(--font-mono)',
           letterSpacing: '0.2em',
         }}
       >
@@ -682,7 +682,7 @@ function DeityChip({ planet, nick }: { planet: HomePlanetEntry; nick: string }) 
           height: 44,
           borderRadius: '50%',
           overflow: 'hidden',
-          background: 'rgba(0,0,0,0.4)',
+          background: 'color-mix(in oklab, var(--color-text-primary) 40%, transparent)',
           position: 'relative',
         }}
       >
@@ -703,7 +703,7 @@ function DeityChip({ planet, nick }: { planet: HomePlanetEntry; nick: string }) 
             letterSpacing: '0.24em',
             color: planet.accent,
             textTransform: 'uppercase',
-            fontFamily: 'Inter, sans-serif',
+            fontFamily: 'var(--font-mono)',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -716,8 +716,8 @@ function DeityChip({ planet, nick }: { planet: HomePlanetEntry; nick: string }) 
             margin: '3px 0 0',
             fontSize: 13,
             fontWeight: 600,
-            color: '#F5F0E8',
-            fontFamily: 'Noto Serif SC, serif',
+            color: 'var(--galaxy-cream)',
+            fontFamily: 'var(--font-serif)',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -729,8 +729,8 @@ function DeityChip({ planet, nick }: { planet: HomePlanetEntry; nick: string }) 
           style={{
             margin: '2px 0 0',
             fontSize: 11,
-            color: 'rgba(245,240,232,0.6)',
-            fontFamily: 'Noto Serif SC, serif',
+            color: 'var(--galaxy-mist-faint)',
+            fontFamily: 'var(--font-serif)',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',

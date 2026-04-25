@@ -515,7 +515,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
                 <button
                   onClick={copyCPLink}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer"
-                  style={{ background: cpCopied ? '#22c55e' : displayColor, color: '#FFFFFF' }}
+                  style={{ background: cpCopied ? 'var(--color-sage)' : displayColor, color: 'var(--color-bg-primary)' }}
                 >
                   {cpCopied ? '链接已复制 ✓' : '复制 CP 邀请链接'}
                   {!cpCopied && (
@@ -538,7 +538,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
               <Link
                 href={`/combo?sbti=${personality.slug}`}
                 className="block rounded-2xl border p-6 sm:p-8 text-center transition-all hover:shadow-md"
-                style={{ borderColor: '#a78bfa30', background: 'rgba(167,139,250,0.06)' }}
+                style={{ borderColor: 'color-mix(in oklab, var(--color-accent) 19%, transparent)', background: 'color-mix(in oklab, var(--color-accent) 6%, transparent)' }}
               >
                 <div className="text-3xl mb-3">🧩</div>
                 <h3 className="text-lg font-semibold mb-2">解锁你的人格拼盘</h3>
@@ -546,8 +546,8 @@ export function ResultContent({ personality, dimensionScores }: Props) {
                   SBTI × MBTI × 星座，三合一拼出你的专属称号和毒舌分析
                 </p>
                 <span
-                  className="inline-flex items-center gap-1 px-5 py-2.5 rounded-xl text-sm font-medium text-white"
-                  style={{ background: '#a78bfa' }}
+                  className="inline-flex items-center gap-1 px-5 py-2.5 rounded-xl text-sm font-medium text-bg-primary"
+                  style={{ background: 'var(--color-accent)' }}
                 >
                   去拼盘 →
                 </span>

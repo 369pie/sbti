@@ -24,18 +24,18 @@ export default function SoultiMapContent() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#FAF8F5' }}>
+    <div className="min-h-screen" style={{ background: 'var(--color-bg-secondary)' }}>
       <header className="max-w-4xl mx-auto px-6 pt-16 pb-8 text-center">
-        <p className="text-[10px] tracking-[0.4em] uppercase mb-4" style={{ fontFamily: monoFont, color: '#8b7355', opacity: 0.7 }}>
+        <p className="text-[10px] tracking-[0.4em] uppercase mb-4" style={{ fontFamily: monoFont, color: 'var(--color-text-muted)', opacity: 0.7 }}>
           NATURE MAP · 32 TYPES
         </p>
-        <h1 className="text-3xl sm:text-4xl mb-4" style={{ fontFamily: serifFont, color: '#2D2A26', letterSpacing: '0.02em' }}>
+        <h1 className="text-3xl sm:text-4xl mb-4" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)', letterSpacing: '0.02em' }}>
           灵魂图谱
         </h1>
-        <p className="text-sm sm:text-base" style={{ fontFamily: serifFont, color: '#6a6054', lineHeight: 2 }}>
+        <p className="text-sm sm:text-base" style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)', lineHeight: 2 }}>
           32 种自然力 × 5 轴聚类 · 一眼看清你和每个人的距离
         </p>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs" style={{ fontFamily: monoFont, color: '#9a918a' }}>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs" style={{ fontFamily: monoFont, color: 'var(--color-text-muted)' }}>
           {SOULTI_DIMENSIONS.map(d => (
             <span key={d.id} className="px-3 py-1 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.2)' }}>
               {d.id} · {d.name}
@@ -50,15 +50,15 @@ export default function SoultiMapContent() {
             <section
               key={q.id}
               className="rounded-3xl p-6 sm:p-7"
-              style={{ background: '#FDFCFA', border: '1px solid rgba(139,115,85,0.15)' }}
+              style={{ background: 'var(--color-bg-secondary)', border: '1px solid rgba(139,115,85,0.15)' }}
             >
-              <p className="text-[10px] tracking-[0.3em] uppercase mb-1" style={{ fontFamily: monoFont, color: '#8b7355' }}>
+              <p className="text-[10px] tracking-[0.3em] uppercase mb-1" style={{ fontFamily: monoFont, color: 'var(--color-text-muted)' }}>
                 Quadrant {q.id}
               </p>
-              <h2 className="text-lg mb-1" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+              <h2 className="text-lg mb-1" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
                 {q.label}
               </h2>
-              <p className="text-xs mb-5" style={{ fontFamily: serifFont, color: '#9a918a' }}>
+              <p className="text-xs mb-5" style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}>
                 {q.desc} · 共 {q.items.length} 种
               </p>
 
@@ -83,17 +83,17 @@ export default function SoultiMapContent() {
                             <p className="text-[10px] tracking-[0.2em]" style={{ fontFamily: monoFont, color: p.color }}>
                               {p.code}
                             </p>
-                            <p className="text-sm truncate" style={{ fontFamily: serifFont, color: '#2D2A26' }}>
+                            <p className="text-sm truncate" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
                               {p.name}
                             </p>
                           </div>
                         </div>
                         <p className="mt-2 text-[10px] flex items-center gap-2" style={{ fontFamily: monoFont, color: rarity.color }}>
                           <span>{rarity.label}</span>
-                          <span style={{ color: '#b0a89e' }}>· {rarity.populationPct.toFixed(1)}%</span>
+                          <span style={{ color: 'var(--color-text-muted)' }}>· {rarity.populationPct.toFixed(1)}%</span>
                         </p>
                         {r?.soulOrigin && (
-                          <p className="mt-1 text-[10px] truncate" style={{ fontFamily: serifFont, color: '#8a7f72' }}>
+                          <p className="mt-1 text-[10px] truncate" style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}>
                             共振 · {r.soulOrigin.zhName}
                           </p>
                         )}
@@ -107,13 +107,13 @@ export default function SoultiMapContent() {
         </div>
 
         <nav className="mt-10 flex flex-wrap justify-center gap-3 text-sm" style={{ fontFamily: serifFont }}>
-          <Link href="/soulti/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: '#6a6054' }}>
+          <Link href="/soulti/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: 'var(--color-text-secondary)' }}>
             ← 开启测试
           </Link>
-          <Link href="/soulti/origin/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: '#6a6054' }}>
+          <Link href="/soulti/origin/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: 'var(--color-text-secondary)' }}>
             32 位历史女性 →
           </Link>
-          <Link href="/soulti/rarity/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: '#6a6054' }}>
+          <Link href="/soulti/rarity/" className="px-4 py-2 rounded-full border" style={{ borderColor: 'rgba(139,115,85,0.3)', color: 'var(--color-text-secondary)' }}>
             稀有度榜 →
           </Link>
         </nav>

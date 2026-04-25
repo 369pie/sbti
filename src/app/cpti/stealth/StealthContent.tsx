@@ -46,7 +46,7 @@ export function StealthContent() {
             </p>
             <Link
               href="/cpti/test"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-rose-500 text-white font-medium text-sm hover:bg-rose-600 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium text-sm hover:bg-rose-600 transition-all"
             >
               先测测自己的CP角色
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -71,7 +71,7 @@ export function StealthContent() {
             </div>
             <button
               onClick={() => setStarted(true)}
-              className="w-full py-3.5 rounded-xl bg-purple-500 text-white font-medium text-sm hover:bg-purple-600 transition-all cursor-pointer"
+              className="w-full py-3.5 rounded-xl bg-purple-500 text-bg-primary font-medium text-sm hover:bg-purple-600 transition-all cursor-pointer"
             >
               开始偷偷测
             </button>

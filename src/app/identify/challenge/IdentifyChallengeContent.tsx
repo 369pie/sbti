@@ -227,7 +227,7 @@ export function IdentifyChallengeContent() {
         </p>
         <Link
           href="/identify/test/"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-medium text-sm"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-bg-primary font-medium text-sm"
         >
           开始测试 →
         </Link>
@@ -356,7 +356,7 @@ export function IdentifyChallengeContent() {
           {/* Path A: 自己也做一个 */}
           <Link
             href="/identify/test/"
-            className="block w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 text-white font-medium text-center text-base hover:from-pink-600 hover:to-rose-600 transition-all shadow-lg shadow-pink-500/20"
+            className="block w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 text-bg-primary font-medium text-center text-base hover:from-pink-600 hover:to-rose-600 transition-all shadow-lg shadow-pink-500/20"
           >
             自己也做一个（解锁完整鉴定）→
           </Link>

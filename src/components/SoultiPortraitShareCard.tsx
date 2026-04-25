@@ -37,7 +37,7 @@ export function SoultiPortraitShareCard({ personality, tearRate }: Props) {
       >
         {/* Top ribbon */}
         <div className="absolute top-5 left-5 right-5 flex items-center justify-between">
-          <span className="text-[10px] tracking-[0.3em] uppercase" style={{ fontFamily: mono, color: '#8b7355' }}>
+          <span className="text-[10px] tracking-[0.3em] uppercase" style={{ fontFamily: mono, color: 'var(--color-text-muted)' }}>
             SoulTI
           </span>
           <span
@@ -96,10 +96,10 @@ export function SoultiPortraitShareCard({ personality, tearRate }: Props) {
 
         {/* Name */}
         <div className="absolute left-0 right-0 text-center" style={{ top: '53%' }}>
-          <h2 className="text-2xl mb-1" style={{ fontFamily: serif, color: '#2D2A26' }}>
+          <h2 className="text-2xl mb-1" style={{ fontFamily: serif, color: 'var(--color-text-primary)' }}>
             {personality.name}
           </h2>
-          <p className="text-xs px-10 leading-[1.9]" style={{ fontFamily: serif, color: '#6a6054' }}>
+          <p className="text-xs px-10 leading-[1.9]" style={{ fontFamily: serif, color: 'var(--color-text-secondary)' }}>
             {personality.tagline}
           </p>
         </div>
@@ -115,14 +115,14 @@ export function SoultiPortraitShareCard({ personality, tearRate }: Props) {
                 border: '1px solid rgba(139,115,85,0.15)',
               }}
             >
-              <p className="text-[11px] leading-[1.9] text-center" style={{ fontFamily: serif, color: '#3a352f', whiteSpace: 'pre-line' }}>
+              <p className="text-[11px] leading-[1.9] text-center" style={{ fontFamily: serif, color: 'var(--color-text-primary)', whiteSpace: 'pre-line' }}>
                 &ldquo;{resonance.quote}&rdquo;
               </p>
-              <p className="mt-2 text-[9px] tracking-[0.2em] text-center" style={{ fontFamily: mono, color: '#8b7355' }}>
+              <p className="mt-2 text-[9px] tracking-[0.2em] text-center" style={{ fontFamily: mono, color: 'var(--color-text-muted)' }}>
                 — {resonance.quoteSource}
               </p>
             </div>
-            <p className="mt-3 text-[10px] text-center" style={{ fontFamily: serif, color: '#8a7f72' }}>
+            <p className="mt-3 text-[10px] text-center" style={{ fontFamily: serif, color: 'var(--color-text-muted)' }}>
               与你共振 · {resonance.soulOrigin.zhName}（{resonance.soulOrigin.era}）
             </p>
           </div>
@@ -131,7 +131,7 @@ export function SoultiPortraitShareCard({ personality, tearRate }: Props) {
         {/* Tear rate */}
         {typeof tearRate === 'number' && tearRate > 0 && (
           <div className="absolute left-5 right-5 text-center" style={{ top: '86%' }}>
-            <p className="text-[10px] tracking-[0.2em]" style={{ fontFamily: mono, color: '#9a918a' }}>
+            <p className="text-[10px] tracking-[0.2em]" style={{ fontFamily: mono, color: 'var(--color-text-muted)' }}>
               裂痕指数 {Math.round(tearRate)} / 100
             </p>
           </div>
@@ -139,16 +139,16 @@ export function SoultiPortraitShareCard({ personality, tearRate }: Props) {
 
         {/* Bottom brand */}
         <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between">
-          <span className="text-[10px] tracking-[0.2em]" style={{ fontFamily: mono, color: '#9a918a' }}>
+          <span className="text-[10px] tracking-[0.2em]" style={{ fontFamily: mono, color: 'var(--color-text-muted)' }}>
             {SHARE_SITE_URL.replace(/^https?:\/\//, '').replace(/\/$/, '')}/soulti
           </span>
-          <span className="text-[10px] tracking-[0.2em]" style={{ fontFamily: mono, color: '#9a918a' }}>
+          <span className="text-[10px] tracking-[0.2em]" style={{ fontFamily: mono, color: 'var(--color-text-muted)' }}>
             {personality.number}
           </span>
         </div>
       </div>
 
-      <p className="mt-3 text-center text-[11px]" style={{ fontFamily: mono, color: '#9a918a' }}>
+      <p className="mt-3 text-center text-[11px]" style={{ fontFamily: mono, color: 'var(--color-text-muted)' }}>
         手机端长按卡片保存图片 · 桌面端请截图
       </p>
     </div>

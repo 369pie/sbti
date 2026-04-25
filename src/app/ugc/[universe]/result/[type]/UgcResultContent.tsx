@@ -228,7 +228,7 @@ export function UgcResultContent({ universeConfig: cfg, personality: p, dimensio
             </button>
             <button
               onClick={quickShare}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer text-white"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer text-bg-primary"
               style={{ background: p.color }}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -277,7 +277,7 @@ export function UgcResultContent({ universeConfig: cfg, personality: p, dimensio
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href={`/ugc/${cfg.id}/test/`}
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-white font-medium text-base hover:bg-accent/90 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base hover:bg-accent/90 transition-all"
           >
             重新测试
           </Link>
@@ -297,7 +297,7 @@ export function UgcResultContent({ universeConfig: cfg, personality: p, dimensio
           <div className="flex flex-wrap gap-2">
             <Link
               href="/creator/"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-bg-primary text-sm font-medium hover:bg-accent/90 transition-colors"
             >
               了解创作者计划
             </Link>

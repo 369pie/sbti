@@ -43,25 +43,25 @@ export default function FanrentiGalleryPage() {
         <div className="relative max-w-4xl mx-auto px-6 py-16 text-center">
           <div className="text-4xl mb-3">🪷</div>
           <h1
-            className="text-3xl sm:text-4xl font-bold text-white mb-3"
+            className="text-3xl sm:text-4xl font-bold text-bg-primary mb-3"
             style={{ fontFamily: '"Noto Serif SC", "Source Han Serif SC", Georgia, serif' }}
           >
             凡人TI · 修仙图鉴
           </h1>
-          <p className="text-white/70 text-base mb-6">
+          <p className="text-bg-primary/70 text-base mb-6">
             29 种道心档案 · 按境界分类 · 点击查看完整人格分析
           </p>
           <div className="flex justify-center gap-3 flex-wrap">
             <Link
               href="/fanrenti/test/"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all"
-              style={{ background: '#4a7a6a', color: '#f0ede8' }}
+              style={{ background: 'var(--color-sage)', color: 'var(--color-bg-primary)' }}
             >
               🪷 测我的道心
             </Link>
             <Link
               href="/fanrenti/"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border border-white/20 text-white/80 hover:border-white/40 hover:text-white transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border border-white/20 text-bg-primary/80 hover:border-white/40 hover:text-bg-primary transition-all"
             >
               ← 返回首页
             </Link>
@@ -129,7 +129,7 @@ export default function FanrentiGalleryPage() {
                       {/* 朱红印章 watermark */}
                       <span
                         className="absolute bottom-1.5 left-2 text-[9px] font-medium opacity-50 tracking-wider rotate-[-3deg]"
-                        style={{ color: '#8b2a1a', fontFamily: 'serif' }}
+                        style={{ color: 'var(--color-text-primary)', fontFamily: 'serif' }}
                       >
                         道友请留步
                       </span>
@@ -163,7 +163,7 @@ export default function FanrentiGalleryPage() {
         <p className="text-text-muted text-sm mb-4">道友，还不知道自己的道心？</p>
         <Link
           href="/fanrenti/test/"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white transition-all hover:opacity-90"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-bg-primary transition-all hover:opacity-90"
           style={{ background: 'linear-gradient(135deg, #2a4d4f, #1a6b5a)' }}
         >
           🪷 测测我的道心

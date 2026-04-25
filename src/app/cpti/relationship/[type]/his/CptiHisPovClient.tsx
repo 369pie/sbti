@@ -51,12 +51,12 @@ export function CptiHisPovClient({ relationship }: Props) {
   }, [relationship.slug, hisSlug, herSlug]);
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] text-[#2c2620]">
+    <div className="min-h-screen bg-bg-primary text-text-primary">
       <div className="mx-auto max-w-[640px] px-5 py-10">
         {/* Eyebrow */}
-        <div className="mb-3 flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.32em] text-[#8a7355]">
+        <div className="mb-3 flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.32em] text-gold">
           <span>CPTI · His POV</span>
-          <span className="h-px flex-1 bg-[#c9a676]/40" />
+          <span className="h-px flex-1 bg-gold/40" />
           <span>{relationship.code}</span>
         </div>
 
@@ -68,37 +68,37 @@ export function CptiHisPovClient({ relationship }: Props) {
           <br />
           你是谁
         </h1>
-        <p className="mt-3 text-sm text-[#6b5b3f]">
+        <p className="mt-3 text-sm text-text-secondary">
           她邀请你测了「{relationship.name}」。这是给你的报告 —— 不是教你怎么哄她，
           是让你看见她现在是怎么看这段关系的。
         </p>
 
         {/* Section I — 在她眼里 */}
         <Section roman="I" title="她对你的定位">
-          <p className="text-[15px] leading-[1.85] text-[#3a342a]">{report.herView}</p>
+          <p className="text-[15px] leading-[1.85] text-text-primary">{report.herView}</p>
         </Section>
 
         {/* Section II — 走向 */}
         <Section roman="II" title="这段关系正在向哪里去">
           <div className="flex items-baseline gap-3">
-            <span className="text-3xl font-serif text-[#c9a676]" style={{ fontFamily: '"Cormorant Garamond", serif' }}>
+            <span className="text-3xl font-serif text-gold" style={{ fontFamily: '"Cormorant Garamond", serif' }}>
               {report.direction.arrow}
             </span>
             <span className="text-base font-medium tracking-wide">{report.direction.label}</span>
-            <span className="ml-auto text-[11px] font-mono text-[#8a7355]">
+            <span className="ml-auto text-[11px] font-mono text-gold">
               compatibility {compatibility}/100
             </span>
           </div>
-          <p className="mt-3 text-[15px] leading-[1.85] text-[#3a342a]">{report.direction.body}</p>
+          <p className="mt-3 text-[15px] leading-[1.85] text-text-primary">{report.direction.body}</p>
         </Section>
 
         {/* Section III — 升级建议 */}
         <Section roman="III" title="想让这段关系更稳，先做这件事">
           <ul className="space-y-5">
             {report.upgrades.map((u, i) => (
-              <li key={i} className="border-l-2 border-[#c9a676]/50 pl-4">
+              <li key={i} className="border-l-2 border-gold/50 pl-4">
                 <div className="mb-1 flex items-center gap-2">
-                  <span className="font-mono text-[10px] tracking-[0.18em] text-[#8a7355]">
+                  <span className="font-mono text-[10px] tracking-[0.18em] text-gold">
                     NO.{String(i + 1).padStart(2, '0')}
                   </span>
                   <span
@@ -108,8 +108,8 @@ export function CptiHisPovClient({ relationship }: Props) {
                     {TONE_BADGE[u.tone].label}
                   </span>
                 </div>
-                <h3 className="text-[15px] font-medium text-[#2c2620]">{u.title}</h3>
-                <p className="mt-1 text-[14px] leading-[1.85] text-[#5a4f3e]">{u.body}</p>
+                <h3 className="text-[15px] font-medium text-text-primary">{u.title}</h3>
+                <p className="mt-1 text-[14px] leading-[1.85] text-text-secondary">{u.body}</p>
               </li>
             ))}
           </ul>
@@ -120,26 +120,26 @@ export function CptiHisPovClient({ relationship }: Props) {
           <Link
             href="/cpti/test/"
             onClick={() => trackCptiEvent('cpti_his_pov_cta_clicked', { target: 'cpti-self', relationship: relationship.slug })}
-            className="block w-full rounded-xl bg-[#2c2620] py-4 text-center text-[15px] font-medium text-[#F5F0E8] transition active:scale-[0.98]"
+            className="block w-full rounded-xl bg-text-primary py-4 text-center text-[15px] font-medium text-bg-primary transition active:scale-[0.98]"
           >
             测一下你自己是哪种 CPTI 角色 →
           </Link>
           <Link
             href="/xpti/"
             onClick={() => trackCptiEvent('cpti_his_pov_cta_clicked', { target: 'xpti', relationship: relationship.slug })}
-            className="block w-full rounded-xl border border-[#c9a676]/60 py-4 text-center text-[14px] font-medium text-[#6b5b3f] transition hover:bg-[#c9a676]/8"
+            className="block w-full rounded-xl border border-gold/60 py-4 text-center text-[14px] font-medium text-text-secondary transition hover:bg-gold/8"
           >
             测你想要的亲密关系是什么样 → XPTI
           </Link>
           <Link
             href={`/cpti/relationship/${relationship.slug}/`}
-            className="block py-3 text-center text-[12px] font-mono uppercase tracking-[0.24em] text-[#8a7355] hover:text-[#2c2620]"
+            className="block py-3 text-center text-[12px] font-mono uppercase tracking-[0.24em] text-gold hover:text-text-primary"
           >
             查看「{relationship.name}」完整描述
           </Link>
         </div>
 
-        <footer className="mt-16 border-t border-[#c9a676]/30 pt-6 text-center text-[10px] font-mono uppercase tracking-[0.32em] text-[#8a7355]">
+        <footer className="mt-16 border-t border-gold/30 pt-6 text-center text-[10px] font-mono uppercase tracking-[0.32em] text-gold">
           CPTI · 关系图鉴 · His POV
         </footer>
       </div>
@@ -152,13 +152,13 @@ function Section({ roman, title, children }: { roman: string; title: string; chi
     <section className="mt-10">
       <div className="mb-4 flex items-baseline gap-3">
         <span
-          className="text-2xl text-[#c9a676]"
+          className="text-2xl text-gold"
           style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: 'italic' }}
         >
           {roman}
         </span>
-        <h2 className="text-[15px] font-medium tracking-wide text-[#2c2620]">{title}</h2>
-        <span className="h-px flex-1 bg-[#c9a676]/30" />
+        <h2 className="text-[15px] font-medium tracking-wide text-text-primary">{title}</h2>
+        <span className="h-px flex-1 bg-gold/30" />
       </div>
       {children}
     </section>

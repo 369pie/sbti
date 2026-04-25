@@ -29,12 +29,12 @@ export function SignaturePerfumeCard({ perfume, annotation }: Props) {
 
       {/* 香水瓶视觉 + 名 */}
       <div style={{ textAlign: 'center', padding: '8px 18px 0' }}>
-        <p style={{ ...eyebrow, color: '#D4B58A' }}>✦ 你的香水 · YOUR SIGNATURE ✦</p>
+        <p style={{ ...eyebrow, color: 'var(--color-gold)' }}>✦ 你的香水 · YOUR SIGNATURE ✦</p>
         <PerfumeBottle accent={accent} house={perfume.house} name={perfume.name} />
         <h3 style={perfumeName}>
           <em style={{ fontStyle: 'italic' }}>{perfume.name}</em>
         </h3>
-        <p style={{ ...houseLabel, color: '#D4B58A' }}>{perfume.house}</p>
+        <p style={{ ...houseLabel, color: 'var(--color-gold)' }}>{perfume.house}</p>
         <p style={positioningLine}>
           <em style={{ fontStyle: 'italic' }}>{perfume.year}</em>
           <span style={{ opacity: 0.5, padding: '0 10px' }}>·</span>
@@ -42,7 +42,7 @@ export function SignaturePerfumeCard({ perfume, annotation }: Props) {
         </p>
         <div style={chipRow}>
           {perfume.toneChips.map((c) => (
-            <span key={c} style={{ ...chip, borderColor: `${accent}55`, color: '#F5F0E8' }}>
+            <span key={c} style={{ ...chip, borderColor: `${accent}55`, color: 'var(--color-bg-primary)' }}>
               {c}
             </span>
           ))}
@@ -67,7 +67,7 @@ export function SignaturePerfumeCard({ perfume, annotation }: Props) {
         <p style={sectionLabel}>最适合的季节与场合</p>
         <div style={chipRow}>
           {perfume.occasion.map((c) => (
-            <span key={c} style={{ ...occasionChip, color: '#F5F0E8' }}>
+            <span key={c} style={{ ...occasionChip, color: 'var(--color-bg-primary)' }}>
               {c}
             </span>
           ))}
@@ -85,7 +85,7 @@ export function SignaturePerfumeCard({ perfume, annotation }: Props) {
       {/* 个性化注解（仅 soul probe 用户） */}
       {annotation && (
         <p style={annotationStyle}>
-          <span style={{ color: '#D4B58A', letterSpacing: '0.36em' }}>// </span>
+          <span style={{ color: 'var(--color-gold)', letterSpacing: '0.36em' }}>// </span>
           {annotation}
         </p>
       )}
@@ -164,7 +164,7 @@ function PerfumeBottle({
             fontFamily: 'Inter, system-ui, sans-serif',
             fontSize: 9,
             letterSpacing: '0.36em',
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
             opacity: 0.85,
           }}
         >
@@ -175,7 +175,7 @@ function PerfumeBottle({
             fontFamily: '"Cormorant Garamond", serif',
             fontStyle: 'italic',
             fontSize: 18,
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
             lineHeight: 1.05,
             textAlign: 'center',
             wordBreak: 'break-word',
@@ -240,7 +240,7 @@ function PyramidCol({
           fontStyle: 'italic',
           fontSize: 16,
           lineHeight: 1.4,
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
         }}
       >
         {content}
@@ -274,7 +274,7 @@ function CrystalRow({ perfume }: { perfume: SignaturePerfume }) {
             fontSize: 10,
             letterSpacing: '0.36em',
             textTransform: 'uppercase',
-            color: '#D4B58A',
+            color: 'var(--color-gold)',
             fontFamily: 'Inter, system-ui, sans-serif',
           }}
         >
@@ -285,7 +285,7 @@ function CrystalRow({ perfume }: { perfume: SignaturePerfume }) {
             margin: '6px 0 2px',
             fontFamily: '"Noto Serif SC", serif',
             fontSize: 19,
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
             fontWeight: 500,
           }}
         >
@@ -438,7 +438,7 @@ const perfumeName: CSSProperties = {
   fontFamily: '"Cormorant Garamond", "Noto Serif SC", serif',
   fontSize: 38,
   lineHeight: 1.1,
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
   letterSpacing: '0.02em',
 };
 

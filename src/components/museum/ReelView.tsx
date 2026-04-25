@@ -200,7 +200,7 @@ export default function ReelView({
                 type="button"
                 onClick={onTogglePlay}
                 aria-label={playing ? '暂停' : '播放'}
-                className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm transition-transform hover:scale-105"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-bg-primary text-sm transition-transform hover:scale-105"
                 style={{ background: tabAccent }}
               >
                 {playing ? '⏸' : '▶'}

@@ -210,7 +210,7 @@ export default function CreatorApplicationsAdminPage() {
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link
               href={loginHref}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-white font-medium hover:bg-accent/90 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-accent/90 transition-colors"
             >
               登录管理员账号
             </Link>
@@ -237,7 +237,7 @@ export default function CreatorApplicationsAdminPage() {
       <div className="flex flex-wrap gap-3 mb-6 text-sm">
         <Link
           href="/creator/admin/ops/"
-          className="inline-flex items-center rounded-xl bg-accent px-4 py-2.5 font-medium text-white hover:bg-accent/90 transition-colors"
+          className="inline-flex items-center rounded-xl bg-accent px-4 py-2.5 font-medium text-bg-primary hover:bg-accent/90 transition-colors"
         >
           去经营总看板
         </Link>

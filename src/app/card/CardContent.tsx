@@ -10,7 +10,7 @@ import { ASSET_SYNC_EVENT, type AssetSummary, type AssetSyncEventDetail } from '
 import { getApiPath, readApiJson } from '@/lib/api';
 import { hasBrowserSupabaseSession } from '@/lib/supabase/client';
 import type { SoultiLayeredResult } from '@/lib/soulti/scoring';
-import { getAllCollected, getCollectionCount } from '@/lib/mysti/collection';
+import { getCollectionCount } from '@/lib/mysti/collection';
 import {
   getOrCreateCard, saveCard, loadCard, decodeCardData,
   encodeCardData, getLitCount, getTotalCount,
@@ -51,6 +51,37 @@ interface CardAssetsResponse {
   };
 }
 
+function compactMark(value: string | undefined, fallback: string) {
+  const source = (value || fallback).replace(/[^\dA-Za-z\u4e00-\u9fa5]/g, '');
+  return (source.slice(0, 3) || fallback.slice(0, 2) || 'TI').toUpperCase();
+}
+
+function ArrowIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M9 7h8v8" />
+    </svg>
+  );
+}
+
+function CodeMark({
+  code,
+  label,
+  color,
+  className = 'h-11 w-11',
+}: {
+  code?: string;
+  label: string;
+  color?: string;
+  className?: string;
+}) {
+  return (
+    <span className={`site-code-mark ${className}`} style={color ? { color } : undefined}>
+      {compactMark(code, label)}
+    </span>
+  );
+}
+
 // Deterministic per-slug rarity — same hash as gacha.slugRarity so badges
 // match anywhere (E-07 per-card rarity badge).
 function cardRarity(slug: string): 'S' | 'A' | 'B' | 'C' | 'D' {
@@ -69,13 +100,14 @@ function cardRarity(slug: string): 'S' | 'A' | 'B' | 'C' | 'D' {
 // ─── Shard preview row (added 2026-04-17) ───────────────────────────────────
 
 function ShardPreviewRow({ card }: { card: WtfCardData }) {
-  const firstLit = useMemo(() => {
-    for (const uid of CARD_UNIVERSE_IDS) {
-      const r = card.results[uid];
-      if (r?.slug) return { uid, slug: r.slug };
+  let firstLit: { uid: string; slug: string } | null = null;
+  for (const uid of CARD_UNIVERSE_IDS) {
+    const r = card.results[uid];
+    if (r?.slug) {
+      firstLit = { uid, slug: r.slug };
+      break;
     }
-    return null;
-  }, [card]);
+  }
 
   useEffect(() => {
     recordCardVisit();
@@ -89,7 +121,7 @@ function ShardPreviewInner({ uid, slug }: { uid: string; slug: string }) {
   const universe = getUniverse(uid);
   const resolved = resolvePersonality(uid, slug);
   const accent = universe?.accent ?? '#888';
-  const symbol = resolved?.emoji ?? universe?.emoji ?? '✦';
+  const symbol = compactMark(slug, universe?.shortName ?? 'TI');
   const shardState = useShardState(uid, slug);
 
   if (!universe) return null;
@@ -160,24 +192,18 @@ function UniverseBadge({
       {isLit ? (
         <Link
           href={`${universe.resultPrefix}/result/${slug}/`}
-          className={`group block rounded-2xl border p-3 text-center transition-all hover:shadow-sm ${
+          className={`group block rounded-2xl border p-3 text-center transition hover:shadow-sm ${
             isPinned
               ? 'border-accent/40 bg-accent-dim ring-1 ring-accent/20'
               : 'border-border-subtle bg-bg-elevated hover:border-border'
           }`}
         >
           {isPinned && (
-            <span className="absolute -top-1.5 -right-1.5 text-[10px] bg-accent text-white w-4 h-4 rounded-full flex items-center justify-center">
-              ★
+            <span className="absolute -top-1.5 -right-1.5 rounded-full bg-accent px-1.5 py-0.5 text-[8px] font-mono tracking-[0.12em] text-bg-primary">
+              PIN
             </span>
           )}
-          <div
-            className="text-2xl mb-1.5"
-            role="img"
-            aria-label={universe.name}
-          >
-            {resolved.emoji}
-          </div>
+          <CodeMark code={slug ?? universe.shortName} label={resolved.name} color={universe.accent} className="mx-auto mb-2 h-10 w-10 text-[10px]" />
           <div className="text-[10px] font-mono tracking-wider text-text-muted">
             {universe.shortName}
           </div>
@@ -201,7 +227,7 @@ function UniverseBadge({
       ) : (
         <Link
           href={universe.testPath}
-          className="group block rounded-2xl border border-dashed p-3 text-center transition-all hover:scale-[1.03]"
+          className="group block rounded-2xl border border-dashed p-3 text-center transition hover:scale-[1.03]"
           style={{
             borderColor: `${universe.accent}30`,
             background: `linear-gradient(145deg, ${universe.accent}08, ${universe.accent}04)`,
@@ -224,7 +250,7 @@ function UniverseBadge({
             className="text-[11px] mt-0.5 font-medium transition-colors"
             style={{ color: `${universe.accent}99` }}
           >
-            去解锁 →
+            去解锁
           </div>
         </Link>
       )}
@@ -232,14 +258,14 @@ function UniverseBadge({
       {isLit && onTogglePin && (
         <button
           onClick={(e) => { e.preventDefault(); onTogglePin(universeId); }}
-          className={`absolute -top-1 -left-1 w-5 h-5 rounded-full text-[10px] flex items-center justify-center transition-all cursor-pointer ${
+          className={`absolute -top-1 -left-1 w-5 h-5 rounded-full text-[10px] flex items-center justify-center transition cursor-pointer ${
             isPinned
-              ? 'bg-accent text-white shadow-sm'
+              ? 'bg-accent text-bg-primary shadow-sm'
               : 'bg-bg-secondary border border-border-subtle text-text-muted hover:border-accent/40 hover:text-accent opacity-0 group-hover:opacity-100'
           }`}
           title={isPinned ? '取消置顶' : '置顶到展柜'}
         >
-          {isPinned ? '★' : '☆'}
+          {isPinned ? 'P' : '+'}
         </button>
       )}
     </motion.div>
@@ -336,7 +362,8 @@ function RelationshipCollection({
     >
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-text-primary flex items-center gap-1.5">
-          💕 CP关系图鉴
+          <CodeMark code="CP" label="CP关系图鉴" color="var(--color-rose)" className="h-7 w-7 text-[9px]" />
+          CP 关系图鉴
         </h3>
         <span className="text-xs font-mono text-text-muted">
           {collected} / {total}
@@ -345,7 +372,7 @@ function RelationshipCollection({
 
       {collected === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-bg-secondary/30 p-6 text-center">
-          <div className="text-3xl mb-2 opacity-40">💕</div>
+          <CodeMark code="CP" label="CP关系" color="var(--color-rose)" className="mx-auto mb-3 h-12 w-12" />
           <p className="text-sm text-text-muted mb-3">
             还没有收集到任何CP关系类型
           </p>
@@ -354,13 +381,13 @@ function RelationshipCollection({
               href="/cpti/"
               className="inline-flex items-center gap-1.5 text-sm text-rose-400 hover:text-rose-300 transition-colors"
             >
-              去做CPTI测试 →
+              去做CPTI测试 <ArrowIcon />
             </Link>
             <Link
               href="/cpti/gallery/"
               className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-rose-400 transition-colors"
             >
-              查看25种关系图鉴 →
+              查看25种关系图鉴 <ArrowIcon className="h-3 w-3" />
             </Link>
           </div>
         </div>
@@ -390,7 +417,7 @@ function RelationshipCollection({
                     return (
                       <div
                         key={relType.slug}
-                        className={`relative group rounded-lg p-2 text-center transition-all ${
+                        className={`relative group rounded-lg p-2 text-center transition ${
                           isCollected
                             ? 'bg-bg-elevated border border-border-subtle'
                             : 'bg-bg-secondary/40 border border-dashed border-border/50 opacity-50'
@@ -409,7 +436,7 @@ function RelationshipCollection({
                               }`}
                               title={syncedSlugs.has(relType.slug) ? '已同步' : '仅本地'}
                             />
-                            <div className="text-lg leading-none">{relType.emoji}</div>
+                            <CodeMark code={relType.code} label={relType.name} color={relType.color} className="mx-auto h-7 w-7 text-[8px]" />
                             <div className="text-[9px] mt-1 leading-tight truncate text-text-secondary">
                               {relType.name}
                             </div>
@@ -419,12 +446,12 @@ function RelationshipCollection({
                             href="/cpti/join"
                             className="block hover:opacity-100 transition-opacity"
                           >
-                            <div className="text-lg leading-none opacity-60">{relType.emoji}</div>
+                            <CodeMark code={relType.code} label={relType.name} color={relType.color} className="mx-auto h-7 w-7 text-[8px] opacity-60" />
                             <div className="text-[9px] mt-1 leading-tight truncate text-text-muted">
                               {relType.name}
                             </div>
                             <div className="text-[8px] mt-0.5 text-rose-400/70 font-medium">
-                              去配对 →
+                              去配对
                             </div>
                           </Link>
                         )}
@@ -442,21 +469,21 @@ function RelationshipCollection({
         <div className="mt-3 text-center">
           <Link
             href="/cpti/gallery/"
-            className="text-xs text-text-muted hover:text-rose-400 transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-text-muted hover:text-rose-400 transition-colors"
           >
-            查看完整图鉴 · 邀请更多人测试 →
+            查看完整图鉴 · 邀请更多人测试 <ArrowIcon className="h-3 w-3" />
           </Link>
         </div>
       )}
 
       {collected === total && (
         <div className="mt-3 text-center">
-          <p className="text-xs text-rose-400 mb-1">🎉 恭喜！集齐全部 {total} 种CP关系类型！</p>
+          <p className="text-xs text-rose-400 mb-1">已集齐全部 {total} 种 CP 关系类型</p>
           <Link
             href="/cpti/gallery/"
-            className="text-xs text-text-muted hover:text-rose-400 transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-text-muted hover:text-rose-400 transition-colors"
           >
-            查看完整图鉴 →
+            查看完整图鉴 <ArrowIcon className="h-3 w-3" />
           </Link>
         </div>
       )}
@@ -480,7 +507,7 @@ function ComparisonView({ myCard, theirCard }: { myCard: WtfCardData; theirCard:
         animate={{ opacity: 1, y: 0 }}
         className="mt-8 rounded-2xl border-2 border-accent/30 bg-gradient-to-b from-accent-dim to-transparent p-6 text-center"
       >
-        <div className="text-3xl mb-3">⚡</div>
+        <CodeMark code="VS" label="对比挑战" color="var(--color-accent)" className="mx-auto mb-3 h-12 w-12" />
         <p className="text-sm text-text-muted mb-1">
           {theirCard.nickname || '对方'} 已点亮 {theirLit} 个宇宙
         </p>
@@ -493,19 +520,19 @@ function ComparisonView({ myCard, theirCard }: { myCard: WtfCardData; theirCard:
         <div className="flex flex-col sm:flex-row gap-2 justify-center">
           <Link
             href="/test/"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-white font-medium text-sm transition-all hover:brightness-110"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-bg-primary font-medium text-sm transition hover:brightness-110"
             style={{
-              background: 'linear-gradient(135deg, #ff4d6d, #e06088)',
-              boxShadow: '0 4px 16px rgba(255,77,109,0.25)',
+              background: 'linear-gradient(135deg, var(--color-rose), var(--color-rose-deep))',
+              boxShadow: '0 4px 16px color-mix(in oklab, var(--color-rose-deep) 25%, transparent)',
             }}
           >
-            开始经典测试 →
+            开始经典测试 <ArrowIcon />
           </Link>
           <Link
             href="/wtfti/test/"
             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-border text-text-secondary text-sm font-medium hover:text-text-primary hover:bg-bg-secondary transition-colors"
           >
-            🤯 毒舌版测试
+            毒舌版测试 <ArrowIcon />
           </Link>
         </div>
       </motion.div>
@@ -588,7 +615,7 @@ function NicknameEditor({
       />
       <button
         onClick={save}
-        className="text-xs px-2 py-1 rounded-lg bg-accent text-white hover:bg-accent/90 transition-colors"
+        className="text-xs px-2 py-1 rounded-lg bg-accent text-bg-primary hover:bg-accent/90 transition-colors"
       >
         确定
       </button>
@@ -635,7 +662,7 @@ function ShareButton({ card, onShareImage }: { card: WtfCardData; onShareImage: 
       <div className="flex flex-col sm:flex-row items-center gap-3 justify-center">
         <button
           onClick={onShareImage}
-          className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors cursor-pointer"
+          className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-accent text-bg-primary text-sm font-medium hover:bg-accent/90 transition-colors cursor-pointer"
         >
           生成分享卡片
         </button>
@@ -648,9 +675,9 @@ function ShareButton({ card, onShareImage }: { card: WtfCardData; onShareImage: 
       </div>
       <button
         onClick={copyChallenge}
-        className="w-full py-3 rounded-xl border border-accent/20 bg-accent-dim text-sm text-accent hover:bg-accent/10 transition-all cursor-pointer"
+        className="w-full py-3 rounded-xl border border-accent/20 bg-accent-dim text-sm text-accent hover:bg-accent/10 transition cursor-pointer"
       >
-        {challengeCopied ? '已复制对比挑战文案 ✓' : '📩 复制对比挑战文案，发给好友'}
+        {challengeCopied ? '已复制对比挑战文案' : '复制对比挑战文案，发给好友'}
       </button>
     </div>
   );
@@ -667,14 +694,16 @@ function AppraisalSection() {
   const [hasIdentifyHistory, setHasIdentifyHistory] = useState(false);
 
   useEffect(() => {
-    // Load SoulTI layered result
-    try {
-      const raw = localStorage.getItem('soulti-layered');
-      if (raw) setSoultiData(JSON.parse(raw) as SoultiLayeredResult);
-    } catch { /* ignore */ }
+    if (typeof window === 'undefined') return;
+    const t = window.setTimeout(() => {
+      try {
+        const raw = localStorage.getItem('soulti-layered');
+        if (raw) setSoultiData(JSON.parse(raw) as SoultiLayeredResult);
+      } catch { /* ignore */ }
 
-    // Load mysti collection count
-    setCollectionCount(getCollectionCount());
+      setCollectionCount(getCollectionCount());
+    }, 0);
+    return () => window.clearTimeout(t);
   }, []);
 
   const hasSoulti = !!soultiData;
@@ -684,28 +713,28 @@ function AppraisalSection() {
   if (showEmptyState) {
     return (
       <div className="rounded-2xl border border-dashed border-border bg-bg-secondary/30 p-8 text-center">
-        <div className="text-3xl mb-3 opacity-40">🔮</div>
+        <CodeMark code="ID" label="鉴定" color="var(--color-accent)" className="mx-auto mb-3 h-12 w-12 opacity-70" />
         <p className="text-sm text-text-muted mb-4">
           还没有任何鉴定结果
         </p>
         <div className="flex flex-col items-center gap-2">
           <Link
             href="/identify/"
-            className="text-sm text-accent hover:text-accent/80 transition-colors"
+            className="inline-flex items-center gap-1 text-sm text-accent hover:text-accent/80 transition-colors"
           >
-            去鉴定一个朋友 →
+            去鉴定一个朋友 <ArrowIcon />
           </Link>
           <Link
             href="/soulti/"
-            className="text-xs text-text-muted hover:text-accent transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-text-muted hover:text-accent transition-colors"
           >
-            做灵魂三镜测试 →
+            做灵魂三镜测试 <ArrowIcon className="h-3 w-3" />
           </Link>
           <Link
             href="/mysti/"
-            className="text-xs text-text-muted hover:text-accent transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-text-muted hover:text-accent transition-colors"
           >
-            去灵鉴抽卡 →
+            去灵鉴抽卡 <ArrowIcon className="h-3 w-3" />
           </Link>
         </div>
       </div>
@@ -731,20 +760,21 @@ function AppraisalSection() {
         >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-text-primary flex items-center gap-1.5">
-              🪞 灵魂三镜
+              <CodeMark code="SO" label="灵魂三镜" color="var(--color-accent)" className="h-7 w-7 text-[9px]" />
+              灵魂三镜
             </h3>
             <Link
               href={`/soulti/result/${soultiData!.overall.slug}/`}
-              className="text-xs text-accent hover:text-accent/80 transition-colors"
+              className="inline-flex items-center gap-1 text-xs text-accent hover:text-accent/80 transition-colors"
             >
-              查看完整报告 →
+              查看完整报告 <ArrowIcon className="h-3 w-3" />
             </Link>
           </div>
           <div className="grid grid-cols-3 gap-3">
             {([
-              { key: 'daySelf', label: '☀️ 白天', data: soultiData!.daySelf },
-              { key: 'nightSelf', label: '🌙 深夜', data: soultiData!.nightSelf },
-              { key: 'dreamTendency', label: '💭 梦里', data: soultiData!.dreamTendency },
+              { key: 'daySelf', label: '白天', data: soultiData!.daySelf },
+              { key: 'nightSelf', label: '深夜', data: soultiData!.nightSelf },
+              { key: 'dreamTendency', label: '梦里', data: soultiData!.dreamTendency },
             ] as const).map(({ key, label, data }) => (
               <div
                 key={key}
@@ -775,19 +805,20 @@ function AppraisalSection() {
         >
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-text-primary flex items-center gap-1.5">
-              ✦ 灵鉴图鉴
+              <CodeMark code="MY" label="灵鉴图鉴" color="var(--color-accent)" className="h-7 w-7 text-[9px]" />
+              灵鉴图鉴
             </h3>
             <Link
               href="/mysti/collection/"
-              className="text-xs text-accent hover:text-accent/80 transition-colors"
+              className="inline-flex items-center gap-1 text-xs text-accent hover:text-accent/80 transition-colors"
             >
-              查看全部 →
+              查看全部 <ArrowIcon className="h-3 w-3" />
             </Link>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex-1 h-2 rounded-full bg-bg-secondary overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-violet-400 to-fuchsia-400 transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-violet-400 to-fuchsia-400 transition-[width] duration-500"
                 style={{ width: `${Math.min(100, (collectionCount / 70) * 100)}%` }}
               />
             </div>
@@ -799,7 +830,7 @@ function AppraisalSection() {
             href="/mysti/"
             className="mt-3 inline-flex items-center gap-1 text-xs text-text-muted hover:text-accent transition-colors"
           >
-            继续抽卡 →
+            继续抽卡 <ArrowIcon className="h-3 w-3" />
           </Link>
         </motion.div>
       )}
@@ -828,7 +859,9 @@ export function CardContent() {
   }, []);
 
   useEffect(() => {
-    hydrateLocalCard();
+    if (typeof window === 'undefined') return;
+    const t = window.setTimeout(() => hydrateLocalCard(), 0);
+    return () => window.clearTimeout(t);
   }, [hydrateLocalCard]);
 
   useEffect(() => {
@@ -857,12 +890,16 @@ export function CardContent() {
   // Sync auth nickname to WTF Card when logged in and card nickname is empty
   useEffect(() => {
     if (!isAuthenticated || !displayName || displayName === '旅行者') return;
-    setCard(prev => {
-      if (!prev || prev.nickname?.trim()) return prev;
-      const updated = { ...prev, nickname: displayName };
-      saveCard(updated);
-      return updated;
-    });
+    if (typeof window === 'undefined') return;
+    const t = window.setTimeout(() => {
+      setCard(prev => {
+        if (!prev || prev.nickname?.trim()) return prev;
+        const updated = { ...prev, nickname: displayName };
+        saveCard(updated);
+        return updated;
+      });
+    }, 0);
+    return () => window.clearTimeout(t);
   }, [isAuthenticated, displayName]);
 
   const shareRef = useRef<WtfCardShareImageGeneratorHandle>(null);
@@ -942,8 +979,25 @@ export function CardContent() {
 
   if (!card) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-5 h-5 rounded-full border-2 border-accent border-t-transparent animate-spin" />
+      <div className="mx-auto min-h-[100dvh] max-w-lg px-4 py-10 sm:py-16">
+        <div className="mb-8 text-center">
+          <div className="site-skeleton mx-auto mb-3 h-4 w-24 rounded-full" />
+          <div className="site-skeleton mx-auto mb-3 h-8 w-56 rounded-full" />
+          <div className="site-skeleton mx-auto h-4 w-40 rounded-full" />
+        </div>
+        <div className="rounded-[1.75rem] border border-border-subtle bg-bg-elevated/70 p-5 shadow-[0_20px_60px_rgba(31,26,22,0.08)]">
+          <div className="mb-6 flex items-center justify-center">
+            <div className="site-skeleton h-24 w-24 rounded-full" />
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="rounded-2xl border border-border-subtle bg-bg-secondary/40 p-3">
+                <div className="site-skeleton mx-auto mb-2 h-10 w-10 rounded-full" />
+                <div className="site-skeleton mx-auto h-3 w-12 rounded-full" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -980,7 +1034,8 @@ export function CardContent() {
       >
         {theirCard && (
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/20 bg-accent-dim text-xs text-accent mb-4">
-            ⚡ {theirCard.nickname || '好友'}发来了对比挑战
+            <CodeMark code="VS" label="对比挑战" color="var(--color-accent)" className="h-5 w-5 text-[8px]" />
+            {theirCard.nickname || '好友'}发来了对比挑战
           </div>
         )}
         <p className="section-label mb-2 flex items-center justify-center gap-2">
@@ -1028,9 +1083,9 @@ export function CardContent() {
         {/* Weekly soul frequency entry */}
         <Link
           href="/weekly/"
-          className="mt-4 mx-auto flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-border-subtle bg-bg-secondary text-xs text-text-secondary hover:border-accent/40 hover:text-accent transition-all w-fit"
+          className="mt-4 mx-auto flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-border-subtle bg-bg-secondary text-xs text-text-secondary hover:border-accent/40 hover:text-accent transition w-fit"
         >
-          ✦ 查看本周灵魂频率
+          查看本周灵魂频率 <ArrowIcon className="h-3 w-3" />
         </Link>
       </motion.div>
 
@@ -1043,7 +1098,7 @@ export function CardContent() {
           className="mb-8"
         >
           <p className="text-[10px] font-mono tracking-widest text-text-muted mb-3 text-center uppercase">
-            ★ 我的展柜精选
+            我的展柜精选
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {pinnedIds.map((uid) => {
@@ -1055,10 +1110,10 @@ export function CardContent() {
                 <Link
                   key={uid}
                   href={`${u.resultPrefix}/result/${r!.slug}/`}
-                  className="group relative flex flex-col items-center w-20 p-2.5 rounded-2xl border border-accent/30 bg-gradient-to-b from-accent-dim to-transparent text-center transition-all hover:shadow-md hover:border-accent/50"
+                  className="group relative flex flex-col items-center w-20 p-2.5 rounded-2xl border border-accent/30 bg-gradient-to-b from-accent-dim to-transparent text-center transition hover:shadow-md hover:border-accent/50"
                 >
-                  <span className="absolute -top-1 -right-1 text-[8px] bg-accent text-white w-3.5 h-3.5 rounded-full flex items-center justify-center">★</span>
-                  <span className="text-2xl mb-1">{p.emoji}</span>
+                  <span className="absolute -top-1 -right-1 rounded-full bg-accent px-1.5 py-0.5 text-[8px] font-mono tracking-[0.12em] text-bg-primary">PIN</span>
+                  <CodeMark code={r!.slug} label={p.name} color={u.accent} className="mb-1 h-9 w-9 text-[9px]" />
                   <span className="text-[10px] font-mono text-text-muted">{u.shortName}</span>
                   <span className="text-[11px] font-medium text-text-primary mt-0.5 leading-tight">{p.name}</span>
                 </Link>
@@ -1066,7 +1121,7 @@ export function CardContent() {
             })}
           </div>
           <p className="text-[10px] text-text-muted text-center mt-2">
-            长按卡片左上角 ☆ 可添加/移除展柜（最多 5 个）
+            长按卡片左上角按钮可添加/移除展柜（最多 5 个）
           </p>
         </motion.div>
       )}
@@ -1074,19 +1129,20 @@ export function CardContent() {
       {/* Tab bar */}
       <div className="flex items-center justify-center gap-1 mb-6 p-1 rounded-full bg-bg-secondary/60 border border-border-subtle">
         {([
-          { key: 'universe' as const, label: '🌌 宇宙', count: litCount },
-          { key: 'relationship' as const, label: '💕 关系', count: mergedRelationships.length },
-          { key: 'appraisal' as const, label: '🔮 鉴定', count: null },
-        ]).map(({ key, label, count }) => (
+          { key: 'universe' as const, label: '宇宙', code: 'UNI', count: litCount },
+          { key: 'relationship' as const, label: '关系', code: 'CP', count: mergedRelationships.length },
+          { key: 'appraisal' as const, label: '鉴定', code: 'ID', count: null },
+        ]).map(({ key, label, code, count }) => (
           <button
             key={key}
             onClick={() => setCardTab(key)}
-            className={`flex-1 px-3 py-2 rounded-full text-xs font-medium transition-all ${
+            className={`flex-1 px-3 py-2 rounded-full text-xs font-medium transition ${
               cardTab === key
                 ? 'bg-bg-elevated text-text-primary shadow-sm'
                 : 'text-text-muted hover:text-text-secondary'
             }`}
           >
+            <span className="mr-1 font-mono text-[10px] opacity-70">{code}</span>
             {label}
             {count !== null && (
               <span className="ml-1 font-mono opacity-60">{count}</span>
@@ -1149,9 +1205,9 @@ export function CardContent() {
           <p className="text-sm text-text-muted mb-3">还有 {totalCount - litCount} 个宇宙等你探索</p>
           <Link
             href="/test/"
-            className="inline-block px-5 py-2 rounded-full bg-bg-secondary text-text-secondary text-sm font-medium hover:bg-bg-tertiary transition-colors"
+            className="inline-flex items-center gap-1 px-5 py-2 rounded-full bg-bg-secondary text-text-secondary text-sm font-medium hover:bg-bg-tertiary transition-colors"
           >
-            继续测试 →
+            继续测试 <ArrowIcon className="h-3 w-3" />
           </Link>
         </motion.div>
       )}
@@ -1197,18 +1253,18 @@ function CollectorProSection({ card }: { card: WtfCardData }) {
           <div className="grid gap-4 py-4 text-center">
             <p
               className="text-[10px] tracking-[0.32em] uppercase"
-              style={{ color: '#8a6d3b', fontFamily: 'var(--font-mono)' }}
+              style={{ color: 'var(--color-gold)', fontFamily: 'var(--font-mono)' }}
             >
               COLLECTOR · ¥3.9 · ONE-TIME
             </p>
             <p
               className="text-base italic px-4"
-              style={{ fontFamily: 'var(--font-display)', color: '#1F1A16' }}
+              style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text-primary)' }}
             >
               把这张卡，做成可以挂起来的纪念品。
             </p>
             <CollectorBookletMockup editionNo={editionNo} />
-            <p className="text-[11px]" style={{ color: '#5B524B' }}>
+            <p className="text-[11px]" style={{ color: 'var(--color-text-secondary)' }}>
               ▲ 实际 PDF 内页样张 · 单击解锁后可下载
             </p>
           </div>
@@ -1236,7 +1292,7 @@ function CollectorProSection({ card }: { card: WtfCardData }) {
           className="mt-2 rounded-lg border border-dashed px-4 py-3 text-[11px] leading-relaxed"
           style={{
             borderColor: 'rgba(168,138,90,0.45)',
-            color: '#7a6a55',
+            color: 'var(--color-text-secondary)',
             fontFamily: 'var(--font-mono)',
           }}
         >
@@ -1282,28 +1338,28 @@ function CollectorDownloadPanel({
       className="rounded-xl border px-4 py-4"
       style={{
         borderColor: 'rgba(168,138,90,0.35)',
-        background: 'rgba(255,253,249,0.78)',
+        background: 'var(--color-bg-elevated)',
       }}
     >
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <div
             className="text-[10px] tracking-[0.32em] uppercase mb-1"
-            style={{ color: '#8a6d3b', fontFamily: 'var(--font-mono)' }}
+            style={{ color: 'var(--color-gold)', fontFamily: 'var(--font-mono)' }}
           >
             DOWNLOAD · 已解锁资产
           </div>
-          <p className="text-sm italic" style={{ color: '#1F1A16', fontFamily: 'var(--font-display)' }}>
+          <p className="text-sm italic" style={{ color: 'var(--color-text-primary)', fontFamily: 'var(--font-display)' }}>
             你的收藏版已可导出。
           </p>
-          <p className="text-[11px] mt-1" style={{ color: '#5B524B' }}>
+          <p className="text-[11px] mt-1" style={{ color: 'var(--color-text-secondary)' }}>
             当前已点亮 {litCount} 个宇宙，导出文件会自动写入你的编号与多宇宙人格档案。
           </p>
         </div>
         <span
           className="text-[10px] px-2.5 py-1 rounded-full"
           style={{
-            color: '#8a6d3b',
+            color: 'var(--color-gold)',
             border: '1px solid rgba(168,138,90,0.35)',
             fontFamily: 'var(--font-mono)',
             letterSpacing: '0.2em',
@@ -1330,20 +1386,20 @@ function CollectorDownloadPanel({
               className="text-left rounded-xl border px-4 py-3 transition-colors"
               style={{
                 borderColor: 'rgba(168,138,90,0.35)',
-                background: active ? 'rgba(201,166,118,0.12)' : 'rgba(255,255,255,0.6)',
+                background: active ? 'var(--color-accent-dim)' : 'var(--color-bg-elevated)',
                 cursor: pending === null ? 'pointer' : 'wait',
               }}
             >
               <div
                 className="text-[10px] tracking-[0.24em] uppercase"
-                style={{ color: '#8a6d3b', fontFamily: 'var(--font-mono)' }}
+                style={{ color: 'var(--color-gold)', fontFamily: 'var(--font-mono)' }}
               >
                 {active ? 'EXPORTING…' : 'COLLECTOR'}
               </div>
-              <p className="text-sm mt-1" style={{ color: '#1F1A16' }}>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-text-primary)' }}>
                 {active ? '正在生成，请稍候…' : item.title}
               </p>
-              <p className="text-[11px] mt-1" style={{ color: '#5B524B' }}>
+              <p className="text-[11px] mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                 {item.desc}
               </p>
             </button>
@@ -1351,11 +1407,11 @@ function CollectorDownloadPanel({
         })}
       </div>
 
-      <p className="text-[10px] mt-3" style={{ color: '#7a6a55', fontFamily: 'var(--font-mono)' }}>
+      <p className="text-[10px] mt-3" style={{ color: 'var(--color-text-secondary)', fontFamily: 'var(--font-mono)' }}>
         导出过程在本地完成，不会额外上传你的卡面数据。
       </p>
       {error && (
-        <p className="text-[11px] mt-2" style={{ color: '#9f4b5b' }}>
+        <p className="text-[11px] mt-2" style={{ color: 'var(--color-ember)' }}>
           {error}
         </p>
       )}
@@ -1377,35 +1433,35 @@ function CollectorBookletMockup({ editionNo }: { editionNo: string }) {
       >
         <defs>
           <linearGradient id="cb-paper" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#FFFCF4" />
-            <stop offset="1" stopColor="#F5EFE0" />
+            <stop offset="0" stopColor="var(--color-bg-primary)" />
+            <stop offset="1" stopColor="var(--color-bg-secondary)" />
           </linearGradient>
           <linearGradient id="cb-foil" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stopColor="#C9A676" />
-            <stop offset="0.5" stopColor="#F0D08A" />
-            <stop offset="1" stopColor="#9C7B47" />
+            <stop offset="0" stopColor="var(--color-gold)" />
+            <stop offset="0.5" stopColor="var(--color-gold-soft)" />
+            <stop offset="1" stopColor="var(--color-gold)" />
           </linearGradient>
         </defs>
         {/* Two pages spread */}
-        <rect x="6" y="8" width="108" height="134" rx="3" fill="url(#cb-paper)" stroke="#d8caa6" strokeWidth="0.6" />
-        <rect x="126" y="8" width="108" height="134" rx="3" fill="url(#cb-paper)" stroke="#d8caa6" strokeWidth="0.6" />
+        <rect x="6" y="8" width="108" height="134" rx="3" fill="url(#cb-paper)" stroke="var(--color-border)" strokeWidth="0.6" />
+        <rect x="126" y="8" width="108" height="134" rx="3" fill="url(#cb-paper)" stroke="var(--color-border)" strokeWidth="0.6" />
         {/* Left page — sigil placeholder */}
         <circle cx="60" cy="58" r="22" fill="none" stroke="url(#cb-foil)" strokeWidth="0.8" />
-        <circle cx="60" cy="58" r="14" fill="none" stroke="#C07A8E" strokeWidth="0.5" opacity="0.7" />
-        <circle cx="60" cy="58" r="4" fill="#C07A8E" opacity="0.6" />
-        <line x1="20" y1="98" x2="100" y2="98" stroke="#C9A676" strokeWidth="0.4" />
-        <text x="60" y="112" textAnchor="middle" fontSize="5" fill="#5B524B" fontFamily="serif" fontStyle="italic">SIGIL · I</text>
-        <text x="60" y="124" textAnchor="middle" fontSize="3.5" fill="#8a6d3b" letterSpacing="1" fontFamily="monospace">EDITION №{editionNo}</text>
+        <circle cx="60" cy="58" r="14" fill="none" stroke="var(--color-rose)" strokeWidth="0.5" opacity="0.7" />
+        <circle cx="60" cy="58" r="4" fill="var(--color-rose)" opacity="0.6" />
+        <line x1="20" y1="98" x2="100" y2="98" stroke="var(--color-gold)" strokeWidth="0.4" />
+        <text x="60" y="112" textAnchor="middle" fontSize="5" fill="var(--color-text-secondary)" fontFamily="serif" fontStyle="italic">SIGIL · I</text>
+        <text x="60" y="124" textAnchor="middle" fontSize="3.5" fill="var(--color-gold)" letterSpacing="1" fontFamily="monospace">EDITION №{editionNo}</text>
         {/* Right page — text spread */}
-        <line x1="140" y1="20" x2="220" y2="20" stroke="#C9A676" strokeWidth="0.4" />
-        <text x="180" y="32" textAnchor="middle" fontSize="4" fill="#8a6d3b" letterSpacing="1.2" fontFamily="monospace">CHAPTER · II</text>
+        <line x1="140" y1="20" x2="220" y2="20" stroke="var(--color-gold)" strokeWidth="0.4" />
+        <text x="180" y="32" textAnchor="middle" fontSize="4" fill="var(--color-gold)" letterSpacing="1.2" fontFamily="monospace">CHAPTER · II</text>
         {Array.from({ length: 9 }).map((_, i) => (
-          <rect key={i} x="142" y={42 + i * 8} width={i === 8 ? 50 : 76} height="2.2" rx="1" fill="#1F1A16" opacity="0.55" />
+          <rect key={i} x="142" y={42 + i * 8} width={i === 8 ? 50 : 76} height="2.2" rx="1" fill="var(--color-text-primary)" opacity="0.55" />
         ))}
-        <line x1="140" y1="124" x2="220" y2="124" stroke="#C9A676" strokeWidth="0.4" />
-        <text x="180" y="134" textAnchor="middle" fontSize="3.5" fill="#8a6d3b" letterSpacing="1" fontFamily="monospace">A4 · 300 DPI · CMYK</text>
+        <line x1="140" y1="124" x2="220" y2="124" stroke="var(--color-gold)" strokeWidth="0.4" />
+        <text x="180" y="134" textAnchor="middle" fontSize="3.5" fill="var(--color-gold)" letterSpacing="1" fontFamily="monospace">A4 · 300 DPI · CMYK</text>
         {/* Spine shadow */}
-        <rect x="114" y="8" width="12" height="134" fill="#1F1A16" opacity="0.06" />
+        <rect x="114" y="8" width="12" height="134" fill="var(--color-text-primary)" opacity="0.06" />
       </svg>
     </div>
   );
@@ -1425,22 +1481,22 @@ function CollectorPerk({
       className="rounded-xl border px-4 py-3"
       style={{
         borderColor: 'rgba(168,138,90,0.35)',
-        background: 'rgba(255,253,249,0.7)',
+        background: 'var(--color-bg-elevated)',
       }}
     >
       <div
         className="text-[10px] tracking-[0.32em] uppercase mb-1"
-        style={{ color: '#8a6d3b', fontFamily: 'var(--font-mono)' }}
+        style={{ color: 'var(--color-gold)', fontFamily: 'var(--font-mono)' }}
       >
         {eyebrow}
       </div>
       <p
         className="italic text-base"
-        style={{ fontFamily: 'var(--font-display)', color: '#1F1A16', margin: 0 }}
+        style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text-primary)', margin: 0 }}
       >
         {title}
       </p>
-      <p className="mt-1 text-xs leading-relaxed" style={{ color: '#5B524B', margin: 0 }}>
+      <p className="mt-1 text-xs leading-relaxed" style={{ color: 'var(--color-text-secondary)', margin: 0 }}>
         {desc}
       </p>
     </div>

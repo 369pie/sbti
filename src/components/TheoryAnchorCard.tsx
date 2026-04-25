@@ -47,7 +47,7 @@ export function TheoryAnchorCard({
       <div className="flex items-center gap-2 flex-wrap">
         <span
           className={`text-[10px] tracking-[0.2em] uppercase ${
-            isDark ? 'text-white/55' : 'text-text-muted'
+            isDark ? 'text-bg-primary/55' : 'text-text-muted'
           }`}
         >
           WTFTI · 此宇宙激活
@@ -61,7 +61,7 @@ export function TheoryAnchorCard({
       {!compact && cfg.axisNote && (
         <p
           className={`mt-2 text-[12px] leading-relaxed ${
-            isDark ? 'text-white/70' : 'text-text-secondary'
+            isDark ? 'text-bg-primary/70' : 'text-text-secondary'
           }`}
         >
           {cfg.axisNote}
@@ -71,7 +71,7 @@ export function TheoryAnchorCard({
         <Link
           href="/theory/"
           className={`mt-2 inline-block text-[11px] underline-offset-2 hover:underline ${
-            isDark ? 'text-white/55' : 'text-text-muted'
+            isDark ? 'text-bg-primary/55' : 'text-text-muted'
           }`}
         >
           了解 WTFTI 4 轴理论 →

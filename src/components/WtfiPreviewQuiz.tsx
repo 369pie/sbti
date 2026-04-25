@@ -142,7 +142,7 @@ function Intro({ onStart }: { onStart: () => void }) {
 
       <button
         onClick={onStart}
-        className="w-full py-4 rounded-full text-white text-sm tracking-[0.18em] uppercase transition-transform hover:scale-[1.01]"
+        className="w-full py-4 rounded-full text-bg-primary text-sm tracking-[0.18em] uppercase transition-transform hover:scale-[1.01]"
         style={{ background: 'var(--color-accent, #C07A8E)' }}
       >
         开始 · 30 题 · 约 5 分钟
@@ -371,7 +371,7 @@ function Result({
       <div className="space-y-3 pt-4">
         <button
           onClick={onReset}
-          className="w-full py-3 rounded-full text-white text-sm tracking-[0.18em] uppercase"
+          className="w-full py-3 rounded-full text-bg-primary text-sm tracking-[0.18em] uppercase"
           style={{ background: 'var(--color-accent, #C07A8E)' }}
         >
           重新测一次

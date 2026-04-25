@@ -490,7 +490,7 @@ export function CptiRelationshipResult() {
           <p className="text-text-muted text-sm mb-6">请先完成CPTI配对测试。</p>
           <Link
             href="/cpti/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-rose-500 text-white font-medium hover:bg-rose-600 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-rose-600 transition-all"
           >
             开始测试
           </Link>
@@ -508,7 +508,7 @@ export function CptiRelationshipResult() {
   // ── Ceremony overlay ──
   if (ceremonyPhase && ceremonyPhase !== 'done') {
     const dimNames = ['主导力', '表达力', '冲突力', '付出力', '融合度'];
-    const dimColors = ['#e06088', '#8b5cf6', '#f59e0b', '#22c55e', '#3b82f6'];
+    const dimColors = ['var(--color-accent)', 'var(--color-accent)', '#f59e0b', 'var(--color-sage)', '#3b82f6'];
 
     return (
       <div
@@ -585,7 +585,7 @@ export function CptiRelationshipResult() {
                     >
                       <motion.div
                         className="w-3 h-3 rounded-full"
-                        style={{ background: isLit ? dimColors[i] : '#D1D5DB' }}
+                        style={{ background: isLit ? dimColors[i] : 'var(--color-border)' }}
                         animate={isLit ? {
                           scale: [1, 1.4, 1],
                           boxShadow: [`0 0 0 ${dimColors[i]}00`, `0 0 12px ${dimColors[i]}60`, `0 0 4px ${dimColors[i]}30`],
@@ -684,7 +684,7 @@ export function CptiRelationshipResult() {
                       key={i}
                       className="absolute w-1 h-1 rounded-full"
                       style={{
-                        background: i % 3 === 0 ? '#FFD700' : i % 3 === 1 ? '#FFA500' : '#FFEC8B',
+                        background: i % 3 === 0 ? 'var(--color-gold)' : i % 3 === 1 ? '#FFA500' : '#FFEC8B',
                         left: `${20 + Math.random() * 60}%`,
                         top: `${30 + Math.random() * 40}%`,
                       }}
@@ -743,7 +743,7 @@ export function CptiRelationshipResult() {
           {/* Share button */}
           <button
             onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
-            className="absolute top-14 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-rose-400 transition-all cursor-pointer"
+            className="absolute top-14 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-accent transition-all cursor-pointer"
             title="生成分享图片"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1211,7 +1211,7 @@ export function CptiRelationshipResult() {
                             setSeasonSkin(skin.id);
                             trackCptiEvent('cpti_seasonal_skin_applied', { skin: skin.id, relationship: relationship.slug });
                           }}
-                          className={`rounded-lg px-3 py-1.5 text-[11px] ${selected ? 'bg-amber-300 text-[#2c2620]' : 'border border-amber-400/40 text-amber-200 hover:bg-amber-400/10'}`}
+                          className={`rounded-lg px-3 py-1.5 text-[11px] ${selected ? 'bg-amber-300 text-text-primary' : 'border border-amber-400/40 text-amber-200 hover:bg-amber-400/10'}`}
                         >
                           {selected ? '使用中' : '使用这套'}
                         </button>
@@ -1244,7 +1244,7 @@ export function CptiRelationshipResult() {
 
             <button
               onClick={copyShareText}
-              className="w-full py-3 rounded-xl border border-rose-500/20 bg-rose-500/5 text-sm text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer"
+              className="w-full py-3 rounded-xl border border-accent/20 bg-accent/5 text-sm text-accent hover:bg-accent/10 transition-all cursor-pointer"
             >
               {textCopied ? '已复制分享文案 ✓' : '📋 复制分享文案'}
             </button>

@@ -26,8 +26,8 @@ export function UniverseSwitcher({ slug, currentUniverseId, theme }: UniverseSwi
   const defaultTheme = {
     cardSurface: 'rgba(30, 30, 40, 0.6)',
     divider: 'rgba(255, 255, 255, 0.1)',
-    accent: '#8b5cf6',
-    text: '#ffffff',
+    accent: 'var(--color-accent)',
+    text: 'var(--color-bg-primary)',
     textMuted: 'rgba(255, 255, 255, 0.5)',
   };
 
@@ -137,7 +137,7 @@ function PreviewCard({
       {limitedStatus && (
         <div
           className="mt-2 text-[9px] font-mono tracking-wider"
-          style={{ color: limitedStatus.isOpen ? '#f59e0b' : theme.textMuted }}
+          style={{ color: limitedStatus.isOpen ? 'var(--color-gold)' : theme.textMuted }}
         >
           {limitedStatus.label}
           {limitedStatus.isOpen && limitedStatus.countdownMs != null && (

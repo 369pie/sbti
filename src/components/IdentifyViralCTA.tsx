@@ -24,12 +24,12 @@ export function IdentifyViralCTA({ personalityName, variant = 'default' }: Props
       >
         <div className={`rounded-2xl border p-5 sm:p-6 flex items-center gap-4 ${
           isXpti
-            ? 'border-[#A3526E]/20 bg-gradient-to-r from-[#A3526E]/12 to-[#6A2A3E]/12'
+            ? 'border-accent/20 bg-gradient-to-r from-accent/12 to-rose-deep/12'
             : 'border-pink-500/15 bg-gradient-to-r from-pink-500/5 to-rose-500/5'
         }`}>
           <div className="text-3xl flex-shrink-0">🔍</div>
           <div className="flex-1 min-w-0">
-            <h3 className={`text-sm font-semibold mb-0.5 ${isXpti ? 'text-[#F3E8EB]' : 'text-text-primary'}`}>
+            <h3 className={`text-sm font-semibold mb-0.5 ${isXpti ? 'text-bg-primary' : 'text-text-primary'}`}>
               你是{personalityName}，你朋友呢？
             </h3>
             <p className="text-xs text-text-muted">
@@ -38,8 +38,8 @@ export function IdentifyViralCTA({ personalityName, variant = 'default' }: Props
           </div>
           <Link
             href="/identify/"
-            className={`flex-shrink-0 px-4 py-2 rounded-full text-white text-xs font-medium transition-colors ${
-              isXpti ? 'bg-[#C2485E] hover:bg-[#A53E58]' : 'bg-pink-500 hover:bg-pink-600'
+            className={`flex-shrink-0 px-4 py-2 rounded-full text-bg-primary text-xs font-medium transition-colors ${
+              isXpti ? 'bg-accent hover:bg-rose-deep' : 'bg-pink-500 hover:bg-pink-600'
             }`}
           >
             帮 ta 鉴定

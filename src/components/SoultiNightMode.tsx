@@ -33,8 +33,20 @@ function readMode(): Mode {
   return 'auto';
 }
 
+function isGlobalDark(): boolean {
+  if (typeof document === 'undefined') return false;
+  const theme = document.body.dataset.theme;
+  return theme === 'wtfti-dark' || theme === 'galaxy';
+}
+
 function applyAttribute(active: boolean) {
   if (typeof document === 'undefined') return;
+  // When global dark theme is already active, SoulTI night mode should not
+  // inject its own overrides to avoid triple-layer color conflicts.
+  if (isGlobalDark()) {
+    document.documentElement.removeAttribute('data-soulti-night');
+    return;
+  }
   if (active) {
     document.documentElement.setAttribute('data-soulti-night', '1');
   } else {
@@ -73,6 +85,9 @@ export function SoultiNightMode() {
     if (mode === 'on') return true;
     if (mode === 'off') return false;
     if (!now) return false; // auto mode needs 'now'
+    // Respect global dark theme: when site-wide dark is already on,
+    // SoulTI night mode should stay dormant to avoid color stacking.
+    if (isGlobalDark()) return false;
     return isNightHour(now.getHours());
   }, [mode, now]);
 

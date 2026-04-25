@@ -48,7 +48,7 @@ export function WhisperInput({
             margin: 0,
             textAlign: 'center',
             fontSize: 15,
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
             fontFamily: 'Noto Serif SC, serif',
             lineHeight: 1.55,
           }}
@@ -61,7 +61,7 @@ export function WhisperInput({
               margin: '6px 0 0',
               textAlign: 'center',
               fontSize: 11.5,
-              color: 'rgba(245,240,232,.5)',
+              color: 'color-mix(in oklab, var(--color-bg-primary) 50%, transparent)',
               fontStyle: 'italic',
               fontFamily: 'Cormorant Garamond, serif',
             }}
@@ -98,7 +98,7 @@ export function WhisperInput({
             outline: 'none',
             resize: 'none',
             background: 'transparent',
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
             fontFamily: 'Cormorant Garamond, Noto Serif SC, serif',
             fontStyle: 'italic',
             fontSize: 18,
@@ -106,7 +106,7 @@ export function WhisperInput({
             textAlign: 'center',
             letterSpacing: 0.5,
             padding: '8px 4px',
-            borderBottom: `1px solid ${value.length > 0 ? '#C9A676' : 'rgba(245,240,232,.18)'}`,
+            borderBottom: `1px solid ${value.length > 0 ? 'var(--color-gold)' : 'rgba(245,240,232,.18)'}`,
             transition: 'border-color .35s',
           }}
         />
@@ -123,7 +123,7 @@ export function WhisperInput({
           }}
         >
           <span>✦ Whisper</span>
-          <span style={{ color: remaining < 5 ? '#C07A8E' : 'rgba(245,240,232,.5)' }}>
+          <span style={{ color: remaining < 5 ? 'var(--color-accent)' : 'color-mix(in oklab, var(--color-bg-primary) 50%, transparent)' }}>
             {value.length} / {maxLength}
           </span>
         </div>

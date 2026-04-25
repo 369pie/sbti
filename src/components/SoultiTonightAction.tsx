@@ -36,7 +36,7 @@ export function SoultiTonightAction({ personality, tearLevel }: Props) {
       <div
         data-soulti-surface="cream"
         className="rounded-2xl border p-6 sm:p-7"
-        style={{ borderColor: `${accent}22`, background: '#FDFCFA' }}
+        style={{ borderColor: `${accent}22`, background: 'var(--color-bg-secondary)' }}
       >
         <div className="flex items-center justify-between mb-4">
           <p
@@ -59,19 +59,19 @@ export function SoultiTonightAction({ personality, tearLevel }: Props) {
         </div>
         <p
           className="text-base leading-[1.9] mb-3"
-          style={{ fontFamily: serifFont, color: '#2D2A26' }}
+          style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
         >
           {action.instruction}
         </p>
         <p
           className="text-[12px] leading-[1.9]"
-          style={{ fontFamily: serifFont, color: '#7A6A5A', fontStyle: 'italic' }}
+          style={{ fontFamily: serifFont, color: 'var(--color-text-secondary)', fontStyle: 'italic' }}
         >
           {action.reason}
         </p>
         <p
           className="mt-5 text-[10px] tracking-[0.2em]"
-          style={{ fontFamily: serifFont, color: '#a89f93' }}
+          style={{ fontFamily: serifFont, color: 'var(--color-text-muted)' }}
         >
           · 不是治疗，只是一件你今晚可以做的小事 ·
         </p>

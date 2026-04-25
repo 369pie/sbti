@@ -147,7 +147,7 @@ export default function MonthlyRecapPage({ allTabs, ym }: MonthlyRecapPageProps)
             <button
               type="button"
               onClick={onCopy}
-              className="text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl text-white"
+              className="text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl text-bg-primary"
               style={{ background: recap.topColor }}
             >
               复制合辑文案 → 发圈
@@ -173,7 +173,7 @@ export default function MonthlyRecapPage({ allTabs, ym }: MonthlyRecapPageProps)
           <p className="text-text-muted text-sm mb-4">这个月还没有收藏的卡。</p>
           <Link
             href="/types/today/"
-            className="inline-block text-sm font-semibold px-5 py-2.5 rounded-xl border border-accent text-accent hover:bg-accent hover:text-white transition-colors"
+            className="inline-block text-sm font-semibold px-5 py-2.5 rounded-xl border border-accent text-accent hover:bg-accent hover:text-bg-primary transition-colors"
           >
             翻今天的第一张 →
           </Link>

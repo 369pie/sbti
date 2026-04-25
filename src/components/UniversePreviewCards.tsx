@@ -79,7 +79,7 @@ export function UniversePreviewCards({ currentUniverse, max = 3, variant = 'defa
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.5 }}
       >
-        <h2 className={`text-sm font-mono tracking-wider uppercase text-center mb-4 ${isXpti ? 'text-[#A38A90]' : 'text-text-muted'}`}>
+        <h2 className="text-sm font-mono tracking-wider uppercase text-center mb-4 text-text-muted">
           解锁更多宇宙
         </h2>
         <div className="grid gap-3">

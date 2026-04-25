@@ -45,7 +45,7 @@ export function RitualLabClient() {
               textAlign: 'center',
               fontFamily: 'Cormorant Garamond, serif',
               fontStyle: 'italic',
-              color: '#C9A676',
+              color: 'var(--color-gold)',
               fontSize: 18,
             }}
           >
@@ -67,7 +67,7 @@ export function RitualLabClient() {
               label: '被注视的中心',
               blurb: '让所有人朝向你',
               glyph: '✿',
-              accent: '#C07A8E',
+              accent: 'var(--color-accent)',
             }}
             right={{
               key: 'R',
@@ -184,8 +184,8 @@ export function RitualLabClient() {
             prompt="哪段声音最像你心里那个频率？"
             hint="点击唱片 → 唱针落下 → 选定。"
             options={[
-              { key: 'A', label: '古典室内乐', blurb: '巴赫无伴奏大提琴', centerGlyph: '♪', accent: '#C9A676' },
-              { key: 'B', label: '清晨民谣', blurb: 'Joni Mitchell', centerGlyph: '♫', accent: '#C07A8E' },
+              { key: 'A', label: '古典室内乐', blurb: '巴赫无伴奏大提琴', centerGlyph: '♪', accent: 'var(--color-gold)' },
+              { key: 'B', label: '清晨民谣', blurb: 'Joni Mitchell', centerGlyph: '♫', accent: 'var(--color-accent)' },
               { key: 'C', label: '深夜电子', blurb: 'Bonobo', centerGlyph: '⌬', accent: '#9C7CFF' },
               { key: 'D', label: '环境氛围', blurb: 'Brian Eno', centerGlyph: '◯', accent: '#7AA3B0' },
             ]}
@@ -202,7 +202,7 @@ export function RitualLabClient() {
             prompt="哪个颜色是你今天的心率？"
             hint="点一下 → 它会滴入水中 → 染上整个空间。"
             options={[
-              { key: 'A', label: '玫瑰陶土', hex: '#C07A8E', blurb: '暖中带血色' },
+              { key: 'A', label: '玫瑰陶土', hex: 'var(--color-accent)', blurb: '暖中带血色' },
               { key: 'B', label: '暮紫', hex: '#5C4A8A', blurb: '深而镇定' },
               { key: 'C', label: '苔绿', hex: '#5A7A5C', blurb: '隐忍生长' },
               { key: 'D', label: '灰蓝', hex: '#7AA3B0', blurb: '海与雾之间' },
@@ -238,7 +238,7 @@ export function RitualLabClient() {
               padding: 28,
               textAlign: 'center',
               fontStyle: 'italic',
-              color: '#C9A676',
+              color: 'var(--color-gold)',
               fontFamily: 'Cormorant Garamond, serif',
               fontSize: 16,
             }}
@@ -282,7 +282,7 @@ export function RitualLabClient() {
             lineHeight: 1.7,
           }}
         >
-          <strong style={{ color: '#C9A676' }}>✦ Picks debug</strong>
+          <strong style={{ color: 'var(--color-gold)' }}>✦ Picks debug</strong>
           <br />
           {JSON.stringify({ picks, sliderValue, whisperText, gateOpen, sigilDone }, null, 2)}
         </p>
@@ -317,7 +317,7 @@ function FormatSection({
           style={{
             fontSize: 10,
             letterSpacing: 4,
-            color: '#C9A676',
+            color: 'var(--color-gold)',
             fontFamily: 'monospace',
             fontWeight: 700,
           }}
@@ -331,7 +331,7 @@ function FormatSection({
             fontFamily: 'Cormorant Garamond, Noto Serif SC, serif',
             fontStyle: 'italic',
             fontWeight: 500,
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
           }}
         >
           {name}
@@ -340,7 +340,7 @@ function FormatSection({
           style={{
             marginLeft: 'auto',
             fontSize: 11,
-            color: 'rgba(245,240,232,.5)',
+            color: 'color-mix(in oklab, var(--color-bg-primary) 50%, transparent)',
           }}
         >
           {tone}

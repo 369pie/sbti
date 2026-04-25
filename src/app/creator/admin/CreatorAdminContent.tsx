@@ -123,7 +123,7 @@ export default function CreatorAdminContent() {
             <div className="mt-6 flex justify-center">
               <Link
                 href={loginHref}
-                className="px-5 py-3 rounded-xl bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"
+                className="px-5 py-3 rounded-xl bg-accent text-bg-primary text-sm font-medium hover:bg-accent/90 transition-colors"
               >
                 登录管理员账号
               </Link>
@@ -243,7 +243,7 @@ export default function CreatorAdminContent() {
                   type="button"
                   disabled={busyId === u.id}
                   onClick={() => void act(u, 'approve')}
-                  className="px-4 py-2 text-sm rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 disabled:opacity-40"
+                  className="px-4 py-2 text-sm rounded-xl bg-emerald-500 text-bg-primary hover:bg-emerald-600 disabled:opacity-40"
                 >
                   通过 · 上线
                 </button>

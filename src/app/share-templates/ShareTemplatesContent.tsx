@@ -276,7 +276,7 @@ export default function ShareTemplatesContent() {
         {ctx.totalLit === 0 && (
           <Link
             href="/test/"
-            className="inline-flex items-center gap-2 mt-4 px-6 py-2 rounded-full bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"
+            className="inline-flex items-center gap-2 mt-4 px-6 py-2 rounded-full bg-accent text-bg-primary text-sm font-medium hover:bg-accent/90 transition-colors"
           >
             先去测一个 →
           </Link>
@@ -291,7 +291,7 @@ export default function ShareTemplatesContent() {
             onClick={() => setFilter(p)}
             className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
               filter === p
-                ? 'bg-accent text-white'
+                ? 'bg-accent text-bg-primary'
                 : 'bg-bg-secondary text-text-muted hover:text-text-secondary'
             }`}
           >

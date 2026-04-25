@@ -59,9 +59,8 @@ export default async function WeHeardYouPage() {
     <main
       style={{
         minHeight: '100vh',
-        background:
-          'radial-gradient(ellipse at top, rgba(168,90,110,0.10) 0%, rgba(245,240,232,0) 55%), #FAF6EE',
-        color: '#15102A',
+        background: 'var(--color-bg-primary)',
+        color: 'var(--color-text-primary)',
         padding: '64px 18px 120px',
         fontFamily: 'var(--font-display, "Noto Serif SC", serif)',
       }}
@@ -72,7 +71,7 @@ export default async function WeHeardYouPage() {
             style={{
               fontSize: 12,
               letterSpacing: '0.42em',
-              color: '#A85A6E',
+              color: 'var(--color-accent)',
               marginBottom: 12,
               fontWeight: 500,
             }}
@@ -88,14 +87,14 @@ export default async function WeHeardYouPage() {
               margin: '16px auto 0',
               fontSize: 14,
               lineHeight: 1.9,
-              opacity: 0.7,
+              color: 'var(--color-text-secondary)',
             }}
           >
-            带 <span style={{ color: '#A85A6E' }}>#想要</span> /{' '}
-            <span style={{ color: '#A85A6E' }}>#体验吐槽</span> 的留言进入这里。
+            带 <span style={{ color: 'var(--color-accent)' }}>#想要</span> /{' '}
+            <span style={{ color: 'var(--color-accent)' }}>#体验吐槽</span> 的留言进入这里。
             每一条都标注了 <em>已收到 / 排期中 / 已上线</em>。
             没收到的——是我们还没读到，
-            <Link href={withBasePath('/her-voice/')} style={{ color: '#A85A6E' }}>
+            <Link href={withBasePath('/her-voice/')} style={{ color: 'var(--color-accent)' }}>
               {' '}去她说墙留言
             </Link>。
           </p>
@@ -111,7 +110,7 @@ export default async function WeHeardYouPage() {
                   fontSize: 13,
                   letterSpacing: '0.42em',
                   margin: '0 0 14px',
-                  color: s === 'shipped' ? '#7A8A82' : s === 'planned' ? '#C9A676' : '#A85A6E',
+                  color: s === 'shipped' ? 'var(--color-sage)' : s === 'planned' ? 'var(--color-gold)' : 'var(--color-accent)',
                   fontWeight: 500,
                 }}
               >
@@ -124,8 +123,8 @@ export default async function WeHeardYouPage() {
                     style={{
                       padding: 16,
                       borderRadius: 14,
-                      background: 'rgba(255,255,255,0.7)',
-                      border: '1px solid rgba(201,166,118,0.25)',
+                      background: 'var(--color-bg-elevated)',
+                      border: '1px solid var(--color-border-subtle)',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 8,
@@ -139,15 +138,15 @@ export default async function WeHeardYouPage() {
                           style={{
                             padding: '2px 8px',
                             borderRadius: 999,
-                            border: '1px solid rgba(201,166,118,0.4)',
-                            color: '#A85A6E',
+                            border: '1px solid var(--color-border-subtle)',
+                            color: 'var(--color-accent)',
                             letterSpacing: '0.18em',
                           }}
                         >
                           # {HERMOSA_TAG_LABELS[t as HermosaTag] ?? t}
                         </span>
                       ))}
-                      <span style={{ marginLeft: 'auto', opacity: 0.55 }}>
+                      <span style={{ marginLeft: 'auto', color: 'var(--color-text-muted)' }}>
                         — {r.signature || 'Anonymous'} ·{' '}
                         {HERMOSA_UNIVERSE_LABELS[r.universe as keyof typeof HERMOSA_UNIVERSE_LABELS] ??
                           r.universe}
@@ -158,9 +157,9 @@ export default async function WeHeardYouPage() {
                         style={{
                           padding: '8px 12px',
                           borderRadius: 8,
-                          background: 'rgba(21,16,42,0.06)',
+                          background: 'var(--color-bg-secondary)',
                           fontSize: 12,
-                          opacity: 0.85,
+                          color: 'var(--color-text-secondary)',
                         }}
                       >
                         ↪ {r.status_note}
@@ -178,16 +177,15 @@ export default async function WeHeardYouPage() {
             style={{
               textAlign: 'center',
               padding: '80px 20px',
-              opacity: 0.6,
-              background: 'rgba(255,255,255,0.5)',
               borderRadius: 16,
-              border: '1px dashed rgba(201,166,118,0.4)',
+              background: 'var(--color-bg-elevated)',
+              border: '1px dashed var(--color-border-subtle)',
             }}
           >
-            <div style={{ fontSize: 14, marginBottom: 10 }}>看板还没有公开记录。</div>
-            <div style={{ fontSize: 12, opacity: 0.75 }}>
+            <div style={{ fontSize: 14, color: 'var(--color-text-secondary)', marginBottom: 10 }}>看板还没有公开记录。</div>
+            <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
               你的话会先出现在
-              <Link href={withBasePath('/her-voice/')} style={{ color: '#A85A6E' }}>
+              <Link href={withBasePath('/her-voice/')} style={{ color: 'var(--color-accent)' }}>
                 {' '}「她说」墙{' '}
               </Link>
               ，被我们读到后会移到这里 ✦

@@ -5,6 +5,8 @@
  *
  * 瀑布流式（CSS columns）展示，按 universe + tag 筛选。
  * 单条 → 黑板字报缩略图 + 引用 + 共鸣 +1。
+ *
+ * Refactored: 全量使用 CSS 变量，适配亮/暗主题。
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -162,9 +164,8 @@ export function HerVoiceContent() {
     <main
       style={{
         minHeight: '100vh',
-        background:
-          'radial-gradient(ellipse at top, rgba(192,122,142,0.10) 0%, rgba(245,240,232,0) 50%), #FAF6EE',
-        color: '#15102A',
+        background: 'var(--color-bg-primary)',
+        color: 'var(--color-text-primary)',
         padding: '64px 18px 120px',
         fontFamily: 'var(--font-display, "Noto Serif SC", serif)',
       }}
@@ -175,7 +176,7 @@ export function HerVoiceContent() {
             style={{
               fontSize: 12,
               letterSpacing: '0.42em',
-              color: '#C9A676',
+              color: 'var(--color-rose)',
               marginBottom: 14,
               fontWeight: 500,
             }}
@@ -199,15 +200,15 @@ export function HerVoiceContent() {
               margin: '18px auto 0',
               fontSize: 14,
               lineHeight: 1.85,
-              opacity: 0.7,
+              color: 'var(--color-text-secondary)',
             }}
           >
             一个只让女性安静说话的声音广场。
             写下你的态度、观点、宣言，被同频的人听见。
             带{' '}
-            <span style={{ color: '#C9A676' }}>#想要</span> /{' '}
-            <span style={{ color: '#C9A676' }}>#体验吐槽</span> 的留言会进入公开的{' '}
-            <Link href={withBasePath('/her-voice/we-heard-you/')} style={{ color: '#A85A6E' }}>
+            <span style={{ color: 'var(--color-rose)' }}>#想要</span> /{' '}
+            <span style={{ color: 'var(--color-rose)' }}>#体验吐槽</span> 的留言会进入公开的{' '}
+            <Link href={withBasePath('/her-voice/we-heard-you/')} style={{ color: 'var(--color-accent)' }}>
               「她说我们听见了」看板 →
             </Link>
           </p>
@@ -223,9 +224,9 @@ export function HerVoiceContent() {
               style={{
                 width: 60,
                 height: 1,
-                background: '#C9A676',
+                background: 'var(--color-rose)',
                 alignSelf: 'center',
-                opacity: 0.6,
+                opacity: 0.4,
               }}
             />
             <span
@@ -233,7 +234,7 @@ export function HerVoiceContent() {
                 fontSize: 12,
                 letterSpacing: '0.32em',
                 fontStyle: 'italic',
-                opacity: 0.55,
+                color: 'var(--color-text-muted)',
               }}
             >
               MMXXVI
@@ -242,9 +243,9 @@ export function HerVoiceContent() {
               style={{
                 width: 60,
                 height: 1,
-                background: '#C9A676',
+                background: 'var(--color-rose)',
                 alignSelf: 'center',
-                opacity: 0.6,
+                opacity: 0.4,
               }}
             />
           </div>
@@ -258,8 +259,8 @@ export function HerVoiceContent() {
             gap: 12,
             marginBottom: 32,
             padding: 18,
-            background: 'rgba(255,255,255,0.7)',
-            border: '1px solid rgba(201,166,118,0.25)',
+            background: 'var(--color-bg-elevated)',
+            border: '1px solid var(--color-border-subtle)',
             borderRadius: 14,
           }}
         >
@@ -290,16 +291,16 @@ export function HerVoiceContent() {
           style={{
             marginBottom: 36,
             padding: 24,
-            background: '#15102A',
+            background: 'var(--color-bg-elevated)',
             borderRadius: 16,
-            border: '1px solid rgba(201,166,118,0.25)',
+            border: '1px solid var(--color-border-subtle)',
           }}
         >
           <div
             style={{
               fontSize: 11,
               letterSpacing: '0.42em',
-              color: '#C9A676',
+              color: 'var(--color-rose)',
               marginBottom: 14,
               textAlign: 'center',
               fontWeight: 500,
@@ -317,9 +318,9 @@ export function HerVoiceContent() {
               width: '100%',
               padding: '14px 16px',
               borderRadius: 12,
-              border: '1px solid rgba(201,166,118,0.30)',
-              background: 'rgba(245,240,232,0.06)',
-              color: '#F5F0E8',
+              border: '1px solid var(--color-border-subtle)',
+              background: 'var(--color-bg-secondary)',
+              color: 'var(--color-text-primary)',
               fontSize: 15,
               lineHeight: 1.7,
               fontFamily: 'inherit',
@@ -347,9 +348,9 @@ export function HerVoiceContent() {
                   style={{
                     padding: '5px 12px',
                     borderRadius: 999,
-                    border: '1px solid ' + (active ? '#C9A676' : 'rgba(201,166,118,0.30)'),
-                    background: active ? '#C9A676' : 'transparent',
-                    color: active ? '#15102A' : '#C9A676',
+                    border: '1px solid ' + (active ? 'var(--color-rose)' : 'var(--color-border-subtle)'),
+                    background: active ? 'var(--color-rose)' : 'transparent',
+                    color: active ? 'var(--color-bg-primary)' : 'var(--color-text-secondary)',
                     fontSize: 12,
                     letterSpacing: '0.18em',
                     cursor: 'pointer',
@@ -380,9 +381,9 @@ export function HerVoiceContent() {
                 flex: '1 1 160px',
                 padding: '10px 14px',
                 borderRadius: 8,
-                border: '1px solid rgba(201,166,118,0.30)',
-                background: 'rgba(245,240,232,0.06)',
-                color: '#F5F0E8',
+                border: '1px solid var(--color-border-subtle)',
+                background: 'var(--color-bg-secondary)',
+                color: 'var(--color-text-primary)',
                 fontSize: 13,
                 outline: 'none',
               }}
@@ -390,7 +391,7 @@ export function HerVoiceContent() {
             <span
               style={{
                 fontSize: 12,
-                color: 'rgba(245,240,232,0.4)',
+                color: 'var(--color-text-muted)',
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
@@ -406,12 +407,12 @@ export function HerVoiceContent() {
                 border: 'none',
                 background:
                   writeText.trim() && writeText.length <= 180 && !writeSubmitting
-                    ? '#C9A676'
-                    : 'rgba(201,166,118,0.20)',
+                    ? 'var(--color-rose)'
+                    : 'var(--color-bg-secondary)',
                 color:
                   writeText.trim() && writeText.length <= 180 && !writeSubmitting
-                    ? '#15102A'
-                    : 'rgba(245,240,232,0.4)',
+                    ? 'var(--color-bg-primary)'
+                    : 'var(--color-text-muted)',
                 fontSize: 13,
                 letterSpacing: '0.24em',
                 fontWeight: 600,
@@ -426,13 +427,13 @@ export function HerVoiceContent() {
             </button>
           </div>
           {writeError ? (
-            <div style={{ fontSize: 12, color: '#ff8b9b', marginTop: 10 }}>{writeError}</div>
+            <div style={{ fontSize: 12, color: 'var(--color-accent)', marginTop: 10 }}>{writeError}</div>
           ) : null}
           {writeSuccess ? (
             <div
               style={{
                 fontSize: 12,
-                color: '#C9A676',
+                color: 'var(--color-rose)',
                 marginTop: 10,
                 letterSpacing: '0.24em',
                 textAlign: 'center',
@@ -450,7 +451,7 @@ export function HerVoiceContent() {
               style={{
                 fontSize: 11,
                 letterSpacing: '0.42em',
-                color: '#A85A6E',
+                color: 'var(--color-accent)',
                 marginBottom: 14,
                 textAlign: 'center',
               }}
@@ -473,7 +474,7 @@ export function HerVoiceContent() {
 
         {/* Wall — CSS columns 瀑布流 */}
         {loading && rows.length === 0 ? (
-          <div style={{ textAlign: 'center', opacity: 0.5, padding: 40 }}>正在打开她们的笔记本…</div>
+          <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: 40 }}>正在打开她们的笔记本…</div>
         ) : rows.length === 0 ? (
           <EmptyState />
         ) : (
@@ -506,7 +507,7 @@ export function HerVoiceContent() {
 function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-      <span style={{ fontSize: 11, letterSpacing: '0.32em', opacity: 0.55, minWidth: 48 }}>
+      <span style={{ fontSize: 11, letterSpacing: '0.32em', color: 'var(--color-text-muted)', minWidth: 48 }}>
         {label}
       </span>
       {children}
@@ -530,9 +531,9 @@ function Pill({
       style={{
         padding: '5px 12px',
         borderRadius: 999,
-        border: '1px solid ' + (active ? '#C9A676' : 'rgba(201,166,118,0.30)'),
-        background: active ? '#C9A676' : 'transparent',
-        color: active ? '#15102A' : '#15102A',
+        border: '1px solid ' + (active ? 'var(--color-rose)' : 'var(--color-border-subtle)'),
+        background: active ? 'var(--color-rose)' : 'transparent',
+        color: active ? 'var(--color-bg-primary)' : 'var(--color-text-secondary)',
         fontSize: 12,
         letterSpacing: '0.18em',
         cursor: 'pointer',
@@ -560,9 +561,9 @@ function WallCard({
         marginBottom: 16,
         padding: 18,
         borderRadius: 14,
-        background: '#15102A',
-        color: '#F5F0E8',
-        boxShadow: '0 10px 30px rgba(21,16,42,0.10)',
+        background: 'var(--color-bg-elevated)',
+        border: '1px solid var(--color-border-subtle)',
+        boxShadow: '0 10px 30px color-mix(in oklab, var(--color-text-primary) 6%, transparent)',
         display: 'flex',
         flexDirection: 'column',
         gap: 12,
@@ -576,9 +577,9 @@ function WallCard({
           fontFamily: 'var(--font-display, "Noto Serif SC", serif)',
         }}
       >
-        <span style={{ color: '#C9A676', marginRight: 4 }}>「</span>
+        <span style={{ color: 'var(--color-rose)', marginRight: 4 }}>「</span>
         {m.text}
-        <span style={{ color: '#C9A676', marginLeft: 4 }}>」</span>
+        <span style={{ color: 'var(--color-rose)', marginLeft: 4 }}>」</span>
       </div>
       <div
         style={{
@@ -595,8 +596,8 @@ function WallCard({
               letterSpacing: '0.18em',
               padding: '2px 8px',
               borderRadius: 999,
-              border: '1px solid rgba(201,166,118,0.45)',
-              color: '#C9A676',
+              border: '1px solid var(--color-border-subtle)',
+              color: 'var(--color-text-secondary)',
             }}
           >
             # {HERMOSA_TAG_LABELS[t as HermosaTag] ?? t}
@@ -608,7 +609,7 @@ function WallCard({
           display: 'flex',
           alignItems: 'center',
           fontSize: 11,
-          opacity: 0.55,
+          color: 'var(--color-text-muted)',
         }}
       >
         <span style={{ fontStyle: 'italic' }}>
@@ -623,9 +624,9 @@ function WallCard({
             marginLeft: 'auto',
             padding: '3px 10px',
             borderRadius: 999,
-            border: '1px solid #C9A676',
-            background: echoed ? '#C9A676' : 'transparent',
-            color: echoed ? '#15102A' : '#C9A676',
+            border: '1px solid var(--color-rose)',
+            background: echoed ? 'var(--color-rose)' : 'transparent',
+            color: echoed ? 'var(--color-bg-primary)' : 'var(--color-rose)',
             fontSize: 11,
             letterSpacing: '0.18em',
             cursor: echoed ? 'default' : 'pointer',
@@ -660,11 +661,10 @@ function FeaturedCard({
   return (
     <article
       style={{
-        background: '#15102A',
-        color: '#F5F0E8',
+        background: 'var(--color-bg-elevated)',
         borderRadius: 16,
         overflow: 'hidden',
-        border: '1px solid rgba(201,166,118,0.4)',
+        border: '1px solid var(--color-border-subtle)',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -672,7 +672,7 @@ function FeaturedCard({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={cardUrl} alt={m.text.slice(0, 30)} style={{ width: '100%', display: 'block' }} />
       <div style={{ padding: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ fontSize: 11, opacity: 0.6, fontStyle: 'italic' }}>
+        <span style={{ fontSize: 11, color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
           — {m.signature || 'Anonymous'}
         </span>
         <button
@@ -683,9 +683,9 @@ function FeaturedCard({
             marginLeft: 'auto',
             padding: '4px 12px',
             borderRadius: 999,
-            border: '1px solid #C9A676',
-            background: echoed ? '#C9A676' : 'transparent',
-            color: echoed ? '#15102A' : '#C9A676',
+            border: '1px solid var(--color-rose)',
+            background: echoed ? 'var(--color-rose)' : 'transparent',
+            color: echoed ? 'var(--color-bg-primary)' : 'var(--color-rose)',
             fontSize: 11,
             letterSpacing: '0.18em',
             cursor: echoed ? 'default' : 'pointer',
@@ -704,16 +704,15 @@ function EmptyState() {
       style={{
         textAlign: 'center',
         padding: '80px 20px',
-        opacity: 0.6,
-        background: 'rgba(255,255,255,0.5)',
+        background: 'var(--color-bg-elevated)',
         borderRadius: 16,
-        border: '1px dashed rgba(201,166,118,0.4)',
+        border: '1px dashed var(--color-border-subtle)',
       }}
     >
-      <div style={{ fontSize: 14, marginBottom: 12 }}>这里还很安静。</div>
-      <div style={{ fontSize: 12, opacity: 0.7 }}>
+      <div style={{ fontSize: 14, color: 'var(--color-text-secondary)', marginBottom: 12 }}>这里还很安静。</div>
+      <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
         在上面写下你的第一句话，或者{' '}
-        <Link href={withBasePath('/')} style={{ color: '#A85A6E' }}>
+        <Link href={withBasePath('/')} style={{ color: 'var(--color-accent)' }}>
           做一个测试
         </Link>{' '}
         从结果页开始 ✦
@@ -725,8 +724,8 @@ function EmptyState() {
           marginTop: 22,
           padding: '10px 22px',
           borderRadius: 999,
-          background: '#C9A676',
-          color: '#15102A',
+          background: 'var(--color-rose)',
+          color: 'var(--color-bg-primary)',
           fontSize: 12,
           letterSpacing: '0.24em',
           textDecoration: 'none',

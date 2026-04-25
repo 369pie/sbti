@@ -37,12 +37,12 @@ function MoonGlyph({ phase, size = 96 }: { phase: LunarPhase; size?: number }) {
     >
       <defs>
         <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#F5F0E8" stopOpacity="0.95" />
-          <stop offset="100%" stopColor="#C9A676" stopOpacity="0.7" />
+          <stop offset="0%" stopColor="var(--galaxy-cream)" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="var(--galaxy-gold)" stopOpacity="0.7" />
         </radialGradient>
       </defs>
       {/* full moon disk dim */}
-      <circle cx={size / 2} cy={size / 2} r={r} fill="rgba(245,240,232,0.08)" stroke="rgba(245,240,232,0.18)" />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="var(--color-border-subtle)" stroke="var(--color-border)" />
       {/* illuminated part — clip with translated circle */}
       <defs>
         <clipPath id="moonClip">
@@ -63,7 +63,7 @@ function MoonGlyph({ phase, size = 96 }: { phase: LunarPhase; size?: number }) {
         cy={size / 2}
         r={r + 1}
         fill="none"
-        stroke="rgba(201,166,118,0.45)"
+        stroke="var(--galaxy-gold-faint)"
         strokeWidth={0.6}
       />
     </svg>
@@ -105,7 +105,7 @@ export function MoonClient() {
   const planet = planetSlug
     ? HOME_PLANET_CATALOG.find((p) => p.slug === planetSlug) ?? null
     : null;
-  const accent = planet?.accent ?? '#C9A676';
+  const accent = planet?.accent ?? 'var(--galaxy-gold)';
 
   function pickOption(idx: number) {
     if (!todayChapter) return;
@@ -127,11 +127,11 @@ export function MoonClient() {
   return (
     <main
       style={{
-        minHeight: '100vh',
+        minHeight: '100dvh',
         background:
-          'radial-gradient(ellipse 100% 60% at 50% 0%, #2a1c4d 0%, #1a1530 38%, #0F0A22 100%)',
-        color: '#F5F0E8',
-        fontFamily: 'Cormorant Garamond, Noto Serif SC, serif',
+          'var(--galaxy-bg-hero)',
+        color: 'var(--galaxy-cream)',
+        fontFamily: 'var(--font-display)',
         padding: '56px 20px 96px',
       }}
     >
@@ -139,11 +139,11 @@ export function MoonClient() {
         <p
           style={{
             margin: 0,
-            fontFamily: 'Inter, sans-serif',
+            fontFamily: 'var(--font-mono)',
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.42em',
-            color: '#C9A676',
+            color: 'var(--galaxy-gold)',
             textAlign: 'center',
             textTransform: 'uppercase',
           }}
@@ -167,9 +167,9 @@ export function MoonClient() {
             maxWidth: 420,
             textAlign: 'center',
             fontSize: 13,
-            color: 'rgba(245,240,232,0.7)',
+            color: 'var(--galaxy-mist)',
             lineHeight: 1.7,
-            fontFamily: 'Noto Serif SC, serif',
+            fontFamily: 'var(--font-serif)',
           }}
         >
           跟月亮走 12 期 — 每一期写一句话，
@@ -186,8 +186,8 @@ export function MoonClient() {
               padding: '20px 18px 18px',
               borderRadius: 18,
               background:
-                'radial-gradient(ellipse at top, rgba(255,255,255,0.05) 0%, transparent 70%)',
-              border: '1px solid rgba(245,240,232,0.08)',
+                'radial-gradient(ellipse at top, color-mix(in oklab, var(--color-bg-elevated) 12%, transparent) 0%, transparent 70%)',
+              border: '1px solid var(--color-border-subtle)',
               display: 'grid',
               gridTemplateColumns: '96px 1fr',
               gap: 18,
@@ -199,11 +199,11 @@ export function MoonClient() {
               <p
                 style={{
                   margin: 0,
-                  fontFamily: 'Inter, sans-serif',
+                  fontFamily: 'var(--font-mono)',
                   fontSize: 9,
                   fontWeight: 700,
                   letterSpacing: '0.32em',
-                  color: '#C9A676',
+                  color: 'var(--galaxy-gold)',
                   textTransform: 'uppercase',
                 }}
               >
@@ -214,8 +214,8 @@ export function MoonClient() {
                   margin: '6px 0 4px',
                   fontSize: 18,
                   fontWeight: 600,
-                  color: '#F5F0E8',
-                  fontFamily: 'Noto Serif SC, serif',
+                  color: 'var(--galaxy-cream)',
+                  fontFamily: 'var(--font-serif)',
                 }}
               >
                 {phase.cnName}
@@ -224,9 +224,9 @@ export function MoonClient() {
                 style={{
                   margin: 0,
                   fontSize: 11,
-                  color: 'rgba(245,240,232,0.65)',
+                  color: 'var(--galaxy-mist)',
                   lineHeight: 1.55,
-                  fontFamily: 'Noto Serif SC, serif',
+                  fontFamily: 'var(--font-serif)',
                 }}
               >
                 月龄第 {phase.ageDay} 天 · 亮度{' '}
@@ -251,7 +251,7 @@ export function MoonClient() {
             <p
               style={{
                 margin: 0,
-                fontFamily: 'Inter, sans-serif',
+                fontFamily: 'var(--font-mono)',
                 fontSize: 9,
                 fontWeight: 700,
                 letterSpacing: '0.32em',
@@ -266,8 +266,8 @@ export function MoonClient() {
                 margin: '8px 0 10px',
                 fontSize: 19,
                 fontWeight: 600,
-                color: '#F5F0E8',
-                fontFamily: 'Noto Serif SC, serif',
+                color: 'var(--galaxy-cream)',
+                fontFamily: 'var(--font-serif)',
               }}
             >
               {todayChapter.title}
@@ -276,9 +276,9 @@ export function MoonClient() {
               style={{
                 margin: '0 0 4px',
                 fontSize: 14,
-                color: '#F5F0E8',
+                color: 'var(--galaxy-cream)',
                 lineHeight: 1.6,
-                fontFamily: 'Noto Serif SC, serif',
+                fontFamily: 'var(--font-serif)',
               }}
             >
               {todayChapter.prompt}
@@ -287,7 +287,7 @@ export function MoonClient() {
               style={{
                 margin: '0 0 12px',
                 fontSize: 11.5,
-                color: 'rgba(245,240,232,0.55)',
+                color: 'var(--galaxy-mist-faint)',
                 lineHeight: 1.5,
                 fontStyle: 'italic',
               }}
@@ -308,12 +308,12 @@ export function MoonClient() {
                       borderRadius: 10,
                       border: picked
                         ? `1px solid ${accent}`
-                        : '1px solid rgba(245,240,232,0.14)',
+                        : '1px solid var(--color-border-subtle)',
                       background: picked ? `${accent}22` : 'transparent',
-                      color: '#F5F0E8',
+                      color: 'var(--galaxy-cream)',
                       cursor: 'pointer',
                       fontSize: 13,
-                      fontFamily: 'Noto Serif SC, serif',
+                      fontFamily: 'var(--font-serif)',
                     }}
                   >
                     {String.fromCharCode(65 + idx)} · {opt}
@@ -325,9 +325,9 @@ export function MoonClient() {
               style={{
                 margin: '12px 0 0',
                 fontSize: 11.5,
-                color: 'rgba(245,240,232,0.6)',
+                color: 'var(--galaxy-mist-faint)',
                 fontStyle: 'italic',
-                fontFamily: 'Noto Serif SC, serif',
+                fontFamily: 'var(--font-serif)',
               }}
             >
               {todayChapter.poeticLine}
@@ -356,18 +356,18 @@ export function MoonClient() {
             margin: '0 auto 22px',
             padding: '14px 14px 12px',
             borderRadius: 14,
-            border: '1px solid rgba(245,240,232,0.08)',
-            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid var(--color-border-subtle)',
+            background: 'color-mix(in oklab, var(--color-bg-elevated) 10%, transparent)',
           }}
         >
           <p
             style={{
               margin: '0 0 10px',
-              fontFamily: 'Inter, sans-serif',
+              fontFamily: 'var(--font-mono)',
               fontSize: 9,
               fontWeight: 700,
               letterSpacing: '0.32em',
-              color: '#C9A676',
+              color: 'var(--galaxy-gold)',
               textTransform: 'uppercase',
             }}
           >
@@ -389,11 +389,11 @@ export function MoonClient() {
                   style={{
                     aspectRatio: '1',
                     borderRadius: 8,
-                    background: done ? `${accent}33` : 'rgba(245,240,232,0.04)',
-                    border: done ? `1px solid ${accent}` : '1px solid rgba(245,240,232,0.1)',
+                    background: done ? `${accent}33` : 'var(--color-accent-dim)',
+                    border: done ? `1px solid ${accent}` : '1px solid var(--color-border-subtle)',
                     display: 'grid',
                     placeItems: 'center',
-                    color: done ? accent : 'rgba(245,240,232,0.4)',
+                    color: done ? accent : 'var(--galaxy-mist-faint)',
                     fontFamily: 'Cormorant Garamond, serif',
                     fontStyle: 'italic',
                     fontSize: 14,
@@ -429,18 +429,18 @@ export function MoonClient() {
             margin: '0 auto 22px',
             padding: '16px 16px 14px',
             borderRadius: 14,
-            border: '1px solid rgba(192,122,142,0.4)',
-            background: 'rgba(192,122,142,0.08)',
+            border: '1px solid color-mix(in oklab, var(--color-rose) 40%, transparent)',
+            background: 'color-mix(in oklab, var(--color-rose) 10%, transparent)',
           }}
         >
           <p
             style={{
               margin: 0,
-              fontFamily: 'Inter, sans-serif',
+              fontFamily: 'var(--font-mono)',
               fontSize: 9,
               fontWeight: 700,
               letterSpacing: '0.32em',
-              color: '#C07A8E',
+              color: 'var(--color-rose)',
               textTransform: 'uppercase',
             }}
           >
@@ -462,8 +462,8 @@ export function MoonClient() {
                       margin: '0 0 6px',
                       fontSize: 16,
                       fontWeight: 600,
-                      color: '#F5F0E8',
-                      fontFamily: 'Noto Serif SC, serif',
+                      color: 'var(--galaxy-cream)',
+                      fontFamily: 'var(--font-serif)',
                     }}
                   >
                     「{letter.title}」
@@ -474,9 +474,9 @@ export function MoonClient() {
                         style={{
                           margin: '0 0 6px',
                           fontSize: 13,
-                          color: 'rgba(245,240,232,0.85)',
+                          color: 'var(--galaxy-mist)',
                           lineHeight: 1.7,
-                          fontFamily: 'Noto Serif SC, serif',
+                          fontFamily: 'var(--font-serif)',
                           whiteSpace: 'pre-wrap',
                         }}
                       >
@@ -486,7 +486,7 @@ export function MoonClient() {
                         style={{
                           margin: '6px 0 0',
                           fontSize: 11,
-                          color: '#C07A8E',
+                          color: 'var(--color-rose)',
                           fontWeight: 700,
                           letterSpacing: 3,
                           textTransform: 'uppercase',
@@ -500,12 +500,12 @@ export function MoonClient() {
                       style={{
                         margin: 0,
                         fontSize: 12,
-                        color: 'rgba(245,240,232,0.7)',
+                        color: 'var(--galaxy-mist)',
                         lineHeight: 1.6,
-                        fontFamily: 'Noto Serif SC, serif',
+                        fontFamily: 'var(--font-serif)',
                       }}
                     >
-                      还有 <strong style={{ color: '#C07A8E' }}>{days}</strong> 天揭封 ·{' '}
+                      还有 <strong style={{ color: 'var(--color-rose)' }}>{days}</strong> 天揭封 ·{' '}
                       {reveal.toLocaleDateString('zh-CN')}
                       <br />
                       到那天回到这里，主神会替你拆信。
@@ -520,9 +520,9 @@ export function MoonClient() {
                 style={{
                   margin: '0 0 8px',
                   fontSize: 12.5,
-                  color: 'rgba(245,240,232,0.78)',
+                  color: 'var(--galaxy-mist)',
                   lineHeight: 1.55,
-                  fontFamily: 'Noto Serif SC, serif',
+                  fontFamily: 'var(--font-serif)',
                 }}
               >
                 给 30 天后的自己写一句话 — 主神会替你封存到那一天再拆。
@@ -538,11 +538,11 @@ export function MoonClient() {
                   padding: '8px 10px',
                   marginBottom: 6,
                   borderRadius: 8,
-                  border: '1px solid rgba(192,122,142,0.4)',
-                  background: 'rgba(26,21,48,0.6)',
-                  color: '#F5F0E8',
+                  border: '1px solid color-mix(in oklab, var(--color-rose) 40%, transparent)',
+                  background: 'color-mix(in oklab, var(--galaxy-ink) 66%, transparent)',
+                  color: 'var(--galaxy-cream)',
                   fontSize: 13,
-                  fontFamily: 'Noto Serif SC, serif',
+                  fontFamily: 'var(--font-serif)',
                   boxSizing: 'border-box',
                 }}
               />
@@ -557,12 +557,12 @@ export function MoonClient() {
                   padding: '8px 10px',
                   marginBottom: 8,
                   borderRadius: 8,
-                  border: '1px solid rgba(192,122,142,0.3)',
-                  background: 'rgba(26,21,48,0.5)',
-                  color: '#F5F0E8',
+                  border: '1px solid color-mix(in oklab, var(--color-rose) 30%, transparent)',
+                  background: 'color-mix(in oklab, var(--galaxy-ink) 60%, transparent)',
+                  color: 'var(--galaxy-cream)',
                   fontSize: 12.5,
                   resize: 'vertical',
-                  fontFamily: 'Noto Serif SC, serif',
+                  fontFamily: 'var(--font-serif)',
                   boxSizing: 'border-box',
                 }}
               />
@@ -575,9 +575,9 @@ export function MoonClient() {
                   borderRadius: 999,
                   border: 'none',
                   background: letterTitle.trim()
-                    ? 'linear-gradient(135deg, #C07A8E 0%, #9C7CFF 100%)'
-                    : 'rgba(245,240,232,0.1)',
-                  color: letterTitle.trim() ? '#1a1530' : 'rgba(245,240,232,0.4)',
+                    ? 'linear-gradient(135deg, var(--color-rose) 0%, var(--galaxy-violet) 100%)'
+                    : 'var(--color-border-subtle)',
+                  color: letterTitle.trim() ? '#4D2C2F' : 'var(--galaxy-mist-faint)',
                   fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: 4,
@@ -603,7 +603,7 @@ export function MoonClient() {
             href="/wtfti/daily/"
             style={{
               fontSize: 11,
-              color: '#9C7CFF',
+              color: 'var(--galaxy-violet)',
               fontWeight: 700,
               letterSpacing: 4,
               textDecoration: 'none',
@@ -617,7 +617,7 @@ export function MoonClient() {
               href={`/wtfti/shrine/${planet.slug}/`}
               style={{
                 fontSize: 11,
-                color: '#C9A676',
+                color: 'var(--galaxy-gold)',
                 fontWeight: 700,
                 letterSpacing: 4,
                 textDecoration: 'none',

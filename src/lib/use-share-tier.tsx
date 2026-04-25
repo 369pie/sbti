@@ -281,8 +281,8 @@ export function ShareTierPicker({
           : active
           ? 'border-gold/70 bg-gold/10 shadow-[0_4px_18px_-6px_rgba(184,144,90,0.35)]'
           : 'border-border-subtle bg-bg-secondary hover:border-gold/40';
-        const textColor = isDark ? 'text-white' : 'text-text-primary';
-        const subColor = isDark ? 'text-white/55' : 'text-text-muted';
+        const textColor = isDark ? 'text-bg-primary' : 'text-text-primary';
+        const subColor = isDark ? 'text-bg-primary/55' : 'text-text-muted';
         const lockColor = unlocked
           ? isDark
             ? 'text-emerald-300'

@@ -216,7 +216,7 @@ function ReturnContent() {
       )}
       {displayStatus === 'failed' && (
         <>
-          <p style={{ color: '#FFB1B1' }}>验证失败，请稍后重试</p>
+          <p style={{ color: 'var(--color-accent-light)' }}>验证失败，请稍后重试</p>
           <button
             onClick={() => router.replace('/mysti/')}
             className="mt-4 px-5 py-2 rounded-full text-sm"
@@ -239,7 +239,7 @@ export default function PaymentReturnPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-[#0B0D17] text-[#F3EFE6]">
+        <div className="min-h-screen flex items-center justify-center bg-bg-primary text-text-primary">
           <p>加载中…</p>
         </div>
       }

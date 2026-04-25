@@ -119,7 +119,7 @@ export function BirdResultContent({ birdPersonality: p, dimensionScores }: Props
 
             {/* Code & Backronym */}
             <div className="flex flex-wrap items-baseline justify-center gap-2 mb-3">
-              <span className="text-2xl font-black font-mono tracking-widest text-[#1A2340]">
+              <span className="text-2xl font-black font-mono tracking-widest text-text-primary">
                 {p.code.split('').join('-')}
               </span>
               <span className="text-sm font-bold opacity-80" style={{ color: p.color }}>
@@ -280,7 +280,7 @@ export function BirdResultContent({ birdPersonality: p, dimensionScores }: Props
             </button>
             <button
               onClick={quickShare}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer text-white"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer text-bg-primary"
               style={{ background: p.color }}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -332,7 +332,7 @@ export function BirdResultContent({ birdPersonality: p, dimensionScores }: Props
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/bird/test/"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-white font-medium text-base hover:bg-accent/90 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base hover:bg-accent/90 transition-all"
           >
             再测一次
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

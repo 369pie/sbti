@@ -15,6 +15,12 @@ export interface UniverseResult {
   testedAt: string;   // ISO date string
 }
 
+export interface MirrorRecord {
+  mode: string;        // 'beauty' | 'fortune' | 'color' | 'compare'
+  summary: string;     // short text summary of the analysis
+  testedAt: string;    // ISO date string
+}
+
 export interface RelationshipRecord {
   slug: string;           // relationship slug (e.g. 'soul', 'plastic')
   partnerNickname: string;
@@ -31,6 +37,7 @@ export interface WtfCardData {
   results: Record<string, UniverseResult | null>; // keyed by universe id
   relationships?: RelationshipRecord[];          // CPTI relationship collection
   pinnedUniverses?: string[];                    // up to 5 pinned universe IDs for showcase
+  mirrorResults?: MirrorRecord[];                // mirror lab results history
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -287,6 +294,40 @@ export function getRelationships(): RelationshipRecord[] {
 export function getCollectedRelationshipSlugs(): string[] {
   const rels = getRelationships();
   return [...new Set(rels.map(r => r.slug))];
+}
+
+// ─── Mirror results collection ─────────────────────────────────────────────
+
+const MAX_MIRROR_RESULTS = 20;
+
+/**
+ * Record a mirror lab result onto the WTF Card.
+ * Keeps up to MAX_MIRROR_RESULTS entries, newest first.
+ */
+export function recordMirrorResult(mode: string, summary: string): void {
+  const card = getOrCreateCard();
+  const list = card.mirrorResults ?? [];
+
+  const entry: MirrorRecord = {
+    mode,
+    summary,
+    testedAt: new Date().toISOString().slice(0, 10),
+  };
+
+  list.unshift(entry);
+  if (list.length > MAX_MIRROR_RESULTS) list.length = MAX_MIRROR_RESULTS;
+
+  card.mirrorResults = list;
+  saveCard(card);
+}
+
+export function getMirrorResults(): MirrorRecord[] {
+  const card = loadCard();
+  return card?.mirrorResults ?? [];
+}
+
+export function getMirrorResultCount(): number {
+  return getMirrorResults().length;
 }
 
 // ─── Pinned showcase ────────────────────────────────────────────────────────

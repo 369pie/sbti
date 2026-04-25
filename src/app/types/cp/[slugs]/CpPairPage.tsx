@@ -102,7 +102,7 @@ export default function CpPairPage({ allTabs, slugs }: CpPairPageProps) {
         <p className="text-sm text-text-muted mb-6">回到图鉴馆，挑两张你喜欢的卡再来配一下。</p>
         <Link
           href="/types/"
-          className="inline-block text-sm font-semibold px-5 py-2.5 rounded-xl border border-accent text-accent hover:bg-accent hover:text-white transition-colors"
+          className="inline-block text-sm font-semibold px-5 py-2.5 rounded-xl border border-accent text-accent hover:bg-accent hover:text-bg-primary transition-colors"
         >
           ← 回图鉴馆
         </Link>
@@ -204,7 +204,7 @@ export default function CpPairPage({ allTabs, slugs }: CpPairPageProps) {
           type="button"
           onClick={onCopyText}
           className="text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl border transition-colors"
-          style={{ background: pair.palette.from, color: '#fff', borderColor: pair.palette.from }}
+          style={{ background: pair.palette.from, color: 'var(--color-bg-primary)', borderColor: pair.palette.from }}
         >
           {copied === 'share' ? '已复制 ✓' : '复制锐评 → 发圈'}
         </button>

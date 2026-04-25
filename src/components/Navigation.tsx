@@ -10,21 +10,25 @@ import { Logo } from '@/components/Logo';
 
 // ─── Static data (intent-based 4-category architecture) ──────────────────────
 
+/** Mirror Lab — AI style analysis, standalone category */
+const MIRROR_ITEMS = [
+  { href: '/mirror/', label: '灵镜实验室', mark: '🔮', desc: '上传照片 · AI 生成风格报告', tag: 'NEW' as const },
+];
+
 /** "测自己" — 6 大核心入口（W3 重构：纳入 Mysti / WTFCard） */
 const HOT_PICKS = [
-  { href: '/wtfti/', label: 'WTFTI 人格神域', emoji: '✦', desc: '90 秒召唤你的主神', tag: '主入口' as const },
-  { href: '/xpti/', label: 'XPTI 恋爱XP', emoji: '💜', desc: '你的亲密偏好是什么？', tag: '热门' as const },
-  { href: '/cpti/', label: 'CPTI 关系深测', emoji: '💕', desc: '你们的关系是什么型？', tag: '深度' as const },
-  { href: '/soulti/', label: 'SoulTI 灵魂镜像', emoji: '🌙', desc: '安静地看见真正的自己', tag: '深度' as const },
-  { href: '/mysti/', label: 'Mysti 灵鉴', emoji: '🔮', desc: '塔罗 × 人格牌 · ¥19/月', tag: '通行证' as const },
-  { href: '/card/', label: 'WTF Card 收藏', emoji: '🃏', desc: '多宇宙人格档案 · ¥9.9', tag: '收藏' as const },
+  { href: '/wtfti/', label: 'WTFTI 人格神域', mark: 'W', desc: '90 秒召唤你的主神', tag: '主入口' as const },
+  { href: '/xpti/', label: 'XPTI 恋爱XP', mark: 'XP', desc: '你的亲密偏好是什么？', tag: '热门' as const },
+  { href: '/cpti/', label: 'CPTI 关系深测', mark: 'CP', desc: '你们的关系是什么型？', tag: '深度' as const },
+  { href: '/soulti/', label: 'SoulTI 灵魂镜像', mark: 'S', desc: '安静地看见真正的自己', tag: '深度' as const },
+  { href: '/mysti/', label: 'Mysti 灵鉴', mark: 'M', desc: '塔罗 × 人格牌 · ¥19/月', tag: '通行证' as const },
+  { href: '/card/', label: 'WTF Card 收藏', mark: 'C', desc: '多宇宙人格档案 · ¥9.9', tag: '收藏' as const },
 ];
 
 type SelfStyleItem = {
   id: string;
   href: string;
   label: string;
-  emoji: string;
   accent: string;
   isUgc?: boolean;
 };
@@ -32,39 +36,39 @@ type SelfStyleItem = {
 /** Style universes (excluding hot-picks and relationship modules) */
 const STYLE_UNIVERSES: SelfStyleItem[] = getLiveUniverses()
   .filter(u => !['cpti', 'xpti', 'soulti', 'wtfti', 'mysti'].includes(u.id) && !u.isUgc)
-  .map(u => ({ id: u.id, href: u.landingPath, label: u.name, emoji: u.emoji, accent: u.accent }));
+  .map(u => ({ id: u.id, href: u.landingPath, label: u.name, accent: u.accent }));
 
 /** UGC universes */
 const UGC_UNIVERSES_NAV: SelfStyleItem[] = getLiveUniverses()
   .filter(u => u.isUgc)
-  .map(u => ({ id: u.id, href: u.landingPath, label: u.name, emoji: u.emoji, accent: u.accent, isUgc: true as const }));
+  .map(u => ({ id: u.id, href: u.landingPath, label: u.name, accent: u.accent, isUgc: true as const }));
 
 const SELF_STYLE_ITEMS: SelfStyleItem[] = [...STYLE_UNIVERSES, ...UGC_UNIVERSES_NAV];
 
 /** Quick/casual tests */
 const CASUAL_TESTS = [
-  { href: '/daily/', label: '今日模式', emoji: '🎲', desc: '6题秒测今天状态' },
-  { href: '/drunk/', label: '酒后人设', emoji: '🍺', desc: '喝多了你是谁？' },
-  { href: '/work/', label: '打工人设', emoji: '💼', desc: '你的职场角色' },
-  { href: '/love/', label: '恋爱人设', emoji: '💗', desc: '你的恋爱角色' },
+  { href: '/daily/', label: '今日模式', mark: 'D', desc: '6题秒测今天状态' },
+  { href: '/drunk/', label: '酒后人设', mark: 'DR', desc: '喝多了你是谁？' },
+  { href: '/work/', label: '打工人设', mark: 'W', desc: '你的职场角色' },
+  { href: '/love/', label: '恋爱人设', mark: 'L', desc: '你的恋爱角色' },
 ];
 
 /** "测关系" — social / multiplayer modules */
 const RELATIONSHIP_ITEMS = [
-  { href: '/cpti/', label: 'CPTI 关系深测', emoji: '💕', desc: '你们的关系是什么型？', tag: '热推' as const },
-  { href: '/cp/', label: 'CP 配对', emoji: '💗', desc: '快速匹配默契度' },
-  { href: '/identify/', label: '好友鉴定', emoji: '🔍', desc: '偷偷测ta是什么人' },
-  { href: '/puzzle/', label: '闺蜜拼图', emoji: '🧩', desc: '4人组合人格画' },
-  { href: '/squad/', label: '组局测试', emoji: '🎯', desc: '拉群一起测' },
-  { href: '/rank/', label: '群组排行', emoji: '🏆', desc: '看看谁最…' },
+  { href: '/cpti/', label: 'CPTI 关系深测', mark: 'CP', desc: '你们的关系是什么型？', tag: '热推' as const },
+  { href: '/cp/', label: 'CP 配对', mark: 'C', desc: '快速匹配默契度' },
+  { href: '/identify/', label: '好友鉴定', mark: 'ID', desc: '偷偷测ta是什么人' },
+  { href: '/puzzle/', label: '闺蜜拼图', mark: 'FR', desc: '4人组合人格画' },
+  { href: '/squad/', label: '组局测试', mark: 'SQ', desc: '拉群一起测' },
+  { href: '/rank/', label: '群组排行', mark: 'R', desc: '看看谁最…' },
 ];
 
 /** "发现" — explore & collect（W3 精简：Mysti / WTFCard 已上移到核心入口） */
 const DISCOVER_ITEMS = [
-  { href: '/types/', label: '人设图鉴', emoji: '📖', desc: '全部人格类型一览' },
-  { href: '/combo/', label: '人格拼盘', emoji: '🧩', desc: 'SBTI × MBTI × 星座' },
-  { href: '/share-templates/', label: '小红书文案', emoji: '📕', desc: '现成分享模板' },
-  { href: '/creator/', label: '创作者中心', emoji: '✨', desc: '做你自己的主题宇宙' },
+  { href: '/types/', label: '人设图鉴', mark: 'A', desc: '全部人格类型一览' },
+  { href: '/combo/', label: '人格拼盘', mark: 'CO', desc: 'SBTI × MBTI × 星座' },
+  { href: '/share-templates/', label: '小红书文案', mark: 'XS', desc: '现成分享模板' },
+  { href: '/creator/', label: '创作者中心', mark: 'CR', desc: '做你自己的主题宇宙' },
 ];
 
 // ─── Dropdown hook ───────────────────────────────────────────────────────────
@@ -153,7 +157,7 @@ export function Navigation() {
 
   return (
     <>
-    <header className="sticky top-0 z-50 bg-bg-elevated/90 backdrop-blur-md border-b border-border-subtle">
+    <header className="wtfti-global-nav sticky top-0 z-50 bg-bg-elevated/90 backdrop-blur-md border-b border-border-subtle">
       <nav className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4" aria-label="主导航">
 
         {/* Logo */}
@@ -166,7 +170,7 @@ export function Navigation() {
         </Link>
 
         {/* ── Desktop nav (intent-based 4 categories) ── */}
-        <div className="hidden md:flex items-center gap-1 rounded-full border border-border-subtle/90 bg-bg-secondary/75 p-1 shadow-[0_10px_28px_rgba(45,42,38,0.06)] backdrop-blur">
+        <div className="wtfti-global-nav-pill hidden md:flex items-center gap-1 rounded-full border border-border-subtle/90 bg-bg-secondary/75 p-1 shadow-[0_10px_28px_color-mix(in_oklab,var(--color-text-primary)_8%,transparent)] backdrop-blur">
 
           {/* 测自己 dropdown */}
           <div
@@ -176,6 +180,7 @@ export function Navigation() {
             onMouseLeave={selfDD.onMouseLeave}
           >
             <button
+              type="button"
               onClick={() => selfDD.setOpen(v => !v)}
               className={`nav-link inline-flex items-center gap-1.5 ${selfDD.open ? 'nav-link-active' : ''}`}
               aria-expanded={selfDD.open}
@@ -190,14 +195,14 @@ export function Navigation() {
                 onMouseEnter={selfDD.onMouseEnter}
                 onMouseLeave={selfDD.onMouseLeave}
               >
-                <div className="grid grid-cols-[1.02fr_1.28fr] gap-4">
-                  <section className="rounded-[24px] border border-[#f2dce6] bg-[linear-gradient(180deg,rgba(255,247,251,0.96),rgba(255,255,255,0.98))] p-4">
+                <div className="grid grid-cols-[1fr_0.88fr_1.1fr] gap-4">
+                  <section className="wtfti-panel rounded-[24px] p-4">
                     <div className="mb-3 flex items-start justify-between gap-3">
                       <div>
                         <p className="text-[10px] font-mono tracking-[0.22em] text-text-muted uppercase">核心宇宙</p>
                         <p className="mt-1 text-xs leading-5 text-text-muted">现阶段的四张主入口，从神域开始最容易上手。</p>
                       </div>
-                      <span className="rounded-full border border-pink-200 bg-white/90 px-2.5 py-1 text-[10px] font-semibold text-[#d84c8d] shadow-sm">
+                      <span className="rounded-full border border-border-subtle bg-bg-elevated/80 px-2.5 py-1 text-[10px] font-semibold text-text-secondary shadow-sm">
                         START HERE
                       </span>
                     </div>
@@ -211,34 +216,57 @@ export function Navigation() {
                           onClick={selfDD.close}
                           className="featured-nav-item group flex items-start gap-3 rounded-[22px] px-4 py-3.5"
                         >
-                          <span className="mt-0.5 text-[1.75rem] leading-none shrink-0">{item.emoji}</span>
+                          <NavMark mark={item.mark} />
                           <span className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
                               <span className="font-semibold text-text-primary">{item.label}</span>
-                              <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold text-white ${
-                                item.tag === '主入口'
-                                  ? 'bg-gradient-to-r from-amber-500 to-rose-500 shadow-[0_0_0_1px_rgba(255,255,255,0.6)]'
-                                  : item.tag === '深度'
-                                  ? 'bg-gradient-to-r from-stone-500 to-stone-600'
-                                  : item.tag === '通行证'
-                                  ? 'bg-gradient-to-r from-violet-500 to-purple-600'
-                                  : item.tag === '收藏'
-                                  ? 'bg-gradient-to-r from-amber-600 to-yellow-600'
-                                  : 'bg-gradient-to-r from-pink-500 to-fuchsia-500'
-                              }`}>
+                              <span className="rounded-full border border-border-subtle bg-bg-elevated/75 px-2 py-0.5 text-[10px] font-semibold text-text-secondary">
                                 {item.tag}
                               </span>
                             </div>
                             <span className="mt-1 block text-xs text-text-muted">{item.desc}</span>
                           </span>
-                          <span className="mt-1 text-text-muted transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+                          <ArrowMark className="mt-1 text-text-muted transition-transform duration-200 group-hover:translate-x-0.5" />
                         </Link>
                       ))}
                     </div>
                   </section>
 
+                  <section className="rounded-[24px] border border-border-subtle bg-bg-elevated/90 p-4">
+                    <div className="mb-3 flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-[10px] font-mono tracking-[0.22em] text-text-muted uppercase">AI 灵镜</p>
+                        <p className="mt-1 text-xs leading-5 text-text-muted">上传一张照片，AI 帮你找到最适合的发型、色彩与妆容方向。</p>
+                      </div>
+                      <span className="rounded-full bg-gradient-to-r from-pink-400 to-rose-400 px-2.5 py-1 text-[10px] font-semibold text-white shadow-sm">
+                        NEW
+                      </span>
+                    </div>
+                    {MIRROR_ITEMS.map(item => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        prefetch={false}
+                        onClick={selfDD.close}
+                        className="featured-nav-item group flex items-start gap-3 rounded-[22px] px-4 py-3.5"
+                      >
+                        <NavMark mark="ML" />
+                        <span className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-text-primary">{item.label}</span>
+                            <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white bg-gradient-to-r from-pink-400 to-rose-400">
+                              {item.tag}
+                            </span>
+                          </div>
+                          <span className="mt-1 block text-xs text-text-muted">{item.desc}</span>
+                        </span>
+                        <ArrowMark className="mt-1 text-text-muted transition-transform duration-200 group-hover:translate-x-0.5" />
+                      </Link>
+                    ))}
+                  </section>
+
                   <div className="space-y-4">
-                    <section className="rounded-[24px] border border-border-subtle bg-white/88 p-4">
+                    <section className="rounded-[24px] border border-border-subtle bg-bg-elevated/90 p-4">
                       <div className="mb-3 flex items-start justify-between gap-3">
                         <div>
                           <p className="text-[10px] font-mono tracking-[0.22em] text-text-muted uppercase">风格宇宙</p>
@@ -256,15 +284,15 @@ export function Navigation() {
                             href={item.href}
                             prefetch={false}
                             onClick={selfDD.close}
-                            className="flex min-w-0 items-start gap-3 rounded-[18px] border border-transparent bg-bg-primary/72 px-3.5 py-3 text-sm transition-all duration-200 hover:bg-bg-secondary hover:border-border-subtle"
+                            className="flex min-w-0 items-start gap-3 rounded-[18px] border border-transparent bg-bg-primary/72 px-3.5 py-3 text-sm transition-[background-color,border-color,color] duration-200 hover:bg-bg-secondary hover:border-border-subtle"
                           >
                             <span
-                              className="mt-1 h-2.5 w-2.5 rounded-full shrink-0 shadow-[0_0_0_4px_rgba(255,255,255,0.72)]"
+                              className="mt-1 h-2.5 w-2.5 rounded-full shrink-0 shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-bg-elevated)_72%,transparent)]"
                               style={{ background: item.accent }}
                             />
                             <span className="min-w-0">
                               <span className="block truncate font-medium text-text-primary">
-                                {item.emoji && <>{item.emoji} </>}{item.label}
+                                {item.label}
                               </span>
                               {item.isUgc && (
                                 <span className="mt-0.5 block text-[10px] font-medium tracking-[0.14em] text-text-muted uppercase">
@@ -277,7 +305,7 @@ export function Navigation() {
                       </div>
                     </section>
 
-                    <section className="rounded-[24px] border border-border-subtle bg-white/88 p-4">
+                    <section className="rounded-[24px] border border-border-subtle bg-bg-elevated/90 p-4">
                       <div className="mb-3">
                         <p className="text-[10px] font-mono tracking-[0.22em] text-text-muted uppercase">轻松一测</p>
                         <p className="mt-1 text-xs leading-5 text-text-muted">不用进入大宇宙，几分钟也能测到一个有意思的小切面。</p>
@@ -290,9 +318,9 @@ export function Navigation() {
                             href={item.href}
                             prefetch={false}
                             onClick={selfDD.close}
-                            className="flex items-start gap-3 rounded-[18px] border border-transparent bg-bg-primary/72 px-3.5 py-3 text-sm transition-all duration-200 hover:bg-bg-secondary hover:border-border-subtle"
+                            className="flex items-start gap-3 rounded-[18px] border border-transparent bg-bg-primary/72 px-3.5 py-3 text-sm transition-[background-color,border-color,color] duration-200 hover:bg-bg-secondary hover:border-border-subtle"
                           >
-                            <span className="text-lg leading-none shrink-0">{item.emoji}</span>
+                            <NavMark mark={item.mark} compact />
                             <span className="min-w-0">
                               <span className="block font-medium text-text-primary">{item.label}</span>
                               <span className="mt-0.5 block text-xs text-text-muted">{item.desc}</span>
@@ -315,6 +343,7 @@ export function Navigation() {
             onMouseLeave={relDD.onMouseLeave}
           >
             <button
+              type="button"
               onClick={() => relDD.setOpen(v => !v)}
               className={`nav-link inline-flex items-center gap-1.5 ${relDD.open ? 'nav-link-active' : ''}`}
               aria-expanded={relDD.open}
@@ -337,7 +366,7 @@ export function Navigation() {
                     onClick={relDD.close}
                     className="nav-dropdown-item"
                   >
-                    <span className="text-base leading-none shrink-0">{item.emoji}</span>
+                    <NavMark mark={item.mark} compact />
                     <span className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-text-primary">{item.label}</span>
@@ -363,6 +392,7 @@ export function Navigation() {
             onMouseLeave={discoverDD.onMouseLeave}
           >
             <button
+              type="button"
               onClick={() => discoverDD.setOpen(v => !v)}
               className={`nav-link inline-flex items-center gap-1.5 ${discoverDD.open ? 'nav-link-active' : ''}`}
               aria-expanded={discoverDD.open}
@@ -385,7 +415,7 @@ export function Navigation() {
                     onClick={discoverDD.close}
                     className="nav-dropdown-item"
                   >
-                    <span className="text-base leading-none shrink-0">{item.emoji}</span>
+                    <NavMark mark={item.mark} compact />
                     <span>
                       <span className="font-medium text-text-primary">{item.label}</span>
                       <span className="block text-xs text-text-muted mt-0.5">{item.desc}</span>
@@ -402,7 +432,7 @@ export function Navigation() {
             prefetch={false}
             className="nav-link inline-flex items-center gap-1"
           >
-            <span className="text-sm">✦</span>
+            <NavMark mark="HV" compact />
             她说
           </Link>
 
@@ -410,6 +440,7 @@ export function Navigation() {
           {isAuthenticated ? (
             <div className="relative" ref={userDD.ref}>
               <button
+                type="button"
                 onClick={userDD.toggle}
                 className="user-avatar"
                 aria-label="用户菜单"
@@ -423,17 +454,18 @@ export function Navigation() {
                     <p className="text-sm font-medium text-text-primary truncate">{displayName}</p>
                   </div>
                   <Link href="/me/" prefetch={false} onClick={userDD.close} className="nav-dropdown-item">
-                    <span>👤</span><span>个人中心</span>
+                    <NavMark mark="ME" compact /><span>个人中心</span>
                   </Link>
                   <Link href="/card/" prefetch={false} onClick={userDD.close} className="nav-dropdown-item">
-                    <span>📋</span><span>我的 WTF Card</span>
+                    <NavMark mark="CD" compact /><span>我的 WTF Card</span>
                   </Link>
                   <button
+                    type="button"
                     onClick={handleLogout}
                     disabled={isLoggingOut}
                     className="nav-dropdown-item w-full text-left text-red-500 hover:text-red-600"
                   >
-                    <span>👋</span><span>{isLoggingOut ? '退出中...' : '退出登录'}</span>
+                    <NavMark mark="OUT" compact /><span>{isLoggingOut ? '退出中…' : '退出登录'}</span>
                   </button>
                 </div>
               )}
@@ -449,14 +481,14 @@ export function Navigation() {
         {!authLoading && !isAuthenticated ? (
           <Link
             href="/auth/login/"
-            className="hidden md:inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors shrink-0"
+            className="hidden md:inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-accent text-bg-primary text-sm font-medium hover:bg-accent/90 transition-colors shrink-0"
           >
             登录
           </Link>
         ) : (
           <Link
             href="/wtfti/galaxy/test/"
-            className="hidden md:inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors shrink-0"
+            className="hidden md:inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-accent text-bg-primary text-sm font-medium hover:bg-accent/90 transition-colors shrink-0"
           >
             召唤主神
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -467,6 +499,7 @@ export function Navigation() {
 
         {/* ── Mobile hamburger ── */}
         <button
+          type="button"
           className="md:hidden p-2 -mr-2 text-text-muted hover:text-text-primary transition-colors"
           onClick={() => setMobileOpen(v => !v)}
           aria-label={mobileOpen ? '关闭菜单' : '打开菜单'}
@@ -479,7 +512,7 @@ export function Navigation() {
 
     {/* ── Mobile full-screen menu ── */}
     {mobileOpen && (
-      <div className="md:hidden fixed inset-0 top-14 z-50 bg-bg-elevated overflow-y-auto">
+      <div className="wtfti-mobile-menu md:hidden fixed inset-0 top-14 z-50 bg-bg-elevated overflow-y-auto">
         <div className="max-w-lg mx-auto px-6 py-8 space-y-8">
 
             {/* Mobile CTA / Auth */}
@@ -488,7 +521,7 @@ export function Navigation() {
                 <Link
                   href="/auth/login/"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full bg-accent text-white font-medium text-base"
+                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base"
                 >
                   登录 / 注册
                 </Link>
@@ -497,7 +530,8 @@ export function Navigation() {
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center justify-center gap-2 w-full py-3 rounded-full border border-border text-text-secondary font-medium text-sm"
                 >
-                  不登录，直接召唤主神 →
+                  不登录，直接召唤主神
+                  <ArrowMark />
                 </Link>
               </div>
             ) : (
@@ -511,7 +545,7 @@ export function Navigation() {
                 <Link
                   href="/wtfti/galaxy/test/"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full bg-accent text-white font-medium text-base"
+                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base"
                 >
                   召唤主神
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -530,10 +564,32 @@ export function Navigation() {
                     href={item.href}
                     prefetch={false}
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-gradient-to-r from-pink-50 via-white to-fuchsia-50 text-text-primary shadow-sm"
+                    className="wtfti-card flex items-center gap-3 rounded-2xl px-3 py-3 text-text-primary"
                   >
-                    <span className="text-lg leading-none">{item.emoji}</span>
+                    <NavMark mark={item.mark} compact />
                     <span className="text-sm font-medium truncate">{item.label}</span>
+                  </Link>
+                ))}
+              </div>
+              {/* AI 灵镜 */}
+              <p className="text-[10px] font-mono tracking-widest text-text-muted uppercase mb-2">AI 灵镜</p>
+              <div className="grid grid-cols-1 gap-2 mb-3">
+                {MIRROR_ITEMS.map(item => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    prefetch={false}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl border border-pink-200/50 bg-gradient-to-r from-pink-50 to-rose-50 hover:from-pink-100 hover:to-rose-100 transition-colors"
+                  >
+                    <span className="text-lg">🔮</span>
+                    <span className="flex-1 min-w-0">
+                      <span className="text-sm font-medium text-text-primary">{item.label}</span>
+                      <span className="block text-xs text-text-muted mt-0.5">{item.desc}</span>
+                    </span>
+                    <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white bg-gradient-to-r from-pink-400 to-rose-400">
+                      NEW
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -553,7 +609,7 @@ export function Navigation() {
                       style={{ background: item.accent }}
                     />
                     <span className="text-sm font-medium text-text-primary truncate">
-                      {item.emoji && <>{item.emoji} </>}{item.label}
+                      {item.label}
                     </span>
                   </Link>
                 ))}
@@ -569,7 +625,7 @@ export function Navigation() {
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-2.5 px-3 py-3 rounded-xl bg-bg-secondary hover:bg-bg-elevated transition-colors"
                   >
-                    <span className="text-base leading-none">{item.emoji}</span>
+                    <NavMark mark={item.mark} compact />
                     <span className="text-sm font-medium text-text-primary truncate">{item.label}</span>
                   </Link>
                 ))}
@@ -587,7 +643,7 @@ export function Navigation() {
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-2.5 px-3 py-3 rounded-xl bg-bg-secondary hover:bg-bg-elevated transition-colors"
                   >
-                    <span className="text-base leading-none">{item.emoji}</span>
+                    <NavMark mark={item.mark} compact />
                     <span className="text-sm font-medium text-text-primary truncate">{item.label}</span>
                   </Link>
                 ))}
@@ -599,14 +655,14 @@ export function Navigation() {
               href="/her-voice/"
               prefetch={false}
               onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-3 px-4 py-3.5 rounded-2xl border border-[#C9A676]/30 bg-[#15102A] text-[#F5F0E8]"
+              className="wtfti-panel flex items-center gap-3 rounded-2xl px-4 py-3.5"
             >
-              <span className="text-lg">✦</span>
+              <NavMark mark="HV" compact />
               <span className="flex-1">
-                <span className="font-medium text-sm">她说 · Her Voice</span>
-                <span className="block text-xs text-[#C9A676] mt-0.5">女性声音广场 · 你的态度被听见</span>
+                <span className="font-medium text-sm text-text-primary">她说 · Her Voice</span>
+                <span className="mt-0.5 block text-xs text-text-muted">女性声音广场 · 你的态度被听见</span>
               </span>
-              <span className="text-xs text-[#C9A676]">→</span>
+              <ArrowMark className="text-text-muted" />
             </Link>
 
             {/* 发现 */}
@@ -620,7 +676,7 @@ export function Navigation() {
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-2.5 px-3 py-3 rounded-xl bg-bg-secondary hover:bg-bg-elevated transition-colors"
                   >
-                    <span className="text-base leading-none">{item.emoji}</span>
+                    <NavMark mark={item.mark} compact />
                     <span className="text-sm font-medium text-text-primary truncate">{item.label}</span>
                   </Link>
                 ))}
@@ -649,11 +705,12 @@ export function Navigation() {
                 ))}
                 {isAuthenticated && (
                   <button
+                    type="button"
                     onClick={() => { handleLogout(); setMobileOpen(false); }}
                     disabled={isLoggingOut}
                     className="block w-full text-left px-3 py-2.5 rounded-xl text-sm text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
                   >
-                    {isLoggingOut ? '退出中...' : '退出登录'}
+                    {isLoggingOut ? '退出中…' : '退出登录'}
                   </button>
                 )}
               </div>
@@ -666,6 +723,36 @@ export function Navigation() {
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
+
+function NavMark({ mark, compact = false }: { mark: string; compact?: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`shrink-0 rounded-full border border-border-subtle bg-bg-elevated/75 text-center font-mono font-semibold uppercase tracking-[0.08em] text-text-muted ${
+        compact
+          ? 'grid h-7 w-7 place-items-center text-[9px]'
+          : 'grid h-11 w-11 place-items-center text-[11px]'
+      }`}
+    >
+      {mark}
+    </span>
+  );
+}
+
+function ArrowMark({ className = '' }: { className?: string }) {
+  return (
+    <svg
+      className={`h-3.5 w-3.5 shrink-0 ${className}`}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M9 7h8v8" />
+    </svg>
+  );
+}
 
 function MobileSection({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (

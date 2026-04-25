@@ -82,7 +82,7 @@ export default function PairGravityPreview() {
             ✦ 当前 S 由 mock 答案派生 ·{' '}
             <Link
               href="/wtfti/galaxy/soul-probe/"
-              style={{ color: '#C9A676', textDecoration: 'underline' }}
+              style={{ color: 'var(--color-gold)', textDecoration: 'underline' }}
             >
               做一次灵魂探针
             </Link>{' '}
@@ -93,7 +93,7 @@ export default function PairGravityPreview() {
 
       <section style={pickerRow}>
         <PlanetPicker label="A · 你" value={aSlug} onChange={setASlug} accent={planetA.accent} />
-        <div style={{ alignSelf: 'center', color: '#D4B58A', fontSize: 22 }}>⚭</div>
+        <div style={{ alignSelf: 'center', color: 'var(--color-gold)', fontSize: 22 }}>⚭</div>
         <PlanetPicker label="B · ta" value={bSlug} onChange={setBSlug} accent={planetB.accent} />
       </section>
 
@@ -115,7 +115,7 @@ export default function PairGravityPreview() {
               margin: 0,
               fontSize: 10,
               letterSpacing: '0.42em',
-              color: '#D4B58A',
+              color: 'var(--color-gold)',
               textTransform: 'uppercase',
             }}
           >
@@ -140,7 +140,7 @@ export default function PairGravityPreview() {
                 fontFamily: '"Cormorant Garamond", serif',
                 fontStyle: 'italic',
                 fontSize: 16,
-                color: '#F5F0E8',
+                color: 'var(--color-bg-primary)',
                 lineHeight: 1.6,
               }}
             >
@@ -175,7 +175,7 @@ export default function PairGravityPreview() {
             margin: '0 0 12px',
             fontFamily: 'var(--font-display), serif',
             fontSize: 32,
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
             letterSpacing: '0.05em',
           }}
         >
@@ -212,7 +212,7 @@ Kindred score   = ${kindred.kindredScore.toFixed(3)}`}
           border: gs.rare ? '1px solid #C9A676' : '1px solid rgba(245,240,232,0.12)',
         }}
       >
-        <p style={{ ...meta, color: '#D4B58A', textAlign: 'center' }}>
+        <p style={{ ...meta, color: 'var(--color-gold)', textAlign: 'center' }}>
           ✦ G ⊕ S · 双层叙事 · {gs.rare ? '稀有相遇' : '常见相遇'}
         </p>
         <h2
@@ -222,7 +222,7 @@ Kindred score   = ${kindred.kindredScore.toFixed(3)}`}
             fontFamily: 'var(--font-display), serif',
             fontStyle: 'italic',
             fontSize: 32,
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
             letterSpacing: '0.04em',
           }}
         >
@@ -272,7 +272,7 @@ Kindred score   = ${kindred.kindredScore.toFixed(3)}`}
             border: '1px solid rgba(201,166,118,0.32)',
           }}
         >
-          <p style={{ ...meta, color: '#D4B58A', textAlign: 'center' }}>
+          <p style={{ ...meta, color: 'var(--color-gold)', textAlign: 'center' }}>
             ✦ Shared Mirror Fragments · 你们共照的灵魂碎片
           </p>
           <p
@@ -286,7 +286,7 @@ Kindred score   = ${kindred.kindredScore.toFixed(3)}`}
               lineHeight: 1.8,
             }}
           >
-            你们共同照亮了 <strong style={{ color: '#C9A676' }}>{kindred.shared.length}</strong> 位历史灵魂的镜子。
+            你们共同照亮了 <strong style={{ color: 'var(--color-gold)' }}>{kindred.shared.length}</strong> 位历史灵魂的镜子。
           </p>
           <div
             style={{
@@ -307,7 +307,7 @@ Kindred score   = ${kindred.kindredScore.toFixed(3)}`}
                   fontFamily: '"Cormorant Garamond", serif',
                   fontStyle: 'italic',
                   fontSize: 14,
-                  color: '#F5F0E8',
+                  color: 'var(--color-bg-primary)',
                 }}
               >
                 {f.sigil} {f.nameZh}
@@ -325,7 +325,7 @@ Kindred score   = ${kindred.kindredScore.toFixed(3)}`}
           border: '1px solid rgba(245,240,232,0.12)',
         }}
       >
-        <p style={{ ...meta, color: '#D4B58A', textAlign: 'center' }}>
+        <p style={{ ...meta, color: 'var(--color-gold)', textAlign: 'center' }}>
           ✦ Twin Sigils · 双印记
         </p>
         <p
@@ -352,11 +352,11 @@ Kindred score   = ${kindred.kindredScore.toFixed(3)}`}
         >
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
             <SoulSigil galaxy={galaxyA} size={200} />
-            <p style={{ margin: 0, fontSize: 11, letterSpacing: '0.2em', color: '#D4B58A' }}>{planetA.name}</p>
+            <p style={{ margin: 0, fontSize: 11, letterSpacing: '0.2em', color: 'var(--color-gold)' }}>{planetA.name}</p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
             <SoulSigil galaxy={galaxyB} size={200} />
-            <p style={{ margin: 0, fontSize: 11, letterSpacing: '0.2em', color: '#D4B58A' }}>{planetB.name}</p>
+            <p style={{ margin: 0, fontSize: 11, letterSpacing: '0.2em', color: 'var(--color-gold)' }}>{planetB.name}</p>
           </div>
         </div>
       </section>
@@ -446,7 +446,7 @@ function PlanetPicker({
           margin: 0,
           fontSize: 10,
           letterSpacing: '0.32em',
-          color: '#D4B58A',
+          color: 'var(--color-gold)',
           fontFamily: 'Inter, sans-serif',
           textTransform: 'uppercase',
         }}
@@ -463,7 +463,7 @@ function PlanetPicker({
           background: 'transparent',
           border: 'none',
           borderBottom: '1px solid rgba(212,181,138,0.4)',
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
           fontFamily: 'var(--font-display), serif',
           fontSize: 18,
           letterSpacing: '0.04em',
@@ -471,7 +471,7 @@ function PlanetPicker({
         }}
       >
         {HOME_PLANET_CATALOG.map((p) => (
-          <option key={p.slug} value={p.slug} style={{ background: '#1a1530' }}>
+          <option key={p.slug} value={p.slug} style={{ background: 'var(--color-bg-primary)' }}>
             {p.name} · {p.code}
           </option>
         ))}
@@ -521,7 +521,7 @@ const page: CSSProperties = {
   minHeight: '100vh',
   background:
     'radial-gradient(ellipse 100% 60% at 50% 0%, #2a1c4d 0%, #1a1530 38%, #0F0A22 100%)',
-  color: '#F5F0E8',
+  color: 'var(--color-bg-primary)',
   fontFamily: 'var(--font-display), "Cormorant Garamond", "Noto Serif SC", serif',
   padding: '64px 24px 96px',
 };
@@ -533,7 +533,7 @@ const eyebrow: CSSProperties = {
   fontFamily: 'Inter, sans-serif',
   fontSize: 11,
   letterSpacing: '0.42em',
-  color: '#D4B58A',
+  color: 'var(--color-gold)',
 };
 
 const title: CSSProperties = {
@@ -544,7 +544,7 @@ const title: CSSProperties = {
   lineHeight: 1.25,
 };
 
-const em: CSSProperties = { fontStyle: 'italic', color: '#C07A8E', padding: '0 4px' };
+const em: CSSProperties = { fontStyle: 'italic', color: 'var(--color-accent)', padding: '0 4px' };
 
 const subtitle: CSSProperties = {
   fontFamily: '"Noto Serif SC", serif',
@@ -573,7 +573,7 @@ const resultBox: CSSProperties = {
 const meta: CSSProperties = {
   fontSize: 11,
   letterSpacing: '0.32em',
-  color: '#D4B58A',
+  color: 'var(--color-gold)',
   fontFamily: 'Inter, sans-serif',
 };
 

@@ -15,10 +15,10 @@ import { buildResourceId } from '@/lib/payments/skus';
 const display = '"Cormorant Garamond", "Noto Serif SC", serif';
 const mono = '"SF Mono", ui-monospace, "Menlo", monospace';
 const PALETTE = {
-  paper: '#F5F0E8',
-  ink: '#1F1A16',
-  inkMute: '#5B524B',
-  rule: '#D6CDBE',
+  paper: 'var(--color-bg-primary)',
+  ink: 'var(--color-text-primary)',
+  inkMute: 'var(--color-text-muted)',
+  rule: 'var(--color-border)',
   rose: '#A85A6E',
   wine: '#6A2A3E',
   gold: '#C9A676',
@@ -196,7 +196,7 @@ function CompareView({ history }: { history: XptiStoredResult[] }) {
               '自动提醒 4 次复测节奏（季度）',
             ]}
             preview={
-              <div style={{ marginTop: 14, padding: 22, background: '#FFFDF9', border: `1px solid ${PALETTE.rule}`, borderRadius: 8, filter: 'blur(3px)', opacity: 0.5 }}>
+              <div style={{ marginTop: 14, padding: 22, background: 'var(--color-bg-elevated)', border: `1px solid ${PALETTE.rule}`, borderRadius: 8, filter: 'blur(3px)', opacity: 0.5 }}>
                 <p style={{ ...pStyle, marginTop: 0 }}>—— 付费后可见全部历史 ——</p>
                 <ul style={{ paddingLeft: 18, color: PALETTE.inkMute, fontSize: 12 }}>
                   {Array.from({ length: 8 }).map((_, i) => (
@@ -206,7 +206,7 @@ function CompareView({ history }: { history: XptiStoredResult[] }) {
               </div>
             }
           >
-            <div style={{ marginTop: 14, padding: 22, background: '#FFFDF9', border: `1px solid ${PALETTE.rule}`, borderRadius: 8 }}>
+            <div style={{ marginTop: 14, padding: 22, background: 'var(--color-bg-elevated)', border: `1px solid ${PALETTE.rule}`, borderRadius: 8 }}>
               <h4 style={{ fontFamily: display, fontStyle: 'italic', fontSize: 18, margin: '0 0 14px' }}>全部历史</h4>
               <ul style={{ listStyle: 'none', padding: 0, display: 'grid', gap: 8 }}>
                 {sorted.map((it) => {

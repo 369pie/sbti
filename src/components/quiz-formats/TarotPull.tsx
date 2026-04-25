@@ -54,7 +54,7 @@ export function TarotPull({ prompt, hint, cards, onPick }: Props) {
             margin: 0,
             textAlign: 'center',
             fontSize: 15,
-            color: '#F5F0E8',
+            color: 'var(--color-bg-primary)',
             fontFamily: 'Noto Serif SC, serif',
             lineHeight: 1.55,
           }}
@@ -67,7 +67,7 @@ export function TarotPull({ prompt, hint, cards, onPick }: Props) {
               margin: '6px 0 0',
               textAlign: 'center',
               fontSize: 11.5,
-              color: 'rgba(245,240,232,.5)',
+              color: 'color-mix(in oklab, var(--color-bg-primary) 50%, transparent)',
             }}
           >
             {hint}
@@ -113,7 +113,7 @@ export function TarotPull({ prompt, hint, cards, onPick }: Props) {
                   display: 'grid',
                   placeItems: 'center',
                   fontFamily: 'Cormorant Garamond, serif',
-                  color: '#C9A676',
+                  color: 'var(--color-gold)',
                   fontSize: 28,
                   letterSpacing: 2,
                 }}
@@ -191,7 +191,7 @@ export function TarotPull({ prompt, hint, cards, onPick }: Props) {
               maxWidth: 320,
               textAlign: 'center',
               fontSize: 13.5,
-              color: '#F5F0E8',
+              color: 'var(--color-bg-primary)',
               fontFamily: 'Noto Serif SC, serif',
               lineHeight: 1.55,
             }}
@@ -224,11 +224,11 @@ export function TarotPull({ prompt, hint, cards, onPick }: Props) {
                     background: isPicked
                       ? 'rgba(201,166,118,.14)'
                       : 'rgba(245,240,232,.04)',
-                    color: '#F5F0E8',
+                    color: 'var(--color-bg-primary)',
                     cursor: 'pointer',
                   }}
                 >
-                  <div style={{ fontSize: 12.5, fontWeight: 500, color: isPicked ? '#C9A676' : '#F5F0E8' }}>
+                  <div style={{ fontSize: 12.5, fontWeight: 500, color: isPicked ? 'var(--color-gold)' : 'var(--color-bg-primary)' }}>
                     {opt.label}
                   </div>
                   {opt.blurb ? (
@@ -250,7 +250,7 @@ export function TarotPull({ prompt, hint, cards, onPick }: Props) {
             style={{
               background: 'transparent',
               border: 'none',
-              color: 'rgba(245,240,232,.5)',
+              color: 'color-mix(in oklab, var(--color-bg-primary) 50%, transparent)',
               fontSize: 11,
               cursor: 'pointer',
             }}

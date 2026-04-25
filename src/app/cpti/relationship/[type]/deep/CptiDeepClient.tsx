@@ -119,7 +119,7 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
       style={{
         minHeight: '100vh',
         background: 'radial-gradient(ellipse at 50% 0%, #2a1a26 0%, #1a1018 60%, #0f0a12 100%)',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         paddingBlock: '64px 96px',
       }}
     >
@@ -147,7 +147,7 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
             fontFamily: mono,
             fontSize: 10,
             letterSpacing: '0.42em',
-            color: '#C9A676',
+            color: 'var(--color-gold)',
             margin: 0,
           }}
         >
@@ -199,7 +199,7 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
               padding: '4px 10px',
               borderRadius: 999,
               border: '1px solid rgba(201,166,118,0.35)',
-              color: '#C9A676',
+              color: 'var(--color-gold)',
             }}
           >
             CODE · {relationship.code}
@@ -255,7 +255,7 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
                   fontFamily: mono,
                   fontSize: 10,
                   letterSpacing: '0.32em',
-                  color: '#D4B58A',
+                  color: 'var(--color-gold)',
                   textAlign: 'center',
                   margin: '0 0 16px',
                 }}
@@ -390,7 +390,7 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
                         fontFamily: mono,
                         fontSize: 11,
                         letterSpacing: '0.24em',
-                        color: '#C9A676',
+                        color: 'var(--color-gold)',
                         opacity: 0.9,
                       }}
                     >
@@ -460,7 +460,7 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
                         fontFamily: mono,
                         fontSize: 10,
                         letterSpacing: '0.32em',
-                        color: '#E89BA8',
+                        color: 'var(--color-accent-light)',
                         marginRight: 10,
                       }}
                     >
@@ -603,7 +603,7 @@ function CrossLink({
         borderRadius: 6,
         border: '1px solid rgba(201,166,118,0.25)',
         background: 'rgba(245,240,232,0.04)',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         transition: 'background 0.2s',
       }}
     >
@@ -613,13 +613,13 @@ function CrossLink({
             fontFamily: mono,
             fontSize: 10,
             letterSpacing: '0.32em',
-            color: '#C9A676',
+            color: 'var(--color-gold)',
           }}
         >
           {eyebrow}
         </span>
         <span style={{ flex: 1 }} />
-        <span style={{ color: '#C9A676', fontSize: 14 }}>→</span>
+        <span style={{ color: 'var(--color-gold)', fontSize: 14 }}>→</span>
       </div>
       <p
         style={{
@@ -782,7 +782,7 @@ function StageSelector({
                 borderRadius: 999,
                 border: `1px solid ${active ? accent : 'rgba(245,240,232,0.2)'}`,
                 background: active ? `${accent}22` : 'rgba(245,240,232,0.04)',
-                color: active ? '#F5F0E8' : 'rgba(245,240,232,0.7)',
+                color: active ? 'var(--color-bg-primary)' : 'rgba(245,240,232,0.7)',
                 fontFamily: mono,
                 fontSize: 11,
                 letterSpacing: '0.18em',
@@ -865,7 +865,7 @@ function PartnerInviteCta({ slug }: { slug: string }) {
           borderRadius: 999,
           border: '1px solid rgba(156,124,255,0.55)',
           background: 'rgba(156,124,255,0.18)',
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
           fontFamily: mono,
           fontSize: 11,
           letterSpacing: '0.24em',

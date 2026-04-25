@@ -220,7 +220,7 @@ export function ClaimAssetCard({
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={handlePrimaryAction}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-bg-primary font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {currentCopy.primaryButton}
               </button>

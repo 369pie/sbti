@@ -37,7 +37,7 @@ export function DailyTodayCTA() {
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
         <Link
           href="/daily/test"
-          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-teal-500 text-white font-medium text-base hover:bg-teal-600 transition-all duration-200"
+          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-teal-500 text-bg-primary font-medium text-base hover:bg-teal-600 transition-all duration-200"
         >
           测一测今天开了什么模式
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -54,7 +54,7 @@ export function DailyTodayCTA() {
       <div className="flex flex-col items-center gap-4">
         <Link
           href={`/daily/result/${todaySlug}/`}
-          className="inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-teal-500 text-white font-medium text-base hover:bg-teal-600 transition-all duration-200"
+          className="inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-teal-500 text-bg-primary font-medium text-base hover:bg-teal-600 transition-all duration-200"
         >
           {status?.emoji} 查看今日结果：{status?.name ?? todaySlug}
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -81,7 +81,7 @@ export function DailyTodayCTA() {
     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
       <Link
         href="/daily/test"
-        className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-teal-500 text-white font-medium text-base hover:bg-teal-600 transition-all duration-200"
+        className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-teal-500 text-bg-primary font-medium text-base hover:bg-teal-600 transition-all duration-200"
       >
         测一测今天开了什么模式
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

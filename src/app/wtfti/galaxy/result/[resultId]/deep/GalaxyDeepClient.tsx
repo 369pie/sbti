@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
 import { SoulSigil } from '@/components/galaxy/SoulSigil';
-import { FragmentPalace } from '@/components/galaxy/FragmentPalace';
 import { SignaturePerfumeCard } from '@/components/galaxy/SignaturePerfumeCard';
 import { PremiumPaywall } from '@/components/PremiumPaywall';
 import { PriceAnchor } from '@/components/PriceAnchor';
@@ -19,7 +18,16 @@ import {
   getPerfumeAnnotation,
   getSignaturePerfume,
 } from '@/lib/wtfi/signature-perfume';
-import { pickLettersForPlanet, type StardustLetter } from '@/lib/wtfi/stardust-letters';
+import { pickLetters30, type StardustLetter } from '@/lib/wtfi/stardust-letters';
+import {
+  renderPilgrimLetter,
+  type RenderedPilgrimLetter,
+} from '@/lib/wtfi/pilgrim-letters';
+import {
+  getShadowRx,
+  SHADOW_RX_LOCKED_HINT,
+  type ShadowRx,
+} from '@/lib/wtfi/shadow-repair-rx';
 import { buildResourceId } from '@/lib/payments/skus';
 
 const display =
@@ -59,10 +67,12 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
     const planetSlug = result.homePlanet.slug;
     const perfume = getSignaturePerfume(planetSlug);
     const annotation = getPerfumeAnnotation(soulAnswers ?? null);
-    // Synthesize a 30-day letter cycle by walking the deterministic seed.
-    const letters30: StardustLetter[] = Array.from({ length: 30 }, (_, i) =>
-      pickLettersForPlanet(planetSlug, i + 1),
-    ).flatMap((trio, i) => trio.slice(0, 1).map((l) => ({ ...l, _day: i + 1 } as StardustLetter & { _day: number })));
+    // Synthesize a 30-day letter cycle: deterministic, ALL UNIQUE per (planet × resultId).
+    // Pre-2026-04-22 bug: this used to walk pickLettersForPlanet(slug, day).slice(0,1),
+    // which returned anchored[0] for every day → 30 identical letters.
+    const letters30: StardustLetter[] = pickLetters30(planetSlug, resultId);
+    const pilgrim = renderPilgrimLetter(result);
+    const shadowRx = getShadowRx(result.shadow?.bucket ?? null);
 
     const resourceId = buildResourceId('wtfti', personalitySlug);
 
@@ -86,7 +96,7 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
           minHeight: '100vh',
           background:
             'radial-gradient(ellipse at top, #1f1840 0%, #0f0a22 60%, #08051a 100%)',
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
           fontFamily: display,
           paddingBottom: 120,
         }}
@@ -158,7 +168,7 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
               fontSize: 10,
               letterSpacing: '0.42em',
               textTransform: 'uppercase',
-              color: '#D4B58A',
+              color: 'var(--color-gold)',
               opacity: 0.7,
               margin: 0,
             }}
@@ -177,7 +187,7 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
             }}
           >
             {result.homePlanet.name}
-            <span style={{ color: '#C9A676' }}> · </span>
+            <span style={{ color: 'var(--color-gold)' }}> · </span>
             完整档案
           </h1>
           <p
@@ -190,7 +200,7 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
               margin: '8px auto 24px',
             }}
           >
-            主神 Sigil 高清 · 灵魂香水全谱注解 · 镜面碎片 24 镜框 · 30 天月相封信
+            主神朝圣信 · Sigil 印刷版 · 暗面 4 周修复处方 · 灵魂香水全谱 · 30 天封信
           </p>
           <EditionStamp editionNo={editionNo} issuedDate={issuedDate} />
           <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -221,7 +231,7 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
                 fontSize: 10,
                 letterSpacing: '0.32em',
                 textTransform: 'uppercase',
-                color: '#C9A676',
+                color: 'var(--color-gold)',
                 opacity: 0.8,
                 margin: 0,
               }}
@@ -261,9 +271,10 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
             resourceId={resourceId}
             lockedTitle="解锁完整主神档案"
             teaserBullets={[
-              'Soul Sigil 高清 480px · 印刷级几何咒符',
-              `灵魂香水全谱注解 · ${perfume?.name ?? '专属调香'}`,
-              '镜面碎片 24 镜框 · 30 天月相封信',
+              `主神亲笔朝圣信 · ${pilgrim?.signedBy ?? '署名给你'}`,
+              '暗面化身 · 4 周修复处方（W1 觉察 → W4 整合）',
+              `灵魂香水全谱 · ${perfume?.name ?? '专属调香'} + Sigil 印刷版`,
+              '未来 30 天 · 每日不同的星屑信',
             ]}
             preview={
               <div style={{ paddingBlock: 20 }}>
@@ -272,7 +283,7 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
                     fontFamily: mono,
                     fontSize: 10,
                     letterSpacing: '0.32em',
-                    color: '#D4B58A',
+                    color: 'var(--color-gold)',
                     opacity: 0.7,
                     textAlign: 'center',
                     margin: '0 0 16px',
@@ -301,9 +312,19 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
             }
           >
             <div style={{ display: 'grid', gap: 56, paddingBlock: 24 }}>
+              {pilgrim && (
+                <DeepSection
+                  eyebrow="PILGRIM'S LETTER · 主神朝圣信"
+                  numeral="I"
+                  title={`${pilgrim.signedBy} 写给你`}
+                >
+                  <PilgrimLetterView letter={pilgrim} />
+                </DeepSection>
+              )}
+
               <DeepSection
                 eyebrow="SIGIL HD · 灵魂印记"
-                numeral="I"
+                numeral="II"
                 title="只属于你的几何咒符 · 印刷版"
               >
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -322,10 +343,22 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
                 </p>
               </DeepSection>
 
+              <DeepSection
+                eyebrow="SHADOW REPAIR Rx · 暗面修复处方"
+                numeral="III"
+                title={shadowRx ? shadowRx.title : SHADOW_RX_LOCKED_HINT.title}
+              >
+                {shadowRx ? (
+                  <ShadowRxView rx={shadowRx} />
+                ) : (
+                  <ShadowRxLocked />
+                )}
+              </DeepSection>
+
               {perfume && (
                 <DeepSection
                   eyebrow="SIGNATURE PERFUME · 灵魂香水全谱"
-                  numeral="II"
+                  numeral="IV"
                   title={perfume.name}
                 >
                   <SignaturePerfumeCard perfume={perfume} annotation={annotation} />
@@ -333,16 +366,8 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
               )}
 
               <DeepSection
-                eyebrow="FRAGMENTS · 镜面碎片"
-                numeral="III"
-                title="你和谁共享了一部分宇宙 · 24 镜框"
-              >
-                <FragmentPalace galaxy={result} />
-              </DeepSection>
-
-              <DeepSection
                 eyebrow="STARDUST LETTERS · 30 天月相封信"
-                numeral="IV"
+                numeral="V"
                 title="未来 30 天 · 每日一封写给你的星屑信"
               >
                 <ol
@@ -377,7 +402,7 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
                             fontFamily: mono,
                             fontSize: 10,
                             letterSpacing: '0.22em',
-                            color: '#C9A676',
+                            color: 'var(--color-gold)',
                             opacity: 0.85,
                           }}
                         >
@@ -413,7 +438,7 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
               {/* Cross-module footer */}
               <DeepSection
                 eyebrow="NEXT · 跨模块深档"
-                numeral="V"
+                numeral="VI"
                 title="解过 WTFTI 的人，78% 也读完了 SoulTI 灵魂深镜"
               >
                 <div
@@ -490,7 +515,7 @@ function DeepSection({ eyebrow, title, numeral, children }: DeepSectionProps) {
             fontSize: 10,
             letterSpacing: '0.32em',
             textTransform: 'uppercase',
-            color: '#D4B58A',
+            color: 'var(--color-gold)',
             opacity: 0.7,
             margin: 0,
           }}
@@ -506,7 +531,7 @@ function DeepSection({ eyebrow, title, numeral, children }: DeepSectionProps) {
           fontWeight: 400,
           letterSpacing: '0.01em',
           margin: '0 0 22px',
-          color: '#F5F0E8',
+          color: 'var(--color-bg-primary)',
         }}
       >
         {title}
@@ -534,7 +559,7 @@ function CrossLink({ href, eyebrow, title, desc }: CrossLinkProps) {
         background: 'rgba(20,15,42,0.6)',
         border: '1px solid rgba(201,166,118,0.18)',
         textDecoration: 'none',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
       }}
     >
       <p
@@ -542,7 +567,7 @@ function CrossLink({ href, eyebrow, title, desc }: CrossLinkProps) {
           fontFamily: mono,
           fontSize: 10,
           letterSpacing: '0.28em',
-          color: '#C9A676',
+          color: 'var(--color-gold)',
           opacity: 0.85,
           margin: 0,
         }}
@@ -649,6 +674,378 @@ function EditionStamp({
   );
 }
 
+// ─────────── Pilgrim Letter view ───────────
+
+function PilgrimLetterView({ letter }: { letter: RenderedPilgrimLetter }) {
+  const para: React.CSSProperties = {
+    fontFamily: '"Noto Serif SC", "Source Han Serif SC", serif',
+    fontSize: 14.5,
+    lineHeight: 2.0,
+    color: 'rgba(245,240,232,0.86)',
+    margin: '0 0 14px',
+    textIndent: '2em',
+  };
+  const heading: React.CSSProperties = {
+    fontFamily: mono,
+    fontSize: 10,
+    letterSpacing: '0.36em',
+    color: 'var(--color-gold)',
+    opacity: 0.85,
+    margin: '24px 0 8px',
+    textTransform: 'uppercase',
+  };
+  return (
+    <article
+      style={{
+        position: 'relative',
+        padding: '32px 30px 30px',
+        borderRadius: 22,
+        background:
+          'radial-gradient(ellipse at top right, rgba(192,122,142,0.08), transparent 60%), rgba(20,15,42,0.62)',
+        border: '1px solid rgba(201,166,118,0.28)',
+        boxShadow:
+          'inset 0 0 28px rgba(201,166,118,0.04), 0 8px 32px rgba(0,0,0,0.18)',
+      }}
+    >
+      <p
+        style={{
+          fontFamily: '"Noto Serif SC", serif',
+          fontSize: 15,
+          letterSpacing: '0.04em',
+          color: 'rgba(245,240,232,0.92)',
+          margin: '0 0 18px',
+          fontWeight: 500,
+        }}
+      >
+        {letter.greeting}
+      </p>
+
+      <p style={heading}>I · 你来时</p>
+      <p style={para}>{letter.past}</p>
+
+      <p style={heading}>II · 你现在</p>
+      <p style={para}>{letter.present}</p>
+
+      <p style={heading}>III · 你将走向</p>
+      <p style={para}>{letter.future}</p>
+      <ol
+        style={{
+          listStyle: 'none',
+          padding: 0,
+          margin: '0 0 18px',
+          display: 'grid',
+          gap: 8,
+        }}
+      >
+        {letter.invitations.map((line, i) => (
+          <li
+            key={i}
+            style={{
+              fontFamily: '"Noto Serif SC", serif',
+              fontSize: 14,
+              lineHeight: 1.85,
+              color: 'rgba(245,240,232,0.82)',
+              padding: '10px 14px',
+              borderRadius: 12,
+              background: 'rgba(201,166,118,0.06)',
+              borderLeft: '2px solid rgba(201,166,118,0.45)',
+            }}
+          >
+            {line}
+          </li>
+        ))}
+      </ol>
+
+      <p
+        style={{
+          ...para,
+          fontStyle: 'italic',
+          color: 'rgba(245,240,232,0.72)',
+          padding: '14px 16px',
+          margin: '20px 0 8px',
+          background: 'rgba(15,10,34,0.5)',
+          borderRadius: 12,
+          border: '1px dashed rgba(192,122,142,0.32)',
+          textIndent: '2em',
+        }}
+      >
+        {letter.shadowLine}
+      </p>
+
+      <p
+        style={{
+          ...para,
+          fontStyle: 'italic',
+          color: 'rgba(245,240,232,0.78)',
+          marginTop: 16,
+        }}
+      >
+        {letter.perfumeFooter}
+      </p>
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          gap: 12,
+          marginTop: 22,
+          paddingTop: 18,
+          borderTop: '1px solid rgba(201,166,118,0.18)',
+        }}
+      >
+        <span
+          aria-hidden
+          className="wtfti-deep-foil"
+          style={{
+            fontFamily: display,
+            fontStyle: 'italic',
+            fontSize: 32,
+            lineHeight: 1,
+          }}
+        >
+          {letter.sealGlyph}
+        </span>
+        <span
+          style={{
+            fontFamily: display,
+            fontStyle: 'italic',
+            fontSize: 16,
+            color: 'rgba(245,240,232,0.92)',
+          }}
+        >
+          {letter.signedBy}
+        </span>
+      </div>
+    </article>
+  );
+}
+
+// ─────────── Shadow Repair Rx view ───────────
+
+function ShadowRxView({ rx }: { rx: ShadowRx }) {
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <p
+        style={{
+          fontFamily: '"Noto Serif SC", serif',
+          fontSize: 14,
+          lineHeight: 1.95,
+          color: 'rgba(245,240,232,0.82)',
+          margin: 0,
+          padding: '14px 16px',
+          borderRadius: 14,
+          background: 'rgba(192,122,142,0.06)',
+          borderLeft: '2px solid rgba(192,122,142,0.45)',
+        }}
+      >
+        <span
+          style={{
+            fontFamily: mono,
+            fontSize: 10,
+            letterSpacing: '0.32em',
+            color: 'var(--color-gold)',
+            opacity: 0.85,
+            marginRight: 10,
+          }}
+        >
+          RX FOR
+        </span>
+        <span
+          style={{
+            fontFamily: display,
+            fontStyle: 'italic',
+            fontSize: 15,
+            color: 'var(--color-bg-primary)',
+            marginRight: 8,
+          }}
+        >
+          {rx.shadowName}
+        </span>
+        — {rx.preface}
+      </p>
+
+      {rx.weeks.map((w) => (
+        <div
+          key={w.week}
+          style={{
+            padding: '20px 20px',
+            borderRadius: 18,
+            background: 'rgba(20,15,42,0.6)',
+            border: '1px solid rgba(201,166,118,0.16)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 12,
+              marginBottom: 10,
+            }}
+          >
+            <span
+              className="wtfti-deep-foil"
+              style={{
+                fontFamily: display,
+                fontStyle: 'italic',
+                fontWeight: 500,
+                fontSize: 24,
+                lineHeight: 1,
+              }}
+            >
+              W{w.week}
+            </span>
+            <span
+              style={{
+                fontFamily: mono,
+                fontSize: 10,
+                letterSpacing: '0.32em',
+                color: 'var(--color-gold)',
+                opacity: 0.85,
+              }}
+            >
+              {w.phase}
+            </span>
+            <span
+              style={{
+                fontFamily: display,
+                fontStyle: 'italic',
+                fontSize: 16,
+                color: 'rgba(245,240,232,0.92)',
+              }}
+            >
+              {w.title}
+            </span>
+          </div>
+
+          <p
+            style={{
+              fontFamily: '"Noto Serif SC", serif',
+              fontSize: 13.5,
+              lineHeight: 1.9,
+              color: 'rgba(245,240,232,0.74)',
+              margin: '0 0 12px',
+            }}
+          >
+            {w.intro}
+          </p>
+
+          <ul
+            style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: '0 0 12px',
+              display: 'grid',
+              gap: 6,
+            }}
+          >
+            {w.actions.map((a, i) => (
+              <li
+                key={i}
+                style={{
+                  fontFamily: '"Noto Serif SC", serif',
+                  fontSize: 13.5,
+                  lineHeight: 1.8,
+                  color: 'rgba(245,240,232,0.84)',
+                  padding: '8px 12px',
+                  borderRadius: 10,
+                  background: 'rgba(201,166,118,0.05)',
+                }}
+              >
+                {a}
+              </li>
+            ))}
+          </ul>
+
+          <p
+            style={{
+              fontFamily: '"Noto Serif SC", serif',
+              fontStyle: 'italic',
+              fontSize: 13,
+              lineHeight: 1.85,
+              color: 'rgba(245,240,232,0.66)',
+              margin: 0,
+              padding: '10px 12px',
+              borderRadius: 10,
+              borderTop: '1px dashed rgba(201,166,118,0.22)',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: mono,
+                fontSize: 9,
+                letterSpacing: '0.32em',
+                color: 'var(--color-gold)',
+                marginRight: 8,
+              }}
+            >
+              REFLECT
+            </span>
+            {w.reflection}
+          </p>
+        </div>
+      ))}
+
+      <p
+        style={{
+          fontFamily: '"Noto Serif SC", serif',
+          fontStyle: 'italic',
+          fontSize: 14,
+          lineHeight: 1.95,
+          color: 'rgba(245,240,232,0.82)',
+          margin: '4px 0 0',
+          textAlign: 'center',
+          padding: '14px 16px',
+        }}
+      >
+        — {rx.closing}
+      </p>
+    </div>
+  );
+}
+
+function ShadowRxLocked() {
+  return (
+    <div
+      style={{
+        padding: '24px 22px',
+        borderRadius: 18,
+        background: 'rgba(20,15,42,0.6)',
+        border: '1px dashed rgba(201,166,118,0.32)',
+        textAlign: 'center',
+      }}
+    >
+      <p
+        style={{
+          fontFamily: '"Noto Serif SC", serif',
+          fontSize: 14,
+          lineHeight: 1.95,
+          color: 'rgba(245,240,232,0.78)',
+          margin: '0 0 16px',
+        }}
+      >
+        {SHADOW_RX_LOCKED_HINT.body}
+      </p>
+      <Link
+        href={`${basePath}${SHADOW_RX_LOCKED_HINT.cta.href}`}
+        style={{
+          display: 'inline-block',
+          padding: '12px 22px',
+          borderRadius: 999,
+          background: 'linear-gradient(120deg, #C07A8E, #C9A676)',
+          color: '#1A1530',
+          textDecoration: 'none',
+          fontSize: 13,
+          letterSpacing: '0.14em',
+          fontWeight: 600,
+        }}
+      >
+        {SHADOW_RX_LOCKED_HINT.cta.label}
+      </Link>
+    </div>
+  );
+}
+
 function DeepLoading() {
   return (
     <div
@@ -657,7 +1054,7 @@ function DeepLoading() {
         display: 'grid',
         placeItems: 'center',
         background: '#1A1530',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         fontFamily: display,
         fontStyle: 'italic',
         fontSize: 18,
@@ -678,7 +1075,7 @@ function DeepMissing() {
         placeItems: 'center',
         padding: '40px 20px',
         background: '#1A1530',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         fontFamily: display,
         textAlign: 'center',
       }}
@@ -689,7 +1086,7 @@ function DeepMissing() {
             fontFamily: mono,
             fontSize: 11,
             letterSpacing: '0.4em',
-            color: '#D4B58A',
+            color: 'var(--color-gold)',
           }}
         >
           NO RECORD · 没有找到神域记录

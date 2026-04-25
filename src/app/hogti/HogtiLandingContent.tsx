@@ -35,7 +35,7 @@ export default function HogtiLandingContent() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/hogti/test/"
-                className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-amber-100 text-[#2a1e0f] font-medium text-base hover:bg-amber-50 transition-all duration-200 shadow-lg"
+                className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-bg-secondary text-text-primary font-medium text-base hover:brightness-110 transition-all duration-200 shadow-lg"
                 style={{ fontFamily: "'EB Garamond', 'Noto Serif SC', serif" }}
               >
                 ⚡ 开始分院
@@ -65,7 +65,7 @@ export default function HogtiLandingContent() {
                 className="hogti-parchment-card rounded-2xl px-4 py-5 text-center"
               >
                 <div className="text-xl sm:text-2xl font-semibold hogti-ink font-mono tracking-tight">{stat.value}</div>
-                <div className="text-[11px] mt-1 tracking-widest uppercase" style={{ color: '#6a4e1f' }}>{stat.label}</div>
+                <div className="text-[11px] mt-1 tracking-widest uppercase" style={{ color: 'var(--color-text-secondary)' }}>{stat.label}</div>
               </div>
             ))}
           </div>
@@ -76,7 +76,7 @@ export default function HogtiLandingContent() {
       <section className="relative py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
-            <span className="text-xs font-mono tracking-[0.3em] uppercase hogti-ink/70 block mb-2" style={{ color: '#8a6a2f' }}>
+            <span className="text-xs font-mono tracking-[0.3em] uppercase hogti-ink/70 block mb-2" style={{ color: 'var(--color-gold)' }}>
               · The Four Houses ·
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold hogti-ink">
@@ -105,7 +105,7 @@ export default function HogtiLandingContent() {
                   <div className="text-[10px] uppercase tracking-[0.2em] mb-2" style={{ color: h.accent }}>
                     {h.nameEn}
                   </div>
-                  <p className="text-xs leading-relaxed hogti-ink/80" style={{ color: '#4a3a1e' }}>
+                  <p className="text-xs leading-relaxed hogti-ink/80" style={{ color: 'var(--color-text-primary)' }}>
                     {h.tagline}
                   </p>
                 </div>
@@ -119,7 +119,7 @@ export default function HogtiLandingContent() {
       <section className="relative py-12 px-6 pb-24">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8 text-center">
-            <span className="text-xs font-mono tracking-[0.3em] uppercase block mb-2" style={{ color: '#8a6a2f' }}>
+            <span className="text-xs font-mono tracking-[0.3em] uppercase block mb-2" style={{ color: 'var(--color-gold)' }}>
               · Possible Outcomes ·
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold hogti-ink">你可能是谁</h2>
@@ -149,7 +149,7 @@ export default function HogtiLandingContent() {
                   <div className="text-[10px] mt-1 tracking-widest uppercase" style={{ color: h.accent }}>
                     {h.nameEn}
                   </div>
-                  <p className="text-[11px] mt-2 leading-snug" style={{ color: '#4a3a1e' }}>
+                  <p className="text-[11px] mt-2 leading-snug" style={{ color: 'var(--color-text-primary)' }}>
                     {c.traits[0]}
                   </p>
                 </div>
@@ -162,8 +162,8 @@ export default function HogtiLandingContent() {
               href="/hogti/test/"
               className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-medium"
               style={{
-                background: '#3a2f6b',
-                color: '#fbf3df',
+                background: 'var(--color-accent)',
+                color: 'var(--color-bg-primary)',
                 fontFamily: "'EB Garamond', 'Noto Serif SC', serif",
               }}
             >
@@ -173,8 +173,8 @@ export default function HogtiLandingContent() {
               href="/hogti/gallery/"
               className="ml-3 inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-medium border"
               style={{
-                borderColor: '#3a2f6b60',
-                color: '#3a2f6b',
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-accent)',
                 fontFamily: "'EB Garamond', 'Noto Serif SC', serif",
               }}
             >

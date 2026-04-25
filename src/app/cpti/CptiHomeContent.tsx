@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { CSSProperties } from 'react';
 import { CPTI_MODEL_NAMES, CPTI_MODEL_COLORS } from '@/lib/cpti/dimensions';
 import type { CptiModelType } from '@/lib/cpti/dimensions';
 import { CPTI_PERSONALITY_TYPES } from '@/lib/cpti/personalities';
@@ -31,12 +32,24 @@ const EXPLORE = [
   { href: '/cpti/scenarios/enemy/', label: '死对头测试', desc: '相爱相杀、欢喜冤家、桃园结义到底是哪一种？' },
 ];
 
+function ArrowIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M9 7h8v8" />
+    </svg>
+  );
+}
+
+function CodeMark({ children, className = '', style }: { children: string; className?: string; style?: CSSProperties }) {
+  return <span className={`site-code-mark h-12 w-12 ${className}`} style={style}>{children}</span>;
+}
+
 export default function CptiHomeContent() {
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-paper)' }}>
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="relative overflow-hidden">
-        <div className="max-w-5xl mx-auto px-6 sm:px-10 pt-16 sm:pt-28 pb-16 sm:pb-24">
+        <div className="max-w-6xl mx-auto grid items-center gap-12 px-6 sm:px-10 pt-16 sm:pt-24 pb-16 sm:pb-24 lg:grid-cols-[0.92fr_0.78fr]">
           <div className="animate-fade-up">
             <div className="flex items-center gap-4 mb-10">
               <span className="serial-number text-sm">Issue · CPTI</span>
@@ -66,13 +79,13 @@ export default function CptiHomeContent() {
 
             <div className="mt-10 sm:mt-14 flex flex-wrap items-center gap-3 sm:gap-4">
               <Link href="/cpti/test/" prefetch={false} className="btn btn-rose">
-                开始测试 <span className="opacity-70">→</span>
+                开始测试 <ArrowIcon />
               </Link>
               <Link href="/cpti/join/" prefetch={false} className="btn btn-ghost">
                 输入配对码
               </Link>
               <Link href="/" prefetch={false} className="eyebrow ml-1 hover:text-text-primary transition-colors">
-                ← 返回 WTFti
+                返回 WTFti
               </Link>
             </div>
 
@@ -81,11 +94,11 @@ export default function CptiHomeContent() {
               <div className="eyebrow mb-3">和谁测？</div>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { href: '/cpti/scenarios/lover/', label: '👫 对象 / 暧昧' },
-                  { href: '/cpti/scenarios/bestie/', label: '👯 闺蜜 / 死党' },
-                  { href: '/cpti/scenarios/family/', label: '👨\u200d👩\u200d👧 家人' },
-                  { href: '/cpti/scenarios/work/', label: '💼 同事 / 队友' },
-                  { href: '/cpti/scenarios/enemy/', label: '⚔️ 死对头' },
+                  { href: '/cpti/scenarios/lover/', label: '对象 / 暧昧' },
+                  { href: '/cpti/scenarios/bestie/', label: '闺蜜 / 死党' },
+                  { href: '/cpti/scenarios/family/', label: '家人' },
+                  { href: '/cpti/scenarios/work/', label: '同事 / 队友' },
+                  { href: '/cpti/scenarios/enemy/', label: '死对头' },
                 ].map((s) => (
                   <Link
                     key={s.href}
@@ -97,6 +110,35 @@ export default function CptiHomeContent() {
                   </Link>
                 ))}
               </div>
+            </div>
+          </div>
+          <div className="site-hero-card hidden rounded-[2rem] p-7 lg:block">
+            <div className="mb-7 flex items-center justify-between">
+              <span className="eyebrow">Relationship Map</span>
+              <span className="site-code-mark h-9 px-3 text-[10px]">CPTI</span>
+            </div>
+            <div className="grid gap-3">
+              {MODELS.map((model, index) => {
+                const color = CPTI_MODEL_COLORS[model.key].base;
+                return (
+                  <div key={model.key} className="grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-[1rem] border border-border-subtle bg-bg-elevated/70 px-4 py-4">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">D{index + 1}</span>
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold text-text-primary">{CPTI_MODEL_NAMES[model.key]}</span>
+                      <span className="mt-1 block truncate text-xs text-text-muted">{model.label}</span>
+                    </span>
+                    <span className="h-2.5 w-2.5 rounded-full" style={{ background: color }} />
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-5 grid grid-cols-3 gap-px overflow-hidden rounded-[1.25rem] border border-border-subtle bg-border-subtle">
+              {MODES.map((mode) => (
+                <div key={mode.n} className="bg-bg-elevated/80 px-3 py-4 text-center">
+                  <p className="stat-value text-2xl text-text-primary">{mode.n}</p>
+                  <p className="mt-1 text-[10px] font-mono uppercase tracking-[0.16em] text-text-muted">{mode.title.slice(0, 4)}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -142,7 +184,7 @@ export default function CptiHomeContent() {
               <div key={item.tag} className="p-6 sm:p-8 relative" style={{ background: item.highlight ? 'linear-gradient(180deg, var(--color-paper-warm) 0%, var(--color-bg-elevated) 100%)' : 'var(--color-bg-elevated)' }}>
                 <span className="serial-number text-xs block mb-6">N°0{i + 1}</span>
                 <span className="eyebrow block mb-3" style={{ color: item.highlight ? 'var(--color-rose-deep)' : undefined }}>
-                  {item.tag}{item.highlight && <span className="ml-2">✦ New</span>}
+                  {item.tag}{item.highlight && <span className="ml-2">New</span>}
                 </span>
                 <p className="text-base sm:text-lg leading-snug" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, color: 'var(--color-ink)' }}>
                   {item.body}
@@ -232,12 +274,14 @@ export default function CptiHomeContent() {
                   <span className="serial-number text-[10px]">N°{String(i + 1).padStart(2, '0')}</span>
                   <span className="text-xs font-mono tracking-wider" style={{ color: p.color }}>{p.code}</span>
                 </div>
-                <div className="text-4xl sm:text-5xl mb-5 transition-transform duration-500 group-hover:scale-105 origin-left">{p.emoji}</div>
+                <CodeMark className="mb-5 transition-transform duration-500 group-hover:scale-105" style={{ color: p.color }}>
+                  {p.code.slice(0, 2)}
+                </CodeMark>
                 <div className="text-base sm:text-lg leading-tight text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
                   {p.name}
                 </div>
                 <p className="text-xs text-text-muted mt-2 line-clamp-2 leading-relaxed">{p.tagline}</p>
-                <span className="block mt-5 h-px transition-all duration-500 group-hover:w-12" style={{ background: p.color, width: 8, opacity: 0.6 }} />
+                <span className="block mt-5 h-px transition-[width] duration-500 group-hover:w-12" style={{ background: p.color, width: 8, opacity: 0.6 }} />
               </Link>
             ))}
           </div>
@@ -263,7 +307,7 @@ export default function CptiHomeContent() {
                 <p className="text-sm text-text-secondary leading-relaxed">{item.desc}</p>
                 <div className="mt-8 flex items-center gap-3">
                   <span className="h-px flex-1" style={{ background: 'var(--color-rose-deep)', opacity: 0.3 }} />
-                  <span className="text-sm transition-transform duration-500 group-hover:translate-x-1" style={{ color: 'var(--color-rose-deep)' }}>进入 →</span>
+                  <span className="text-sm transition-transform duration-500 group-hover:translate-x-1" style={{ color: 'var(--color-rose-deep)' }}>进入</span>
                 </div>
               </Link>
             ))}
@@ -284,7 +328,7 @@ export default function CptiHomeContent() {
           </p>
           <hr className="editorial-rule w-16 mx-auto mb-10" />
           <Link href="/cpti/test/" prefetch={false} className="btn btn-rose">
-            测测你和身边人是什么关系 <span className="opacity-70">→</span>
+            测测你和身边人是什么关系 <ArrowIcon />
           </Link>
         </div>
       </section>

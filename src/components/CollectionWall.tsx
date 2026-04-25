@@ -50,7 +50,7 @@ export function CollectionWall() {
   if (isLoading) {
     return (
       <div className="min-h-[200px] flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-[#C9A676] border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-gold border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -75,7 +75,7 @@ export function CollectionWall() {
               fontWeight: 500,
               letterSpacing: '0.32em',
               textTransform: 'uppercase',
-              color: '#C9A676',
+              color: 'var(--color-gold)',
               fontFamily: 'Inter, sans-serif',
             }}
           >
@@ -86,11 +86,11 @@ export function CollectionWall() {
               margin: '8px 0 0',
               fontSize: 20,
               fontWeight: 600,
-              color: '#F5F0E8',
+              color: 'var(--color-bg-primary)',
               fontFamily: 'var(--font-display), "Noto Serif SC", serif',
             }}
           >
-            已解锁 <span style={{ color: '#C07A8E' }}>{litCount}</span>/{totalCount} 个宇宙
+            已解锁 <span style={{ color: 'var(--color-accent)' }}>{litCount}</span>/{totalCount} 个宇宙
           </h3>
         </div>
 
@@ -115,7 +115,7 @@ export function CollectionWall() {
           </svg>
           <div
             className="absolute inset-0 flex items-center justify-center text-xs font-semibold"
-            style={{ color: '#C9A676' }}
+            style={{ color: 'var(--color-gold)' }}
           >
             {progressPct}%
           </div>
@@ -210,7 +210,7 @@ function UniverseGridCard({ item, index }: { item: UniverseCard; index: number }
           margin: '0 0 4px',
           fontSize: 13,
           fontWeight: 600,
-          color: isUnlocked ? '#F5F0E8' : 'rgba(245, 240, 232, 0.6)',
+          color: isUnlocked ? 'var(--color-bg-primary)' : 'rgba(245, 240, 232, 0.6)',
           fontFamily: 'var(--font-display), "Noto Serif SC", serif',
           lineHeight: 1.3,
         }}

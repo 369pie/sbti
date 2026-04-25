@@ -352,7 +352,7 @@ export function CptiPairEntryPanel({ personality }: Props) {
               />
               <button
                 onClick={generateInviteLink}
-                className="w-full py-2.5 rounded-xl bg-rose-500 text-white font-medium text-sm hover:bg-rose-600 transition-colors cursor-pointer"
+                className="w-full py-2.5 rounded-xl bg-rose-500 text-bg-primary font-medium text-sm hover:bg-rose-600 transition-colors cursor-pointer"
               >
                 生成专属邀请链接
               </button>
@@ -491,17 +491,17 @@ function PairCodePoster({
         flexDirection: 'column',
         justifyContent: 'space-between',
         fontFamily: 'var(--font-display, "Noto Serif SC", serif)',
-        color: '#1f1d1b',
+        color: 'var(--color-text-primary)',
       }}
     >
       <div>
-        <div style={{ fontSize: 28, letterSpacing: 12, color: '#a8a29e', textTransform: 'uppercase' }}>
+        <div style={{ fontSize: 28, letterSpacing: 12, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>
           CPTI · 关系图鉴
         </div>
         <div style={{ marginTop: 16, fontSize: 56, fontWeight: 600, lineHeight: 1.1, maxWidth: 760 }}>
           {scenarioText || '测测我俩在 25 种关系里是哪一种'}
         </div>
-        <div style={{ marginTop: 24, fontSize: 24, color: '#78716c' }}>
+        <div style={{ marginTop: 24, fontSize: 24, color: 'var(--color-text-muted)' }}>
           5 维度 · 16 角色 · 25 种关系类型
         </div>
       </div>
@@ -511,13 +511,13 @@ function PairCodePoster({
           alignSelf: 'center',
           padding: '64px 96px',
           borderRadius: 48,
-          background: 'rgba(255,255,255,0.85)',
+          background: 'color-mix(in oklab, var(--color-bg-primary) 85%, transparent)',
           border: '4px solid rgba(245,158,11,0.5)',
           boxShadow: '0 32px 80px -32px rgba(245,158,11,0.4)',
           textAlign: 'center',
         }}
       >
-        <div style={{ fontSize: 28, color: '#a8a29e', letterSpacing: 6, marginBottom: 24 }}>
+        <div style={{ fontSize: 28, color: 'var(--color-text-muted)', letterSpacing: 6, marginBottom: 24 }}>
           PAIR CODE
         </div>
         <div
@@ -532,21 +532,21 @@ function PairCodePoster({
         >
           {pairCode}
         </div>
-        <div style={{ marginTop: 20, fontSize: 22, color: '#78716c' }}>
+        <div style={{ marginTop: 20, fontSize: 22, color: 'var(--color-text-muted)' }}>
           打开 wtfti.com/cpti/join 输入即可
         </div>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
-          <div style={{ fontSize: 22, color: '#a8a29e' }}>发起人</div>
+          <div style={{ fontSize: 22, color: 'var(--color-text-muted)' }}>发起人</div>
           <div style={{ fontSize: 36, fontWeight: 600, marginTop: 8 }}>
             {personality.code} · {personality.name}
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 22, color: '#a8a29e' }}>WTFTI</div>
-          <div style={{ fontSize: 28, color: '#1f1d1b', fontWeight: 600, marginTop: 8 }}>
+          <div style={{ fontSize: 22, color: 'var(--color-text-muted)' }}>WTFTI</div>
+          <div style={{ fontSize: 28, color: 'var(--color-text-primary)', fontWeight: 600, marginTop: 8 }}>
             wtfti.com/cpti
           </div>
         </div>

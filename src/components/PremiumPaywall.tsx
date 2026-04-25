@@ -420,7 +420,7 @@ export function PremiumPaywall({
                 className="w-full max-w-xs py-3.5 rounded-xl text-sm tracking-wider transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-wait"
                 style={{
                   background: `linear-gradient(135deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`,
-                  color: '#fff',
+                  color: 'var(--color-bg-primary)',
                   fontFamily: 'var(--font-display)',
                   boxShadow: `0 8px 24px ${theme.cardGlow}`,
                 }}
@@ -458,7 +458,7 @@ export function PremiumPaywall({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     className="mt-3 text-xs"
-                    style={{ color: '#B14A4A' }}
+                    style={{ color: 'var(--color-accent)' }}
                   >
                     {error}
                   </motion.p>

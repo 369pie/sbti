@@ -177,7 +177,7 @@ export default function CptiSquadClient() {
             <button
               onClick={runAnalysis}
               disabled={!canAnalyze}
-              className="px-4 py-2 rounded-lg bg-rose-500/90 hover:bg-rose-500 text-white text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded-lg bg-accent/90 hover:bg-accent text-bg-primary text-sm disabled:opacity-40 disabled:cursor-not-allowed"
             >
               分析这群人
             </button>
@@ -274,7 +274,7 @@ export default function CptiSquadClient() {
                   <Link
                     href="/cpti/pricing/?intent=squad"
                     onClick={() => trackSquad('cpti_squad_paywall_view', { size: filled.length })}
-                    className="block w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 text-white text-sm text-center font-medium hover:opacity-90"
+                    className="block w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 text-bg-primary text-sm text-center font-medium hover:opacity-90"
                   >
                     ¥39 解锁完整报告 →
                   </Link>

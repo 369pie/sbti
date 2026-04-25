@@ -98,7 +98,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
             {/* 学院名 */}
             <div
               className="text-[10px] sm:text-xs tracking-[0.45em] uppercase mb-2 text-amber-100/90"
-              style={{ color: '#fbf3df' }}
+              style={{ color: 'var(--color-bg-primary)' }}
             >
               {house.nameEn}
             </div>
@@ -116,7 +116,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
               className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-5"
               style={{
                 background: `${house.accent}`,
-                color: '#fff9e6',
+                color: 'var(--color-bg-primary)',
               }}
             >
               {house.emoji} {house.name} · {character.archetype}
@@ -198,7 +198,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
           <p className="text-base hogti-ink italic font-medium leading-relaxed mb-4">
             {character.essence}
           </p>
-          <p className="text-sm leading-[1.9] whitespace-pre-line" style={{ color: '#3a2e18' }}>
+          <p className="text-sm leading-[1.9] whitespace-pre-line" style={{ color: 'var(--color-text-primary)' }}>
             {character.narrative}
           </p>
         </motion.section>
@@ -213,7 +213,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
           <h2 className="text-xs tracking-[0.3em] uppercase mb-4" style={{ color: house.textAccent }}>
             📜 你在魔法世界里的 OS
           </h2>
-          <p className="text-sm leading-[1.9] whitespace-pre-line" style={{ color: '#3a2e18' }}>
+          <p className="text-sm leading-[1.9] whitespace-pre-line" style={{ color: 'var(--color-text-primary)' }}>
             {p.copy.osTranslation}
           </p>
         </motion.section>
@@ -237,7 +237,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
                 >
                   {i + 1}
                 </span>
-                <span className="text-sm leading-relaxed" style={{ color: '#3a2e18' }}>{s}</span>
+                <span className="text-sm leading-relaxed" style={{ color: 'var(--color-text-primary)' }}>{s}</span>
               </li>
             ))}
           </ul>
@@ -261,7 +261,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
             {character.dialogueMarker}
           </p>
           <div className="hogti-gold-divider w-20 mx-auto mt-4" />
-          <p className="text-sm mt-4 italic" style={{ color: '#3a2e18' }}>
+          <p className="text-sm mt-4 italic" style={{ color: 'var(--color-text-primary)' }}>
             {p.copy.closer}
           </p>
         </motion.section>
@@ -278,7 +278,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
           <h3 className="text-lg font-semibold mb-1 hogti-ink" style={{ fontFamily: "'EB Garamond', 'Noto Serif SC', serif" }}>
             发一张你的分院通知书
           </h3>
-          <p className="text-xs mb-5" style={{ color: '#4a3a1e' }}>
+          <p className="text-xs mb-5" style={{ color: 'var(--color-text-primary)' }}>
             {character.socialShare}
           </p>
 
@@ -317,7 +317,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
 
         {/* Other characters */}
         <section className="mb-8">
-          <h3 className="text-xs tracking-[0.3em] uppercase mb-4 text-center" style={{ color: '#8a6a2f' }}>
+          <h3 className="text-xs tracking-[0.3em] uppercase mb-4 text-center" style={{ color: 'var(--color-gold)' }}>
             · 其他霍格沃茨人格 ·
           </h3>
           <div className="grid grid-cols-2 gap-3">
@@ -362,7 +362,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
               className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-medium text-sm shadow-lg"
               style={{
                 background: house.accent,
-                color: '#fbf3df',
+                color: 'var(--color-bg-primary)',
                 fontFamily: "'EB Garamond', 'Noto Serif SC', serif",
               }}
             >

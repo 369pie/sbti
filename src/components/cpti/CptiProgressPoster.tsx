@@ -68,8 +68,8 @@ export function CptiProgressPoster({ collectedSlugs }: Props) {
         disabled={downloading}
         className={`group inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all ${
           isGraduated
-            ? 'bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 text-white shadow-lg hover:shadow-xl'
-            : 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-md hover:shadow-lg'
+            ? 'bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 text-bg-primary shadow-lg hover:shadow-xl'
+            : 'bg-gradient-to-r from-rose-500 to-purple-600 text-bg-primary shadow-md hover:shadow-lg'
         } ${downloading ? 'opacity-60 cursor-wait' : 'hover:scale-[1.02]'}`}
       >
         <span className="text-base">{isGraduated ? '🏆' : '📤'}</span>

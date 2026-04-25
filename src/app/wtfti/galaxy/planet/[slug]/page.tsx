@@ -87,7 +87,7 @@ export default async function PlanetLandingPage({ params }: Props) {
         minHeight: '100vh',
         background:
           'radial-gradient(ellipse 100% 60% at 50% 0%, #2a1c4d 0%, #1a1530 38%, #0F0A22 100%)',
-        color: '#F5F0E8',
+        color: 'var(--color-bg-primary)',
         fontFamily: 'var(--font-display), "Cormorant Garamond", "Noto Serif SC", serif',
         padding: '64px 24px 96px',
       }}
@@ -99,7 +99,7 @@ export default async function PlanetLandingPage({ params }: Props) {
             fontFamily: 'Inter, sans-serif',
             fontSize: 11,
             letterSpacing: '0.42em',
-            color: '#D4B58A',
+            color: 'var(--color-gold)',
             textAlign: 'center',
             textTransform: 'uppercase',
           }}
@@ -147,7 +147,7 @@ export default async function PlanetLandingPage({ params }: Props) {
             fontFamily: '"Noto Serif SC", serif',
             fontSize: 14,
             lineHeight: 1.85,
-            color: 'rgba(245,240,232,0.8)',
+            color: 'color-mix(in oklab, var(--color-bg-primary) 80%, transparent)',
             textAlign: 'center',
           }}
         >
@@ -176,7 +176,7 @@ export default async function PlanetLandingPage({ params }: Props) {
             fontFamily: '"Noto Serif SC", serif',
             fontSize: 14.5,
             lineHeight: 1.95,
-            color: 'rgba(245,240,232,0.85)',
+            color: 'color-mix(in oklab, var(--color-bg-primary) 85%, transparent)',
             letterSpacing: '0.02em',
           }}
         >
@@ -193,10 +193,10 @@ export default async function PlanetLandingPage({ params }: Props) {
               border: `1px solid ${planet.accent}55`,
             }}
           >
-            <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.42em', color: '#D4B58A', textTransform: 'uppercase' }}>
+            <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.42em', color: 'var(--color-gold)', textTransform: 'uppercase' }}>
               ✦ Tutelary Deity · 主神化身 · {deity.sigilGlyph}
             </p>
-            <h2 style={{ margin: '8px 0 14px', fontFamily: 'var(--font-display), serif', fontStyle: 'italic', fontSize: 24, color: '#F5F0E8', letterSpacing: '0.04em' }}>
+            <h2 style={{ margin: '8px 0 14px', fontFamily: 'var(--font-display), serif', fontStyle: 'italic', fontSize: 24, color: 'var(--color-bg-primary)', letterSpacing: '0.04em' }}>
               {deity.eastern.name} · {deity.western.name} · {deity.occult.name}
             </h2>
             <p style={{ margin: '0 0 8px', fontSize: 13.5, color: 'rgba(245,240,232,0.85)', lineHeight: 1.85 }}>
@@ -223,10 +223,10 @@ export default async function PlanetLandingPage({ params }: Props) {
               border: '1px solid rgba(201,166,118,0.22)',
             }}
           >
-            <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.42em', color: '#D4B58A', textTransform: 'uppercase', textAlign: 'center' }}>
+            <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.42em', color: 'var(--color-gold)', textTransform: 'uppercase', textAlign: 'center' }}>
               ✦ Soul Sigil · 灵魂印记
             </p>
-            <p style={{ margin: '8px auto 24px', maxWidth: 380, textAlign: 'center', fontSize: 12.5, lineHeight: 1.7, color: 'rgba(245,240,232,0.65)', fontFamily: '"Noto Serif SC", serif' }}>
+            <p style={{ margin: '8px auto 24px', maxWidth: 380, textAlign: 'center', fontSize: 12.5, lineHeight: 1.7,              color: 'color-mix(in oklab, var(--color-bg-primary) 65%, transparent)',fontFamily: '"Noto Serif SC", serif' }}>
               这是属于「{planet.name}」类人格的几何咒符样式范例。
               <br />
               做完测试后，你会得到唯一属于你自己的版本。
@@ -253,7 +253,7 @@ export default async function PlanetLandingPage({ params }: Props) {
               margin: 0,
               fontSize: 10,
               letterSpacing: '0.42em',
-              color: '#C07A8E',
+              color: 'var(--color-accent)',
               textTransform: 'uppercase',
             }}
           >
@@ -265,7 +265,7 @@ export default async function PlanetLandingPage({ params }: Props) {
               fontFamily: 'var(--font-display), serif',
               fontStyle: 'italic',
               fontSize: 26,
-              color: '#F5F0E8',
+              color: 'var(--color-bg-primary)',
               letterSpacing: '0.04em',
             }}
           >
@@ -276,14 +276,14 @@ export default async function PlanetLandingPage({ params }: Props) {
               margin: '6px auto 18px',
               maxWidth: 420,
               fontSize: 13,
-              color: 'rgba(245,240,232,0.78)',
+              color: 'color-mix(in oklab, var(--color-bg-primary) 78%, transparent)',
               fontFamily: '"Noto Serif SC", serif',
               lineHeight: 1.85,
             }}
           >
             音乐 · 文学 · 颜色 · 电影 · 气味 · 触觉——
             <br />
-            和 ta 答得越像，你们越接近「<span style={{ color: '#C9A676' }}>灵魂双星</span>」。
+            和 ta 答得越像，你们越接近「<span style={{ color: 'var(--color-gold)' }}>灵魂双星</span>」。
           </p>
           <Link
             href="/wtfti/galaxy/soul-probe/"
@@ -292,7 +292,7 @@ export default async function PlanetLandingPage({ params }: Props) {
               padding: '12px 22px',
               borderRadius: 999,
               border: '1px solid #C07A8E',
-              background: '#C07A8E',
+              background: 'var(--color-accent)',
               color: '#1a1530',
               fontFamily: '"Noto Serif SC", serif',
               fontSize: 13,
@@ -321,7 +321,7 @@ export default async function PlanetLandingPage({ params }: Props) {
                 fontFamily: 'Inter, sans-serif',
                 fontSize: 10,
                 letterSpacing: '0.42em',
-                color: '#D4B58A',
+                color: 'var(--color-gold)',
                 textTransform: 'uppercase',
               }}
             >
@@ -333,7 +333,7 @@ export default async function PlanetLandingPage({ params }: Props) {
                 fontFamily: 'var(--font-display), serif',
                 fontStyle: 'italic',
                 fontSize: 22,
-                color: '#F5F0E8',
+                color: 'var(--color-bg-primary)',
                 letterSpacing: '0.04em',
               }}
             >
@@ -356,7 +356,7 @@ export default async function PlanetLandingPage({ params }: Props) {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.42em', color: '#D4B58A', fontFamily: 'Inter, sans-serif' }}>
+              <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.42em', color: 'var(--color-gold)', fontFamily: 'Inter, sans-serif' }}>
                 ✦ TODAY&apos;S EPHEMERIS
               </p>
               <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: 10, color: 'rgba(245,240,232,0.4)' }}>
@@ -406,7 +406,7 @@ export default async function PlanetLandingPage({ params }: Props) {
                 fontFamily: 'Inter, sans-serif',
                 fontSize: 10,
                 letterSpacing: '0.42em',
-                color: '#D4B58A',
+                color: 'var(--color-gold)',
                 textTransform: 'uppercase',
               }}
             >
@@ -426,7 +426,7 @@ export default async function PlanetLandingPage({ params }: Props) {
                     fontStyle: 'italic',
                     fontSize: 16,
                     lineHeight: 1.6,
-                    color: '#F5F0E8',
+                    color: 'var(--color-bg-primary)',
                   }}
                 >
                   「{l.quote}」
@@ -438,7 +438,7 @@ export default async function PlanetLandingPage({ params }: Props) {
                       fontFamily: 'Inter, sans-serif',
                       fontSize: 10,
                       letterSpacing: '0.2em',
-                      color: 'rgba(245,240,232,0.55)',
+                      color: 'color-mix(in oklab, var(--color-bg-primary) 55%, transparent)',
                     }}
                   >
                     — {l.author}
@@ -458,7 +458,7 @@ export default async function PlanetLandingPage({ params }: Props) {
               fontFamily: 'Inter, sans-serif',
               fontSize: 10,
               letterSpacing: '0.42em',
-              color: '#D4B58A',
+              color: 'var(--color-gold)',
               textTransform: 'uppercase',
             }}
           >
@@ -480,7 +480,7 @@ export default async function PlanetLandingPage({ params }: Props) {
                 <Link
                   href={`/wtfti/galaxy/planet/${p.slug}/`}
                   style={{
-                    color: 'rgba(245,240,232,0.7)',
+                    color: 'color-mix(in oklab, var(--color-bg-primary) 70%, transparent)',
                     fontFamily: 'var(--font-display), serif',
                     fontStyle: 'italic',
                     fontSize: 14,

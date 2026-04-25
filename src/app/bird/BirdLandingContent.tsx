@@ -29,7 +29,7 @@ export default function BirdLandingContent() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/bird/test/"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-white font-medium text-base hover:bg-accent/90 transition-all duration-200"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base hover:bg-accent/90 transition-all duration-200"
               >
                 开始测试
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -152,7 +152,7 @@ export default function BirdLandingContent() {
           </p>
           <Link
             href="/bird/test/"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-white font-medium text-base hover:bg-accent/90 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base hover:bg-accent/90 transition-all"
           >
             开始测试
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
