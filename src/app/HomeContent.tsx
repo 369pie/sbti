@@ -14,6 +14,7 @@ import { WTFTI_PERSONALITIES, getWtftiTypeThumbnailImage } from '@/lib/wtfti-per
  * priority: WTFTI / SoulTI flagships first, then relationships, then Mysti
  * (subscription) and WTFCard (collector).
  */
+/** Phase 0 首页收敛：只保留 3 个主入口 */
 const UNIVERSE_GRID: Array<{
   href: string;
   numeral: string;
@@ -27,100 +28,51 @@ const UNIVERSE_GRID: Array<{
   accentDeep: string;
 }> = [
   {
-    href: '/wtfti/',
+    href: '/mysti/daily/',
     numeral: 'I',
-    eyebrow: 'WTFTI · Pantheon',
-    title: '人格神域',
-    italic: '召唤你的主神',
-    desc: '主神 × 神侍三位 × 暗面副形 × 月相日课 × 五感档案。一份只属于你的神祇身份。',
-    free: '免费 90 秒召唤',
-    sku: 'wtfti-deep-pantheon',
-    accent: 'var(--color-rose)',
-    accentDeep: 'var(--color-rose-deep)',
-  },
-  {
-    href: '/soulti/',
-    numeral: 'II',
-    eyebrow: 'SOULTI · Mirror',
-    title: '灵魂镜像',
-    italic: '安静地看见自己',
-    desc: '九轴交叉 × 修复处方 × 写给你的灵魂长信。这一面镜子很轻，但很狠。',
-    free: '免费完整测试',
-    sku: 'soulti-deep-mirror',
-    accent: 'var(--color-rose-deep)',
-    accentDeep: 'var(--color-ember)',
-  },
-  {
-    href: '/cpti/',
-    numeral: 'III',
-    eyebrow: 'CPTI · Together',
-    title: '关系深测',
-    italic: '你们是什么型？',
-    desc: '24 题双人 × 8 维关系雷达 × 30 条共修建议 × 12 个月主题。',
-    free: '免费 24 题双人测',
-    sku: 'cpti-deep-relationship',
-    accent: 'var(--color-gold)',
-    accentDeep: 'var(--color-gold-leaf)',
-  },
-  {
-    href: '/xpti/',
-    numeral: 'IV',
-    eyebrow: 'XPTI · Intimacy',
-    title: '恋爱 XP',
-    italic: '你的偏好与雷区',
-    desc: 'XP 雷达 × 6 类亲密配对推荐 × 8 个雷区清单 × 24 个对话开场白。',
-    free: '免费 XP 测试',
-    sku: 'xpti-deep-xp',
-    accent: 'var(--color-rose)',
-    accentDeep: 'var(--color-rose-deep)',
-  },
-  {
-    href: '/mysti/',
-    numeral: 'V',
-    eyebrow: 'MYSTI · Daily',
-    title: '灵鉴 Mysti',
-    italic: '每日抽牌 · 长期陪伴',
-    desc: '塔罗 × 人格牌 × 灵魂信。订阅制陪伴你看见每一天的小预兆。',
+    eyebrow: 'MYSTI · Today',
+    title: '今日一牌',
+    italic: '听懂今天的自己',
+    desc: '每天一张牌，给情绪一个名字。适合深夜打开，先安抚，再决定要不要深聊。',
     free: '每日免费抽牌',
     sku: 'monthly-pass',
     accent: 'var(--color-sage)',
     accentDeep: 'var(--color-gem)',
   },
   {
-    href: '/card/',
-    numeral: 'VI',
-    eyebrow: 'WTFCARD · Archive',
-    title: '多宇宙档案',
-    italic: '你的人格收藏册',
-    desc: '把所有测过的宇宙合并为一张可下载的典藏档案。集邮 / 印刷级 PDF / 1080×1920 壁纸。',
-    free: '免费集邮',
-    sku: 'wtfcard-collector',
+    href: '/cpti/',
+    numeral: 'II',
+    eyebrow: 'CPTI · Us',
+    title: '我们合不合',
+    italic: '把关系说清楚',
+    desc: '双人关系深测：默契、冲突、修复建议。想懂一段关系时，从这里开始。',
+    free: '免费 24 题双人测',
+    sku: 'cpti-deep-relationship',
     accent: 'var(--color-gold)',
     accentDeep: 'var(--color-gold-leaf)',
   },
   {
-    href: '/mirror/',
-    numeral: 'VII',
-    eyebrow: 'MIRROR · AI Style Lab',
-    title: '灵镜实验室',
-    italic: '上传照片 · AI 帮你变美',
-    desc: '发型改造 × 个人色彩诊断 × 妆容教学 × 穿搭推荐。拍一张照片，拿到专属于你的风格报告。',
-    free: '免费 2 次体验',
+    href: '/test/',
+    numeral: 'III',
+    eyebrow: 'CLASSIC · First Look',
+    title: '经典测试',
+    italic: '三分钟认识自己',
+    desc: '低承诺的人格初见。测完再决定要不要走进今日一牌或关系合盘。',
+    free: '免费文字版测试',
     sku: 'wtfti-deep-pantheon',
     accent: 'var(--color-rose)',
     accentDeep: 'var(--color-rose-deep)',
   },
 ];
 
-/** Style universes (auto-generated from live universes) */
-const STYLE_UNIVERSES = getLiveUniverses()
-  .filter(u => !['cpti', 'xpti', 'soulti', 'wtfti', 'mysti'].includes(u.id) && !u.isUgc);
+/** Style universes — Phase 0 首页不再展示换皮/游戏向入口 */
+const STYLE_UNIVERSES: ReturnType<typeof getLiveUniverses> = [];
 
 /** Relationship / social play — shrunk to 3 marquee cards */
 const RELATIONSHIP_PLAYS = [
-  { href: '/cp/', mark: 'CP', label: 'CP 配对', desc: '快速匹配默契度' },
-  { href: '/identify/', mark: 'ID', label: '好友鉴定', desc: '帮朋友做一份人格鉴定书' },
-  { href: '/squad/', mark: 'SQ', label: '组局测试', desc: '拉群一起测' },
+  { href: '/xpti/', mark: 'XC', label: '关系沟通', desc: '测测你们怎么说话、怎么靠近' },
+  { href: '/cpti/', mark: 'CP', label: '我们合不合', desc: '双人关系深测' },
+  { href: '/soulti/', mark: 'SL', label: '灵魂长信', desc: '写给自己的一封长信' },
 ];
 
 const HERO_PERSONAS = WTFTI_PERSONALITIES.slice(0, 3);
@@ -137,14 +89,14 @@ const FAQS = [
       'MBTI 更像经典人格框架，WTFTI 更贴近中文互联网语境。你看到的是生活反应和关系状态，不是四个字母和理论模型。',
   },
   {
-    question: '这么多宇宙，从哪个开始？',
+    question: '我该从哪个开始？',
     answer:
-      '先从 WTFTI 人格神域开始：90 秒召唤主神，拿到你的主星与神龛，再去 SoulTI、CPTI、XPTI 看同一个你在不同主题里的翻译。',
+      '先抽「今日一牌」安顿情绪；想看关系就去「我们合不合」；只想快速认识自己，走「经典测试」。',
   },
   {
-    question: '付费内容是什么？为什么不全部订阅？',
+    question: '付费内容是什么？',
     answer:
-      '六大宇宙的核心测试和结果页全部免费。如果想读到「深度档案」（深档主神三联档 / 灵魂长信 / 关系雷达 / XP 雷达），可以单次解锁 ¥3.9–9.9；想长期陪伴和每日抽牌再考虑 Mysti 月度通行证 ¥19/月。',
+      '核心体验先免费。想要更完整的情绪解读、关系合盘或灵魂长信，再按次解锁；需要每天陪伴可以考虑 Mysti 月卡。',
   },
   {
     question: '结果能拿来做严肃诊断吗？',
@@ -198,29 +150,28 @@ export default function HomeContent() {
               </p>
               <hr className="editorial-rule w-24 mb-6" />
               <p className="text-base sm:text-lg leading-[1.8] text-text-secondary max-w-xl">
-                一份写给当代女性的人格图鉴。<br className="hidden sm:block" />
-                同一个你，在不同宇宙里，被翻译成完全不同的样子。
+                写给当代女性的情绪陪伴站。<br className="hidden sm:block" />
+                先听懂今天的自己，再看清一段关系。
               </p>
             </div>
 
           {/* Primary CTA row */}
           <div className="mt-12 sm:mt-16 flex flex-wrap items-center gap-4">
-            <Link href="/wtfti/galaxy/test/" prefetch={false} className="btn btn-ink">
-              召唤你的主神
+            <Link href="/mysti/daily/" prefetch={false} className="btn btn-ink">
+              今日一牌
               <ArrowIcon />
             </Link>
-            <Link href="/wtfti/" prefetch={false} className="btn btn-ghost">
-              人格神域首页
+            <Link href="/cpti/" prefetch={false} className="btn btn-ghost">
+              我们合不合
             </Link>
-            <span className="eyebrow ml-2 hidden sm:inline">
-              {universes.length} 个宇宙 · 100+ 种人格
-            </span>
+            <Link href="/test/" prefetch={false} className="btn btn-ghost">
+              经典测试
+            </Link>
           </div>
-          {/* 经典初见兜底链接 — 低承诺用户分流 */}
           <p className="mt-4 text-xs text-text-muted">
-            不想进神域？
-            <Link href="/test/" prefetch={false} className="underline underline-offset-2 hover:text-text-secondary transition-colors ml-1">
-              经典初见版（文字版 · 3-5 分钟）
+            想看关系沟通画像？
+            <Link href="/xpti/" prefetch={false} className="underline underline-offset-2 hover:text-text-secondary transition-colors ml-1">
+              打开 XPTI 关系沟通
             </Link>
           </p>
           </div>
@@ -278,10 +229,10 @@ export default function HomeContent() {
               <span className="serial-number text-xs mr-3">02</span>
               <span className="eyebrow">What&apos;s Inside</span>
               <h2 className="section-headline text-3xl sm:text-4xl mt-3">
-                核心<span className="editorial-italic" style={{ color: 'var(--color-rose)' }}>产品</span>
+                先从这<span className="editorial-italic" style={{ color: 'var(--color-rose)' }}>三件事</span>开始
               </h2>
               <p className="display-tagline text-text-secondary mt-3 text-base max-w-xl">
-                每个宇宙都能先免费体验核心测试与结果，再按你喜欢的方向慢慢深入。
+                今日一牌安顿情绪，我们合不合看清关系，经典测试快速认识自己。
               </p>
             </div>
           </div>

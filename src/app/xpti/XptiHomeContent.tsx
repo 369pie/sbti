@@ -9,7 +9,7 @@ const VELVET_DARK_WINE = '#6A2A3E';
 const VELVET_ROSE = 'var(--color-accent)';
 
 const DIMS: { key: XptiModelType; poleHigh: string; poleLow: string; question: string }[] = [
-  { key: 'dominance', poleHigh: '指挥官', poleLow: '乖顺流', question: '你在亲密关系里是导演还是女主' },
+  { key: 'dominance', poleHigh: '指挥官', poleLow: '乖顺流', question: '你在关系沟通里是导演还是女主' },
   { key: 'exposure', poleHigh: '坦白局', poleLow: '面具系', question: '你愿意暴露多少真实的自己' },
   { key: 'sensory', poleHigh: '通感体', poleLow: '钝感力', question: '一次触碰能让你过电吗' },
   { key: 'tempo', poleHigh: '微波炉', poleLow: '慢火锅', question: '你喜欢快节奏还是慢慢升温' },
@@ -57,7 +57,7 @@ function XptiRadarPreview() {
         viewBox={`0 0 ${size} ${size}`}
         className="w-full max-w-[320px] h-auto"
         role="img"
-        aria-label="九维亲密偏好雷达预览"
+        aria-label="九维关系沟通雷达预览"
       >
         {levels.map(level => {
           const points = nodes
@@ -295,7 +295,7 @@ export default function XptiHomeContent() {
             <span className="serial-number text-xs mr-3">03</span>
             <span className="eyebrow">Nine dimensions · 九条线索</span>
             <h2 className="section-headline text-2xl sm:text-4xl mt-3">
-              亲密偏好的<span className="editorial-italic">九条线</span>
+              关系沟通的<span className="editorial-italic">九条线</span>
             </h2>
             <p className="display-tagline text-text-secondary mt-4 text-base sm:text-lg max-w-xl">
               每一条都是你靠近一个人时，悄悄被点亮的频率。
@@ -494,7 +494,7 @@ export default function XptiHomeContent() {
             <span className="serial-number text-xs mr-3">06</span>
             <span className="eyebrow">Decode</span>
             <h2 className="section-headline text-2xl sm:text-4xl mt-3">
-              三步<span className="editorial-italic">照见你的亲密偏好</span>
+              三步<span className="editorial-italic">照见你的关系沟通</span>
             </h2>
           </div>
 
@@ -540,7 +540,7 @@ export default function XptiHomeContent() {
           <span className="serial-number text-xs mr-3">07</span>
           <span className="eyebrow">Ready</span>
           <h2 className="editorial-display text-3xl sm:text-5xl md:text-6xl mt-6 mb-4">
-            你的亲密偏好，
+            你的关系沟通，
             <br />
             <span className="editorial-italic" style={{ color: VELVET_DARK_WINE }}>
               藏在这 12 种原型里

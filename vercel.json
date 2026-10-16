@@ -9,7 +9,10 @@
     {
       "source": "/:path*",
       "has": [
-        { "type": "host", "value": "wtfti.com" }
+        {
+          "type": "host",
+          "value": "wtfti.com"
+        }
       ],
       "destination": "https://www.wtfti.com/:path*",
       "permanent": true
@@ -17,7 +20,10 @@
     {
       "source": "/:path*",
       "has": [
-        { "type": "host", "value": "sbtinb.com" }
+        {
+          "type": "host",
+          "value": "sbtinb.com"
+        }
       ],
       "destination": "https://www.wtfti.com/:path*",
       "permanent": true
@@ -25,9 +31,72 @@
     {
       "source": "/:path*",
       "has": [
-        { "type": "host", "value": "www.sbtinb.com" }
+        {
+          "type": "host",
+          "value": "www.sbtinb.com"
+        }
       ],
       "destination": "https://www.wtfti.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/creator/:path*",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/ugc/:path*",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/c/:path*",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/mirror/:path*",
+      "destination": "/mysti/daily/",
+      "permanent": true
+    },
+    {
+      "source": "/bird/:path*",
+      "destination": "/test/",
+      "permanent": true
+    },
+    {
+      "source": "/drunk/:path*",
+      "destination": "/test/",
+      "permanent": true
+    },
+    {
+      "source": "/wtfti/galaxy/:path*",
+      "destination": "/mysti/daily/",
+      "permanent": true
+    },
+    {
+      "source": "/wtfti/kings/:path*",
+      "destination": "/test/",
+      "permanent": true
+    },
+    {
+      "source": "/wtfti/delta/:path*",
+      "destination": "/test/",
+      "permanent": true
+    },
+    {
+      "source": "/jueti/:path*",
+      "destination": "/test/",
+      "permanent": true
+    },
+    {
+      "source": "/fanrenti/:path*",
+      "destination": "/test/",
+      "permanent": true
+    },
+    {
+      "source": "/hogti/:path*",
+      "destination": "/test/",
       "permanent": true
     }
   ]
