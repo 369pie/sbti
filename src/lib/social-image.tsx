@@ -50,13 +50,15 @@ function loadSocialFonts(): Promise<{
   return socialFontsPromise;
 }
 
-const featuredTypes = [
-  { code: 'CTRL', label: '拿捏者', background: 'linear-gradient(135deg, #f59e0b 0%, #fb923c 100%)' },
-  { code: 'BOSS', label: '控场王', background: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)' },
-  { code: 'CHILL', label: '无所谓', background: 'linear-gradient(135deg, #22c55e 0%, #06b6d4 100%)' },
-] as const;
+const BG = '#FFF7F8';
+const ACCENT = '#F59BB8';
+const INK = '#4D2C2F';
+const INK_SOFT = '#6E4549';
+const ROSE_MIST = '#FAD6E0';
 
-export const socialImageAlt = 'WTFTI 多宇宙人格测试预览图，展示平台品牌与测试亮点';
+const chips = ['今日一牌', '情侣关系报告 ¥12.9', '三分钟经典测试'] as const;
+
+export const socialImageAlt = 'WTFTI — 女生的情绪陪伴站 · 情侣关系沟通报告';
 
 export const socialImageSize = {
   width: 1200,
@@ -76,243 +78,92 @@ export async function createSocialImageResponse() {
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'column',
           justifyContent: 'space-between',
-          background: 'linear-gradient(135deg, #FAF8F5 0%, #F2EFEA 55%, #EDE8E2 100%)',
-          color: '#2D2A26',
-          padding: '52px 56px',
+          alignItems: 'center',
+          background: `radial-gradient(circle at 85% 15%, #FCE9F0 0%, ${BG} 55%, #FFFFFF 100%)`,
+          color: INK,
+          padding: '56px 64px',
+          fontFamily: 'Noto Sans SC',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            top: '-120px',
-            right: '-80px',
-            width: '380px',
-            height: '380px',
-            borderRadius: '999px',
-            background: 'rgba(224, 96, 136, 0.08)',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '-80px',
-            left: '-40px',
-            width: '320px',
-            height: '320px',
-            borderRadius: '999px',
-            background: 'rgba(14, 165, 196, 0.06)',
-          }}
-        />
-
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '640px' }}>
           <div
             style={{
               display: 'flex',
-              alignItems: 'center',
               alignSelf: 'flex-start',
               borderRadius: '999px',
-              border: '1px solid #DDD8D1',
-              background: '#FFFFFF',
-              padding: '12px 18px',
-              fontSize: '24px',
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color: '#e06088',
-              fontWeight: 600,
+              background: ACCENT,
+              color: INK,
+              padding: '10px 22px',
+              fontSize: '26px',
+              fontWeight: 700,
+              letterSpacing: '0.18em',
             }}
           >
             WTFTI
           </div>
-
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              marginTop: '28px',
-              maxWidth: '760px',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                fontSize: '88px',
-                lineHeight: 1,
-                fontWeight: 800,
-                letterSpacing: '-0.04em',
-              }}
-            >
-              What&apos;s your type?
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                marginTop: '14px',
-                fontSize: '40px',
-                lineHeight: 1.2,
-                color: '#2D2A26',
-                fontFamily: 'Noto Sans SC',
-                fontWeight: 700,
-              }}
-            >
-              WTFTI 多宇宙人格测试
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                marginTop: '18px',
-                fontSize: '30px',
-                lineHeight: 1.3,
-                color: '#6B6560',
-              }}
-            >
-              10+ universes, 100+ types, endless versions of you.
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                marginTop: '10px',
-                fontSize: '24px',
-                lineHeight: 1.3,
-                color: '#7A736D',
-                fontFamily: 'Noto Sans SC',
-              }}
-            >
-              同一个你，在不同宇宙里会被翻译成完全不同的人设
-            </div>
+          <div style={{ display: 'flex', marginTop: '36px', fontSize: '76px', fontWeight: 700, lineHeight: 1.1 }}>
+            女生的情绪陪伴站
           </div>
+          <div style={{ display: 'flex', marginTop: '14px', fontSize: '44px', fontWeight: 700, color: INK_SOFT }}>
+            情侣关系沟通报告
+          </div>
+          <div style={{ display: 'flex', marginTop: '24px', fontSize: '28px', color: INK_SOFT, lineHeight: 1.4 }}>
+            先听懂今天的自己，再看清一段关系。
+          </div>
+          <div style={{ display: 'flex', marginTop: '36px', gap: '12px' }}>
+            {chips.map((c) => (
+              <div
+                key={c}
+                style={{
+                  display: 'flex',
+                  borderRadius: '999px',
+                  border: `2px solid ${ACCENT}`,
+                  background: '#FFFFFF',
+                  padding: '10px 20px',
+                  fontSize: '22px',
+                  color: INK,
+                }}
+              >
+                {c}
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', marginTop: '32px', fontSize: '22px', color: '#9C7178' }}>wtfti.com</div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div
-              style={{
-                display: 'flex',
-                gap: '14px',
-                alignItems: 'center',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  borderRadius: '999px',
-                  background: 'rgba(224, 96, 136, 0.1)',
-                  border: '1px solid rgba(224, 96, 136, 0.3)',
-                  padding: '10px 16px 12px',
-                  color: '#e06088',
-                }}
-              >
-                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>10+ universes</div>
-                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>多个主题宇宙</div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  borderRadius: '999px',
-                  background: 'rgba(14, 165, 196, 0.1)',
-                  border: '1px solid rgba(14, 165, 196, 0.3)',
-                  padding: '10px 16px 12px',
-                  color: '#0ea5c4',
-                }}
-              >
-                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>100+ types</div>
-                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>100+ 张人设卡</div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  borderRadius: '999px',
-                  background: 'rgba(14, 165, 114, 0.1)',
-                  border: '1px solid rgba(14, 165, 114, 0.3)',
-                  padding: '10px 16px 12px',
-                  color: '#0ea572',
-                }}
-              >
-                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>WTF energy</div>
-                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>荒诞又上头</div>
-              </div>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                marginTop: '24px',
-                fontSize: '20px',
-                color: '#9C9590',
-                alignItems: 'center',
-              }}
-            >
-              <span>wtfti.com</span>
-              <span style={{ display: 'flex', marginLeft: '12px', fontFamily: 'Noto Sans SC', letterSpacing: 0 }}>
-                中文语境人格测试
-              </span>
-            </div>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '360px',
+            padding: '32px',
+            borderRadius: '32px',
+            background: '#FFFFFF',
+            border: `2px solid ${ROSE_MIST}`,
+            boxShadow: '0 24px 60px rgba(245, 155, 184, 0.35)',
+          }}
+        >
+          <div style={{ display: 'flex', fontSize: '20px', color: '#9C7178' }}>今晚可以试着这样说</div>
+          <div style={{ display: 'flex', marginTop: '16px', fontSize: '32px', fontWeight: 700, lineHeight: 1.45, color: INK }}>
+            “我不是想赢这场架，我只是想你先抱抱我。”
           </div>
-
           <div
             style={{
               display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              padding: '22px 24px',
-              borderRadius: '28px',
-              background: '#FFFFFF',
-              border: '1px solid #DDD8D1',
+              marginTop: '28px',
+              alignSelf: 'flex-start',
+              borderRadius: '999px',
+              background: INK,
+              color: BG,
+              padding: '12px 24px',
+              fontSize: '22px',
+              fontWeight: 700,
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                fontSize: '17px',
-                color: '#9C9590',
-                textTransform: 'uppercase',
-                letterSpacing: '0.12em',
-              }}
-            >
-              Featured types
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                marginTop: '6px',
-                fontSize: '16px',
-                color: '#8D867F',
-                fontFamily: 'Noto Sans SC',
-              }}
-            >
-              热门人设
-            </div>
-            <div style={{ display: 'flex', marginTop: '14px', gap: '10px' }}>
-              {featuredTypes.map((type) => (
-                <div
-                  key={type.code}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    width: '82px',
-                    height: '82px',
-                    borderRadius: '22px',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: type.background,
-                    color: '#FFFFFF',
-                  }}
-                >
-                  <div style={{ display: 'flex', fontSize: '20px', fontWeight: 800 }}>{type.code}</div>
-                  <div style={{ display: 'flex', marginTop: '4px', fontSize: '13px', fontFamily: 'Noto Sans SC' }}>
-                    {type.label}
-                  </div>
-                </div>
-              ))}
-            </div>
+            和 ta 一起测
           </div>
         </div>
       </div>
