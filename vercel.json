@@ -11,6 +11,10 @@
     {
       "path": "/api/push/dispatch",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/email/daily-dispatch",
+      "schedule": "15 0 * * *"
     }
   ],
   "redirects": [

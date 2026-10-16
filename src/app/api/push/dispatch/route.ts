@@ -25,10 +25,7 @@ type PushRow = {
 function cronAuthorized(req: NextRequest): boolean {
   const auth = req.headers.get('authorization') ?? '';
   const expected =
-    process.env.PUSH_CRON_SECRET ??
-    process.env.WTFTI_LETTER_CRON_SECRET ??
-    process.env.SOUL_LETTER_CRON_SECRET ??
-    process.env.CRON_SECRET;
+    process.env.CRON_SECRET ?? process.env.PUSH_CRON_SECRET;
   // If no secret is configured (local preview), allow — same pattern as letter remind.
   if (!expected) return true;
   return auth === `Bearer ${expected}`;
