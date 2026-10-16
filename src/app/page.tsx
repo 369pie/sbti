@@ -10,23 +10,23 @@ const homepageFaqSchema = {
       name: 'WTFTI 是什么？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'WTFTI 是一个多宇宙人格测试平台。同一个你，在不同主题宇宙里有不同的人格翻译，经典版、毒舌版、社畜版、鸟类版、花朵版各有独立的视觉风格和测试体验。',
+        text: 'WTFTI 是写给女生的情绪陪伴站：每天一张牌帮你安顿情绪，XPTI 关系报告帮你看懂你和 ta 怎么沟通、怎么靠近。',
       },
     },
     {
       '@type': 'Question',
-      name: '和 MBTI 有什么区别？',
+      name: '情侣关系报告能看到什么？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'MBTI 更像经典人格框架，WTFTI 更贴近中文互联网语境。在这里你看到的是生活反应、关系状态和行为习惯，不是四个字母和理论模型。',
+        text: '你和 ta 各自完成 XPTI 测试后，可以解锁双人合并雷达、6 类张力配对和 24 句对话脚本。可以一方付清，也可以两人各付一半。',
       },
     },
     {
       '@type': 'Question',
-      name: '这么多宇宙，我该从哪个开始？',
+      name: '我该从哪里开始？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: '推荐先从 WTFTI 人格神域开始：90 秒召唤你的主神，拿到主星与神龛后，再去 SoulTI、CPTI、XPTI 等宇宙看同一个你在不同主题中的翻译。',
+        text: '想安顿今天的情绪，先抽「今日一牌」；想看懂一段关系，和 ta 一起做 XPTI 关系测试；想快速认识自己，做三分钟经典测试。',
       },
     },
     {
@@ -34,16 +34,16 @@ const homepageFaqSchema = {
       name: '结果能拿来做严肃诊断吗？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: '不能。WTFTI 的核心是娱乐和自我观察，适合截图发给朋友一起笑，不适合替代专业心理评估。',
+        text: '不能。WTFTI 用于自我观察和关系沟通参考，不能替代专业心理评估。',
       },
     },
   ],
 };
 
 export const metadata: Metadata = {
-  title: 'WTFTI 多宇宙人格测试平台 — 测测你是哪种抽象人格',
+  title: 'WTFTI — 女生的情绪陪伴站 · 情侣关系沟通报告',
   description:
-    'WTFTI 多宇宙人格测试平台：先从经典 SBTI 人格测试开始，再去毒舌版、修仙版、鸟类版、花朵版等宇宙看看同一个你会被翻译成什么样。',
+    '先听懂今天的自己，再看清一段关系。每日一牌安顿情绪，XPTI 情侣关系报告帮你读懂 ta 的沟通方式，也被 ta 读懂。',
   alternates: { canonical: '/' },
 };
 

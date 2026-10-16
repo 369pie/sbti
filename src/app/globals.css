@@ -20,49 +20,49 @@
     system-ui, sans-serif;
 
   /* ─── Paper palette — Warm Oat（默认浅色 · 与 wtfti-light 同源）───── */
-  --color-bg-primary: #FBF6F0;       /* Warm Oat · 暖燕麦色 */
-  --color-bg-secondary: #F4E9DF;     /* Soft Sand · 柔沙色 */
-  --color-bg-tertiary: #EBDFD1;      /* Dusty Beige · 尘米色 */
+  --color-bg-primary: #FFF7F8;       /* Warm Oat · 暖燕麦色 */
+  --color-bg-secondary: #FCE9F0;     /* Soft Sand · 柔沙色 */
+  --color-bg-tertiary: #FAD6E0;      /* Dusty Beige · 尘米色 */
   --color-bg-elevated: #FFFFFF;
-  --color-paper: #FBF6F0;
-  --color-paper-deep: #F4E9DF;
-  --color-paper-warm: #F5EEE4;
+  --color-paper: #FFF7F8;
+  --color-paper-deep: #FCE9F0;
+  --color-paper-warm: #FFF1EE;
 
   /* Ink / text */
-  --color-text-primary: #3D2C23;     /* Deep Espresso · 深浓缩棕色 */
-  --color-text-secondary: #5C4035;
-  --color-text-muted: #8B6D5E;
-  --color-ink: #3D2C23;
-  --color-ink-soft: #5C4035;
-  --color-ink-mute: #8B6D5E;
-  --color-stone: #A88B7D;
+  --color-text-primary: #4D2C2F;     /* Deep Espresso · 深浓缩棕色 */
+  --color-text-secondary: #6E4549;
+  --color-text-muted: #9C7178;
+  --color-ink: #4D2C2F;
+  --color-ink-soft: #6E4549;
+  --color-ink-mute: #9C7178;
+  --color-stone: #B89098;
 
   /* Rules & borders */
-  --color-border: #E0D0C0;
-  --color-border-subtle: #F0E4D8;
-  --color-rule: #E0D0C0;
-  --color-rule-soft: #F0E4D8;
+  --color-border: #F2C0CE;
+  --color-border-subtle: #FAD6E0;
+  --color-rule: #F2C0CE;
+  --color-rule-soft: #FAD6E0;
 
   /* Accent system — Warm Rose（Warm Rose 唯一主色 + Copper Gold + Matcha Leaf 三色奏鸣） */
-  --color-accent: #C9867D;
-  --color-accent-light: #E7C6C0;
-  --color-accent-dim: rgba(201, 134, 125, 0.12);
-  --color-rose: #C9867D;
-  --color-rose-dust: #E7C6C0;
-  --color-rose-deep: #A86B63;
-  --color-gold: #C9A676;             /* Copper Gold · 铜金（取代古典 gold） */
-  --color-gold-soft: #DDBFA3;
-  --color-gold-leaf: #C9A676;
-  --color-ember: #9C5C52;            /* deep rose · warning */
-  --color-sage: #B7C7A2;             /* Matcha Leaf · success / CTA-2 */
-  --color-gem: #9AB37A;              /* Matcha Leaf 深一档 */
+  --color-accent: #F59BB8;
+  --color-accent-light: #FAD6E0;
+  --color-accent-dim: rgba(245, 155, 184, 0.12);
+  --color-rose: #F59BB8;
+  --color-rose-dust: #FAD6E0;
+  --color-rose-deep: #E07AA0;
+  --color-gold: #F7C7B8;             /* Copper Gold · 铜金（取代古典 gold） */
+  --color-gold-soft: #FAD6E0;
+  --color-gold-leaf: #F7C7B8;
+  --color-ember: #C2596F;            /* deep rose · warning */
+  --color-sage: #C7D7A2;             /* Matcha Leaf · success / CTA-2 */
+  --color-gem: #A6BB78;              /* Matcha Leaf 深一档 */
 
   /* Model colors — 跟随 Warm Oat 暖棕光谱 */
-  --color-model-self: #C9867D;
-  --color-model-emotion: #A86B63;
-  --color-model-attitude: #B7C7A2;
-  --color-model-action: #C9A676;
-  --color-model-social: #E7C6C0;
+  --color-model-self: #F59BB8;
+  --color-model-emotion: #E07AA0;
+  --color-model-attitude: #C7D7A2;
+  --color-model-action: #F7C7B8;
+  --color-model-social: #FAD6E0;
 
   /* Radius scale v3 */
   --radius-sharp: 0px;
@@ -360,101 +360,101 @@ body[data-theme='wtfti-dark'] .bg-white\/70:not([data-keep-white]) {
    --------------------------------------------------------------------- */
 body[data-theme='wtfti-light'] {
   /* ── Galaxy ink layers → 全部翻译成燕麦/柔沙/尘棕 三层光带 ───────── */
-  --galaxy-ink-deep: #FBF6F0;       /* Warm Oat — 外层画布 */
-  --galaxy-ink: #F4E9DF;            /* Soft Sand — 中段背景 */
-  --galaxy-ink-soft: #EBDFD1;       /* Dusty Beige — 浮层 */
-  --galaxy-twilight: #DDBFA3;       /* Warm Taupe — 强调浮层 */
+  --galaxy-ink-deep: #FFF7F8;       /* Warm Oat — 外层画布 */
+  --galaxy-ink: #FCE9F0;            /* Soft Sand — 中段背景 */
+  --galaxy-ink-soft: #FAD6E0;       /* Dusty Beige — 浮层 */
+  --galaxy-twilight: #FAD6E0;       /* Warm Taupe — 强调浮层 */
 
   /* "Cream" 在 dark 用作主文字色名义 → light 下接 Deep Espresso，保持原组件文字可读 */
-  --galaxy-cream: #3D2C23;          /* Deep Espresso — 主文字 */
-  --galaxy-parchment: #5C4035;      /* Espresso softer — 副文字 */
+  --galaxy-cream: #4D2C2F;          /* Deep Espresso — 主文字 */
+  --galaxy-parchment: #6E4549;      /* Espresso softer — 副文字 */
   --galaxy-mist: rgba(61, 44, 35, 0.66);
   --galaxy-mist-faint: rgba(61, 44, 35, 0.34);
 
   /* Accents — Warm Rose / Copper Gold / Matcha Leaf 三色奏鸣 */
-  --galaxy-rose: #C9867D;                              /* Warm Rose */
-  --galaxy-rose-soft: rgba(201, 134, 125, 0.20);
-  --galaxy-rose-glow: rgba(201, 134, 125, 0.34);
-  --galaxy-gold: #C9A676;                              /* Copper Gold — 高级金 */
-  --galaxy-gold-soft: #DDBFA3;                         /* Warm Taupe */
+  --galaxy-rose: #F59BB8;                              /* Warm Rose */
+  --galaxy-rose-soft: rgba(245, 155, 184, 0.20);
+  --galaxy-rose-glow: rgba(245, 155, 184, 0.34);
+  --galaxy-gold: #F7C7B8;                              /* Copper Gold — 高级金 */
+  --galaxy-gold-soft: #FAD6E0;                         /* Warm Taupe */
   --galaxy-gold-faint: rgba(201, 166, 118, 0.30);
-  --galaxy-violet: #B7C7A2;                            /* Matcha Leaf → 第二 accent */
-  --galaxy-violet-soft: rgba(183, 199, 162, 0.22);
-  --galaxy-violet-glow: rgba(183, 199, 162, 0.30);
-  --galaxy-moon: #F4E9DF;                              /* Soft Sand */
-  --galaxy-nebula: #EBDFD1;                            /* Dusty Beige */
+  --galaxy-violet: #C7D7A2;                            /* Matcha Leaf → 第二 accent */
+  --galaxy-violet-soft: rgba(199, 215, 162, 0.22);
+  --galaxy-violet-glow: rgba(199, 215, 162, 0.30);
+  --galaxy-moon: #FCE9F0;                              /* Soft Sand */
+  --galaxy-nebula: #FAD6E0;                            /* Dusty Beige */
 
   /* Hero / Section / Paper — 三段暖棕光带 */
   --galaxy-bg-hero: radial-gradient(
     ellipse 120% 80% at 50% 0%,
-    #F4E9DF 0%,
-    #FBF6F0 55%,
+    #FCE9F0 0%,
+    #FFF7F8 55%,
     #FFFFFF 100%
   );
   --galaxy-bg-section: radial-gradient(
     ellipse 110% 70% at 50% 25%,
-    #FBF6F0 0%,
-    #F4E9DF 70%
+    #FFF7F8 0%,
+    #FCE9F0 70%
   );
-  --galaxy-bg-paper: linear-gradient(180deg, #FFFFFF 0%, #FBF6F0 100%);
+  --galaxy-bg-paper: linear-gradient(180deg, #FFFFFF 0%, #FFF7F8 100%);
 
   /* Hairline · 浅色态用 Warm Rose 半透明做发丝细线 */
-  --galaxy-hairline: linear-gradient(90deg, transparent, rgba(201, 134, 125, 0.55) 50%, transparent);
-  --galaxy-divider-gold: 1px solid rgba(201, 134, 125, 0.30);
+  --galaxy-hairline: linear-gradient(90deg, transparent, rgba(245, 155, 184, 0.55) 50%, transparent);
+  --galaxy-divider-gold: 1px solid rgba(245, 155, 184, 0.30);
 
   /* 光晕 · 极轻、无 bloom */
-  --galaxy-rose-halo: 0 12px 36px rgba(201, 134, 125, 0.20),
-    0 2px 8px rgba(201, 134, 125, 0.10);
-  --galaxy-violet-halo: 0 12px 36px rgba(183, 199, 162, 0.18);
+  --galaxy-rose-halo: 0 12px 36px rgba(245, 155, 184, 0.20),
+    0 2px 8px rgba(245, 155, 184, 0.10);
+  --galaxy-violet-halo: 0 12px 36px rgba(199, 215, 162, 0.18);
 
   /* ── 全站 paper token 覆写（Navigation / footer / 卡片 / 按钮 全部跟随）── */
-  --color-bg-primary: #FBF6F0;       /* Warm Oat */
-  --color-bg-secondary: #F4E9DF;     /* Soft Sand */
-  --color-bg-tertiary: #EBDFD1;      /* Dusty Beige */
+  --color-bg-primary: #FFF7F8;       /* Warm Oat */
+  --color-bg-secondary: #FCE9F0;     /* Soft Sand */
+  --color-bg-tertiary: #FAD6E0;      /* Dusty Beige */
   --color-bg-elevated: #FFFFFF;      /* 真白卡片 */
-  --color-paper: #FBF6F0;
-  --color-paper-deep: #F4E9DF;
-  --color-paper-warm: #F5EEE4;       /* Warm Oat + Warm Sand 混合 */
+  --color-paper: #FFF7F8;
+  --color-paper-deep: #FCE9F0;
+  --color-paper-warm: #FFF1EE;       /* Warm Oat + Warm Sand 混合 */
 
-  --color-text-primary: #3D2C23;     /* Deep Espresso — 高对比度 AAA */
-  --color-text-secondary: #5C4035;   /* Espresso softer — AA body */
-  --color-text-muted: #8B6D5E;       /* Muted Espresso — 仅限 ≥18px */
-  --color-ink: #3D2C23;
-  --color-ink-soft: #5C4035;
-  --color-ink-mute: #8B6D5E;
-  --color-stone: #A88B7D;             /* 装饰用暖棕 */
+  --color-text-primary: #4D2C2F;     /* Deep Espresso — 高对比度 AAA */
+  --color-text-secondary: #6E4549;   /* Espresso softer — AA body */
+  --color-text-muted: #9C7178;       /* Muted Espresso — 仅限 ≥18px */
+  --color-ink: #4D2C2F;
+  --color-ink-soft: #6E4549;
+  --color-ink-mute: #9C7178;
+  --color-stone: #B89098;             /* 装饰用暖棕 */
 
-  --color-border: #E0D0C0;            /* 中性棕边框 */
-  --color-border-subtle: #F0E4D8;     /* 柔和棕边线 */
-  --color-rule: #E0D0C0;
-  --color-rule-soft: #F0E4D8;
+  --color-border: #F2C0CE;            /* 中性棕边框 */
+  --color-border-subtle: #FAD6E0;     /* 柔和棕边线 */
+  --color-rule: #F2C0CE;
+  --color-rule-soft: #FAD6E0;
 
-  --color-accent: #C9867D;            /* 唯一主 accent · Warm Rose */
-  --color-accent-light: #E7C6C0;
-  --color-accent-dim: rgba(201, 134, 125, 0.12);
-  --color-rose: #C9867D;
-  --color-rose-dust: #E7C6C0;
-  --color-rose-deep: #A86B63;         /* hover / pressed — 更深更易读 */
-  --color-gold: #C9A676;              /* Copper Gold — 真铜金 */
-  --color-gold-soft: #DDBFA3;
-  --color-gold-leaf: #C9A676;
-  --color-ember: #9C5C52;             /* deep rose · 错误/警告色 */
-  --color-sage: #B7C7A2;              /* Matcha Leaf · 成功/CTA-2 */
-  --color-gem: #9AB37A;               /* Matcha Leaf 深一档 */
+  --color-accent: #F59BB8;            /* 唯一主 accent · Warm Rose */
+  --color-accent-light: #FAD6E0;
+  --color-accent-dim: rgba(245, 155, 184, 0.12);
+  --color-rose: #F59BB8;
+  --color-rose-dust: #FAD6E0;
+  --color-rose-deep: #E07AA0;         /* hover / pressed — 更深更易读 */
+  --color-gold: #F7C7B8;              /* Copper Gold — 真铜金 */
+  --color-gold-soft: #FAD6E0;
+  --color-gold-leaf: #F7C7B8;
+  --color-ember: #C2596F;             /* deep rose · 错误/警告色 */
+  --color-sage: #C7D7A2;              /* Matcha Leaf · 成功/CTA-2 */
+  --color-gem: #A6BB78;               /* Matcha Leaf 深一档 */
 
   /* Model 配色 · 中性暖棕光谱 */
-  --color-model-self: #C9867D;        /* Warm Rose */
-  --color-model-emotion: #A86B63;     /* Rose Deep */
-  --color-model-attitude: #B7C7A2;    /* Matcha */
-  --color-model-action: #C9A676;      /* Copper Gold */
-  --color-model-social: #E7C6C0;      /* Warm Taupe */
+  --color-model-self: #F59BB8;        /* Warm Rose */
+  --color-model-emotion: #E07AA0;     /* Rose Deep */
+  --color-model-attitude: #C7D7A2;    /* Matcha */
+  --color-model-action: #F7C7B8;      /* Copper Gold */
+  --color-model-social: #FAD6E0;      /* Warm Taupe */
 
   background: var(--color-bg-primary);
   background-image: none;
   color: var(--color-text-primary);
 }
 body[data-theme='wtfti-light'] ::selection {
-  background: rgba(201, 134, 125, 0.36);
+  background: rgba(245, 155, 184, 0.36);
   color: var(--color-text-primary);
 }
 body[data-theme='wtfti-light'] :focus-visible {
@@ -994,8 +994,8 @@ html {
   transform: translateY(-1px);
 }
 .btn-rose {
-  background: var(--color-rose-deep);
-  color: var(--color-bg-primary);
+  background: var(--color-rose);
+  color: var(--color-ink); /* Pearl Cocoa on Strawberry 5.6:1 AA */
   border: 1px solid var(--color-rose-deep);
   box-shadow: 0 16px 34px -24px color-mix(in oklab, var(--color-rose-deep) 70%, transparent);
 }

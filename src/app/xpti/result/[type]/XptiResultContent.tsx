@@ -16,6 +16,7 @@ const XptiShareImageGenerator = dynamic(
 );
 import { useCallback, useRef, useState } from 'react';
 import { getSiteUrl } from '@/lib/site';
+import { SKU_PRICES } from '@/lib/mysti/unlock';
 import { CrossTestRecommendations } from '@/components/CrossTestRecommendations';
 import { HermosaInputCard } from '@/components/hermosa/HermosaInputCard';
 import { WtfCardCTA } from '@/components/WtfCardCTA';
@@ -328,42 +329,21 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
             })}
           </div>
 
-          {/* Couple invite CTA — Sprint 2 of v3.0 */}
-          <div
-            className="mt-6 rounded-xl border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
-            style={{
-              background: `${personality.color}0A`,
-              borderColor: `${personality.color}33`,
-            }}
-          >
-            <div className="flex-1">
-              <div className="text-[10px] font-mono tracking-[0.32em] uppercase mb-1" style={{ color: personality.color }}>
-                Couple Report · 12 Q
-              </div>
-              <p className="text-sm text-text-secondary leading-relaxed">
-                把这个签名发给伴侣，对方做 12 题精简版即可生成<strong>双人张力雷达 + 配对模型</strong>。
-              </p>
-            </div>
+          {/* Phase 1 · 两个主行动：深度解读 + 邀请 ta */}
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <Link
-              href={`/xpti/couple/`}
-              className="inline-flex items-center justify-center px-4 py-2.5 rounded-full text-xs font-mono tracking-[0.18em] uppercase whitespace-nowrap"
-              style={{ background: personality.color, color: 'var(--color-bg-primary)' }}
+              href={`/xpti/result/${personality.slug}/deep/`}
+              className="btn btn-ink w-full"
             >
-              邀请伴侣 →
+              解锁我的深度解读 · ¥{SKU_PRICES['xpti-deep-xp'].price}
+            </Link>
+            <Link href="/xpti/couple/" className="btn btn-rose w-full">
+              邀请 ta 一起测 · 合并报告
             </Link>
           </div>
-
-          {/* Archive / replay CTA — Sprint 3 of v3.0 */}
-          <div className="mt-3 flex items-center justify-between gap-3 text-xs">
-            <span className="text-text-muted">想看张力是否随时间变化？</span>
-            <Link
-              href={`/xpti/archive/`}
-              className="font-mono tracking-[0.18em] uppercase underline"
-              style={{ color: personality.color }}
-            >
-              我的张力档案 →
-            </Link>
-          </div>
+          <p className="mt-2 text-xs text-text-muted">
+            ta 做 12 道精简题，就能生成你们的双人雷达和对话脚本；可以一人 ¥{SKU_PRICES['xpti-couple-report'].price} 付清，也可以各付 ¥{SKU_PRICES['xpti-couple-half'].price}。
+          </p>
         </motion.div>
       </section>
 
@@ -548,20 +528,6 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
         </motion.div>
       </section>
 
-      <HermosaInputCard
-        universe="xpti"
-        slug={personality.slug}
-        code={personality.code}
-        personalityName={personality.name}
-        accent={personality.color}
-      />
-
-      <CrossTestRecommendations currentTest="xpti" personalityName={personality.name} variant="xpti" />
-
-      <section className="max-w-2xl mx-auto px-6 pb-8">
-        <WtfiTheoryWiring universe="xpti" variant="light" />
-      </section>
-
       {/* Share section */}
       <section className="max-w-2xl mx-auto px-6 pb-16">
         <motion.div
@@ -632,6 +598,30 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
         </div>
       </section>
 
+      {/* Phase 1 · 次要推荐统一折叠 */}
+      <section className="max-w-2xl mx-auto px-6 pb-24">
+        <details className="rounded-2xl border border-rule-soft bg-bg-elevated/70">
+          <summary className="cursor-pointer px-5 py-4 text-sm font-medium text-text-secondary">
+            更多推荐
+          </summary>
+          <div className="pb-6">
+            <div className="px-5 pb-4 text-xs">
+              <Link href="/xpti/archive/" className="underline text-text-secondary">我的张力档案 · 看看关系随时间的变化 →</Link>
+            </div>
+      <HermosaInputCard
+        universe="xpti"
+        slug={personality.slug}
+        code={personality.code}
+        personalityName={personality.name}
+        accent={personality.color}
+      />
+
+      <CrossTestRecommendations currentTest="xpti" personalityName={personality.name} variant="xpti" />
+
+      <section className="max-w-2xl mx-auto px-6 pb-8">
+        <WtfiTheoryWiring universe="xpti" variant="light" />
+      </section>
+
       <ResultClosureEngine
         currentUniverse="xpti"
         personalitySlug={personality.slug}
@@ -640,6 +630,9 @@ export function XptiResultContent({ personality, dimensionScores }: Props) {
         variant="xpti"
       />
       <DailyCheckInCTA variant="xpti" />
+          </div>
+        </details>
+      </section>
     </div>
   );
 }

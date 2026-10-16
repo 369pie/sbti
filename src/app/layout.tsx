@@ -196,10 +196,8 @@ export default function RootLayout({
               <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
                 <Link href="/card/" prefetch={false} className="hover:text-text-primary transition-colors">我的 WTF Card</Link>
                 <Link href="/types/" prefetch={false} className="hover:text-text-primary transition-colors">人设图鉴</Link>
-                <Link href="/mirror/" prefetch={false} className="hover:text-text-primary transition-colors">灵镜实验室</Link>
                 <Link href="/guide/" prefetch={false} className="hover:text-text-primary transition-colors">测试说明</Link>
                 <Link href="/about/" prefetch={false} className="hover:text-text-primary transition-colors">关于测试</Link>
-                <Link href="/creator/" prefetch={false} className="hover:text-text-primary transition-colors">创作者中心</Link>
                 <Link href="/contact/" prefetch={false} className="hover:text-text-primary transition-colors">联系与社群</Link>
                 <Link href="/privacy/" prefetch={false} className="hover:text-text-primary transition-colors">隐私说明</Link>
                 <Link href="/terms/" prefetch={false} className="hover:text-text-primary transition-colors">使用条款</Link>
