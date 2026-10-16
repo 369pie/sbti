@@ -1,10 +1,9 @@
 import Link from 'next/link';
 import NextImage from 'next/image';
-import { getLiveUniverses } from '@/lib/universes';
+import { CoupleRadar } from '@/components/xpti/CoupleRadar';
 import { withBasePath } from '@/lib/site';
 import { FollowMeCard, FollowMeFloating } from '@/components/FollowMeLinks';
 import { SKU_PRICES, type MystiSku } from '@/lib/mysti/unlock';
-import { WTFTI_PERSONALITIES, getWtftiTypeThumbnailImage } from '@/lib/wtfti-personalities';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -68,9 +67,6 @@ const UNIVERSE_GRID: Array<{
   },
 ];
 
-/** Style universes — Phase 0 首页不再展示换皮/游戏向入口 */
-const STYLE_UNIVERSES: ReturnType<typeof getLiveUniverses> = [];
-
 /** Relationship / social play — shrunk to 3 marquee cards */
 const RELATIONSHIP_PLAYS = [
   { href: '/xpti/', mark: 'XC', label: '关系沟通', desc: '测测你们怎么说话、怎么靠近' },
@@ -78,13 +74,15 @@ const RELATIONSHIP_PLAYS = [
   { href: '/soulti/', mark: 'SL', label: '灵魂长信', desc: '写给自己的一封长信' },
 ];
 
-const HERO_PERSONAS = WTFTI_PERSONALITIES.slice(0, 3);
+/** 首页 hero 关系报告预览用的示例数据（非真实用户） */
+const PREVIEW_A = { archetype: { name: '你', slug: 'preview-a', color: 'var(--color-rose)' }, dims: [3, 2, 3, 1, 2, 3, 2, 1, 3] };
+const PREVIEW_B = { archetype: { name: 'ta', slug: 'preview-b', color: 'var(--color-rose-deep)' }, dims: [1, 3, 2, 3, 2, 1, 3, 2, 2] };
 
 const FAQS = [
   {
     question: 'WTFTI 是什么？',
     answer:
-      'WTFTI 是一个多宇宙人格测试平台。同一个你，在不同主题宇宙里有不同的人格翻译——毒舌版的你、灵魂版的你、关系版的你、收藏版的你。',
+      'WTFTI 是写给女生的情绪陪伴站：每天一张牌帮你安顿情绪，关系报告帮你看懂你和 ta 怎么沟通、怎么靠近。',
   },
   {
     question: '和 MBTI 有什么区别？',
@@ -104,7 +102,7 @@ const FAQS = [
   {
     question: '结果能拿来做严肃诊断吗？',
     answer:
-      '不能。WTFTI 的核心是娱乐和自我观察，适合截图发给朋友一起笑，不适合替代专业心理评估。',
+      '不能。WTFTI 的核心是娱乐和自我观察，适合用来更了解自己和身边的人，不能替代专业心理评估。',
   },
 ];
 
@@ -123,8 +121,6 @@ function CodeMark({ children, className = '' }: { children: string; className?: 
 }
 
 export default function HomeContent() {
-  const universes = getLiveUniverses();
-
   return (
     <div className="min-h-screen">
 
@@ -173,41 +169,20 @@ export default function HomeContent() {
           </p>
           </div>
 
-          <div className="relative mx-auto hidden w-full max-w-[430px] lg:block" aria-label="WTFTI 首页人格卡预览">
-            <div className="site-hero-card relative aspect-[4/5] overflow-hidden rounded-[2rem] p-5">
-              <div className="absolute inset-8 rounded-full border border-border-subtle" />
-              <div className="absolute left-1/2 top-1/2 h-[58%] w-[58%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border-subtle bg-bg-elevated/54" />
-              {HERO_PERSONAS.map((persona, index) => (
-                <Link
-                  key={persona.slug}
-                  href={`/wtfti/result/${persona.slug}/`}
-                  prefetch={false}
-                  className={[
-                    'group absolute w-[43%] rounded-[1.2rem] border border-border-subtle bg-bg-elevated/80 p-2 shadow-sm backdrop-blur transition-[transform,box-shadow] duration-300 hover:-translate-y-1',
-                    index === 0 ? 'left-[7%] top-[10%] rotate-[-5deg]' : '',
-                    index === 1 ? 'right-[7%] top-[23%] rotate-[4deg]' : '',
-                    index === 2 ? 'left-[24%] bottom-[8%] rotate-[-1deg]' : '',
-                  ].join(' ')}
-                >
-                  <div className="aspect-square rounded-[0.9rem] bg-bg-secondary/70 p-3">
-                    <NextImage
-                      src={getWtftiTypeThumbnailImage(persona.slug)}
-                      alt={`${persona.wtftiName} 人格卡`}
-                      width={220}
-                      height={220}
-                      priority={index === 0}
-                      className="h-full w-full object-contain drop-shadow-md transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="px-1 pt-2">
-                    <p className="truncate font-mono text-[10px] uppercase tracking-[0.16em] text-text-muted">{persona.code}</p>
-                    <p className="truncate text-sm font-medium text-text-primary">{persona.wtftiName}</p>
-                  </div>
-                </Link>
-              ))}
-              <div className="absolute bottom-6 right-6 text-right">
-                <p className="stat-value text-5xl text-text-primary">17</p>
-                <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-text-muted">Universe</p>
+          <div className="relative mx-auto w-full max-w-[430px]" aria-label="情侣关系报告预览">
+            <div className="site-hero-card relative overflow-hidden rounded-[2rem] p-5 sm:p-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="eyebrow">关系报告 · 预览</span>
+                <span className="text-xs font-medium text-text-secondary">¥{XPTI_COUPLE_REPORT_PRICE}</span>
+              </div>
+              <div className="mx-auto max-w-[300px]">
+                <CoupleRadar inviter={PREVIEW_A} partner={PREVIEW_B} size={300} />
+              </div>
+              <div className="mt-3 rounded-2xl border border-border-subtle bg-bg-elevated/80 p-4">
+                <p className="text-[11px] text-text-muted mb-1">今晚可以试着这样说</p>
+                <p className="text-sm leading-relaxed text-text-primary">
+                  “我不是想赢这场架，我只是想你先抱抱我。”
+                </p>
               </div>
             </div>
           </div>
@@ -258,7 +233,7 @@ export default function HomeContent() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          N°02 What's Inside · 6 大宇宙 magazine grid
+          N°02 What's Inside · 三个主入口
          ══════════════════════════════════════════════════════════════════════ */}
       <section className="py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
         <div className="max-w-5xl mx-auto">
@@ -338,11 +313,6 @@ export default function HomeContent() {
             ))}
           </div>
 
-          <div className="mt-10 text-center">
-            <span className="eyebrow text-text-muted">
-              本期统计 · {universes.length} 个测试宇宙 · 100+ 种人格
-            </span>
-          </div>
         </div>
       </section>
 
@@ -355,10 +325,10 @@ export default function HomeContent() {
             <span className="serial-number text-xs mr-3">03</span>
             <span className="eyebrow">Together</span>
             <h2 className="section-headline text-3xl sm:text-4xl mt-3">
-              和朋友<span className="editorial-italic">一起玩</span>
+              关系里的<span className="editorial-italic">更多答案</span>
             </h2>
             <p className="display-tagline text-text-secondary mt-4 text-base sm:text-lg max-w-xl">
-              测完自己，拉上朋友——看看你们之间发生了什么化学反应。
+              恋人、闺蜜、家人——每段在意的关系，都值得被认真看一次。
             </p>
           </div>
 
@@ -387,93 +357,6 @@ export default function HomeContent() {
                 />
               </Link>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          N°04 Style universes（缩到 1 行 grid）
-         ══════════════════════════════════════════════════════════════════════ */}
-      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-12 animate-fade-up">
-            <span className="serial-number text-xs mr-3">04</span>
-            <span className="eyebrow">Style universes</span>
-            <h2 className="section-headline text-3xl sm:text-4xl mt-3">
-              选一个<span className="editorial-italic">风格宇宙</span>
-            </h2>
-            <p className="display-tagline text-text-secondary mt-4 text-base sm:text-lg max-w-xl">
-              每个宇宙有独立的视觉、题目和人格翻译——像走进不同的美术馆展厅。
-            </p>
-          </div>
-
-          <div
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-px bg-border-subtle border border-border-subtle"
-          >
-            {STYLE_UNIVERSES.map((u, i) => (
-              <Link
-                key={u.id}
-                href={u.landingPath}
-                prefetch={false}
-                className="animate-fade-up group relative block p-6 sm:p-8 transition-colors duration-500 bg-bg-elevated"
-                style={{ animationDelay: `${i * 50}ms` }}
-              >
-                <span className="serial-number text-[10px] absolute top-3 right-4">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span
-                  className="inline-flex items-center justify-center w-12 h-12 text-2xl mb-6 transition-transform duration-500 group-hover:scale-110 origin-left"
-                  style={{ background: 'var(--color-accent-dim)', borderRadius: 'var(--radius-soft)' }}
-                >
-                  {u.shortName.slice(0, 2)}
-                </span>
-                <h3 className="text-base text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>
-                  {u.name}
-                </h3>
-                <span
-                  className="mt-6 block h-px w-8 transition-[width] duration-500 group-hover:w-16"
-                  style={{ background: 'color-mix(in oklab, var(--color-accent) 50%, transparent)' }}
-                />
-              </Link>
-            ))}
-          </div>
-
-          <div className="mt-8 text-center">
-            <Link href="/types/" prefetch={false} className="text-sm text-text-secondary hover:text-text-primary transition-colors underline-offset-2 hover:underline">
-              查看完整人设图鉴
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          N°05 Creator program
-         ══════════════════════════════════════════════════════════════════════ */}
-      <section className="defer-section py-20 sm:py-28 px-6 sm:px-10" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="relative overflow-hidden p-10 sm:p-16" style={{ background: 'var(--color-paper-warm)', border: '1px solid var(--color-rule)' }}>
-            <div className="flex items-center gap-4 mb-8">
-              <span className="serial-number text-xs">05</span>
-              <span className="editorial-rule w-16" />
-              <span className="eyebrow" style={{ color: 'var(--color-gold)' }}>Creator beta</span>
-            </div>
-            <h2 className="editorial-display text-4xl sm:text-5xl md:text-6xl max-w-3xl mb-6">
-              做你自己的<br />
-              <span className="editorial-italic" style={{ color: 'var(--color-gold)' }}>人格宇宙</span>
-            </h2>
-            <p className="text-base sm:text-lg leading-[1.85] text-text-secondary max-w-xl">
-              把你的内容做成可传播的人格测试。<br className="hidden sm:block" />
-              免费主题拉新，付费主题变现。
-            </p>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <Link href="/creator/" prefetch={false} className="btn btn-gold">
-                查看创作者计划
-                <ArrowIcon />
-              </Link>
-              <Link href="/creator/apply/" prefetch={false} className="btn btn-ghost">
-                申请内测
-              </Link>
-            </div>
           </div>
         </div>
       </section>
@@ -575,7 +458,7 @@ export default function HomeContent() {
               加入 <span className="editorial-italic" style={{ color: 'var(--color-rose)' }}>WTFTI</span> 社群
             </h2>
             <p className="display-tagline text-text-secondary mt-3 text-base">
-              测完想找同类？来群里一起玩；想从头开始？下方一键召唤主神。
+              测完想聊聊？群里有很多和你一样认真对待感情的人。
             </p>
           </div>
 
@@ -624,31 +507,22 @@ export default function HomeContent() {
 
           {/* Bottom CTA — folded into community footer */}
           <div className="text-center pt-6" style={{ borderTop: '1px solid var(--color-rule-soft)' }}>
-            <span className="eyebrow block mb-4">首选路径</span>
+            <span className="eyebrow block mb-4">从这里开始</span>
             <h3 className="section-headline text-2xl sm:text-3xl mb-4">
-              从召唤主神开始<span className="editorial-italic" style={{ color: 'var(--color-rose)' }}>最对味</span>
+              想被 ta 读懂，<span className="editorial-italic" style={{ color: 'var(--color-rose-deep)' }}>先一起测一次</span>
             </h3>
             <p className="display-tagline text-text-secondary mb-8 text-base max-w-md mx-auto">
-              90 秒仪式 · 拿到主星与神龛 · 之后再慢慢解锁五感、月相、合奏。
+              三分钟答题，拿到你们的沟通方式和一句今晚就能用的话。
             </p>
-            <Link
-              href="/wtfti/galaxy/test/"
-              prefetch={false}
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-bg-primary font-medium transition hover:brightness-110"
-              style={{
-                background: 'linear-gradient(135deg, var(--color-gold-leaf), var(--color-rose-deep))',
-                boxShadow: '0 8px 32px color-mix(in oklab, var(--color-rose-deep) 28%, transparent)',
-              }}
-            >
-              召唤主神
-              <ArrowIcon />
-            </Link>
-            <p className="mt-5 text-xs text-text-muted">
-                想先快速预览人格轮廓？
-              <Link href="/test/" prefetch={false} className="underline underline-offset-2 hover:text-text-secondary transition-colors ml-1">
-                经典初见版（文字版，3-5 分钟）
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Link href="/xpti/test/" prefetch={false} className="btn btn-ink">
+                和 ta 一起测
+                <ArrowIcon />
               </Link>
-            </p>
+              <Link href="/mysti/daily/" prefetch={false} className="btn btn-ghost">
+                今日一牌
+              </Link>
+            </div>
           </div>
         </div>
 

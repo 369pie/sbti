@@ -3,6 +3,10 @@ import NextImage from 'next/image';
 import { XPTI_MODEL_NAMES, XPTI_MODEL_COLORS } from '../../lib/xpti/dimensions';
 import type { XptiModelType } from '../../lib/xpti/dimensions';
 import { XPTI_PERSONALITY_TYPES, getXptiTypeThumbnailImage } from '../../lib/xpti/personalities';
+import { SKU_PRICES } from '../../lib/mysti/unlock';
+
+const COUPLE_FULL_PRICE = SKU_PRICES['xpti-couple-report'].price;
+const COUPLE_HALF_PRICE = SKU_PRICES['xpti-couple-half'].price;
 
 /* XPTI 主调：枯玫瑰 + 深酒红，作为 paper 上的 accent，与首页 editorial 系统统一。 */
 const VELVET_DARK_WINE = '#6A2A3E';
@@ -171,20 +175,11 @@ export default function XptiHomeContent() {
             </div>
 
             <div className="mt-10 sm:mt-14 flex flex-wrap items-center gap-3 sm:gap-4">
-              <Link
-                href="/xpti/test/"
-                prefetch={false}
-                className="btn"
-                style={{
-                  background: VELVET_DARK_WINE,
-                  color: 'var(--color-bg-primary)',
-                  borderColor: VELVET_DARK_WINE,
-                }}
-              >
-                开始测试 <ArrowIcon />
+              <Link href="/xpti/test/" prefetch={false} className="btn btn-ink">
+                和 ta 一起测 <ArrowIcon />
               </Link>
-              <Link href="/types/" prefetch={false} className="btn btn-ghost">
-                先翻翻 12 种原型
+              <Link href="/xpti/couple/" prefetch={false} className="btn btn-rose">
+                邀请 ta · 各付 ¥{COUPLE_HALF_PRICE}
               </Link>
               <Link
                 href="/"
@@ -193,6 +188,14 @@ export default function XptiHomeContent() {
               >
                 返回 WTFti
               </Link>
+            </div>
+            <div className="mt-6 max-w-xl rounded-2xl border border-border-subtle bg-bg-elevated/80 p-4 sm:p-5">
+              <p className="text-sm font-medium text-text-primary">
+                情侣关系报告 ¥{COUPLE_FULL_PRICE} · 也可以两人各付 ¥{COUPLE_HALF_PRICE}
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-text-muted">
+                双人合并雷达 · 6 类张力配对 · 24 句对话脚本。一个人先免费测，拉上 ta 就能解锁。
+              </p>
             </div>
           </div>
           <div className="site-hero-card hidden rounded-[2rem] p-7 lg:block">
@@ -555,8 +558,7 @@ export default function XptiHomeContent() {
           <Link
             href="/xpti/test/"
             prefetch={false}
-            className="btn"
-            style={{ background: VELVET_DARK_WINE, color: 'var(--color-bg-primary)', borderColor: VELVET_DARK_WINE }}
+            className="btn btn-ink"
           >
             测测你的靠近方式 <ArrowIcon />
           </Link>
@@ -570,8 +572,8 @@ export default function XptiHomeContent() {
               SoulTI 觉察版
             </Link>
             <span>·</span>
-            <Link href="/wtfti/" className="hover:text-text-primary transition-colors">
-              WTF 毒舌版
+            <Link href="/mysti/daily/" className="hover:text-text-primary transition-colors">
+              今日一牌
             </Link>
           </div>
         </div>
