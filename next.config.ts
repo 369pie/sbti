@@ -16,6 +16,23 @@ const imagesUnoptimized =
 const nextConfig: NextConfig = {
   // output: 'export', // Removed: incompatible with API routes (Supabase/CPTI)
   trailingSlash: true,
+  async redirects() {
+    // Phase 0: retired UGC / game-themed / 神域 routes
+    return [
+      { source: '/creator/:path*', destination: '/', permanent: true },
+      { source: '/ugc/:path*', destination: '/', permanent: true },
+      { source: '/c/:path*', destination: '/', permanent: true },
+      { source: '/mirror/:path*', destination: '/mysti/daily/', permanent: true },
+      { source: '/bird/:path*', destination: '/test/', permanent: true },
+      { source: '/drunk/:path*', destination: '/test/', permanent: true },
+      { source: '/wtfti/galaxy/:path*', destination: '/mysti/daily/', permanent: true },
+      { source: '/wtfti/kings/:path*', destination: '/test/', permanent: true },
+      { source: '/wtfti/delta/:path*', destination: '/test/', permanent: true },
+      { source: '/jueti/:path*', destination: '/test/', permanent: true },
+      { source: '/fanrenti/:path*', destination: '/test/', permanent: true },
+      { source: '/hogti/:path*', destination: '/test/', permanent: true },
+    ];
+  },
   images: {
     unoptimized: imagesUnoptimized,
     formats: ['image/avif', 'image/webp'],
