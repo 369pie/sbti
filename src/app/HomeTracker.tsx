@@ -3,7 +3,8 @@
 import { useEffect } from 'react';
 import { enqueueProductEvent } from '@/lib/analytics/product-events';
 
-// Funnel step 1 of the refocus path: home_view → home_cta_click → first_look_finish → register_complete.
+// P0 funnel: home_view → first_look_finish (/start) → archive_created (register) → push_enabled.
+// See docs/01-strategy/p0-funnel-gate-2026-10.md
 export function HomeTracker() {
   useEffect(() => {
     enqueueProductEvent('home', 'home_view');

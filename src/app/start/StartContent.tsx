@@ -10,6 +10,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
+import { enqueueProductEvent } from '@/lib/analytics/product-events';
 
 type Pillar = 'I' | 'II' | 'III';
 
@@ -105,13 +106,13 @@ const PILLAR_META: Record<
   },
   III: {
     serial: 'III',
-    eyebrow: 'WRITE WITH HER · 一起写下她',
-    title: '从长夜里点亮的第一束光开始',
+    eyebrow: '懂我 · 树洞',
+    title: '找一个地方，把心里话轻轻放下',
     italic: '不评论、不点赞、不互关——只是被一群「她」远远地接住。',
-    cta: '走进 HER AURORA · 她的极光',
-    href: '/her-voice/',
+    cta: '走进树洞 · 说出来就好受一点',
+    href: '/bottle/',
     secondaryCta: '或查看今夜的极光时刻',
-    secondaryHref: '/her-voice/#topic',
+    secondaryHref: '/bottle/',
     accent: 'var(--color-gold-leaf)',
     accentSoft: 'rgba(201, 166, 118, 0.12)',
   },
@@ -162,6 +163,12 @@ export function StartContent() {
         module: 'home',
         slug: `pillar_${final}`,
         source: next.join('-'),
+      });
+      // P0 funnel step 2: map /start finish → first_look_finish (gate query name).
+      enqueueProductEvent('home', 'first_look_finish', {
+        step: 'finish',
+        slug: `pillar_${final}`,
+        props: { source: next.join('-') },
       });
     }
   }
