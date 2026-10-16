@@ -64,7 +64,7 @@ export default function UniverseStatsPage() {
 
   if (!stats) {
     return (
-      <div className="min-h-screen bg-bg-primary flex items-center justify-center text-red-600">
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center text-ember">
         无法加载数据
       </div>
     );
@@ -185,7 +185,7 @@ export default function UniverseStatsPage() {
                   </div>
                   <div className="text-right shrink-0">
                     <div className="text-xs text-text-secondary">{new Date(result.createdAt).toLocaleDateString('zh-CN')}</div>
-                    <div className={`text-[11px] mt-1 ${result.shared ? 'text-green-600' : 'text-text-muted'}`}>
+                    <div className={`text-[11px] mt-1 ${result.shared ? 'text-sage-text' : 'text-text-muted'}`}>
                       {result.shared ? '已分享' : '未分享'}
                     </div>
                   </div>
@@ -250,7 +250,7 @@ export default function UniverseStatsPage() {
         <div className="mt-8 flex gap-3">
           <a
             href={withBasePath('/creator/earnings')}
-            className="flex-1 py-3 rounded-xl bg-green-600/10 text-green-600 text-sm font-medium text-center hover:bg-green-600/12 transition-colors"
+            className="flex-1 py-3 rounded-xl bg-sage/10 text-sage-text text-sm font-medium text-center hover:bg-sage/12 transition-colors"
           >
             💰 查看收益中心
           </a>

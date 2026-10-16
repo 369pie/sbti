@@ -61,7 +61,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
   if (!character) {
     return (
       <HogtiTheme>
-        <div className="p-10 text-center text-amber-100">角色数据缺失：{p.characterId}</div>
+        <div className="p-10 text-center text-gold-soft">角色数据缺失：{p.characterId}</div>
       </HogtiTheme>
     );
   }
@@ -77,7 +77,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
             transition={{ duration: 0.5 }}
           >
             {/* Top ribbon */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] tracking-[0.25em] uppercase mb-6 bg-amber-50/20 border border-amber-200/40 text-amber-100 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] tracking-[0.25em] uppercase mb-6 bg-gold/10 border border-gold/40 text-gold-soft backdrop-blur-sm">
               <HogtiQuillIcon className="w-3.5 h-3.5" />
               Hogwarts · TI · {p.number}
             </div>
@@ -97,7 +97,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
 
             {/* 学院名 */}
             <div
-              className="text-[10px] sm:text-xs tracking-[0.45em] uppercase mb-2 text-amber-100/90"
+              className="text-[10px] sm:text-xs tracking-[0.45em] uppercase mb-2 text-gold-soft/90"
               style={{ color: 'var(--color-bg-primary)' }}
             >
               {house.nameEn}
@@ -105,7 +105,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
 
             {/* Character name */}
             <h1
-              className="text-4xl sm:text-5xl md:text-6xl font-semibold mb-3 text-amber-50 drop-shadow-[0_2px_10px_rgba(0,0,0,0.25)]"
+              className="text-4xl sm:text-5xl md:text-6xl font-semibold mb-3 text-gold-soft drop-shadow-[0_2px_10px_rgba(0,0,0,0.25)]"
               style={{ fontFamily: "'EB Garamond', 'Noto Serif SC', serif" }}
             >
               {character.name}
@@ -123,7 +123,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
             </div>
 
             {/* Tagline */}
-            <p className="text-base sm:text-lg leading-relaxed max-w-md mx-auto text-amber-100/90 italic">
+            <p className="text-base sm:text-lg leading-relaxed max-w-md mx-auto text-gold-soft/90 italic">
               &ldquo;{p.tagline}&rdquo;
             </p>
           </motion.div>
@@ -302,7 +302,7 @@ export function HogtiResultContent({ hogtiPersonality: p }: Props) {
             </button>
             <button
               onClick={quickShare}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer text-amber-50 shadow"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer text-gold-soft shadow"
               style={{ background: house.accent }}
             >
               {copied ? '已复制 ✓' : '复制链接'}

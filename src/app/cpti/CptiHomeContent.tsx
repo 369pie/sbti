@@ -104,7 +104,7 @@ export default function CptiHomeContent() {
                     key={s.href}
                     href={s.href}
                     prefetch={false}
-                    className="px-4 py-2 rounded-full text-sm border border-border-subtle bg-bg-secondary/40 text-text-secondary hover:text-rose-500 hover:border-rose-500/40 transition-colors"
+                    className="px-4 py-2 rounded-full text-sm border border-border-subtle bg-bg-secondary/40 text-text-secondary hover:text-rose-text hover:border-accent/40 transition-colors"
                   >
                     {s.label}
                   </Link>

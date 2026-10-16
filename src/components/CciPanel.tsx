@@ -22,7 +22,7 @@ interface Props {
 export function CciPanel({ variant = 'light', className = '' }: Props) {
   const [profiles, setProfiles] = useState<UniverseProfile[] | null>(null);
   useEffect(() => {
-    setProfiles(loadUniverseProfiles());
+    queueMicrotask(() => setProfiles(loadUniverseProfiles()));
   }, []);
 
   if (profiles === null) return null;

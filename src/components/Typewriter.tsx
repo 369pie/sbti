@@ -53,7 +53,7 @@ export function Typewriter({
     const el = ref.current;
     if (!el) return;
     if (typeof IntersectionObserver === 'undefined') {
-      setStarted(true);
+      queueMicrotask(() => setStarted(true));
       return;
     }
     const io = new IntersectionObserver(

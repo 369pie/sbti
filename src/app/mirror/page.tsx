@@ -3,14 +3,14 @@ import { getSiteUrl } from '@/lib/site';
 import MirrorClient from './MirrorClient';
 
 const MIRROR_DESCRIPTION =
-  'WTFTI 灵镜实验室：上传一张照片，生成发型、个人色彩、妆容与穿搭方向的 GPT-Image-2 风格报告。';
+  '灵镜 · 形象档案馆：上传一张照片，AI 给你三页式整体诊断卡（色彩 / 妆发 / 穿搭），看见你将成为的样子。';
 
 export const metadata: Metadata = {
-  title: '灵镜实验室 · 发型色彩妆容分析',
+  title: '灵镜 · 形象档案馆 · WTFTI',
   description: MIRROR_DESCRIPTION,
   alternates: { canonical: '/mirror/' },
   openGraph: {
-    title: '灵镜实验室 · WTFTI',
+    title: '灵镜 · 形象档案馆 · WTFTI',
     description: MIRROR_DESCRIPTION,
     url: getSiteUrl('/mirror/'),
     type: 'website',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '灵镜实验室 · WTFTI',
+    title: '灵镜 · 形象档案馆 · WTFTI',
     description: MIRROR_DESCRIPTION,
   },
 };

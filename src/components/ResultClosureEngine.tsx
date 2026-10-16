@@ -63,43 +63,40 @@ export function ResultClosureEngine({
   const [switcherCards, setSwitcherCards] = useState<{ id: string; emoji: string; name: string; teaser: string; testPath: string; accent: string; tested: boolean }[]>([]);
 
   useEffect(() => {
-    const card = loadCard();
-    const tested = new Set<string>();
-    if (card) {
-      for (const uid of CARD_UNIVERSE_IDS) {
-        if (card.results[uid]) tested.add(uid);
+    queueMicrotask(() => {
+      const card = loadCard();
+      const tested = new Set<string>();
+      if (card) {
+        for (const uid of CARD_UNIVERSE_IDS) {
+          if (card.results[uid]) tested.add(uid);
+        }
       }
-    }
 
-    // Card progress
-    const lit = tested.size;
-    const total = CARD_UNIVERSE_IDS.length;
-    const saved = tested.has(currentUniverse);
-    setCardState({ lit, total, saved });
+      // Card progress
+      const lit = tested.size;
+      const total = CARD_UNIVERSE_IDS.length;
+      const saved = tested.has(currentUniverse);
+      setCardState({ lit, total, saved });
 
-    // Universe switcher: pick 3 untested (or random if all tested), excluding current
-    let candidates = CARD_UNIVERSE_IDS.filter(uid => uid !== currentUniverse && !tested.has(uid));
-    if (candidates.length === 0) {
-      candidates = CARD_UNIVERSE_IDS.filter(uid => uid !== currentUniverse);
-    }
-    // Shuffle
-    for (let i = candidates.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
-    }
-    const picks = candidates.slice(0, 3);
-    setSwitcherCards(picks.map(uid => {
-      const u = getUniverse(uid);
-      return {
-        id: uid,
-        emoji: u?.emoji || '✨',
-        name: u?.name || uid,
-        teaser: UNIVERSE_TEASERS[uid] ?? `去${u?.name ?? uid}看看`,
-        testPath: u?.testPath || '/',
-        accent: u?.accent || '#888',
-        tested: tested.has(uid),
-      };
-    }));
+      // Universe switcher: pick 3 untested (or stable others if all tested), excluding current
+      let candidates = CARD_UNIVERSE_IDS.filter(uid => uid !== currentUniverse && !tested.has(uid));
+      if (candidates.length === 0) {
+        candidates = CARD_UNIVERSE_IDS.filter(uid => uid !== currentUniverse);
+      }
+      const picks = candidates.slice(0, 3);
+      setSwitcherCards(picks.map(uid => {
+        const u = getUniverse(uid);
+        return {
+          id: uid,
+          emoji: u?.emoji || '✨',
+          name: u?.name || uid,
+          teaser: UNIVERSE_TEASERS[uid] ?? `去${u?.name ?? uid}看看`,
+          testPath: u?.testPath || '/',
+          accent: u?.accent || '#888',
+          tested: tested.has(uid),
+        };
+      }));
+    });
   }, [currentUniverse]);
 
   // Save current result to WTF Card

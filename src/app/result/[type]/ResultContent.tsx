@@ -310,7 +310,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
               onClick={toggleSkin}
               className={`px-3 py-2 rounded-xl border text-xs font-medium transition-all cursor-pointer ${
                 showXiuxian
-                  ? 'border-purple-300/60 bg-purple-50/80 text-purple-600 hover:bg-purple-100/80'
+                  ? 'border-violet-text/60 bg-violet-text/10 text-violet-text hover:bg-violet-text/20'
                   : 'border-border-subtle bg-bg-secondary/60 text-text-muted hover:bg-bg-secondary hover:text-text-secondary'
               }`}
               title={showXiuxian ? '切换为标准版' : '切换为修仙版'}

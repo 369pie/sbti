@@ -8,6 +8,21 @@ import {
   HERMOSA_UNIVERSE_LABELS,
   type HermosaTag,
 } from '@/lib/hermosa/tags';
+import {
+  pageStyle,
+  shellStyle,
+  datelineStyle,
+  datelineRuleStyle,
+  eyebrowStyle,
+  titleStyle,
+  accentRuleStyle,
+  ledeStyle,
+  ACCENT,
+  INK,
+  INK_MUTED,
+  HAIRLINE,
+  HerVoiceMobileStyles,
+} from '../_editorial-styles';
 
 export const metadata: Metadata = {
   title: '她说我们听见了 · HERMOSA · WTFTI',
@@ -47,6 +62,11 @@ async function fetchHeard(): Promise<Row[]> {
 }
 
 const STATUS_ORDER = ['shipped', 'planned', 'heard'] as const;
+const STATUS_COLOR: Record<string, string> = {
+  shipped: '#5C7A4F',
+  planned: '#C9A676',
+  heard: ACCENT,
+};
 
 export default async function WeHeardYouPage() {
   const rows = await fetchHeard();
@@ -56,47 +76,29 @@ export default async function WeHeardYouPage() {
   }
 
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        background: 'var(--color-bg-primary)',
-        color: 'var(--color-text-primary)',
-        padding: '64px 18px 120px',
-        fontFamily: 'var(--font-display, "Noto Serif SC", serif)',
-      }}
-    >
-      <div style={{ maxWidth: 880, margin: '0 auto' }}>
-        <header style={{ textAlign: 'center', marginBottom: 36 }}>
-          <div
-            style={{
-              fontSize: 12,
-              letterSpacing: '0.42em',
-              color: 'var(--color-accent)',
-              marginBottom: 12,
-              fontWeight: 500,
-            }}
-          >
-            HERMOSA · WE HEARD YOU
-          </div>
-          <h1 style={{ margin: 0, fontSize: 38, fontStyle: 'italic', lineHeight: 1.25 }}>
-            她说，我们听见了。
+    <main className="hv-page" style={pageStyle}>
+      <HerVoiceMobileStyles />
+      <div style={{ ...shellStyle, maxWidth: 880 }}>
+        <div style={datelineStyle}>
+          <span>HERMOSA · WE HEARD YOU · {String(rows.length).padStart(3, '0')}</span>
+          <span className="hv-dateline-r">暮光博物笔记 · MMXXVI</span>
+        </div>
+        <div style={datelineRuleStyle} />
+
+        <header style={{ marginBottom: 56 }}>
+          <div style={eyebrowStyle}>§ WE HEARD YOU · 公开看板</div>
+          <h1 style={titleStyle}>
+            她说，我们<span style={{ color: ACCENT }}>听见了</span>。
           </h1>
-          <p
-            style={{
-              maxWidth: 540,
-              margin: '16px auto 0',
-              fontSize: 14,
-              lineHeight: 1.9,
-              color: 'var(--color-text-secondary)',
-            }}
-          >
-            带 <span style={{ color: 'var(--color-accent)' }}>#想要</span> /{' '}
-            <span style={{ color: 'var(--color-accent)' }}>#体验吐槽</span> 的留言进入这里。
-            每一条都标注了 <em>已收到 / 排期中 / 已上线</em>。
-            没收到的——是我们还没读到，
-            <Link href={withBasePath('/her-voice/')} style={{ color: 'var(--color-accent)' }}>
+          <div style={accentRuleStyle} />
+          <p style={ledeStyle}>
+            带 <span style={{ color: ACCENT, fontStyle: 'normal' }}>#想要</span> /{' '}
+            <span style={{ color: ACCENT, fontStyle: 'normal' }}>#体验吐槽</span> 的留言进入这里。
+            每一条都标注了 <em>已收到 / 排期中 / 已上线</em>。没收到的——是我们还没读到，
+            <Link href={withBasePath('/her-voice/')} style={{ color: ACCENT, fontStyle: 'normal' }}>
               {' '}去她说墙留言
-            </Link>。
+            </Link>
+            。
           </p>
         </header>
 
@@ -104,62 +106,94 @@ export default async function WeHeardYouPage() {
           const list = grouped[s] ?? [];
           if (list.length === 0) return null;
           return (
-            <section key={s} style={{ marginTop: 36 }}>
-              <h2
+            <section key={s} style={{ marginTop: 48 }}>
+              <div
                 style={{
-                  fontSize: 13,
-                  letterSpacing: '0.42em',
-                  margin: '0 0 14px',
-                  color: s === 'shipped' ? 'var(--color-sage)' : s === 'planned' ? 'var(--color-gold)' : 'var(--color-accent)',
-                  fontWeight: 500,
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 14,
+                  marginBottom: 18,
+                  paddingBottom: 10,
+                  borderBottom: `1px solid ${INK}`,
                 }}
               >
-                — {HERMOSA_STATUS_LABELS[s]} ({list.length}) —
-              </h2>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {list.map((r) => (
+                <span
+                  style={{
+                    fontFamily: 'ui-monospace, "SF Mono", monospace',
+                    fontSize: 11,
+                    letterSpacing: '0.42em',
+                    color: STATUS_COLOR[s] ?? ACCENT,
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  § {HERMOSA_STATUS_LABELS[s]} ({String(list.length).padStart(2, '0')})
+                </span>
+                <div style={{ flex: 1, height: 1, background: HAIRLINE }} />
+              </div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 0 }}>
+                {list.map((r, idx) => (
                   <li
                     key={r.id}
                     style={{
-                      padding: 16,
-                      borderRadius: 14,
-                      background: 'var(--color-bg-elevated)',
-                      border: '1px solid var(--color-border-subtle)',
+                      padding: '20px 0',
+                      borderTop: idx === 0 ? 'none' : `1px dotted ${HAIRLINE}`,
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: 8,
+                      gap: 12,
                     }}
                   >
-                    <div style={{ fontSize: 15, lineHeight: 1.7, fontStyle: 'italic' }}>「{r.text}」</div>
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', fontSize: 11 }}>
+                    <div
+                      style={{
+                        fontSize: 18,
+                        lineHeight: 1.6,
+                        fontStyle: 'italic',
+                        color: INK,
+                      }}
+                    >
+                      <span style={{ color: ACCENT, marginRight: 4, fontStyle: 'normal' }}>“</span>
+                      {r.text}
+                      <span style={{ color: ACCENT, marginLeft: 2, fontStyle: 'normal' }}>”</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'baseline' }}>
                       {(r.tags ?? []).map((t) => (
                         <span
                           key={t}
                           style={{
-                            padding: '2px 8px',
-                            borderRadius: 999,
-                            border: '1px solid var(--color-border-subtle)',
-                            color: 'var(--color-accent)',
-                            letterSpacing: '0.18em',
+                            fontFamily: 'ui-monospace, "SF Mono", monospace',
+                            fontSize: 10,
+                            color: ACCENT,
+                            letterSpacing: '0.28em',
+                            textTransform: 'uppercase',
                           }}
                         >
                           # {HERMOSA_TAG_LABELS[t as HermosaTag] ?? t}
                         </span>
                       ))}
-                      <span style={{ marginLeft: 'auto', color: 'var(--color-text-muted)' }}>
+                      <span
+                        style={{
+                          marginLeft: 'auto',
+                          color: INK_MUTED,
+                          fontFamily: 'ui-monospace, "SF Mono", monospace',
+                          fontSize: 10,
+                          letterSpacing: '0.28em',
+                          textTransform: 'uppercase',
+                        }}
+                      >
                         — {r.signature || 'Anonymous'} ·{' '}
-                        {HERMOSA_UNIVERSE_LABELS[r.universe as keyof typeof HERMOSA_UNIVERSE_LABELS] ??
-                          r.universe}
+                        {HERMOSA_UNIVERSE_LABELS[r.universe as keyof typeof HERMOSA_UNIVERSE_LABELS] ?? r.universe}
                       </span>
                     </div>
                     {r.status_note ? (
                       <div
                         style={{
-                          padding: '8px 12px',
-                          borderRadius: 8,
-                          background: 'var(--color-bg-secondary)',
-                          fontSize: 12,
-                          color: 'var(--color-text-secondary)',
+                          padding: '12px 16px',
+                          borderLeft: `3px solid ${STATUS_COLOR[s] ?? ACCENT}`,
+                          background: 'rgba(26, 21, 48, 0.03)',
+                          fontSize: 14,
+                          lineHeight: 1.7,
+                          color: INK,
+                          fontStyle: 'italic',
+                          fontFamily: '"Cormorant Garamond", serif',
                         }}
                       >
                         ↪ {r.status_note}
@@ -177,15 +211,15 @@ export default async function WeHeardYouPage() {
             style={{
               textAlign: 'center',
               padding: '80px 20px',
-              borderRadius: 16,
-              background: 'var(--color-bg-elevated)',
-              border: '1px dashed var(--color-border-subtle)',
+              border: `1px dashed ${HAIRLINE}`,
             }}
           >
-            <div style={{ fontSize: 14, color: 'var(--color-text-secondary)', marginBottom: 10 }}>看板还没有公开记录。</div>
-            <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
+            <div style={{ fontSize: 18, color: INK, marginBottom: 14, fontStyle: 'italic' }}>
+              — 看板还没有公开记录。
+            </div>
+            <div style={{ fontSize: 13, color: INK_MUTED, fontFamily: '"Cormorant Garamond", serif', fontStyle: 'italic' }}>
               你的话会先出现在
-              <Link href={withBasePath('/her-voice/')} style={{ color: 'var(--color-accent)' }}>
+              <Link href={withBasePath('/her-voice/')} style={{ color: ACCENT }}>
                 {' '}「她说」墙{' '}
               </Link>
               ，被我们读到后会移到这里 ✦

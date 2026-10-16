@@ -1367,7 +1367,7 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
 
             <button
               onClick={copyShareText}
-              className="w-full py-3 rounded-xl border border-stone-300/40 bg-stone-100/30 text-sm text-stone-500 hover:bg-stone-100/60 transition-all cursor-pointer"
+              className="w-full py-3 rounded-xl border border-border bg-bg-secondary/40 text-sm text-text-secondary hover:bg-bg-secondary/70 transition-all cursor-pointer"
             >
               {textCopied ? '已复制分享文案 ✓' : '📋 复制分享文案'}
             </button>
@@ -1393,7 +1393,7 @@ export function SoultiResultContent({ personality, dimensionScores }: Props) {
               </button>
               <button
                 onClick={quickShare}
-                className="flex-1 py-3 rounded-xl border border-stone-300/40 text-sm text-stone-500 hover:bg-stone-100/40 transition-all cursor-pointer flex items-center justify-center gap-2"
+                className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:bg-bg-secondary/40 transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />

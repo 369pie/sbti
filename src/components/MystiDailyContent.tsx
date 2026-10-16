@@ -6,8 +6,10 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { MYSTI_THEMES } from '@/lib/mysti/themes';
+import { useWtftiTheme } from '@/components/wtfti/WtftiThemeProvider';
 import type { MystiTheme, MystiShareImageGeneratorHandle } from '@/lib/mysti/types';
 import { getDailyCard, getDailyCardIndex, getRandomBonusCard, formatDateCN, type DailyCardInterpretation } from '@/lib/mysti/daily-card';
+import { getDailyStarLine } from '@/lib/mingli/engine';
 const MystiDailyShareImageGenerator = dynamic(
   () => import('@/components/MystiDailyShareImageGenerator').then((m) => m.MystiDailyShareImageGenerator),
   { ssr: false },
@@ -15,16 +17,11 @@ const MystiDailyShareImageGenerator = dynamic(
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 import { isSubscriber } from '@/lib/mysti/subscription';
 
-const THEME_STORAGE_KEY = 'mysti-theme-preference';
+
 
 export function MystiDailyContent() {
-  const [themeId, setThemeId] = useState<MystiTheme['id']>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-      if (stored === 'pale' || stored === 'celestial') return stored;
-    }
-    return 'celestial';
-  });
+  const { theme: wtftiTheme } = useWtftiTheme();
+  const themeId = wtftiTheme === 'dark' ? 'celestial' : 'pale';
   const [dailyCard, setDailyCard] = useState<DailyCardInterpretation | null>(null);
   const [bonusCard, setBonusCard] = useState<DailyCardInterpretation | null>(null);
   const [bonusUsedToday, setBonusUsedToday] = useState<boolean>(() => {
@@ -39,12 +36,15 @@ export function MystiDailyContent() {
     if (typeof window === 'undefined') return false;
     return isSubscriber();
   }, []);
+  const todayStar = useMemo(() => getDailyStarLine(new Date()), []);
   const [mounted, setMounted] = useState(false);
   const shareRef = useRef<MystiShareImageGeneratorHandle>(null);
 
   useEffect(() => {
-    setDailyCard(getDailyCard());
-    setMounted(true);
+    queueMicrotask(() => {
+      setDailyCard(getDailyCard());
+      setMounted(true);
+    });
     trackMystiEvent('mysti_daily_view');
   }, []);
 
@@ -61,15 +61,7 @@ export function MystiDailyContent() {
     }
   }, [subscriber, bonusUsedToday]);
 
-  const toggleTheme = useCallback(() => {
-    setThemeId(prev => {
-      const next = prev === 'celestial' ? 'pale' : 'celestial';
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(THEME_STORAGE_KEY, next);
-      }
-      return next;
-    });
-  }, []);
+  
 
   const theme = MYSTI_THEMES[themeId];
   const today = new Date();
@@ -95,14 +87,7 @@ export function MystiDailyContent() {
         <Link href="/mysti/" className="text-sm font-medium tracking-wide opacity-80 hover:opacity-100 transition-opacity" style={{ color: theme.textMuted }}>
           WTFTI · 灵鉴
         </Link>
-        <button
-          onClick={toggleTheme}
-          className="px-3 py-1.5 rounded-full text-xs border transition-all hover:brightness-110"
-          style={{ borderColor: theme.divider, color: theme.accent, background: theme.accentSoft }}
-          aria-label="切换主题"
-        >
-          {theme.label}
-        </button>
+        
       </div>
 
       {/* Main content */}
@@ -200,6 +185,23 @@ export function MystiDailyContent() {
           <div className="text-xs tracking-wider uppercase mb-3 text-center" style={{ color: theme.accent }}>
             ✦ 今日解读 ✦
           </div>
+          <p
+            className="text-[15px] leading-[1.55] text-center mb-3"
+            style={{
+              color: theme.accent,
+              fontFamily: 'var(--font-display)',
+              fontStyle: 'italic',
+              opacity: 0.95,
+            }}
+          >
+            {todayStar.line}
+            <span
+              className="not-italic ml-2 text-[10px] tracking-[0.18em] uppercase"
+              style={{ fontFamily: 'ui-monospace, "SF Mono", monospace', color: theme.text, opacity: 0.55 }}
+            >
+              · {todayStar.starLabel}
+            </span>
+          </p>
           <p className="text-sm leading-relaxed text-center" style={{ color: theme.text }}>
             {dailyCard.dailyReading}
           </p>

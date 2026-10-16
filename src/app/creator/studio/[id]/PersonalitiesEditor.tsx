@@ -70,6 +70,14 @@ export function PersonalitiesEditor({
   const [genStyle, setGenStyle] = useState<Record<number, string>>({});
   const [genLoading, setGenLoading] = useState<Record<number, boolean>>({});
 
+  const setField = useCallback((index: number, field: keyof PersonalityDraft, value: string) => {
+    setPersonalities((current) => {
+      const next = [...current];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  }, []);
+
   const generateImage = useCallback(async (index: number, personality: PersonalityDraft) => {
     if (!personality.id) {
       alert('请先保存人格再生成图鉴');
@@ -98,18 +106,10 @@ export function PersonalitiesEditor({
       const err = await res.json().catch(() => ({}));
       alert(err.error ?? 'AI 图鉴生成失败，请稍后重试');
     }
-  }, [genStyle, universeId, onSaved]);
+  }, [genStyle, universeId, onSaved, setField]);
 
   const fieldClass =
     'w-full bg-bg-secondary border border-border-subtle rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-border transition-colors';
-
-  const setField = (index: number, field: keyof PersonalityDraft, value: string) => {
-    setPersonalities((current) => {
-      const next = [...current];
-      next[index] = { ...next[index], [field]: value };
-      return next;
-    });
-  };
 
   const addPersonality = () => {
     setPersonalities((current) => [
@@ -256,7 +256,7 @@ export function PersonalitiesEditor({
               <button
                 onClick={() => removePersonality(index)}
                 disabled={isDeleting}
-                className="text-text-muted hover:text-red-600 transition-colors text-sm disabled:opacity-40"
+                className="text-text-muted hover:text-ember transition-colors text-sm disabled:opacity-40"
               >
                 删除
               </button>
@@ -360,7 +360,7 @@ export function PersonalitiesEditor({
                   type="button"
                   onClick={() => generateImage(index, personality)}
                   disabled={genLoading[index] || !personality.id}
-                  className="flex-1 py-1.5 rounded-lg bg-purple-600/20 text-purple-300 text-xs font-medium hover:bg-purple-600/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 py-1.5 rounded-lg bg-violet-text/20 text-violet-text text-xs font-medium hover:bg-violet-text/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   {genLoading[index] ? '✨ 生成中…' : '🎨 AI 生成图鉴'}
                 </button>

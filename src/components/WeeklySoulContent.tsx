@@ -12,8 +12,10 @@ export function WeeklySoulContent() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    setFreq(generateSoulFrequency());
+    queueMicrotask(() => {
+      setMounted(true);
+      setFreq(generateSoulFrequency());
+    });
   }, []);
 
   const card = typeof window !== 'undefined' ? loadCard() : null;

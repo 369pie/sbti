@@ -76,8 +76,8 @@ export default function CreatorStudioPage() {
 
   const statusLabel: Record<string, { text: string; className: string }> = {
     draft: { text: '草稿', className: 'bg-bg-tertiary text-text-secondary' },
-    review: { text: '审核中', className: 'bg-yellow-500/20 text-amber-600' },
-    published: { text: '已发布', className: 'bg-green-500/12 text-green-600' },
+    review: { text: '审核中', className: 'bg-gold/20 text-gold-text' },
+    published: { text: '已发布', className: 'bg-sage/12 text-sage-text' },
     archived: { text: '已归档', className: 'bg-bg-secondary text-text-muted' },
   };
 
@@ -102,11 +102,11 @@ export default function CreatorStudioPage() {
                 <div className="text-text-muted mt-1">草稿</div>
               </div>
               <div className="rounded-xl bg-bg-secondary px-3 py-2">
-                <div className="text-amber-600 font-semibold">{statusCounts.review}</div>
+                <div className="text-gold-text font-semibold">{statusCounts.review}</div>
                 <div className="text-text-muted mt-1">审核中</div>
               </div>
               <div className="col-span-2 rounded-xl bg-bg-secondary px-3 py-2">
-                <div className="text-green-600 font-semibold">{statusCounts.published}</div>
+                <div className="text-sage-text font-semibold">{statusCounts.published}</div>
                 <div className="text-text-muted mt-1">已发布</div>
               </div>
             </div>

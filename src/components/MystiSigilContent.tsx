@@ -57,12 +57,14 @@ export function MystiSigilContent() {
   const [unlocked, setUnlocked] = useState(false);
 
   useEffect(() => {
-    setUnlocked(
-      isUnlocked('sigil-yearly', RESOURCE_ID) ||
-        // 通行证用户也直接放行（与 subscription.ts 的覆盖语义保持一致）
-        isSubscriber(),
-    );
-    setHydrated(true);
+    queueMicrotask(() => {
+      setUnlocked(
+        isUnlocked('sigil-yearly', RESOURCE_ID) ||
+          // 通行证用户也直接放行（与 subscription.ts 的覆盖语义保持一致）
+          isSubscriber(),
+      );
+      setHydrated(true);
+    });
   }, []);
 
   const currentMonth = useMemo(() => {

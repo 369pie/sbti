@@ -28,9 +28,11 @@ export default function DailyMoonPhasePanel() {
       }
     };
 
-    setPhase(getMoonPhase());
-    const s = recordCheckIn();
-    setStreak(s.lastCheckInDate ? s : loadStreak());
+    queueMicrotask(() => {
+      setPhase(getMoonPhase());
+      const s = recordCheckIn();
+      setStreak(s.lastCheckInDate ? s : loadStreak());
+    });
 
     window.addEventListener(ASSET_SYNC_EVENT, hydratePanel);
     return () => window.removeEventListener(ASSET_SYNC_EVENT, hydratePanel);

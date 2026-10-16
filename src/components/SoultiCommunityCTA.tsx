@@ -55,7 +55,7 @@ export function SoultiCommunityCTA({ personalityName, rarity, accentColor }: Pro
 
         <ul className="space-y-1.5 text-xs text-text-secondary mb-6" style={{ fontFamily: serifFont }}>
           <li>· 每周一位灵魂共振女性的深度故事</li>
-          <li>· 同类型的人在一起聊"白天和深夜的我"</li>
+          <li>· 同类型的人在一起聊&quot;白天和深夜的我&quot;</li>
           <li>· 提名你心中的下一位灵魂共振女性</li>
           <li>· 内部抢先体验深度报告 & 新功能</li>
         </ul>

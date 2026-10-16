@@ -259,7 +259,7 @@ export function CreatorResultContent({ universe, personality, allPersonalities, 
                   <Link href={`/creator/profile/${creator.id}/`} className="text-sm font-medium text-bg-primary hover:text-bg-primary/80 transition-colors">
                     {creator.name}
                   </Link>
-                  {creator.is_verified && <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-300">已认证</span>}
+                  {creator.is_verified && <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-text/15 text-violet-text">已认证</span>}
                 </div>
                 <div className="text-xs text-bg-primary/30 mt-1">本测试创作者</div>
                 {creator.bio && (

@@ -142,7 +142,7 @@ export function FanrentiShareCard({ personality: p, character, realm, shareUrl }
             className="text-center text-white/85 text-sm leading-relaxed mb-6"
             style={{ fontFamily: '"Noto Serif SC", Georgia, serif' }}
           >
-            "{p.tagline}"
+            &quot;{p.tagline}&quot;
           </p>
 
           {/* Tags */}

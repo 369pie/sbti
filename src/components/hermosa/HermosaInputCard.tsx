@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { getApiPath } from '@/lib/api';
+import { enqueueProductEvent } from '@/lib/analytics/product-events';
 import { withBasePath } from '@/lib/site';
 import {
   HERMOSA_TAGS,
@@ -19,6 +20,8 @@ import {
   type HermosaTag,
   type HermosaUniverse,
 } from '@/lib/hermosa/tags';
+import { getCurrentHermosaTopic } from '@/lib/hermosa/topics';
+import { rememberOwnContribution } from '@/lib/hermosa/contributions-storage';
 
 interface Message {
   id: string;
@@ -42,6 +45,7 @@ interface Props {
 
 const SIG_KEY = 'hermosa.signature';
 const ECHO_KEY = 'hermosa.echoes.v1';
+const RESULT_TOPIC_WEEK = getCurrentHermosaTopic().week;
 
 function loadEchoes(): Set<string> {
   if (typeof window === 'undefined') return new Set();
@@ -61,6 +65,18 @@ function saveEcho(id: string) {
     next.push(id);
     window.localStorage.setItem(ECHO_KEY, JSON.stringify(next.slice(-200)));
   } catch {}
+}
+
+function followUpHref(
+  kind: 'book' | 'ai_question',
+  universe: HermosaUniverse,
+  slug?: string,
+  code?: string,
+): string {
+  const params = new URLSearchParams({ kind, universe });
+  if (slug) params.set('slug', slug);
+  if (code) params.set('code', code);
+  return withBasePath(`/her-voice/?${params}`);
 }
 
 export function HermosaInputCard({
@@ -139,6 +155,7 @@ export function HermosaInputCard({
         return;
       }
       setSubmitted(data.message);
+      rememberOwnContribution(data.message.id);
       try {
         if (signature) window.localStorage.setItem(SIG_KEY, signature.trim());
       } catch {}
@@ -183,92 +200,97 @@ export function HermosaInputCard({
 
   return (
     <section
+      className="hv-ic-shell"
       style={{
         margin: '64px auto 0',
-        width: 'min(100% - 32px, 960px)',
-        padding: '44px 28px 36px',
-        background: 'var(--color-bg-elevated, #FFFDF9)',
-        border: '1px solid var(--color-border-subtle, #E3DCD1)',
-        borderRadius: 20,
-        boxShadow: '0 1px 2px rgba(31, 26, 22, 0.04), 0 12px 32px -16px rgba(31, 26, 22, 0.10)',
+        width: 'min(100% - 48px, 860px)',
+        padding: '48px 32px 40px',
+        background: '#FAF7F2',
+        border: 'none',
+        borderTop: '3px solid #1A1530',
+        borderBottom: '1px solid rgba(26,21,48,0.14)',
         boxSizing: 'border-box',
-        color: 'var(--color-text-primary, #1F1A16)',
+        color: '#1A1530',
+        fontFamily: '"Noto Serif SC", serif',
       }}
       aria-labelledby="hermosa-input-title"
     >
-      <header style={{ textAlign: 'center', marginBottom: 28 }}>
-        <div
-          aria-hidden
-          style={{
-            margin: '0 auto 14px',
-            height: 1,
-            width: 44,
-            background:
-              'linear-gradient(90deg, transparent, var(--color-gold-leaf, #C9A676), transparent)',
-          }}
-        />
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @media (max-width: 720px) {
+              .hv-ic-shell { margin: 40px auto 0 !important; width: 100% !important; padding: 32px 18px !important; }
+              .hv-ic-cols { flex-direction: column !important; }
+            }
+          `,
+        }}
+      />
+      <header style={{ marginBottom: 32 }}>
         <div
           style={{
             fontSize: 11,
             letterSpacing: '0.42em',
-            color: 'var(--color-gold, #B8905A)',
-            marginBottom: 10,
-            fontWeight: 500,
+            color: accent,
+            marginBottom: 14,
             textTransform: 'uppercase',
+            fontFamily: 'ui-monospace, "SF Mono", monospace',
           }}
         >
-          HERMOSA · 她 说
+          § 写入档案 · COMPOSE
         </div>
         <h2
           id="hermosa-input-title"
           style={{
             margin: 0,
-            fontSize: 24,
-            lineHeight: 1.35,
+            fontSize: 32,
+            lineHeight: 1.15,
             fontStyle: 'italic',
             fontWeight: 500,
-            color: 'var(--color-text-primary, #1F1A16)',
-            fontFamily: 'var(--font-display, "Noto Serif SC", serif)',
+            letterSpacing: '-0.02em',
+            color: '#1A1530',
+            fontFamily: 'var(--font-display, "Cormorant Garamond", "Noto Serif SC", serif)',
           }}
         >
-          {personalityName ? `她想对${personalityName}说什么？` : '她想说点什么？'}
+          {personalityName ? `她想对${personalityName}说什么？` : '写下你想说的'}
         </h2>
+        <div style={{ width: 48, height: 2, background: accent, margin: '20px 0 0' }} />
         <p
           style={{
-            marginTop: 10,
-            fontSize: 13,
-            lineHeight: 1.7,
-            color: 'var(--color-text-secondary, #5B524B)',
-            maxWidth: 520,
-            marginInline: 'auto',
+            marginTop: 18,
+            fontSize: 14,
+            lineHeight: 1.85,
+            color: '#1A1530',
+            opacity: 0.78,
+            maxWidth: 580,
           }}
         >
-          一句话写给同型号姐妹、写给产品、写给世界。
-          带 <span style={{ color: accent, fontWeight: 600 }}>#想要</span> /{' '}
-          <span style={{ color: accent, fontWeight: 600 }}>#体验吐槽</span> 的留言会进入产品方公开看板。
+          一句话写给同型号姐妹、写给产品。带 <span style={{ color: accent, fontStyle: 'italic', fontWeight: 600 }}>#想要</span> /{' '}
+          <span style={{ color: accent, fontStyle: 'italic', fontWeight: 600 }}>#体验吐槽</span> 会进入我们的开发板。
         </p>
       </header>
 
       {!submitted ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value.slice(0, 200))}
-            placeholder={tag ? HERMOSA_TAG_HINTS[tag] : '一行话，不超过 180 字…'}
+            placeholder={tag ? HERMOSA_TAG_HINTS[tag] : '在这里点亮一束光。可以只是一个名字、一句没说出口的话、一个棗…'}
             rows={3}
             maxLength={200}
             style={{
               width: '100%',
-              padding: '14px 16px',
-              borderRadius: 12,
-              border: '1px solid var(--color-border-subtle, #E3DCD1)',
-              background: 'var(--color-paper-warm, #F5EFE4)',
-              color: 'var(--color-text-primary, #1F1A16)',
-              fontSize: 15,
-              lineHeight: 1.7,
-              fontFamily: 'inherit',
+              padding: '16px 20px',
+              borderRadius: 0,
+              border: 'none',
+              borderBottom: '1px solid rgba(26,21,48,0.14)',
+              background: '#F5F0E8',
+              color: '#1A1530',
+              fontSize: 16,
+              lineHeight: 1.75,
+              fontFamily: '"Noto Serif SC", serif',
+              fontStyle: 'italic',
               resize: 'vertical',
-              minHeight: 88,
+              minHeight: 100,
               outline: 'none',
             }}
           />
@@ -281,51 +303,62 @@ export function HermosaInputCard({
                   type="button"
                   onClick={() => setTag(active ? '' : t)}
                   style={{
-                    padding: '6px 14px',
-                    borderRadius: 999,
-                    border: '1px solid ' + (active ? accent : 'var(--color-border-subtle, #E3DCD1)'),
+                    padding: active ? '6px 12px 6px 10px' : '6px 12px',
+                    borderRadius: 0,
+                    border: '1px solid ' + (active ? accent : 'rgba(26,21,48,0.14)'),
                     background: active ? accent : 'transparent',
-                    color: active ? '#FFFDF9' : 'var(--color-text-secondary, #5B524B)',
-                    fontSize: 12,
-                    letterSpacing: '0.18em',
+                    color: active ? '#F5F0E8' : '#8A817A',
+                    fontFamily: 'ui-monospace, "SF Mono", monospace',
+                    fontSize: 11,
+                    letterSpacing: '0.32em',
+                    textTransform: 'uppercase',
                     cursor: 'pointer',
                     transition: 'all 200ms ease',
                   }}
                 >
-                  # {HERMOSA_TAG_LABELS[t]}
+                  <span style={{ opacity: 0.6 }}>#</span> {HERMOSA_TAG_LABELS[t]}
                 </button>
               );
             })}
           </div>
           <div
+            className="hv-ic-cols"
             style={{
               display: 'flex',
-              gap: 10,
-              alignItems: 'center',
+              gap: 12,
+              alignItems: 'baseline',
               flexWrap: 'wrap',
+              borderTop: '1px dashed rgba(26,21,48,0.14)',
+              paddingTop: 18,
             }}
           >
-            <input
-              type="text"
-              value={signature}
-              onChange={(e) => setSignature(e.target.value.slice(0, 24))}
-              placeholder="可空 · 匿名昵称"
-              maxLength={24}
-              style={{
-                flex: '1 1 160px',
-                padding: '10px 14px',
-                borderRadius: 8,
-                border: '1px solid var(--color-border-subtle, #E3DCD1)',
-                background: 'var(--color-paper-warm, #F5EFE4)',
-                color: 'var(--color-text-primary, #1F1A16)',
-                fontSize: 13,
-                outline: 'none',
-              }}
-            />
+            <div style={{ display: 'flex', flex: '1 1 200px', alignItems: 'baseline', borderBottom: '1px solid #1A1530' }}>
+              <span style={{ fontFamily: 'ui-monospace, "SF Mono", monospace', fontSize: 10, color: '#8A817A', letterSpacing: '0.2em' }}>FROM ·</span>
+              <input
+                type="text"
+                value={signature}
+                onChange={(e) => setSignature(e.target.value.slice(0, 24))}
+                placeholder="可空 · 匿名昵称"
+                maxLength={24}
+                style={{
+                  flex: 1,
+                  padding: '6px 12px',
+                  borderRadius: 0,
+                  border: 'none',
+                  background: 'transparent',
+                  color: '#1A1530',
+                  fontFamily: 'var(--font-display, "Cormorant Garamond", "Noto Serif SC", serif)',
+                  fontStyle: 'italic',
+                  fontSize: 18,
+                  outline: 'none',
+                }}
+              />
+            </div>
             <span
               style={{
-                fontSize: 12,
-                color: 'var(--color-text-muted, #9A908A)',
+                fontFamily: 'ui-monospace, "SF Mono", monospace',
+                fontSize: 11,
+                color: '#8A817A',
                 fontVariantNumeric: 'tabular-nums',
                 marginRight: 'auto',
               }}
@@ -337,24 +370,27 @@ export function HermosaInputCard({
               onClick={onSubmit}
               disabled={!valid}
               style={{
-                padding: '10px 26px',
-                borderRadius: 999,
+                padding: '12px 24px',
+                borderRadius: 0,
                 border: 'none',
-                background: valid ? accent : 'var(--color-bg-tertiary, #ECE5D9)',
-                color: valid ? '#FFFDF9' : 'var(--color-text-muted, #9A908A)',
-                fontSize: 13,
-                letterSpacing: '0.24em',
-                fontWeight: 600,
+                background: valid ? '#1A1530' : 'rgba(26,21,48,0.06)',
+                color: valid ? '#F5F0E8' : 'rgba(26,21,48,0.3)',
+                fontFamily: 'ui-monospace, "SF Mono", monospace',
+                fontSize: 11,
+                letterSpacing: '0.42em',
+                textTransform: 'uppercase',
+                fontWeight: 500,
                 cursor: valid ? 'pointer' : 'not-allowed',
-                boxShadow: valid ? '0 6px 18px -8px rgba(31,26,22,0.30)' : 'none',
                 transition: 'all 180ms ease',
               }}
             >
-              {submitting ? '抄写中…' : '写下她说'}
+              {submitting ? '· LIGHTING ·' : '→ 点亮这束光'}
             </button>
           </div>
           {err ? (
-            <div style={{ fontSize: 12, color: 'var(--color-rose-deep, #A85A6E)' }}>{err}</div>
+            <div style={{ fontFamily: 'ui-monospace, "SF Mono", monospace', fontSize: 11, color: '#C0512F' }}>
+              {err}
+            </div>
           ) : null}
         </div>
       ) : (
@@ -363,89 +399,123 @@ export function HermosaInputCard({
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: 16,
+            gap: 20,
           }}
         >
           <div
             style={{
-              fontSize: 13,
-              color: 'var(--color-gold, #B8905A)',
-              letterSpacing: '0.32em',
+              fontFamily: 'ui-monospace, "SF Mono", monospace',
+              fontSize: 11,
+              color: accent,
+              letterSpacing: '0.42em',
               textTransform: 'uppercase',
             }}
           >
-            ✦ 她说已被收藏 ✦
+            § 已存档 · SAVED
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={cardUrl}
-            alt="HERMOSA 黑板字报"
+            alt="HERMOSA 存档"
             style={{
               width: '100%',
               maxWidth: 360,
-              borderRadius: 14,
-              boxShadow: '0 14px 38px rgba(31,26,22,0.20)',
+              borderRadius: 0,
+              border: `1px solid rgba(26,21,48,0.14)`,
             }}
           />
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div className="hv-ic-cols" style={{ display: 'flex', gap: 12, width: '100%', maxWidth: 360 }}>
             <a
               href={cardUrl}
               target="_blank"
               rel="noreferrer"
               style={{
-                padding: '8px 18px',
-                borderRadius: 999,
-                border: '1px solid ' + accent,
-                color: accent,
-                fontSize: 12,
-                letterSpacing: '0.24em',
+                flex: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '10px 18px',
+                borderRadius: 0,
+                border: '1px solid rgba(26,21,48,0.14)',
+                color: '#1A1530',
+                fontFamily: 'ui-monospace, "SF Mono", monospace',
+                fontSize: 10,
+                letterSpacing: '0.32em',
+                textTransform: 'uppercase',
                 textDecoration: 'none',
               }}
             >
-              下载长图
+              ↓ 保存长图
             </a>
             <Link
               href={withBasePath('/her-voice/')}
               style={{
-                padding: '8px 18px',
-                borderRadius: 999,
-                background: accent,
-                color: '#FFFDF9',
-                fontSize: 12,
-                letterSpacing: '0.24em',
+                flex: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '10px 18px',
+                borderRadius: 0,
+                background: '#1A1530',
+                color: '#F5F0E8',
+                fontFamily: 'ui-monospace, "SF Mono", monospace',
+                fontSize: 10,
+                letterSpacing: '0.32em',
+                textTransform: 'uppercase',
                 textDecoration: 'none',
-                fontWeight: 600,
               }}
             >
-              去她说墙
+              → 返回她说墙
             </Link>
+          </div>
+          <div
+            className="hv-ic-cols"
+            style={{
+              width: '100%',
+              maxWidth: 520,
+              display: 'flex',
+              gap: 12,
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              paddingTop: 12,
+              borderTop: '1px dashed rgba(26,21,48,0.14)',
+            }}
+          >
+            <FollowUpLink
+              href={followUpHref('book', universe, slug, code)}
+              target="result_book_followup"
+            >
+              推荐一本书
+            </FollowUpLink>
+            <FollowUpLink
+              href={followUpHref('ai_question', universe, slug, code)}
+              target="result_ai_followup"
+            >
+              写一个 AI 问题
+            </FollowUpLink>
+            <FollowUpLink
+              href={withBasePath('/her-voice/my/')}
+              target="result_salon_followup"
+            >
+              → 点亮自己的第一束光
+            </FollowUpLink>
           </div>
         </div>
       )}
 
       {peers.length > 0 ? (
-        <div style={{ marginTop: 32 }}>
-          <div
-            aria-hidden
-            style={{
-              margin: '0 auto 12px',
-              height: 1,
-              width: 32,
-              background:
-                'linear-gradient(90deg, transparent, var(--color-gold-leaf, #C9A676), transparent)',
-            }}
-          />
+        <div style={{ marginTop: 40, borderTop: '3px solid #1A1530', paddingTop: 32 }}>
           <div
             style={{
-              fontSize: 11,
-              letterSpacing: '0.32em',
-              color: 'var(--color-gold, #B8905A)',
+              fontFamily: 'ui-monospace, "SF Mono", monospace',
+              fontSize: 10,
+              letterSpacing: '0.42em',
+              color: '#8A817A',
               textTransform: 'uppercase',
-              textAlign: 'center',
-              marginBottom: 14,
+              marginBottom: 20,
             }}
           >
-            同型号姐妹的话
+            § 回声 · PEERS
           </div>
           <ul
             style={{
@@ -454,60 +524,68 @@ export function HermosaInputCard({
               margin: 0,
               display: 'flex',
               flexDirection: 'column',
-              gap: 12,
+              gap: 0,
             }}
           >
             {peers.slice(0, 3).map((m) => (
               <li
                 key={m.id}
                 style={{
-                  padding: 14,
-                  borderRadius: 12,
-                  background: 'var(--color-paper-warm, #F5EFE4)',
-                  border: '1px solid var(--color-border-subtle, #E3DCD1)',
+                  padding: '16px 0',
+                  borderBottom: '1px solid rgba(26,21,48,0.14)',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 6,
+                  gap: 8,
                 }}
               >
                 <div
                   style={{
-                    fontSize: 14,
-                    lineHeight: 1.65,
+                    fontSize: 15,
+                    lineHeight: 1.75,
                     fontStyle: 'italic',
-                    color: 'var(--color-text-primary, #1F1A16)',
-                    fontFamily: 'var(--font-display, "Noto Serif SC", serif)',
+                    color: '#1A1530',
+                    fontFamily: '"Noto Serif SC", serif',
                   }}
                 >
-                  「{m.text}」
+                  “{m.text}”
                 </div>
                 <div
                   style={{
                     display: 'flex',
-                    fontSize: 11,
-                    color: 'var(--color-text-muted, #9A908A)',
-                    alignItems: 'center',
-                    gap: 8,
+                    alignItems: 'baseline',
+                    gap: 12,
                   }}
                 >
-                  <span>— {m.signature || 'Anonymous'}</span>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-display, "Cormorant Garamond", "Noto Serif SC", serif)',
+                      fontStyle: 'italic',
+                      fontSize: 14,
+                      color: '#8A817A',
+                    }}
+                  >
+                    — {m.signature || 'Anonymous'}
+                  </span>
                   <span style={{ marginLeft: 'auto' }} />
                   <button
                     type="button"
                     onClick={() => onEcho(m.id)}
                     disabled={echoed.has(m.id)}
                     style={{
-                      padding: '3px 12px',
-                      borderRadius: 999,
-                      border: '1px solid ' + accent,
+                      padding: '4px 10px',
+                      borderRadius: 0,
+                      border: '1px solid ' + (echoed.has(m.id) ? accent : 'rgba(26,21,48,0.14)'),
                       background: echoed.has(m.id) ? accent : 'transparent',
-                      color: echoed.has(m.id) ? '#FFFDF9' : accent,
-                      fontSize: 11,
-                      letterSpacing: '0.18em',
+                      color: echoed.has(m.id) ? '#F5F0E8' : '#1A1530',
+                      fontFamily: 'ui-monospace, "SF Mono", monospace',
+                      fontSize: 10,
+                      letterSpacing: '0.32em',
+                      textTransform: 'uppercase',
                       cursor: echoed.has(m.id) ? 'default' : 'pointer',
+                      transition: 'all 200ms ease',
                     }}
                   >
-                    ✦ {m.echo_count} 共鸣
+                    {echoed.has(m.id) ? '✓ ' + m.echo_count : '+ ' + m.echo_count}
                   </button>
                 </div>
               </li>
@@ -516,5 +594,43 @@ export function HermosaInputCard({
         </div>
       ) : null}
     </section>
+  );
+}
+
+function FollowUpLink({
+  href,
+  target,
+  children,
+}: {
+  href: string;
+  target: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={() =>
+        enqueueProductEvent('her_voice', 'her_voice_asset_click', {
+          props: { target, topic_week: RESULT_TOPIC_WEEK },
+        })
+      }
+      style={{
+        flex: '1 1 140px',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '10px 14px',
+        borderRadius: 0,
+        border: '1px solid rgba(26,21,48,0.14)',
+        color: '#1A1530',
+        fontFamily: 'ui-monospace, "SF Mono", monospace',
+        fontSize: 10,
+        letterSpacing: '0.32em',
+        textTransform: 'uppercase',
+        textDecoration: 'none',
+      }}
+    >
+      {children}
+    </Link>
   );
 }

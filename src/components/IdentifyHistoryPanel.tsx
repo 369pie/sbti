@@ -45,7 +45,7 @@ function AssessmentRow({
   return (
     <Link
       href={`/identify/result/${entry.personaSlug}/?r=${encodeURIComponent(entry.shareToken)}`}
-      className="block rounded-2xl border border-border-subtle bg-bg-elevated p-4 hover:border-pink-500/25 hover:bg-pink-500/5 transition-all"
+      className="block rounded-2xl border border-border-subtle bg-bg-elevated p-4 hover:border-accent/25 hover:bg-accent/5 transition-all"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 min-w-0">
@@ -69,7 +69,7 @@ function AssessmentRow({
           </p>
           <p className="text-[11px] text-text-muted mt-1">{formatDateLabel(entry.createdAt)}</p>
           {mode === 'received' && !entry.subjectViewedAt && (
-            <span className="inline-flex mt-2 px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-400 text-[10px] font-medium">
+            <span className="inline-flex mt-2 px-2 py-0.5 rounded-full bg-accent/10 text-rose-text text-[10px] font-medium">
               NEW
             </span>
           )}
@@ -77,7 +77,7 @@ function AssessmentRow({
       </div>
 
       {direction === 'card' && mode === 'sent' && entry.challengeOpenedAt && (
-        <p className="text-[11px] text-emerald-500 mt-3">对方已经打开过这份鉴定</p>
+        <p className="text-[11px] text-sage-text mt-3">对方已经打开过这份鉴定</p>
       )}
     </Link>
   );
@@ -121,7 +121,7 @@ export function IdentifyHistoryPanel({
   if (loading) {
     return (
       <div className="rounded-2xl border border-border-subtle bg-bg-elevated p-5 flex items-center justify-center">
-        <div className="w-4 h-4 rounded-full border-2 border-pink-400 border-t-transparent animate-spin" />
+        <div className="w-4 h-4 rounded-full border-2 border-accent border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -157,7 +157,7 @@ export function IdentifyHistoryPanel({
       </div>
 
       {data.summary.receivedCount > 0 && data.summary.receivedLocked && (
-        <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4">
+        <div className="rounded-2xl border border-accent/20 bg-accent/5 p-4">
           <p className="text-sm font-medium text-text-primary">
             有 {data.summary.receivedCount} 人鉴定了你
           </p>
@@ -166,7 +166,7 @@ export function IdentifyHistoryPanel({
           </p>
           <Link
             href="/auth/claimed?next=/identify/"
-            className="inline-flex mt-3 px-4 py-2 rounded-full bg-rose-500 text-bg-primary text-sm font-medium hover:bg-rose-600 transition-colors"
+            className="inline-flex mt-3 px-4 py-2 rounded-full bg-accent text-bg-primary text-sm font-medium hover:bg-ember transition-colors"
           >
             登录查看谁鉴定了你
           </Link>
@@ -174,7 +174,7 @@ export function IdentifyHistoryPanel({
       )}
 
       {!data.summary.receivedLocked && data.summary.unreadReceivedCount > 0 && (
-        <div className="rounded-2xl border border-pink-500/20 bg-pink-500/6 p-4">
+        <div className="rounded-2xl border border-accent/20 bg-accent/6 p-4">
           <p className="text-sm font-medium text-text-primary">有人新鉴定了你</p>
           <p className="text-xs text-text-muted mt-1">
             你有 {data.summary.unreadReceivedCount} 条还没看的灵鉴记录。

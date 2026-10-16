@@ -43,31 +43,27 @@ export function UniversePreviewCards({ currentUniverse, max = 3, variant = 'defa
   const isXpti = variant === 'xpti';
 
   useEffect(() => {
-    const card = loadCard();
-    const tested = new Set<string>();
-    if (card) {
-      for (const uid of CARD_UNIVERSE_IDS) {
-        if (card.results[uid]) tested.add(uid);
+    queueMicrotask(() => {
+      const card = loadCard();
+      const tested = new Set<string>();
+      if (card) {
+        for (const uid of CARD_UNIVERSE_IDS) {
+          if (card.results[uid]) tested.add(uid);
+        }
       }
-    }
 
-    // Get untested universes (excluding current)
-    let candidates = CARD_UNIVERSE_IDS.filter(
-      uid => uid !== currentUniverse && !tested.has(uid)
-    );
+      // Get untested universes (excluding current)
+      let candidates = CARD_UNIVERSE_IDS.filter(
+        uid => uid !== currentUniverse && !tested.has(uid)
+      );
 
-    // If all tested, show random others (excluding current) as "see your result"
-    if (candidates.length === 0) {
-      candidates = CARD_UNIVERSE_IDS.filter(uid => uid !== currentUniverse);
-    }
+      // If all tested, show stable others (excluding current) as "see your result"
+      if (candidates.length === 0) {
+        candidates = CARD_UNIVERSE_IDS.filter(uid => uid !== currentUniverse);
+      }
 
-    // Shuffle and pick top N
-    for (let i = candidates.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
-    }
-
-    setCards(candidates.slice(0, max));
+      setCards(candidates.slice(0, max));
+    });
   }, [currentUniverse, max]);
 
   if (cards.length === 0) return null;

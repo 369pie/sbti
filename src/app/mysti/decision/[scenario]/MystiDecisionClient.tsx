@@ -52,8 +52,10 @@ export function MystiDecisionClient({ scenario }: { scenario: DecisionScenario }
   useEffect(() => {
     trackMystiEvent('mysti_decision_entry', { slug: scenario.id });
     // Hydrate quota + pack state on mount
-    setQuota(getQuotaStatus());
-    setPremium(hasDecisionPack());
+    queueMicrotask(() => {
+      setQuota(getQuotaStatus());
+      setPremium(hasDecisionPack());
+    });
   }, [scenario.id]);
 
   const refreshQuota = useCallback(() => {

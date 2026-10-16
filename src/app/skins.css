@@ -1,0 +1,152 @@
+/* WTFTI design system v3 — docs/04-design-growth/design/wtfti-design-system-v3-2026-10.md
+   Two skins: .skin-journal (daily pages) and .skin-velvet (玄学 / paid content). */
+
+.skin-journal {
+  --s-bg: #FBF6EC;
+  --s-bg-2: #F5ECDD;
+  --s-card: #FFFDF8;
+  --s-ink: #4A3628;
+  --s-ink-2: #6E5646;
+  --s-mute: #8A7362;
+  --s-line: #E8DCC8;
+  --s-accent: #E8907A;
+  --s-accent-soft: #FADBD0;
+  --s-accent-text: #B45C47;
+  --s-sage: #A9C5A0;
+  --s-butter: #F2CE7E;
+  --s-cta: #4A3628;
+  --s-on-cta: #FFF8EC;
+  --s-h-font: var(--font-xiaowei), var(--font-serif-sc), "Noto Serif SC", serif;
+  --s-hand: var(--font-longcang), cursive;
+  --s-radius: 6px;
+  background: var(--s-bg) radial-gradient(rgba(74, 54, 40, 0.05) 1px, transparent 1px) 0 0 / 14px 14px;
+  color: var(--s-ink);
+}
+
+.skin-velvet {
+  --s-bg: #2A1020;
+  --s-bg-2: #351528;
+  --s-card: #3A1A2D;
+  --s-ink: #F6E9DF;
+  --s-ink-2: #E2CBBF;
+  --s-mute: #B9998F;
+  --s-line: rgba(217, 183, 126, 0.32);
+  --s-accent: #D9B77E;
+  --s-accent-soft: rgba(217, 183, 126, 0.14);
+  --s-accent-text: #E8C995;
+  --s-rose: #E8B4B8;
+  --s-cta: #D9B77E;
+  --s-on-cta: #2A1020;
+  --s-h-font: var(--font-serif-sc), "Noto Serif SC", serif;
+  --s-hand: var(--font-cormorant), serif;
+  --s-radius: 4px;
+  background:
+    radial-gradient(80% 50% at 50% 0%, #4A1B36, transparent 70%),
+    var(--s-bg);
+  color: var(--s-ink);
+}
+
+.skin-journal,
+.skin-velvet {
+  font-family: var(--font-sans-sc), "Noto Sans SC", "PingFang SC", sans-serif;
+}
+
+.s-eyebrow {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--s-mute);
+}
+.skin-velvet .s-eyebrow { color: var(--s-accent); }
+
+.s-title { font-family: var(--s-h-font); color: var(--s-ink); font-weight: 400; }
+.skin-velvet .s-title { font-weight: 500; }
+.s-en { font-family: var(--font-cormorant), serif; }
+.s-hand { font-family: var(--s-hand); }
+
+.s-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  width: 100%;
+  padding: 0 24px;
+  background: var(--s-cta);
+  color: var(--s-on-cta);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  border-radius: 30px;
+  box-shadow: 0 4px 0 #2E2017;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.s-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #2E2017; }
+.skin-velvet .s-btn {
+  border-radius: 2px;
+  letter-spacing: 0.2em;
+  box-shadow: 0 0 0 1px var(--s-accent), 0 0 0 4px var(--s-bg), 0 0 0 5px rgba(217, 183, 126, 0.5);
+}
+
+.s-card {
+  position: relative;
+  background: var(--s-card);
+  border: 1px solid var(--s-line);
+  border-radius: var(--s-radius);
+}
+.skin-journal .s-card { box-shadow: 0 8px 24px rgba(74, 54, 40, 0.08); }
+.skin-journal .s-card--lined {
+  background: var(--s-card) linear-gradient(transparent 31px, rgba(232, 220, 200, 0.6) 32px) 0 0 / 100% 32px;
+}
+.skin-velvet .s-card { box-shadow: inset 0 0 0 4px var(--s-card), inset 0 0 0 5px rgba(217, 183, 126, 0.22); }
+
+.s-tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 74px;
+  height: 22px;
+  background: rgba(242, 206, 126, 0.55);
+  transform: translateX(-50%) rotate(-3deg);
+  pointer-events: none;
+}
+.s-tape--peach { background: rgba(232, 144, 122, 0.35); }
+.s-tape--sage { background: rgba(169, 197, 160, 0.5); }
+
+.s-polaroid {
+  position: absolute;
+  background: #fff;
+  padding: 9px 9px 30px;
+  box-shadow: 0 6px 18px rgba(74, 54, 40, 0.14);
+}
+.s-polaroid__caption {
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--s-hand);
+  font-size: 20px;
+  color: var(--s-ink-2);
+}
+
+/* Keep page content clear of the mobile tab bar (HerNav). */
+@media (max-width: 767px) {
+  body:has(.her-tabbar) > main { padding-bottom: 72px; }
+}
+
+/* Auth forms inside the journal skin. */
+.skin-journal .auth-input {
+  background: var(--s-card);
+  border-color: var(--s-line);
+  color: var(--s-ink);
+  border-radius: 14px;
+}
+.skin-journal .auth-input:focus { border-color: var(--s-accent); box-shadow: 0 0 0 3px var(--s-accent-soft); }
+.skin-journal .auth-button {
+  background: var(--s-cta);
+  color: var(--s-on-cta);
+  border-radius: 30px;
+  box-shadow: 0 4px 0 #2E2017;
+}

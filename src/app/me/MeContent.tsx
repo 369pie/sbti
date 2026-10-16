@@ -372,12 +372,12 @@ export function MeContent() {
             {hasCreatorAccess && (
               <Link
                 href="/creator/studio/"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl border border-emerald-200 bg-emerald-50 hover:border-emerald-300 hover:bg-emerald-100/60 transition-all"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl border border-sage/45 bg-sage/15 hover:border-sage/70 hover:bg-sage/25 transition-all"
               >
                 <span className="text-xl">🎨</span>
                 <div className="min-w-0">
-                  <div className="text-sm font-medium text-emerald-800">创作工作台</div>
-                  <div className="text-xs text-emerald-700/80">已开通，立即进入管理宇宙</div>
+                  <div className="text-sm font-medium text-sage-text">创作工作台</div>
+                  <div className="text-xs text-sage-text/80">已开通，立即进入管理宇宙</div>
                 </div>
               </Link>
             )}
@@ -442,13 +442,13 @@ export function MeContent() {
             )}
 
             {creatorApplication?.status === 'approved' && !hasCreatorAccess && (
-              <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              <div className="mt-3 rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-gold-text">
                 你的申请已通过，创作工作台正在开通中，请稍后刷新本页查看入口。
               </div>
             )}
 
             {creatorApplication?.status === 'approved' && hasCreatorAccess && (
-              <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 flex items-center justify-between gap-3">
+              <div className="mt-3 rounded-xl border border-sage/45 bg-sage/15 px-4 py-3 text-sm text-sage-text flex items-center justify-between gap-3">
                 <span>创作者身份已开通，可直接进入创作工作台。</span>
                 <Link
                   href="/creator/studio/"
@@ -491,7 +491,7 @@ export function MeContent() {
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="w-full py-2.5 rounded-xl border border-border-subtle text-sm text-text-secondary hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all"
+                className="w-full py-2.5 rounded-xl border border-border-subtle text-sm text-text-secondary hover:text-ember hover:border-ember/30 hover:bg-ember/10 transition-all"
               >
                 {isLoggingOut ? '退出中...' : '退出登录'}
               </button>

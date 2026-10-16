@@ -12,7 +12,7 @@ import { useAuth } from '@/components/AuthProvider';
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('next') || '/card/';
+  const redirectTo = searchParams.get('next') || '/today/';
   const registered = searchParams.get('registered') === '1';
 
   const { refresh } = useAuth();
@@ -67,17 +67,16 @@ export function LoginForm() {
   }, [isBusy, login, password, redirectTo, router, refresh]);
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4 py-12">
+    <div className="skin-journal min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="text-4xl mb-3">🔮</div>
-          <h1 className="text-2xl font-bold font-heading text-text-primary">欢迎回来</h1>
-          <p className="text-sm text-text-muted mt-1.5">登录后同步你的人格衣橱</p>
+          <h1 className="s-title text-[30px]">欢迎回来</h1>
+          <p className="text-sm mt-1.5" style={{ color: 'var(--s-mute)' }}>登录后，你的档案和今日卡会回来</p>
         </div>
 
         {registered && (
-          <div className="mb-6 p-3 rounded-xl bg-green-50 border border-green-200 text-sm text-green-700 text-center">
+          <div className="mb-6 p-3 rounded-xl bg-sage/10 border border-sage/45 text-sm text-sage-text text-center">
             ✅ 注册成功！请登录你的账号
           </div>
         )}
@@ -85,7 +84,7 @@ export function LoginForm() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600 text-center">
+            <div className="p-3 rounded-xl bg-ember/10 border border-ember/30 text-sm text-ember text-center">
               {error}
             </div>
           )}

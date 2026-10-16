@@ -23,11 +23,13 @@ export function MystiMoodContent() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    const t = getTodayMood();
-    setToday(t);
-    setHistory(getMoodHistory(30));
-    setStats(getMoodStats(30));
-    if (t?.note) setNote(t.note);
+    queueMicrotask(() => {
+      const t = getTodayMood();
+      setToday(t);
+      setHistory(getMoodHistory(30));
+      setStats(getMoodStats(30));
+      if (t?.note) setNote(t.note);
+    });
   }, []);
 
   const handlePick = (mood: MoodId) => {

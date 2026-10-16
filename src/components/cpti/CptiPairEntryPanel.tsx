@@ -276,7 +276,7 @@ export function CptiPairEntryPanel({ personality }: Props) {
       {/* Header */}
       <div className="text-center">
         <h2 className="text-xl sm:text-2xl font-semibold text-text-primary mb-2">
-          想知道你和 ta 是 <span className="text-rose-500">25 种关系</span> 里的哪一种？
+          想知道你和 ta 是 <span className="text-rose-text">25 种关系</span> 里的哪一种？
         </h2>
         <p className="text-sm text-text-muted">
           情侣 · 闺蜜 · 妈 · 同事 · 死对头 — 任何一段关系都能测
@@ -294,7 +294,7 @@ export function CptiPairEntryPanel({ personality }: Props) {
             }}
             className={`px-3 py-1.5 rounded-full text-xs sm:text-sm transition-all cursor-pointer border ${
               scenario === s.key
-                ? 'border-rose-500/60 bg-rose-500/10 text-rose-500'
+                ? 'border-accent/60 bg-accent/10 text-rose-text'
                 : 'border-border-subtle bg-bg-secondary/40 text-text-muted hover:text-text-secondary'
             }`}
           >
@@ -314,7 +314,7 @@ export function CptiPairEntryPanel({ personality }: Props) {
         </div>
         <button
           onClick={cycleScript}
-          className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg bg-bg-elevated border border-border-subtle text-text-secondary hover:text-rose-500 hover:border-rose-500/40 transition-colors"
+          className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg bg-bg-elevated border border-border-subtle text-text-secondary hover:text-rose-text hover:border-accent/40 transition-colors"
           title="换一个文案"
         >
           换一句 ↻
@@ -327,11 +327,11 @@ export function CptiPairEntryPanel({ personality }: Props) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-5 sm:p-6 flex flex-col"
+          className="rounded-2xl border border-accent/20 bg-accent/5 p-5 sm:p-6 flex flex-col"
         >
           <div className="flex items-start justify-between mb-3">
             <div>
-              <div className="text-xs font-mono tracking-wider text-rose-500 uppercase mb-1">Card A</div>
+              <div className="text-xs font-mono tracking-wider text-rose-text uppercase mb-1">Card A</div>
               <h3 className="text-base font-semibold">发链接给 ta</h3>
             </div>
             <span className="text-2xl">💌</span>
@@ -348,11 +348,11 @@ export function CptiPairEntryPanel({ personality }: Props) {
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 maxLength={20}
-                className="w-full px-3 py-2.5 rounded-xl border border-border-subtle bg-bg-secondary text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-rose-500/40"
+                className="w-full px-3 py-2.5 rounded-xl border border-border-subtle bg-bg-secondary text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent/40"
               />
               <button
                 onClick={generateInviteLink}
-                className="w-full py-2.5 rounded-xl bg-rose-500 text-bg-primary font-medium text-sm hover:bg-rose-600 transition-colors cursor-pointer"
+                className="w-full py-2.5 rounded-xl bg-accent text-bg-primary font-medium text-sm hover:bg-cta-from transition-colors cursor-pointer"
               >
                 生成专属邀请链接
               </button>
@@ -374,7 +374,7 @@ export function CptiPairEntryPanel({ personality }: Props) {
                 </button>
                 <button
                   onClick={shareInviteLink}
-                  className="flex-1 py-2.5 rounded-xl border border-rose-500/40 text-xs text-rose-500 hover:bg-rose-500/10 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl border border-accent/40 text-xs text-rose-text hover:bg-accent/10 cursor-pointer"
                 >
                   分享给 ta
                 </button>
@@ -388,11 +388,11 @@ export function CptiPairEntryPanel({ personality }: Props) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.05 }}
-          className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 sm:p-6 flex flex-col"
+          className="rounded-2xl border border-gold/30 bg-gold/5 p-5 sm:p-6 flex flex-col"
         >
           <div className="flex items-start justify-between mb-3">
             <div>
-              <div className="text-xs font-mono tracking-wider text-amber-500 uppercase mb-1">Card B</div>
+              <div className="text-xs font-mono tracking-wider text-gold-text uppercase mb-1">Card B</div>
               <h3 className="text-base font-semibold">六位匹配码</h3>
             </div>
             <span className="text-2xl">🎫</span>
@@ -407,14 +407,14 @@ export function CptiPairEntryPanel({ personality }: Props) {
             </div>
           ) : !pairCode ? (
             <div className="flex items-center justify-center py-6 text-xs text-text-muted">
-              <div className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mr-2" />
+              <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin mr-2" />
               生成中...
             </div>
           ) : (
             <div className="space-y-2 mt-auto">
-              <div className="rounded-xl border border-amber-500/30 bg-bg-elevated p-3 text-center">
+              <div className="rounded-xl border border-gold/30 bg-bg-elevated p-3 text-center">
                 <div className="text-[10px] text-text-muted mb-1">配对码</div>
-                <div className="text-2xl sm:text-3xl font-mono font-bold tracking-[0.32em] text-amber-500">
+                <div className="text-2xl sm:text-3xl font-mono font-bold tracking-[0.32em] text-gold-text">
                   {pairCode}
                 </div>
               </div>
@@ -434,7 +434,7 @@ export function CptiPairEntryPanel({ personality }: Props) {
                 <button
                   onClick={downloadPoster}
                   disabled={posterDownloading}
-                  className="py-2.5 rounded-xl border border-amber-500/40 text-xs text-amber-500 hover:bg-amber-500/10 cursor-pointer disabled:opacity-60"
+                  className="py-2.5 rounded-xl border border-gold/40 text-xs text-gold-text hover:bg-gold/10 cursor-pointer disabled:opacity-60"
                 >
                   {posterDownloading ? '生成…' : '下载海报'}
                 </button>

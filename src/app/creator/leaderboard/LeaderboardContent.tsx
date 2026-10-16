@@ -88,7 +88,7 @@ export function LeaderboardContent({ entries }: { entries: LeaderboardEntry[] })
                         {entry.creatorName}
                       </Link>
                       {entry.isVerified && (
-                        <span className="text-blue-600 text-xs">✓</span>
+                        <span className="text-violet-text text-xs">✓</span>
                       )}
                     </div>
                     <div className="text-xs text-text-muted mt-0.5 flex items-center gap-2">

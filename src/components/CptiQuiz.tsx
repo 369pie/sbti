@@ -380,7 +380,7 @@ export function CptiQuiz({
   // Mode banner — kept above QuizShell so progress bar stays the first thing in view
   const banner = isPeerMode && inviteData ? (
     <div className="px-6 pt-3 max-w-2xl mx-auto w-full">
-      <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-2.5 text-center">
+      <div className="rounded-md border border-rose-dust/60 bg-rose-dust/30 px-4 py-2.5 text-center">
         <p className="text-xs sm:text-sm" style={{ color: 'var(--color-rose-deep)' }}>
           💌 {inviteData.nickname || '对方'}想知道你们是什么关系 · 请以观察者视角回答
         </p>

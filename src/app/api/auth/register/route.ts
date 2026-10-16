@@ -5,11 +5,12 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { username, password, email, nickname } = body as {
+    const { username, password, email, nickname, birthYear } = body as {
       username?: string;
       password?: string;
       email?: string;
       nickname?: string;
+      birthYear?: number;
     };
 
     // ── Validate ──
@@ -41,27 +42,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '昵称最多30个字符' }, { status: 400 });
     }
 
+    // 14+ only (docs/01-strategy/wtfti-her-refocus-2026-10.md §8).
+    const thisYear = new Date().getFullYear();
+    if (!Number.isInteger(birthYear) || birthYear! < thisYear - 100 || birthYear! > thisYear) {
+      return NextResponse.json({ error: '请填写出生年份' }, { status: 400 });
+    }
+    if (thisYear - birthYear! < 14) {
+      return NextResponse.json({ error: 'WTFTI 目前只对 14 岁以上开放' }, { status: 403 });
+    }
+
     // ── Create user via admin client (bypasses email confirmation) ──
     const authEmail = trimmedEmail || `${trimmedUsername}@wtfti.local`;
     const admin = createAdminSupabaseClient();
 
-    // Try to create — if the placeholder email already exists, Supabase will reject it
-    // (getUserByEmail was removed in newer supabase-js versions)
-
     const { data, error } = await admin.auth.admin.createUser({
       email: authEmail,
       password,
-      email_confirm: true, // Auto-confirm — no verification email needed
+      email_confirm: true,
       user_metadata: {
         username: trimmedUsername,
         nickname: trimmedNickname,
         display_name: trimmedNickname || trimmedUsername,
         has_real_email: !!trimmedEmail,
+        birth_year: birthYear,
       },
     });
 
     if (error) {
-      // Handle duplicate email
       if (error.message?.includes('already been registered') || error.message?.includes('already exists')) {
         return NextResponse.json({ error: '该用户名已被注册' }, { status: 409 });
       }
@@ -72,7 +79,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '注册失败，请稍后重试' }, { status: 500 });
     }
 
-    // ── Auto-sign in the new user via the regular client ──
+    // P0 archive stub: upsert her_profiles so birth_year lives on a real table.
+    const { error: profileError } = await admin.from('her_profiles').upsert(
+      {
+        user_id: data.user.id,
+        birth_year: birthYear,
+        nickname: trimmedNickname || trimmedUsername,
+        completeness_pct: 10,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id' },
+    );
+    if (profileError) {
+      // Non-fatal: user exists; ops can backfill. Log for migration readiness.
+      console.error('[api/auth/register] her_profiles upsert failed', profileError.message);
+    }
+
     const supabase = await createServerSupabaseClient();
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: authEmail,
@@ -80,11 +102,11 @@ export async function POST(request: NextRequest) {
     });
 
     if (signInError) {
-      // User created but auto-login failed — still redirect to login
       return NextResponse.json({
         success: true,
         userId: data.user.id,
         autoSignedIn: false,
+        archiveCreated: !profileError,
       });
     }
 
@@ -92,6 +114,7 @@ export async function POST(request: NextRequest) {
       success: true,
       userId: data.user.id,
       autoSignedIn: true,
+      archiveCreated: !profileError,
     });
   } catch (err) {
     console.error('[api/auth/register] unexpected error:', err);

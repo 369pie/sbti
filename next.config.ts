@@ -16,23 +16,6 @@ const imagesUnoptimized =
 const nextConfig: NextConfig = {
   // output: 'export', // Removed: incompatible with API routes (Supabase/CPTI)
   trailingSlash: true,
-  async redirects() {
-    // Phase 0: retired UGC / game-themed / 神域 routes
-    return [
-      { source: '/creator/:path*', destination: '/', permanent: true },
-      { source: '/ugc/:path*', destination: '/', permanent: true },
-      { source: '/c/:path*', destination: '/', permanent: true },
-      { source: '/mirror/:path*', destination: '/mysti/daily/', permanent: true },
-      { source: '/bird/:path*', destination: '/test/', permanent: true },
-      { source: '/drunk/:path*', destination: '/test/', permanent: true },
-      { source: '/wtfti/galaxy/:path*', destination: '/mysti/daily/', permanent: true },
-      { source: '/wtfti/kings/:path*', destination: '/test/', permanent: true },
-      { source: '/wtfti/delta/:path*', destination: '/test/', permanent: true },
-      { source: '/jueti/:path*', destination: '/test/', permanent: true },
-      { source: '/fanrenti/:path*', destination: '/test/', permanent: true },
-      { source: '/hogti/:path*', destination: '/test/', permanent: true },
-    ];
-  },
   images: {
     unoptimized: imagesUnoptimized,
     formats: ['image/avif', 'image/webp'],
@@ -49,6 +32,31 @@ const nextConfig: NextConfig = {
   },
   basePath,
   allowedDevOrigins: ['127.0.0.1'],
+  // Route convergence (docs/01-strategy/wtfti-her-refocus-2026-10.md §7).
+  // P0 route cut (refocus §7): 301 offline prefixes. Source pages kept on disk for now.
+  // IMPORTANT: do NOT redirect /mirror — 美我 stays live.
+  async redirects() {
+    const toTest = [
+      'bird', 'flower', 'fanrenti', 'work', 'drunk', 'love', 'identify', 'daily', 'cp', 'jueti',
+      'squad', 'rank', 'combo', 'puzzle', 'gacha', 'banti', 'card',
+    ];
+    const toHome = [
+      'creator', 'ugc', 'c', 'lingjian', 'her-books', 'her-wealth', 'weekly', 'theory', 'guide',
+      'share-templates', 'types',
+    ];
+    // 懂我: merge her-voice → bottle (treehole).
+    const toBottle = ['her-voice'];
+    return [
+      ...toTest.map((r) => ({ source: `/${r}/:path*`, destination: '/start/', permanent: true })),
+      ...toHome.map((r) => ({ source: `/${r}/:path*`, destination: '/', permanent: true })),
+      ...toBottle.map((r) => ({ source: `/${r}/:path*`, destination: '/bottle/', permanent: true })),
+      // Offline wtfti side-universes → main test entry.
+      { source: '/wtfti/kings/:path*', destination: '/start/', permanent: true },
+      { source: '/wtfti/delta/:path*', destination: '/start/', permanent: true },
+      { source: '/wtfti/feng/:path*', destination: '/start/', permanent: true },
+      { source: '/wtfti/galaxy/:path*', destination: '/start/', permanent: true },
+    ];
+  },
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
     NEXT_PUBLIC_SITE_BASE_PATH: process.env.NEXT_PUBLIC_SITE_BASE_PATH ?? '',

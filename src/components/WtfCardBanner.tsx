@@ -16,21 +16,23 @@ export function WtfCardBanner() {
 
   useEffect(() => {
     if (!mounted) return;
-    const card = loadCard();
-    if (card) {
-      setLit(getLitCount(card));
-      // Collect lit badge emojis for visual display
-      const b: { emoji: string; shortName: string }[] = [];
-      for (const uid of CARD_UNIVERSE_IDS) {
-        const r = card.results[uid];
-        if (r) {
-          const u = getUniverse(uid);
-          const resolved = resolvePersonality(uid, r.slug);
-          if (u) b.push({ emoji: resolved?.emoji || u.emoji, shortName: u.shortName });
+    queueMicrotask(() => {
+      const card = loadCard();
+      if (card) {
+        setLit(getLitCount(card));
+        // Collect lit badge emojis for visual display
+        const b: { emoji: string; shortName: string }[] = [];
+        for (const uid of CARD_UNIVERSE_IDS) {
+          const r = card.results[uid];
+          if (r) {
+            const u = getUniverse(uid);
+            const resolved = resolvePersonality(uid, r.slug);
+            if (u) b.push({ emoji: resolved?.emoji || u.emoji, shortName: u.shortName });
+          }
         }
+        setBadges(b);
       }
-      setBadges(b);
-    }
+    });
   }, [mounted]);
 
   if (!mounted) return null;

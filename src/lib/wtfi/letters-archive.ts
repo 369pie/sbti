@@ -1,11 +1,17 @@
 /**
  * Stardust Letters Archive · 用户写给未来自己的信
  *
- * 存储：localStorage（key: `wtfti.letters.v1`）
+ * 存储：localStorage（key: `wtfti.letters.v1`）+ 云端同步（/api/wtfti/assets，见 cloud-sync.ts）
  * 触发：根据 dueAt 字段，访问时检查是否到期 → 弹出收信箱
- *
- * 后续可接 Supabase（payload 已设计为可序列化、可同步）。
  */
+
+import { queueLetterDeletion, scheduleWtftiCloudSync } from './cloud-sync';
+
+/** 封信仪式 → 星尘（fire-and-forget，见 star-spirit-client） */
+function grantStarDustForSeal(personalitySlug?: string): void {
+  if (typeof window === 'undefined') return;
+  void import('./star-spirit-client').then((m) => m.tryEarnStarDust('letter', personalitySlug ?? null));
+}
 
 export interface StardustUserLetter {
   id: string;
@@ -90,6 +96,8 @@ export function sealStardustLetter({
   const all = safeRead();
   all.push(letter);
   safeWrite(all);
+  scheduleWtftiCloudSync();
+  grantStarDustForSeal(personalitySlug);
   return letter;
 }
 
@@ -142,9 +150,12 @@ export function markStardustLetterOpened(id: string): void {
   const all = safeRead();
   const next = all.map((l) => (l.id === id ? { ...l, opened: true } : l));
   safeWrite(next);
+  scheduleWtftiCloudSync();
 }
 
 export function deleteStardustLetter(id: string): void {
   const all = safeRead().filter((l) => l.id !== id);
   safeWrite(all);
+  queueLetterDeletion(id);
+  scheduleWtftiCloudSync();
 }

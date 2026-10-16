@@ -270,7 +270,7 @@ export function QuestionsEditor({
               <button
                 onClick={() => removeQuestion(questionIndex)}
                 disabled={isDeleting}
-                className="text-text-muted hover:text-red-600 transition-colors text-sm pt-2 disabled:opacity-40"
+                className="text-text-muted hover:text-ember transition-colors text-sm pt-2 disabled:opacity-40"
               >
                 删除
               </button>
@@ -291,7 +291,7 @@ export function QuestionsEditor({
                     <button
                       onClick={() => removeOption(questionIndex, optionIndex)}
                       disabled={question.options.length <= 1}
-                      className="text-text-muted hover:text-red-600 transition-colors text-sm disabled:opacity-20"
+                      className="text-text-muted hover:text-ember transition-colors text-sm disabled:opacity-20"
                     >
                       ✕
                     </button>

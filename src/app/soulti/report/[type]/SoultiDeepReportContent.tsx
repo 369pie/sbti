@@ -43,14 +43,16 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
   const [layered, setLayered] = useState<SoultiLayeredResult | null>(null);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('soulti-layered');
-      if (!raw) return;
-      const data = JSON.parse(raw) as SoultiLayeredResult;
-      if (data.overall?.slug === personality.slug) {
-        setLayered(data);
-      }
-    } catch { /* ignore */ }
+    queueMicrotask(() => {
+      try {
+        const raw = localStorage.getItem('soulti-layered');
+        if (!raw) return;
+        const data = JSON.parse(raw) as SoultiLayeredResult;
+        if (data.overall?.slug === personality.slug) {
+          setLayered(data);
+        }
+      } catch { /* ignore */ }
+    });
   }, [personality.slug]);
 
   const crossReadings = getCrossReadingsForCode(personality.code);
@@ -200,7 +202,7 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
               >
                 白天你是<span style={{ color: dayP.color }}>{dayP.name}</span>，
                 深夜你变成<span style={{ color: nightP.color }}>{nightP.name}</span>。
-                这不是你的"前后不一"——这是你在不同能量状态下的自然切换。
+                这不是你的&quot;前后不一&quot;——这是你在不同能量状态下的自然切换。
                 白天你用一套方式保护自己、维持关系；深夜，当社会面具卸下，
                 你的另一层需求和模式才浮出水面。
                 理解这种张力，不是为了选一边，而是为了让两个你都被看见。

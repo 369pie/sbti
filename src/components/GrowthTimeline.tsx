@@ -87,7 +87,7 @@ export default function GrowthTimeline() {
   }, []);
 
   useEffect(() => {
-    refreshEvents();
+    queueMicrotask(refreshEvents);
     window.addEventListener(ASSET_SYNC_EVENT, refreshEvents);
     return () => window.removeEventListener(ASSET_SYNC_EVENT, refreshEvents);
   }, [refreshEvents]);

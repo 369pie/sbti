@@ -92,7 +92,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-xl font-medium text-text-primary mb-3">七、免责声明</h2>
           <p>
-            本平台按"现状"提供服务，不对以下情况承担责任：
+            本平台按&quot;现状&quot;提供服务，不对以下情况承担责任：
           </p>
           <ul className="list-disc pl-5 space-y-2 mt-3">
             <li>用户因依赖测试结果做出的人生决策</li>

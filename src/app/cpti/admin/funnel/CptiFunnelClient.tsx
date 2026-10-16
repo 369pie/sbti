@@ -102,7 +102,7 @@ export default function CptiFunnelClient() {
     <main className="min-h-screen bg-bg-primary text-text-primary px-4 py-10">
       <div className="max-w-4xl mx-auto space-y-8">
         <header className="space-y-2">
-          <p className="text-xs tracking-[0.4em] text-amber-300/70 uppercase">CPTI · Funnel · Admin</p>
+          <p className="text-xs tracking-[0.4em] text-gold-soft/70 uppercase">CPTI · Funnel · Admin</p>
           <h1 className="text-3xl font-display">真实漏斗看板</h1>
           <p className="text-xs text-text-muted">
             读取 Supabase `product_events` 中 module=`cpti` 的真实事件。页面本身不开放，需 `ADMIN_FUNNEL_TOKEN`。
@@ -136,12 +136,12 @@ export default function CptiFunnelClient() {
               type="button"
               onClick={() => void fetchData()}
               disabled={loading}
-              className="rounded-lg border border-amber-400/50 bg-amber-400/10 px-4 py-2 text-sm text-amber-200 hover:bg-amber-400/15 disabled:opacity-50"
+              className="rounded-lg border border-gold/50 bg-gold/10 px-4 py-2 text-sm text-gold-soft hover:bg-gold/15 disabled:opacity-50"
             >
               {loading ? '查询中…' : '查询'}
             </button>
           </div>
-          {err && <p className="text-xs text-rose-300">{err}</p>}
+          {err && <p className="text-xs text-rose-text">{err}</p>}
           {data && (
             <p className="text-xs text-text-muted">
               过去 {data.days} 天 · 共 {data.totalRows} 条事件 · since {data.sinceIso.slice(0, 10)}
@@ -160,10 +160,10 @@ export default function CptiFunnelClient() {
                 <li key={s.step} className="space-y-1">
                   <div className="flex justify-between text-xs">
                     <span>{s.label}</span>
-                    <span className="font-mono text-amber-200">{v} <span className="text-text-muted">({pct.toFixed(0)}%)</span></span>
+                    <span className="font-mono text-gold-soft">{v} <span className="text-text-muted">({pct.toFixed(0)}%)</span></span>
                   </div>
                   <div className="h-1.5 rounded-full bg-bg-secondary overflow-hidden">
-                    <div className="h-full bg-amber-400/80" style={{ width: `${pct}%` }} />
+                    <div className="h-full bg-gold/80" style={{ width: `${pct}%` }} />
                   </div>
                 </li>
               );
@@ -178,7 +178,7 @@ export default function CptiFunnelClient() {
             {(data?.eventSummary ?? []).map((item) => (
               <li key={item.event} className="flex justify-between font-mono">
                 <span className="truncate text-text-secondary">{item.event}</span>
-                <span className="text-amber-200">{item.sessions}</span>
+                <span className="text-gold-soft">{item.sessions}</span>
               </li>
             ))}
             {(!data || data.eventSummary.length === 0) && <li className="text-text-muted text-center py-4">还没有事件。先去 /cpti/ 走一遍流程。</li>}
@@ -192,7 +192,7 @@ export default function CptiFunnelClient() {
             {(data?.recent ?? []).map((e) => (
               <li key={`${e.ts}-${e.event}-${e.sessionId ?? 'anon'}`} className="flex gap-3 text-text-secondary">
                 <span className="text-text-muted shrink-0">{new Date(e.ts).toLocaleTimeString()}</span>
-                <span className="text-amber-300/80 w-24 shrink-0 truncate">{e.step ?? '—'}</span>
+                <span className="text-gold-soft/80 w-24 shrink-0 truncate">{e.step ?? '—'}</span>
                 <span className="flex-1 truncate">{e.event}</span>
                 {e.slug ? <span className="hidden sm:block text-text-muted truncate max-w-[120px]">{e.slug}</span> : null}
               </li>

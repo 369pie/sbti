@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import NextImage from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { HOME_PLANET_CATALOG, type HomePlanetEntry } from '@/lib/wtfi/galaxy-planets';
 import { getDeity } from '@/lib/wtfi/pantheon';
@@ -14,9 +14,22 @@ import {
 } from '@/lib/wtfi/soul-resonance';
 import { readGS } from '@/lib/wtfi/soul-resonance';
 import { loadCard } from '@/lib/wtf-card';
+import { saveDuetSessionLocal } from '@/lib/wtfi/cloud-sync';
+import { tryEarnStarDust } from '@/lib/wtfi/star-spirit-client';
 import { withBasePath } from '@/lib/site';
 
 const SOUL_KEY = 'wtfti.soul.answers.v1';
+
+/** duet 会话的确定性 id：同一对（双方 slug+soul）重复 reveal 幂等 */
+function makeDuetId(mySlug: string, partnerSlug: string, partnerSoul: string): string {
+  const seed = `${mySlug}|${partnerSlug}|${partnerSoul}`;
+  let h = 0x811c9dc5;
+  for (let i = 0; i < seed.length; i += 1) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return `duet-${(h >>> 0).toString(16)}`;
+}
 
 function cosine(a: number[], b: number[]): number {
   const len = Math.min(a.length, b.length);
@@ -193,6 +206,28 @@ export function DuetClient() {
     const reading = readGS(G, S);
     return { G, S, reading };
   }, [mode, myPlanet, hostPlanet, mySoul, hostSoul]);
+
+  // 合奏完成 → 时间资产存档（本地 + 云端，确定性 id 幂等）
+  const revealArchivedRef = useRef(false);
+  useEffect(() => {
+    if (!reveal || !host || !myPlanet || revealArchivedRef.current) return;
+    revealArchivedRef.current = true;
+    saveDuetSessionLocal({
+      id: makeDuetId(myPlanet.slug, host.planet, host.soul),
+      mySlug: myPlanet.slug,
+      partnerSlug: host.planet,
+      pairData: {
+        G: reveal.G,
+        S: reveal.S,
+        quadrant: reveal.reading.quadrant,
+        title: reveal.reading.title,
+        hostNick: host.nick ?? null,
+      },
+      createdAt: new Date().toISOString(),
+    });
+    // 合奏仪式 → 星尘
+    tryEarnStarDust('duet', myPlanet.slug);
+  }, [reveal, host, myPlanet]);
 
   return (
     <main

@@ -249,7 +249,7 @@ export default function CreatorApplicationsAdminPage() {
         </Link>
       </div>
 
-      <div className="rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 mb-6">
+      <div className="rounded-2xl border border-gold/50 bg-gold/10 px-4 py-3 text-sm text-gold-text mb-6">
         使用前请先在服务端配置环境变量：
         <span className="font-mono"> SUPABASE_SERVICE_ROLE_KEY </span>
         （或
@@ -290,7 +290,7 @@ export default function CreatorApplicationsAdminPage() {
       </section>
 
       {error && (
-        <div className="rounded-xl border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 mb-4">{error}</div>
+        <div className="rounded-xl border border-ember/40 bg-ember/10 px-3 py-2 text-sm text-ember mb-4">{error}</div>
       )}
 
       <section className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">

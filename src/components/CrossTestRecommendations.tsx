@@ -52,13 +52,15 @@ export function CrossTestRecommendations({ currentTest, personalityName, max = 4
   void variant;
 
   useEffect(() => {
-    const card = loadCard();
-    if (!card) return;
-    const tested = new Set<string>();
-    for (const uid of CARD_UNIVERSE_IDS) {
-      if (card.results[uid]) tested.add(uid);
-    }
-    setTestedUniverses(tested);
+    queueMicrotask(() => {
+      const card = loadCard();
+      if (!card) return;
+      const tested = new Set<string>();
+      for (const uid of CARD_UNIVERSE_IDS) {
+        if (card.results[uid]) tested.add(uid);
+      }
+      setTestedUniverses(tested);
+    });
   }, []);
 
   // Smart sorting: prioritize untested card-universe tests, then others

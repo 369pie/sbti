@@ -138,7 +138,7 @@ function AddMembersStep({
                 <span className="text-xs text-text-primary">{m.name}</span>
                 <button
                   onClick={() => onRemove(i)}
-                  className="text-text-muted hover:text-red-400 text-xs ml-0.5 cursor-pointer"
+                  className="text-text-muted hover:text-ember text-xs ml-0.5 cursor-pointer"
                 >
                   ✕
                 </button>

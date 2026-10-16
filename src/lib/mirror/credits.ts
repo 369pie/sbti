@@ -44,7 +44,14 @@ export interface MirrorHistoryRecord {
 
 const FREE_CREDITS = 2;
 const CREDITS_PER_GENERATION = 1;
+/**
+ * SKU 设计（2026-05-05 战略升级 — 双轨定价）：
+ *  · mirror-archive：¥19.9 三页诊断卡（色彩+妆发+穿搭，单次 = 20 次额度）
+ *    升级款，"档案"心智锚点
+ *  · mirror-10 / mirror-30：保留 ¥1/次的引流路径
+ */
 const TOP_UP_OPTIONS = [
+  { credits: 20, price: 19.9, label: '三页诊断卡 · ¥19.9', pack: 'mirror-archive', highlight: true, subtitle: '色彩 / 妆发 / 穿搭 一次成档' },
   { credits: 10, price: 10, label: '灵镜 10 次 · ¥10', pack: 'mirror-10' },
   { credits: 30, price: 30, label: '灵镜 30 次 · ¥30', pack: 'mirror-30' },
 ];

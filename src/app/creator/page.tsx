@@ -199,7 +199,7 @@ export default function CreatorPage() {
       </section>
 
       <section className="max-w-5xl mx-auto px-6 pb-20">
-        <div className="rounded-3xl border border-border-subtle bg-gradient-to-r from-pink-50 via-white to-amber-50 p-8 sm:p-10 text-center">
+        <div className="rounded-3xl border border-border-subtle bg-gradient-to-r from-accent/10 via-bg-elevated to-gold/10 p-8 sm:p-10 text-center">
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-text-primary">内测招募进行中</h2>
           <p className="mt-3 text-text-secondary leading-8 max-w-2xl mx-auto">
             如果你有固定内容方向（情感、职场、二次元、游戏、宠物、校园等），并愿意持续运营主题宇宙，欢迎申请。

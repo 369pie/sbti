@@ -137,6 +137,7 @@ export const UNIVERSES: Universe[] = [
     landingPath: '/wtfti/feng/',
     resultPrefix: '/wtfti/feng',
     galleryTabId: undefined,
+    // eslint-disable-next-line no-restricted-syntax -- Feng 沉浸皮肤内容色（v2 §7 L2 宇宙皮肤豁免：neon 绿是 feng-cyber-theme 的内容色，非 UI 色）
     activeClass: 'bg-[#0a0a0a] text-[#39ff14] border border-[#39ff14]/40 shadow-sm font-medium',
   },
   {

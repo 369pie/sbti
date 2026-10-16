@@ -260,147 +260,96 @@ function MystiLandingContent() {
         ))}
       </div>
 
-      <div className="w-full max-w-md relative">
-        {/* Hero */}
-        <div className="text-center mb-8">
-          <p
-            className="text-[11px] tracking-[0.4em] uppercase mb-3"
-            style={{ color: theme.accentGold }}
+      <div className="w-full max-w-md relative pb-6">
+        {/* Hero — 她的私人神谕室 */}
+        <div className="text-center mb-9 mt-6 relative">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
           >
-            WTFTI · MYSTI
-          </p>
-          <h1
-            className="text-4xl sm:text-5xl mb-3"
-            style={{ color: theme.text, fontFamily: 'var(--font-display)', fontWeight: 400 }}
-          >
-            灵鉴
-          </h1>
-          <p
-            className="text-sm sm:text-base italic"
-            style={{ color: theme.textMuted, fontFamily: 'var(--font-serif)' }}
-          >
-            用 22 张大阿卡纳，翻译你灵魂的频率
-          </p>
+            <p
+              className="text-[10px] tracking-[0.4em] uppercase mb-4"
+              style={{ color: theme.accentGold, fontFamily: 'var(--font-mono)' }}
+            >
+              HER · TWILIGHT · ORACLE
+            </p>
+            <h1
+              className="text-5xl sm:text-6xl mb-4 italic leading-[0.95]"
+              style={{ color: theme.text, fontFamily: 'var(--font-display)', fontWeight: 400 }}
+            >
+              灵鉴
+            </h1>
+            <p
+              className="mx-auto max-w-[22rem] text-[13px] sm:text-sm leading-[1.85]"
+              style={{ color: theme.textMuted, fontFamily: 'var(--font-serif)' }}
+            >
+              <span className="italic" style={{ color: theme.text }}>她的</span>私人神谕室<br />
+              一座可以随时回访的暮光神龛<br />
+              把每一次提问，写成一页可收藏的灵魂档案
+            </p>
+            <div className="mx-auto mt-6 flex items-center justify-center gap-3">
+              <span style={{ color: theme.accentGold }}>✦</span>
+              <span
+                className="text-[10px] tracking-[0.32em] uppercase"
+                style={{ color: theme.textSubtle, fontFamily: 'var(--font-mono)' }}
+              >
+                FOR HER · BY HER · ABOUT HER
+              </span>
+              <span style={{ color: theme.accentGold }}>✦</span>
+            </div>
+          </motion.div>
         </div>
 
-        {/* ── 今日决策 · 90 秒决策快卡 (E1 v1, 2026-04-21) ── */}
-        <Link
-          href="/mysti/decision/"
-          className="block mb-6 rounded-2xl border px-5 py-5 transition-transform hover:-translate-y-0.5"
-          style={{
-            borderColor: theme.accentGold,
-            background: `linear-gradient(135deg, ${theme.cardSurfaceElevated} 0%, ${theme.cardSurface} 100%)`,
-            boxShadow: `0 16px 36px -16px ${theme.cardGlow}`,
-          }}
+        {/* --- PREMIUM SUBSCRIPTION BANNER (终身席位) --- */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-9"
         >
-          <div className="flex items-center justify-between">
-            <span
-              className="text-[10px] tracking-[0.42em] uppercase font-bold"
-              style={{ color: theme.accentGold }}
-            >
-              ✦ 今夜决策 · 90 SEC
-            </span>
-            <span
-              className="text-[11px]"
-              style={{ color: theme.accent }}
-            >
-              进入 →
-            </span>
-          </div>
-          <p
-            className="mt-3 text-lg italic leading-snug"
-            style={{ color: theme.text, fontFamily: 'var(--font-display)' }}
-          >
-            今夜赴约？此刻交锋？出门远行？
-          </p>
-          <p
-            className="mt-2 text-xs"
-            style={{ color: theme.textMuted }}
-          >
-            选一个场景 · 抽 3 张牌 · 一句可截屏的暮光金句
-          </p>
-        </Link>
-
-
-        {/* 价格锚点卡 — 让用户一眼看到 Mysti 体系的三档定价 */}
-        <div
-          className="mb-6 rounded-2xl border px-5 py-4 backdrop-blur-md"
-          style={{
-            background: theme.cardSurface,
-            borderColor: theme.cardBorder,
-            boxShadow: `0 8px 24px ${theme.cardGlow}`,
-          }}
-        >
-          <div
-            className="text-[10px] tracking-[0.42em] uppercase mb-3 text-center"
-            style={{ color: theme.accentGold, fontFamily: 'var(--font-mono)' }}
-          >
-            MYSTI · 价位
-          </div>
-          <div className="grid grid-cols-3 gap-3 text-center">
-            {[
-              { name: '灵魂信', price: '¥9.9', sub: '深度抽牌' },
-              { name: '月报', price: '¥6.9', sub: '本月 12 张' },
-              { name: '礼品卡', price: '¥39.9', sub: '送 TA 一份' },
-            ].map((tier) => (
-              <div key={tier.name}>
-                <div
-                  className="text-[10px] tracking-[0.24em] uppercase mb-1"
-                  style={{ color: theme.textSubtle, fontFamily: 'var(--font-mono)' }}
-                >
-                  {tier.name}
-                </div>
-                <div
-                  className="text-lg italic"
-                  style={{ color: theme.accentGold, fontFamily: 'var(--font-display)' }}
-                >
-                  {tier.price}
-                </div>
-                <div
-                  className="text-[10px] mt-1"
-                  style={{ color: theme.textMuted }}
-                >
-                  {tier.sub}
-                </div>
-              </div>
-            ))}
-          </div>
           <Link
             href="/mysti/subscribe/"
-            className="mt-3 pt-3 text-center text-xs italic border-t flex items-center justify-center gap-2 hover:opacity-80 transition-opacity"
-            style={{
-              color: theme.textMuted,
-              borderColor: theme.cardBorder,
-              fontFamily: 'var(--font-serif)',
-              textDecoration: 'none',
-            }}
+            className="group relative block rounded-2xl p-[1px] overflow-hidden transition-all hover:scale-[1.01] active:scale-[0.99] shadow-lg"
           >
-            <span
-              aria-hidden
+            <div
+              className="absolute inset-0 transition-opacity duration-700 opacity-60 group-hover:opacity-100"
               style={{
-                display: 'inline-block',
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                background:
-                  'radial-gradient(circle at 30% 30%, #FFE6A3, #C9A676 60%, #8B6A3A)',
-                boxShadow: '0 0 6px rgba(201,166,118,0.5)',
+                background: `linear-gradient(135deg, ${theme.accentGold}40, ${theme.accentGold}, ${theme.accentGold}40)`,
               }}
             />
-            想全部解锁？
-            <span
-              className="premium-foil"
+            <div
+              className="relative rounded-[15px] p-5 h-full flex flex-col"
               style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: 12,
-                letterSpacing: '0.18em',
-                fontWeight: 600,
+                background: `linear-gradient(135deg, ${theme.cardSurfaceElevated} 0%, ${theme.cardSurface} 100%)`,
               }}
             >
-              通行证 · ¥19/月
-            </span>
+              <div className="flex justify-between items-center mb-3">
+                <span
+                  className="text-[10px] tracking-[0.25em] font-bold uppercase"
+                  style={{ color: theme.accentGold, fontFamily: 'var(--font-mono)' }}
+                >
+                  ✦ Twilight Pass · 终身席位
+                </span>
+                <span className="premium-foil text-[11px] font-semibold tracking-widest uppercase">
+                  申请会籍 →
+                </span>
+              </div>
+              <p
+                className="text-[20px] italic mb-1.5 tracking-wide leading-snug"
+                style={{ color: theme.text, fontFamily: 'var(--font-display)' }}
+              >
+                把神谕室的钥匙，留给自己。
+              </p>
+              <p
+                className="text-[11px] leading-relaxed"
+                style={{ color: theme.textMuted, fontFamily: 'var(--font-serif)' }}
+              >
+                无限暮光抽牌 · 合盘长文 · 历年命书 · 节气暗信 · 年度灵魂纪章
+              </p>
+            </div>
           </Link>
-        </div>
+        </motion.div>
 
         {/* 合盘回流模式 */}
         {partnerPersonality && partnerData && (
@@ -454,8 +403,176 @@ function MystiLandingContent() {
           </motion.div>
         )}
 
-        {/* 主仪式 CTA — 卡牌堆视觉 */}
-        <div className="space-y-4">
+        {/* --- 三大暮光提问（对标 Tianfu，女性诗化重写） --- */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.18 }}
+          className="mb-9"
+        >
+          <div className="text-center mb-4">
+            <p
+              className="text-[10px] tracking-[0.36em] uppercase"
+              style={{ color: theme.accentGold, fontFamily: 'var(--font-mono)' }}
+            >
+              ✦ 她的三个暮光提问 ✦
+            </p>
+            <p
+              className="mt-2 text-[12px] italic"
+              style={{ color: theme.textMuted, fontFamily: 'var(--font-serif)' }}
+            >
+              点一题，让宇宙替你回答。
+            </p>
+          </div>
+          <div className="space-y-3">
+            {[
+              {
+                kicker: '关系',
+                glyph: '❍',
+                title: '在他/她身边，我会更亮还是更暗？',
+                sub: '能量匹配 · 暗涌信号 · 沟通窗口',
+                href: '/mysti/decision/date/',
+              },
+              {
+                kicker: '选择',
+                glyph: '✕',
+                title: '现在该转身离开，还是再等一程？',
+                sub: '走留时机 · 上升轨迹 · 隐性代价',
+                href: '/mysti/decision/interview/',
+              },
+              {
+                kicker: '绽放',
+                glyph: '✿',
+                title: '我下一段绽放，会从哪片土壤里长出？',
+                sub: '潜能挖掘 · 天赋方位 · 萌芽信号',
+                href: '/mysti/decision/travel/',
+              },
+            ].map((q, i) => (
+              <Link
+                key={q.kicker}
+                href={q.href}
+                className="group block rounded-2xl border px-5 py-4 transition-all hover:-translate-y-0.5 hover:border-opacity-100"
+                style={{
+                  borderColor: theme.cardBorder,
+                  background: `linear-gradient(135deg, ${theme.cardSurface} 0%, ${theme.cardSurfaceElevated} 100%)`,
+                  boxShadow: `0 6px 20px -10px ${theme.cardGlow}`,
+                }}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                    style={{
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      borderColor: theme.accentGold,
+                      color: theme.accentGold,
+                      background: theme.accentSoft,
+                      fontFamily: 'var(--font-display)',
+                    }}
+                  >
+                    {q.glyph}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span
+                        className="text-[10px] tracking-[0.28em] uppercase"
+                        style={{ color: theme.accentGold, fontFamily: 'var(--font-mono)' }}
+                      >
+                        Q.{(i + 1).toString().padStart(2, '0')} · {q.kicker}
+                      </span>
+                      <span className="text-[11px]" style={{ color: theme.textSubtle }}>→</span>
+                    </div>
+                    <p
+                      className="text-[15px] italic leading-snug mb-1.5"
+                      style={{ color: theme.text, fontFamily: 'var(--font-display)' }}
+                    >
+                      {q.title}
+                    </p>
+                    <p
+                      className="text-[11px] leading-relaxed"
+                      style={{ color: theme.textMuted }}
+                    >
+                      {q.sub}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* --- 暮光月相 · 今日一签（每日回访 hook） --- */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.24 }}
+          className="mb-9"
+        >
+          <Link
+            href="/mysti/daily/"
+            className="group relative block rounded-2xl border overflow-hidden transition-all hover:-translate-y-0.5"
+            style={{
+              borderColor: theme.cardBorderStrong,
+              background: `linear-gradient(110deg, ${theme.cardSurfaceElevated} 0%, ${theme.cardSurface} 60%, ${theme.accentSoft} 100%)`,
+              boxShadow: `0 10px 28px -14px ${theme.cardGlow}`,
+            }}
+          >
+            <div className="flex items-center gap-5 px-5 py-5">
+              <div className="relative shrink-0 w-16 h-16">
+                <div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: `radial-gradient(circle at 35% 35%, ${theme.accentGold}, ${theme.accent} 60%, transparent 80%)`,
+                    opacity: 0.55,
+                    filter: 'blur(1px)',
+                  }}
+                />
+                <div
+                  className="absolute inset-1 rounded-full"
+                  style={{
+                    background: theme.cardSurfaceElevated,
+                    boxShadow: `inset -10px -8px 16px ${theme.accentDeep}, inset 10px 8px 14px ${theme.accentGold}30`,
+                  }}
+                />
+                <span
+                  className="absolute inset-0 flex items-center justify-center text-[10px] tracking-[0.22em] uppercase"
+                  style={{ color: theme.accentGold, fontFamily: 'var(--font-mono)' }}
+                >
+                  ☾
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div
+                  className="text-[10px] tracking-[0.28em] uppercase mb-1"
+                  style={{ color: theme.accentGold, fontFamily: 'var(--font-mono)' }}
+                >
+                  暮光月相 · 今日一签
+                </div>
+                <p
+                  className="text-[17px] italic leading-snug"
+                  style={{ color: theme.text, fontFamily: 'var(--font-display)' }}
+                >
+                  抽一张属于今晚的牌。
+                </p>
+                <p
+                  className="text-[11px] mt-1.5 leading-relaxed"
+                  style={{ color: theme.textMuted }}
+                >
+                  60 秒 · 月相 + 心情 + 一句暮光签辞
+                </p>
+              </div>
+              <span className="text-[11px]" style={{ color: theme.accent }}>→</span>
+            </div>
+          </Link>
+        </motion.div>
+
+        {/* --- CORE ACTION: SHUFFLE TAROT --- */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-6 space-y-3"
+        >
           <button
             type="button"
             onClick={() => handleShuffle('single')}
@@ -466,21 +583,17 @@ function MystiLandingContent() {
               boxShadow: `0 12px 40px ${theme.cardGlow}`,
             }}
           >
-            <span className="absolute top-2 left-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              ✦
-            </span>
-            <span className="absolute bottom-2 right-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              ✦
-            </span>
+            <span className="absolute top-3 left-3 text-[10px] opacity-40" style={{ color: theme.text }}>✦</span>
+            <span className="absolute bottom-3 right-3 text-[10px] opacity-40" style={{ color: theme.text }}>✦</span>
             <div className="relative">
               <div
-                className="text-base mb-1 text-bg-primary tracking-wide"
-                style={{ fontFamily: 'var(--font-serif)' }}
+                className="text-lg mb-1 tracking-widest"
+                style={{ color: theme.text, fontFamily: 'var(--font-serif)' }}
               >
-                {partnerPersonality ? '✦ 为我们的合盘洗牌' : '✦ 为我洗牌'}
+                {partnerPersonality ? '看见我们怎样 · 为合盘洗牌' : '看见我是谁 · 为我洗牌'}
               </div>
-              <div className="text-xs text-bg-primary/70">
-                {partnerPersonality ? '抽出你的灵魂牌，自动配对合盘' : '塔罗仪式 · 大约 30 秒'}
+              <div className="text-[11px] tracking-widest uppercase" style={{ color: theme.textSubtle, fontFamily: 'var(--font-mono)' }}>
+                {partnerPersonality ? '抽出灵魂牌自动配对' : '塔罗人格仪式 · 大约 30 秒'}
               </div>
             </div>
           </button>
@@ -492,7 +605,7 @@ function MystiLandingContent() {
             onToggle={e => setShowSelfPicker((e.target as HTMLDetailsElement).open)}
           >
             <summary
-              className="cursor-pointer px-4 py-3 text-xs tracking-wider list-none flex items-center justify-between"
+              className="cursor-pointer px-4 py-3 text-[13px] tracking-wider list-none flex items-center justify-between"
               style={{ color: theme.textMuted }}
             >
               <span>我已经知道我的人格</span>
@@ -502,17 +615,17 @@ function MystiLandingContent() {
               <select
                 value={selectedSlug}
                 onChange={e => setSelectedSlug(e.target.value)}
-                className="w-full bg-transparent outline-none cursor-pointer text-sm rounded-lg border px-3 py-2"
+                className="w-full bg-transparent outline-none cursor-pointer text-sm rounded-lg border px-3 py-3"
                 style={{
                   color: theme.text,
-                  borderColor: theme.cardBorder,
+                  borderColor: theme.cardBorderStrong,
                 }}
               >
-                <option value="" style={{ background: theme.cardSurface }}>
+                <option value="" style={{ background: theme.cardSurfaceElevated }}>
                   选择你的 WTFTI 人格
                 </option>
                 {WTFTI_PERSONALITIES.map(p => (
-                  <option key={p.slug} value={p.slug} style={{ background: theme.cardSurface }}>
+                  <option key={p.slug} value={p.slug} style={{ background: theme.cardSurfaceElevated }}>
                     {p.emoji} {p.wtftiName}
                   </option>
                 ))}
@@ -520,7 +633,7 @@ function MystiLandingContent() {
               <button
                 onClick={handleKnownStart}
                 disabled={!selectedSlug}
-                className="w-full py-2.5 rounded-lg text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full py-3 rounded-lg text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{
                   background: theme.accentSoft,
                   color: theme.accent,
@@ -533,10 +646,10 @@ function MystiLandingContent() {
               </button>
             </div>
           </details>
-
+          
           <Link
             href="/wtfti/test/?mode=mysti"
-            className="block w-full py-3 rounded-xl text-sm font-medium text-center transition-all hover:opacity-80"
+            className="block w-full py-3.5 rounded-xl text-sm font-medium text-center transition-all hover:opacity-80"
             style={{
               borderWidth: 1,
               borderStyle: 'solid',
@@ -545,77 +658,210 @@ function MystiLandingContent() {
               background: 'transparent',
             }}
           >
-            🃏 还没测过？先测 WTFTI 人格
+            还没测过？先测 WTFTI 人格
           </Link>
-        </div>
+        </motion.div>
+
+        {/* --- 信任徽章（对标 Tianfu 的 250+ 工具） --- */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.36 }}
+          className="mb-8 grid grid-cols-4 gap-2 rounded-2xl border px-3 py-4"
+          style={{ borderColor: theme.cardBorder, background: `${theme.cardSurface}80` }}
+        >
+          {[
+            { num: '29', label: '灵魂人格' },
+            { num: '22', label: '大阿卡纳' },
+            { num: '11', label: '关系原型' },
+            { num: '3K+', label: '诗辞签卡' },
+          ].map(b => (
+            <div key={b.label} className="text-center">
+              <div
+                className="text-xl italic leading-none"
+                style={{ color: theme.accentGold, fontFamily: 'var(--font-display)' }}
+              >
+                {b.num}
+              </div>
+              <div
+                className="mt-1.5 text-[9px] tracking-[0.18em] uppercase"
+                style={{ color: theme.textSubtle, fontFamily: 'var(--font-mono)' }}
+              >
+                {b.label}
+              </div>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* 三层系统：让用户理解灵鉴 / 灵镜 / 灵笺的闭环 */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mb-8 rounded-2xl border px-5 py-5 backdrop-blur-md"
+          style={{
+            background: theme.cardSurface,
+            borderColor: theme.cardBorder,
+            boxShadow: `0 8px 24px ${theme.cardGlow}`,
+          }}
+        >
+          <div
+            className="text-[10px] tracking-[0.35em] uppercase mb-4 text-center"
+            style={{ color: theme.accentGold, fontFamily: 'var(--font-mono)' }}
+          >
+            ASK · SEE · ARCHIVE
+          </div>
+          <div className="grid grid-cols-3 gap-3 text-center">
+            {[
+              { name: '问心', value: '灵鉴', sub: '决策 · 命书' },
+              { name: '现身', value: '灵镜', sub: '色彩 · 妆发' },
+              { name: '留痕', value: '灵笺', sub: '档案 · 回看' },
+            ].map((tier) => (
+              <div key={tier.name}>
+                <div
+                  className="text-[10px] tracking-[0.24em] uppercase mb-1.5"
+                  style={{ color: theme.textSubtle, fontFamily: 'var(--font-mono)' }}
+                >
+                  {tier.name}
+                </div>
+                <div
+                  className="text-xl italic"
+                  style={{ color: theme.accentGold, fontFamily: 'var(--font-display)' }}
+                >
+                  {tier.value}
+                </div>
+                <div
+                  className="text-[10px] mt-1.5"
+                  style={{ color: theme.textMuted }}
+                >
+                  {tier.sub}
+                </div>
+              </div>
+            ))}
+          </div>
+          <Link
+            href="/lingjian/"
+            className="mt-4 pt-4 text-center text-xs italic border-t flex items-center justify-center gap-2 hover:opacity-80 transition-opacity"
+            style={{
+              color: theme.textMuted,
+              borderColor: theme.cardBorder,
+              fontFamily: 'var(--font-serif)',
+              textDecoration: 'none',
+            }}
+          >
+            <span
+              aria-hidden
+              style={{
+                display: 'inline-block',
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: 'radial-gradient(circle at 30% 30%, #FFE6A3, #C9A676 60%, #8B6A3A)',
+                boxShadow: '0 0 6px rgba(201,166,118,0.5)',
+              }}
+            />
+            已有结果？
+            <span
+              className="premium-foil"
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 12,
+                letterSpacing: '0.18em',
+                fontWeight: 600,
+              }}
+            >
+              回到我的灵笺
+            </span>
+          </Link>
+        </motion.div>
 
         {!partnerPersonality && (
-          <div className="mt-6 grid grid-cols-3 gap-2.5">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mb-8 grid grid-cols-3 gap-3"
+          >
             <button
               onClick={() => handleShuffle('random')}
-              className="py-2.5 rounded-lg text-xs font-medium transition-all hover:bg-white/5"
+              className="py-3 rounded-xl text-xs font-medium transition-all hover:bg-white/5"
               style={{
                 borderWidth: 1,
                 borderStyle: 'solid',
-                borderColor: theme.cardBorder,
+                borderColor: theme.cardBorderStrong,
                 color: theme.accentGold,
               }}
             >
-              🎲 随机合盘
+              随机合盘
             </button>
             <Link
-              href="/mysti/daily/"
-              className="py-2.5 rounded-lg text-xs font-medium text-center transition-all hover:bg-white/5"
+              href="/mysti/destiny/"
+              className="py-3 rounded-xl text-xs font-medium text-center transition-all hover:bg-white/5"
               style={{
                 borderWidth: 1,
                 borderStyle: 'solid',
-                borderColor: theme.cardBorder,
+                borderColor: theme.cardBorderStrong,
                 color: theme.accent,
               }}
             >
-              ✦ 每日一牌
+              命书馆
             </Link>
             <Link
-              href="/mysti/gacha/"
-              className="py-2.5 rounded-lg text-xs font-medium text-center transition-all hover:bg-white/5"
+              href="/lingjian/"
+              className="py-3 rounded-xl text-xs font-medium text-center transition-all hover:bg-white/5"
               style={{
                 borderWidth: 1,
                 borderStyle: 'solid',
-                borderColor: theme.cardBorder,
+                borderColor: theme.cardBorderStrong,
                 color: theme.accentGold,
               }}
             >
-              🎴 抽卡
+              我的灵笺
             </Link>
-          </div>
+          </motion.div>
         )}
 
-        {/* W3/W5/W6 入口 */}
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          {[
-            { href: '/mysti/archive/', emoji: '📜', label: '关系档案' },
-            { href: '/mysti/mood/', emoji: '🌗', label: '今日心情' },
-            { href: '/mysti/seasonal/', emoji: '✦', label: '节气年报' },
-            { href: '/mysti/monthly/', emoji: '🌙', label: '灵魂月报' },
-            { href: '/mysti/sigil/', emoji: '✺', label: '年度纪章' },
-            { href: '/mysti/gift/', emoji: '🎁', label: '礼品卡' },
-          ].map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="py-2 rounded-lg text-[11px] text-center transition-all hover:bg-white/5"
-              style={{
-                borderWidth: 1,
-                borderStyle: 'solid',
-                borderColor: theme.divider,
-                color: theme.textMuted,
-              }}
-            >
-              <div className="text-base leading-none mb-0.5">{item.emoji}</div>
-              {item.label}
-            </Link>
-          ))}
-        </div>
+        {/* 更多仪式：保留资产，但不再和首屏主路径抢焦点 */}
+        <motion.details
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mt-3 rounded-xl border" 
+          style={{ borderColor: theme.divider }}
+        >
+          <summary
+            className="cursor-pointer list-none px-4 py-3 text-center text-[11px] tracking-[0.24em] uppercase"
+            style={{ color: theme.textMuted }}
+          >
+            更多仪式
+          </summary>
+          <div className="grid grid-cols-3 gap-2 px-3 pb-3">
+            {[
+              { href: '/mysti/archive/', label: '关系档案' },
+              { href: '/mysti/daily/', label: '每日一牌' },
+              { href: '/mysti/gacha/', label: '抽卡' },
+              { href: '/mysti/mood/', label: '今日心情' },
+              { href: '/mysti/monthly/', label: '灵魂月报' },
+              { href: '/mysti/gift/', label: '礼品卡' },
+              { href: '/mysti/seasonal/', label: '节气年报' },
+              { href: '/mysti/sigil/', label: '年度纪章' },
+            ].map(item => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="py-2 rounded-lg text-[11px] text-center transition-all hover:bg-white/5"
+                style={{
+                  borderWidth: 1,
+                  borderStyle: 'solid',
+                  borderColor: theme.divider,
+                  color: theme.textMuted,
+                }}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </motion.details>
 
         <p
           className="text-center text-[11px] mt-7 italic"

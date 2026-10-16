@@ -47,7 +47,9 @@ export function SymptomsContent({ personality: p }: Props) {
 
   // Suggest exploring another personality
   const others = WTFTI_PERSONALITIES.filter(o => o.slug !== p.slug);
-  const randomOthers = others.sort(() => Math.random() - 0.5).slice(0, 4);
+  const randomOthers = [...others]
+    .sort((a, b) => stablePersonalityRank(p.slug, a.slug) - stablePersonalityRank(p.slug, b.slug))
+    .slice(0, 4);
 
   return (
     <div className="min-h-screen">
@@ -98,7 +100,7 @@ export function SymptomsContent({ personality: p }: Props) {
             {/* Heat stats */}
             <div className="flex items-center justify-center gap-4 mt-5">
               <span className="flex items-center gap-1 text-xs text-text-muted">
-                <span className="text-red-500">🔥</span>
+                <span className="text-ember">🔥</span>
                 {heat.participantsText}人打过勾
               </span>
               <span className="w-px h-3 bg-border-subtle" />
@@ -303,4 +305,13 @@ export function SymptomsContent({ personality: p }: Props) {
       </section>
     </div>
   );
+}
+
+function stablePersonalityRank(currentSlug: string, candidateSlug: string): number {
+  let hash = 0;
+  const key = `${currentSlug}:${candidateSlug}`;
+  for (let i = 0; i < key.length; i += 1) {
+    hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  }
+  return hash;
 }

@@ -3,17 +3,13 @@ import NextImage from 'next/image';
 import { XPTI_MODEL_NAMES, XPTI_MODEL_COLORS } from '../../lib/xpti/dimensions';
 import type { XptiModelType } from '../../lib/xpti/dimensions';
 import { XPTI_PERSONALITY_TYPES, getXptiTypeThumbnailImage } from '../../lib/xpti/personalities';
-import { SKU_PRICES } from '../../lib/mysti/unlock';
-
-const COUPLE_FULL_PRICE = SKU_PRICES['xpti-couple-report'].price;
-const COUPLE_HALF_PRICE = SKU_PRICES['xpti-couple-half'].price;
 
 /* XPTI 主调：枯玫瑰 + 深酒红，作为 paper 上的 accent，与首页 editorial 系统统一。 */
 const VELVET_DARK_WINE = '#6A2A3E';
 const VELVET_ROSE = 'var(--color-accent)';
 
 const DIMS: { key: XptiModelType; poleHigh: string; poleLow: string; question: string }[] = [
-  { key: 'dominance', poleHigh: '指挥官', poleLow: '乖顺流', question: '你在关系沟通里是导演还是女主' },
+  { key: 'dominance', poleHigh: '指挥官', poleLow: '乖顺流', question: '你在亲密关系里是导演还是女主' },
   { key: 'exposure', poleHigh: '坦白局', poleLow: '面具系', question: '你愿意暴露多少真实的自己' },
   { key: 'sensory', poleHigh: '通感体', poleLow: '钝感力', question: '一次触碰能让你过电吗' },
   { key: 'tempo', poleHigh: '微波炉', poleLow: '慢火锅', question: '你喜欢快节奏还是慢慢升温' },
@@ -61,7 +57,7 @@ function XptiRadarPreview() {
         viewBox={`0 0 ${size} ${size}`}
         className="w-full max-w-[320px] h-auto"
         role="img"
-        aria-label="九维关系沟通雷达预览"
+        aria-label="九维亲密偏好雷达预览"
       >
         {levels.map(level => {
           const points = nodes
@@ -175,11 +171,20 @@ export default function XptiHomeContent() {
             </div>
 
             <div className="mt-10 sm:mt-14 flex flex-wrap items-center gap-3 sm:gap-4">
-              <Link href="/xpti/test/" prefetch={false} className="btn btn-ink">
-                和 ta 一起测 <ArrowIcon />
+              <Link
+                href="/xpti/test/"
+                prefetch={false}
+                className="btn"
+                style={{
+                  background: VELVET_DARK_WINE,
+                  color: 'var(--color-bg-primary)',
+                  borderColor: VELVET_DARK_WINE,
+                }}
+              >
+                开始测试 <ArrowIcon />
               </Link>
-              <Link href="/xpti/couple/" prefetch={false} className="btn btn-rose">
-                邀请 ta · 各付 ¥{COUPLE_HALF_PRICE}
+              <Link href="/types/" prefetch={false} className="btn btn-ghost">
+                先翻翻 12 种原型
               </Link>
               <Link
                 href="/"
@@ -188,14 +193,6 @@ export default function XptiHomeContent() {
               >
                 返回 WTFti
               </Link>
-            </div>
-            <div className="mt-6 max-w-xl rounded-2xl border border-border-subtle bg-bg-elevated/80 p-4 sm:p-5">
-              <p className="text-sm font-medium text-text-primary">
-                情侣关系报告 ¥{COUPLE_FULL_PRICE} · 也可以两人各付 ¥{COUPLE_HALF_PRICE}
-              </p>
-              <p className="mt-1 text-xs leading-relaxed text-text-muted">
-                双人合并雷达 · 6 类张力配对 · 24 句对话脚本。一个人先免费测，拉上 ta 就能解锁。
-              </p>
             </div>
           </div>
           <div className="site-hero-card hidden rounded-[2rem] p-7 lg:block">
@@ -298,7 +295,7 @@ export default function XptiHomeContent() {
             <span className="serial-number text-xs mr-3">03</span>
             <span className="eyebrow">Nine dimensions · 九条线索</span>
             <h2 className="section-headline text-2xl sm:text-4xl mt-3">
-              关系沟通的<span className="editorial-italic">九条线</span>
+              亲密偏好的<span className="editorial-italic">九条线</span>
             </h2>
             <p className="display-tagline text-text-secondary mt-4 text-base sm:text-lg max-w-xl">
               每一条都是你靠近一个人时，悄悄被点亮的频率。
@@ -497,7 +494,7 @@ export default function XptiHomeContent() {
             <span className="serial-number text-xs mr-3">06</span>
             <span className="eyebrow">Decode</span>
             <h2 className="section-headline text-2xl sm:text-4xl mt-3">
-              三步<span className="editorial-italic">照见你的关系沟通</span>
+              三步<span className="editorial-italic">照见你的亲密偏好</span>
             </h2>
           </div>
 
@@ -543,7 +540,7 @@ export default function XptiHomeContent() {
           <span className="serial-number text-xs mr-3">07</span>
           <span className="eyebrow">Ready</span>
           <h2 className="editorial-display text-3xl sm:text-5xl md:text-6xl mt-6 mb-4">
-            你的关系沟通，
+            你的亲密偏好，
             <br />
             <span className="editorial-italic" style={{ color: VELVET_DARK_WINE }}>
               藏在这 12 种原型里
@@ -558,7 +555,8 @@ export default function XptiHomeContent() {
           <Link
             href="/xpti/test/"
             prefetch={false}
-            className="btn btn-ink"
+            className="btn"
+            style={{ background: VELVET_DARK_WINE, color: 'var(--color-bg-primary)', borderColor: VELVET_DARK_WINE }}
           >
             测测你的靠近方式 <ArrowIcon />
           </Link>
@@ -572,8 +570,8 @@ export default function XptiHomeContent() {
               SoulTI 觉察版
             </Link>
             <span>·</span>
-            <Link href="/mysti/daily/" className="hover:text-text-primary transition-colors">
-              今日一牌
+            <Link href="/wtfti/" className="hover:text-text-primary transition-colors">
+              WTF 毒舌版
             </Link>
           </div>
         </div>

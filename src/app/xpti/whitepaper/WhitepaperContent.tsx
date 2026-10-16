@@ -14,9 +14,10 @@ const PALETTE = {
   ink: 'var(--color-text-primary)',
   inkMute: 'var(--color-text-muted)',
   rule: 'var(--color-border)',
+  // XPTI 酒红家族打印色（v2 §7.1 允许的 rose 家族内变体；本页为打印友好白底，属显式隔离页）
   rose: '#A85A6E',
   wine: '#6A2A3E',
-  gold: '#C9A676',
+  gold: 'var(--color-gold)',
 };
 
 /**

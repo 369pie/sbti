@@ -32,6 +32,8 @@ type MystiEvent =
   | 'mysti_gift_purchase_initiate'
   | 'mysti_gift_purchase_success'
   | 'mysti_daily_bonus_pull'
+  // ── HER AURORA 联动 ──
+  | 'mysti_aurora_invite_click'
   // ── Decision Quick-Card v1 (2026-04-21) ──
   | 'mysti_decision_entry'
   | 'mysti_decision_quota_consume'

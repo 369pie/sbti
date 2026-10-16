@@ -104,9 +104,13 @@ function SingleSelectCard({
   onAnswered: (a: SAssociationAnswer | SLatencyAnswer) => void;
   anchor?: React.ReactNode;
 }) {
-  const [startedAt] = useState(() => Date.now());
+  const startedAtRef = useRef(0);
   const [picked, setPicked] = useState<string | null>(null);
   const timedOutRef = useRef(false);
+
+  useEffect(() => {
+    startedAtRef.current = performance.now();
+  }, [q.id]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -121,10 +125,10 @@ function SingleSelectCard({
     return () => window.clearTimeout(timer);
   }, [picked, q.countdownMs, q.id, onAnswered]);
 
-  const handlePick = (key: string) => {
+  const handlePick = (key: string, event: React.MouseEvent<HTMLButtonElement>) => {
     if (picked !== null || timedOutRef.current) return;
     setPicked(key);
-    const latencyMs = Date.now() - startedAt;
+    const latencyMs = Math.max(0, event.timeStamp - startedAtRef.current);
     window.setTimeout(() => {
       onAnswered({ questionId: q.id, optionKey: key, latencyMs });
     }, 180);
@@ -140,7 +144,7 @@ function SingleSelectCard({
           <button
             key={opt.key}
             type="button"
-            onClick={() => handlePick(opt.key)}
+            onClick={(event) => handlePick(opt.key, event)}
             disabled={picked !== null}
             style={{
               ...optionButtonStyle,

@@ -23,7 +23,7 @@ export default function TheoryPage() {
             你不是 16 种人格，你是 4 条情境维度。
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-text-secondary">
-            MBTI 说人格是稳定的。WTFTI 说：人格是被场景"激活"的。
+            MBTI 说人格是稳定的。WTFTI 说：人格是被场景&quot;激活&quot;的。
             你在恋爱里像 ENFP，在职场里像 INTJ——不是你装，是 4 条「情境维度」在不同宇宙被点亮的方式不同。
           </p>
         </header>
@@ -32,7 +32,7 @@ export default function TheoryPage() {
           <h2 className="text-2xl font-display mb-4">W · T · F · I — 4 条情境维度</h2>
           <p className="mb-6 text-text-secondary">
             理论锚点：Mischel & Shoda (1995) <em>Cognitive-Affective Personality System (CAPS)</em>。
-            人格不是 trait，是"<strong>if 情境 then 反应</strong>"的结构性签名。
+            人格不是 trait，是&quot;<strong>if 情境 then 反应</strong>&quot;的结构性签名。
             WTFTI 把 CAPS 的 5 个核心单元本土化为 4 条可测量的情境维度。
           </p>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -78,9 +78,9 @@ export default function TheoryPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-display mb-4">每个宇宙激活哪几条轴？</h2>
           <p className="mb-4 text-text-secondary">
-            同一套 4 轴框架下，不同宇宙有不同的"激活配置"。
+            同一套 4 轴框架下，不同宇宙有不同的&quot;激活配置&quot;。
             修仙宇宙看你的「触发反应 + 应对弹性」，恋爱宇宙看「情绪倾斜 + 印记锚点」——
-            这就是为什么你在不同测试里"像不同人"。
+            这就是为什么你在不同测试里&quot;像不同人&quot;。
           </p>
           <div className="overflow-hidden rounded-xl border border-border-subtle">
             <table className="w-full text-sm">
@@ -132,8 +132,8 @@ export default function TheoryPage() {
           <h2 className="text-2xl font-display mb-4">CCI · 你的跨情境一致性</h2>
           <p className="mb-4 text-text-secondary">
             完成多个宇宙的测试后，WTFTI 会算出你的 CCI（Cross-Context Consistency Index）：
-            把你在每个宇宙的 W/T/F/I 画像对齐，看你"在不同情境下有多稳定"。
-            <strong>高 CCI = 一以贯之；低 CCI = 高度情境化（更"WTF"）。</strong>
+            把你在每个宇宙的 W/T/F/I 画像对齐，看你&quot;在不同情境下有多稳定&quot;。
+            <strong>高 CCI = 一以贯之；低 CCI = 高度情境化（更&quot;WTF&quot;）。</strong>
           </p>
           <CciPanel />
         </section>

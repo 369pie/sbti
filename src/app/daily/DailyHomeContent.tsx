@@ -25,17 +25,17 @@ export default function DailyHomeContent() {
 
         <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
           <div className="animate-fade-up">
-            <span className="inline-block text-xs font-mono tracking-[0.25em] text-text-muted mb-2 uppercase">
+            <span className="inline-block text-xs font-mono tracking-[0.25em] text-stone mb-2 uppercase">
               Daily Status Check · 每天题目不同
             </span>
-            <div className="text-sm font-mono text-teal-400 tracking-wider mb-6">
+            <div className="text-sm font-mono text-sage tracking-wider mb-6">
               {dateStr}
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
               今天的你
               <br />
-              <span className="bg-gradient-to-r from-teal-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">开了什么模式</span>
+              <span className="gradient-text">开了什么模式</span>
             </h1>
 
             <p className="text-text-secondary text-lg sm:text-xl leading-relaxed max-w-xl mx-auto mb-10">
@@ -56,7 +56,7 @@ export default function DailyHomeContent() {
             ].map(stat => (
               <div key={stat.label} className="bg-bg-secondary/60 px-4 py-6 text-center">
                 <div className="text-2xl font-semibold text-text-primary mb-1">{stat.value}</div>
-                <div className="text-xs text-text-muted">{stat.label}</div>
+                <div className="text-xs text-stone">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -69,7 +69,7 @@ export default function DailyHomeContent() {
       {/* 5 Dimensions */}
       <section className="max-w-3xl mx-auto px-6 pb-20">
         <div className="animate-fade-up">
-          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-8">
+          <h2 className="text-sm font-mono tracking-wider text-stone uppercase text-center mb-8">
             五大状态维度
           </h2>
 
@@ -90,7 +90,7 @@ export default function DailyHomeContent() {
                     <span className="text-sm font-medium text-text-primary">
                       {DAILY_MODEL_NAMES[m.key]}
                     </span>
-                    <span className="text-text-muted text-sm ml-2">{m.label}</span>
+                    <span className="text-stone text-sm ml-2">{m.label}</span>
                   </div>
                 </div>
               );
@@ -102,7 +102,7 @@ export default function DailyHomeContent() {
       {/* Status types preview */}
       <section className="max-w-3xl mx-auto px-6 pb-24">
         <div className="animate-fade-up-delay-1">
-          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-8">
+          <h2 className="text-sm font-mono tracking-wider text-stone uppercase text-center mb-8">
             12 张今日模式卡
           </h2>
 
@@ -126,7 +126,7 @@ export default function DailyHomeContent() {
                   />
                 </div>
                 <span className="text-sm font-medium text-text-primary">{s.name}</span>
-                <span className="text-xs text-text-muted text-center leading-snug">{s.tagline}</span>
+                <span className="text-xs text-stone text-center leading-snug">{s.tagline}</span>
               </div>
             ))}
           </div>

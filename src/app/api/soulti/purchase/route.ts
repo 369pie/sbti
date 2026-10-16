@@ -1,14 +1,16 @@
 /**
- * SoulTI purchase
+ * SoulTI purchase stub (E-09)
  *
- * Records purchase intent. Unlock MUST go through `/api/soulti/verify` after
- * a real provider confirms payment. Stub checkout URLs are only allowed when
- * `isSoultiPaymentStubMode()` is true (non-production by default).
+ * Creates a pending order and returns a mock checkout URL. Wire a real
+ * provider (微信/支付宝/Stripe) by replacing `createMockOrder` and wiring
+ * `/api/soulti/verify` to the provider's webhook.
+ *
+ * Security: this endpoint records intent only; actual unlock must be gated by
+ * `/api/soulti/verify` after provider confirms payment.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getPaymentAvailabilityStatus, getPaymentBlockedPayload } from '@/lib/payment/availability';
-import { isSoultiPaymentStubMode } from '@/lib/soulti/payment-mode';
 
 interface PurchaseRequestBody {
   slug?: string;
@@ -41,26 +43,7 @@ export async function POST(req: NextRequest) {
 
   const config = SKU_CONFIG[sku];
   const orderId = `so_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-  const isStub = isSoultiPaymentStubMode();
-
-  if (!isStub) {
-    // Live mode: refuse free unlock. Real Xunhupay wiring for SoulTI follows Mysti.
-    return NextResponse.json(
-      {
-        error: 'payment_provider_required',
-        message: 'SoulTI 付费已关闭假支付。请通过 Mysti 虎皮椒收款链路完成支付，或等待 SoulTI 正式下单接口上线。',
-        orderId,
-        slug,
-        sku,
-        priceCny: config.priceCny,
-        label: config.label,
-        status: 'blocked_stub',
-        isStub: false,
-        checkoutUrl: null,
-      },
-      { status: 503 },
-    );
-  }
+  const isStub = process.env.SOULTI_PAYMENT_PROVIDER !== 'live';
 
   return NextResponse.json({
     orderId,
@@ -69,8 +52,9 @@ export async function POST(req: NextRequest) {
     priceCny: config.priceCny,
     label: config.label,
     status: 'pending',
-    isStub: true,
-    checkoutUrl: `/api/soulti/verify?orderId=${orderId}&stub=1`,
+    isStub,
+    // In stub mode we return an immediate-unlock path for dev testing.
+    checkoutUrl: isStub ? `/api/soulti/verify?orderId=${orderId}&stub=1` : null,
     expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
   });
 }

@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import { MystiSubscribeContent } from '@/components/MystiSubscribeContent';
 
 export const metadata: Metadata = {
-  title: '灵魂通行证 — WTFTI 灵鉴',
-  description: '¥19/月 起，每日翻牌 + 全 Plus 分享卡 + 灵魂月报 + 单次内容 7 折。',
+  title: '暮光通行证 · 灵鉴会籍 — 她的私人神谕室',
+  description:
+    '把神谕室的钥匙留给自己。无限暮光抽牌 · 合盘长文 · 历年命书 · 节气暗信 · 年度灵魂纪章。¥19/月 起，单次内容 7 折。',
   alternates: { canonical: '/mysti/subscribe/' },
   robots: { index: true, follow: true },
 };

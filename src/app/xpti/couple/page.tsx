@@ -80,21 +80,24 @@ export default async function XptiCouplePage({ searchParams }: XptiCouplePagePro
   if (rawInvite) {
     const decoded = decodeCoupleInvite(rawInvite);
     if (decoded) {
+      let upgradedCouple: Awaited<ReturnType<typeof createCouple>> | null = null;
       try {
-        const couple = await createCouple({
+        upgradedCouple = await createCouple({
           inviterSlug: decoded.slug,
           inviterDims: decoded.dims,
           inviterNickname: decoded.nick ?? null,
         });
+      } catch (err) {
+        console.error('[xpti/couple page] legacy invite upgrade failed', err);
+      }
+      if (upgradedCouple) {
         return (
           <CoupleClient
-            initialCouple={toView(couple)}
-            initialShareToken={couple.share_token}
+            initialCouple={toView(upgradedCouple)}
+            initialShareToken={upgradedCouple.share_token}
             legacyInviteMode={true}
           />
         );
-      } catch (err) {
-        console.error('[xpti/couple page] legacy invite upgrade failed', err);
       }
     }
   }

@@ -8,6 +8,14 @@
  * 战略：plan §B4 杠杆 #3 月相章节
  */
 
+import { queueLetterDeletion, scheduleWtftiCloudSync } from './cloud-sync';
+
+/** 月相章节仪式 → 星尘（fire-and-forget） */
+function grantStarDustForChapter(): void {
+  if (typeof window === 'undefined') return;
+  void import('./star-spirit-client').then((m) => m.tryEarnStarDust('moon'));
+}
+
 const SYNODIC_MONTH = 29.530588853; // days
 // Reference new moon: 2026-01-19 21:53 UTC
 const REFERENCE_NEW_MOON_MS = Date.UTC(2026, 0, 19, 21, 53);
@@ -246,6 +254,7 @@ export function saveMoonProgress(p: MoonProgress) {
   } catch {
     /* ignore */
   }
+  scheduleWtftiCloudSync();
 }
 
 export function answerChapter(index: number, optionIdx: number): MoonProgress {
@@ -262,6 +271,7 @@ export function answerChapter(index: number, optionIdx: number): MoonProgress {
     next.title = LUNAR_CHAPTERS[11].options[optionIdx];
   }
   saveMoonProgress(next);
+  grantStarDustForChapter();
   return next;
 }
 
@@ -318,6 +328,7 @@ export function sealFutureLetter(title: string, body: string, planetSlug?: strin
       /* ignore */
     }
   }
+  scheduleWtftiCloudSync();
   return letter;
 }
 
@@ -332,9 +343,14 @@ export function daysUntilReveal(letter: FutureLetter, now: Date = new Date()): n
 
 export function clearFutureLetter() {
   if (typeof window === 'undefined') return;
+  const current = loadFutureLetter();
+  if (current) {
+    queueLetterDeletion(`future:${current.sealedAt}`);
+  }
   try {
     window.localStorage.removeItem(LETTER_KEY);
   } catch {
     /* ignore */
   }
+  scheduleWtftiCloudSync();
 }

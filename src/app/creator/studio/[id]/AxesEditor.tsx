@@ -122,7 +122,7 @@ export function AxesEditor({ universeId, axes: initial, onSaved }: Props) {
             />
             <button
               onClick={() => removeAxis(i)}
-              className="text-text-muted hover:text-red-600 transition-colors text-sm"
+              className="text-text-muted hover:text-ember transition-colors text-sm"
             >
               ✕
             </button>

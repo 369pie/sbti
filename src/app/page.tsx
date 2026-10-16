@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import HomeContent from './HomeContent';
+import HomeContentV3 from './HomeContentV3';
 
 const homepageFaqSchema = {
   '@context': 'https://schema.org',
@@ -10,23 +10,23 @@ const homepageFaqSchema = {
       name: 'WTFTI 是什么？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'WTFTI 是写给女生的情绪陪伴站：每天一张牌帮你安顿情绪，XPTI 关系报告帮你看懂你和 ta 怎么沟通、怎么靠近。',
+        text: 'WTFTI 是懂你的女生私人顾问：测一测看清自己，美我帮你找到适合的颜色、妆容和风格，树洞给你一个敢说心里话的地方。',
       },
     },
     {
       '@type': 'Question',
-      name: '情侣关系报告能看到什么？',
+      name: '测完之后能得到什么？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: '你和 ta 各自完成 XPTI 测试后，可以解锁双人合并雷达、6 类张力配对和 24 句对话脚本。可以一方付清，也可以两人各付一半。',
+        text: '你会有一份自己的档案，以及每天一张根据档案生成的今日卡：今日运势、幸运色穿搭和一句妆容建议。档案越完整，今日卡越准。',
       },
     },
     {
       '@type': 'Question',
-      name: '我该从哪里开始？',
+      name: '需要注册吗？要花钱吗？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: '想安顿今天的情绪，先抽「今日一牌」；想看懂一段关系，和 ta 一起做 XPTI 关系测试；想快速认识自己，做三分钟经典测试。',
+        text: '测试免费、不用注册。想跨设备保存档案时再登录。深度报告和会员是付费的，价格会在点击前写明。',
       },
     },
     {
@@ -34,16 +34,15 @@ const homepageFaqSchema = {
       name: '结果能拿来做严肃诊断吗？',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: '不能。WTFTI 用于自我观察和关系沟通参考，不能替代专业心理评估。',
+        text: '不能。测试和玄学内容仅供娱乐与自我探索，不能替代专业的心理或医疗建议。',
       },
     },
   ],
 };
 
 export const metadata: Metadata = {
-  title: 'WTFTI — 女生的情绪陪伴站 · 情侣关系沟通报告',
-  description:
-    '先听懂今天的自己，再看清一段关系。每日一牌安顿情绪，XPTI 情侣关系报告帮你读懂 ta 的沟通方式，也被 ta 读懂。',
+  title: 'WTFTI — 懂你的女生私人顾问',
+  description: '看清自己、变好看、有地方说心里话。90 秒人格测试，每天一张为你写的今日卡：运势、穿搭色、妆容建议，还有一个敢说话的树洞。',
   alternates: { canonical: '/' },
 };
 
@@ -54,7 +53,7 @@ export default function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageFaqSchema) }}
       />
-      <HomeContent />
+      <HomeContentV3 />
     </>
   );
 }

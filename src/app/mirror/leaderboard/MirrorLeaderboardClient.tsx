@@ -29,11 +29,11 @@ const MOCK_STYLES: LeaderboardEntry[] = [
   { label: '暗黑辣妹', count: 892, percentage: 15, emoji: '🖤' },
 ];
 
-const MOCK_FORTUNE_TYPES: LeaderboardEntry[] = [
-  { label: '面相气质分析', count: 1892, percentage: 38, emoji: '👁' },
-  { label: '掌纹命理分析', count: 1234, percentage: 25, emoji: '🖐' },
-  { label: '五官亮点标注', count: 1023, percentage: 20, emoji: '✨' },
-  { label: '风格命格解读', count: 856, percentage: 17, emoji: '🔮' },
+const MOCK_ARCHIVE_TYPES: LeaderboardEntry[] = [
+  { label: '三页诊断卡', count: 1892, percentage: 38, emoji: '✦' },
+  { label: '发型专项', count: 1234, percentage: 25, emoji: '✧' },
+  { label: '色彩诊断', count: 1023, percentage: 20, emoji: '◇' },
+  { label: '风格对比', count: 856, percentage: 17, emoji: '◆' },
 ];
 
 const MOCK_TOTAL_TESTS = 12847;
@@ -141,7 +141,10 @@ export default function MirrorLeaderboardClient() {
   const [myResults, setMyResults] = useState<MirrorRecord[]>([]);
 
   useEffect(() => {
-    setMyResults(getMirrorResults());
+    const id = window.setTimeout(() => {
+      setMyResults(getMirrorResults());
+    }, 0);
+    return () => window.clearTimeout(id);
   }, []);
 
   return (
@@ -162,7 +165,7 @@ export default function MirrorLeaderboardClient() {
             </h1>
 
             <p className="wtfti-copy max-w-xl mx-auto">
-              最热门的色彩季节、风格类型和命纹分析方向。
+              最热门的色彩季节、风格类型和三页档案方向。
             </p>
           </div>
 
@@ -190,8 +193,8 @@ export default function MirrorLeaderboardClient() {
 
           <div className="mb-10">
             <LeaderboardTable
-              title="✦ 命纹分析方向"
-              entries={MOCK_FORTUNE_TYPES}
+              title="✦ 档案类型偏好"
+              entries={MOCK_ARCHIVE_TYPES}
               totalLabel="次"
             />
           </div>

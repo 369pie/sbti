@@ -228,7 +228,7 @@ export default async function CreatorPublicProfilePage({ params }: PageProps) {
               <div className="flex items-center gap-2 flex-wrap mt-3">
                 <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">{creator.name}</h1>
                 {creator.is_verified && (
-                  <span className="px-2 py-1 rounded-full bg-blue-500/15 text-blue-300 text-xs">已认证</span>
+                  <span className="px-2 py-1 rounded-full bg-violet-text/15 text-violet-text text-xs">已认证</span>
                 )}
               </div>
               <p className="text-sm text-text-muted mt-2">TA 在 WTFTI 的人格宇宙展示页，可以从这里直接进入代表作和最新作品。</p>
@@ -427,7 +427,7 @@ export default async function CreatorPublicProfilePage({ params }: PageProps) {
                           <Link href={`/creator/profile/${universe.creator.id}/`} className="hover:text-text-secondary transition-colors">
                             {universe.creator.name}
                           </Link>
-                          {universe.creator.is_verified && <span className="text-blue-300">已认证</span>}
+                          {universe.creator.is_verified && <span className="text-violet-text">已认证</span>}
                         </div>
                       )}
                     </div>

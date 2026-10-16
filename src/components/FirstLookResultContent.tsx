@@ -34,8 +34,10 @@ export function FirstLookResultContent({ slug }: FirstLookResultContentProps) {
   const shareRef = useRef<FirstLookShareImageGeneratorHandle>(null);
 
   useEffect(() => {
-    setStored(loadFirstLookResult());
-    setReady(true);
+    queueMicrotask(() => {
+      setStored(loadFirstLookResult());
+      setReady(true);
+    });
   }, []);
 
   // Fallback deep-dive matches if session is empty (e.g. direct URL visit).

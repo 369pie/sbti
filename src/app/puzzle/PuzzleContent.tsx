@@ -333,9 +333,9 @@ export default function PuzzleContent() {
 
             {/* Incomplete toast */}
             {result && !result.isComplete && (
-              <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-center">
+              <div className="rounded-xl border border-gold/20 bg-gold/5 p-4 text-center">
                 <p className="text-sm text-text-secondary">
-                  还差 <span className="font-bold text-amber-600">{4 - result.filledCount}</span> 人
+                  还差 <span className="font-bold text-gold-text">{4 - result.filledCount}</span> 人
                   <br />
                   <span className="text-xs text-text-muted">复制链接发给闺蜜，让ta填入自己的人格</span>
                 </p>

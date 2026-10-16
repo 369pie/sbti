@@ -72,7 +72,7 @@ export default function FanrentiLandingContent() {
                 <div className="text-xl sm:text-2xl font-semibold fr-ink-text" style={{ fontFamily: "'Noto Serif SC', serif" }}>
                   {stat.value}
                 </div>
-                <div className="text-[11px] mt-1 tracking-widest uppercase" style={{ color: 'var(--color-text-muted)' }}>
+                <div className="text-[11px] mt-1 tracking-widest uppercase" style={{ color: 'var(--color-stone)' }}>
                   {stat.label}
                 </div>
               </div>

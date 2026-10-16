@@ -13,20 +13,20 @@ export default function HogtiLandingContent() {
       <section className="relative">
         <div className="max-w-3xl mx-auto px-6 pt-20 pb-16 text-center">
           <div className="animate-fade-up">
-            <span className="inline-block text-[11px] font-mono tracking-[0.3em] text-amber-100/90 mb-6 uppercase">
+            <span className="inline-block text-[11px] font-mono tracking-[0.3em] text-gold/90 mb-6 uppercase">
               WTFTI · 魔法宇宙
             </span>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.12] mb-5 text-amber-50 drop-shadow-[0_2px_12px_rgba(0,0,0,0.3)]">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.12] mb-5 text-gold drop-shadow-[0_2px_12px_rgba(0,0,0,0.3)]">
               <span className="block" style={{ fontFamily: "'EB Garamond', 'Noto Serif SC', serif" }}>
                 Hogwarts · TI
               </span>
-              <span className="block mt-2 text-2xl sm:text-3xl md:text-4xl text-amber-200/90 tracking-wide">
+              <span className="block mt-2 text-2xl sm:text-3xl md:text-4xl text-gold/90 tracking-wide">
                 你是哪位霍格沃茨同学？
               </span>
             </h1>
 
-            <p className="text-amber-50/90 text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-9">
+            <p className="text-gold/90 text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-9">
               3 分钟情境题，把你对号入座到 <b>15 位标志性角色 + 4 个学院</b>。
               <br className="hidden sm:inline" />
               结果卡可直接发小红书 / 朋友圈，附魔法录取通知书风格。
@@ -46,7 +46,7 @@ export default function HogtiLandingContent() {
               <Link
                 href="/wtfti/"
                 prefetch={false}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-amber-200/30 text-amber-100/80 text-sm hover:text-amber-50 hover:border-amber-200/60 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-gold/30 text-gold/80 text-sm hover:text-gold hover:border-gold/60 transition-all"
               >
                 经典 WTFTI
               </Link>

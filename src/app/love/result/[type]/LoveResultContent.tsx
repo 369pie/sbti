@@ -78,7 +78,7 @@ export function LoveResultContent({ personality, dimensionScores }: Props) {
           {/* Top-right share button */}
           <button
             onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
-            className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-pink-400 transition-all cursor-pointer"
+            className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-rose-text transition-all cursor-pointer"
             title="生成分享图片"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -227,7 +227,7 @@ export function LoveResultContent({ personality, dimensionScores }: Props) {
 
             <button
               onClick={copyShareText}
-              className="w-full py-3 rounded-xl border border-pink-500/20 bg-pink-500/5 text-sm text-pink-400 hover:bg-pink-500/10 transition-all cursor-pointer"
+              className="w-full py-3 rounded-xl border border-accent/20 bg-accent/5 text-sm text-rose-text hover:bg-accent/10 transition-all cursor-pointer"
             >
               {textCopied ? '已复制分享文案 ✓' : '📋 复制分享文案'}
             </button>
@@ -241,7 +241,7 @@ export function LoveResultContent({ personality, dimensionScores }: Props) {
               </button>
               <button
                 onClick={quickShare}
-                className="flex-1 py-3 rounded-xl border border-pink-500/30 text-sm text-pink-400 hover:bg-pink-500/10 transition-all cursor-pointer flex items-center justify-center gap-2"
+                className="flex-1 py-3 rounded-xl border border-accent/30 text-sm text-rose-text hover:bg-accent/10 transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />

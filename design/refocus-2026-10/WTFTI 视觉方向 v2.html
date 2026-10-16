@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WTFTI · 视觉方向探索 v2</title>
+<!--
+  v2：同一套信息结构（首页 + 今日），三个视觉方向。
+  A 奶油日记：治愈手帐、纸胶带、拍立得，偏 14-28
+  B 珍珠月光：珠光、月相、柔雾玻璃，偏 14-26
+  C 丝绒夜：酒红丝绒、香槟金、拱门塔罗框，偏 22-40
+  每个方向改的是：色板 · 字体 · 卡片形态 · 装饰母题 · 首屏构图。
+  图片位一律占位，等真实素材替换。
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&family=ZCOOL+XiaoWei&family=Long+Cang&display=swap" rel="stylesheet">
+<style>
+  /* ================= TOKENS PER DIRECTION ================= */
+  body[data-dir="a"] {
+    --bg: #FBF6EC; --bg-2: #F5ECDD; --card: #FFFDF8; --ink: #4A3628; --ink-2: #6E5646; --mute: #9C8574;
+    --line: #E8DCC8; --accent: #E8907A; --accent-soft: #FADBD0; --accent-text: #B45C47;
+    --c2: #A9C5A0; --c3: #F2CE7E; --cta: #4A3628; --on-cta: #FFF8EC;
+    --h-font: "ZCOOL XiaoWei", "Noto Serif SC", serif; --b-font: "Noto Sans SC", sans-serif; --hand: "Long Cang", cursive;
+    --en: "Cormorant Garamond", serif; --radius: 6px; --page: #EFE6D6;
+  }
+  body[data-dir="b"] {
+    --bg: #F7F4FC; --bg-2: #EFEAF9; --card: rgba(255,255,255,.62); --ink: #2E2747; --ink-2: #554D72; --mute: #8C86A6;
+    --line: rgba(140,120,200,.18); --accent: #A78BFA; --accent-soft: #E9E1FF; --accent-text: #7457D9;
+    --c2: #F5B8D0; --c3: #A9D2F2; --cta: #2E2747; --on-cta: #FFFFFF;
+    --h-font: "Noto Sans SC", sans-serif; --b-font: "Noto Sans SC", sans-serif; --hand: "Cormorant Garamond", serif;
+    --en: "Cormorant Garamond", serif; --radius: 28px; --page: #E6E1F3;
+  }
+  body[data-dir="c"] {
+    --bg: #2A1020; --bg-2: #351528; --card: #3A1A2D; --ink: #F6E9DF; --ink-2: #E2CBBF; --mute: #B9998F;
+    --line: rgba(217,183,126,.32); --accent: #D9B77E; --accent-soft: rgba(217,183,126,.14); --accent-text: #E8C995;
+    --c2: #E8B4B8; --c3: #9C6B8E; --cta: #D9B77E; --on-cta: #2A1020;
+    --h-font: "Noto Serif SC", serif; --b-font: "Noto Sans SC", sans-serif; --hand: "Cormorant Garamond", serif;
+    --en: "Cormorant Garamond", serif; --radius: 4px; --page: #160810;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--page); font-family: var(--b-font); color: var(--ink); transition: background .4s; }
+  [data-only] { display: none !important; }
+  body[data-dir="a"] [data-only~="a"], body[data-dir="b"] [data-only~="b"], body[data-dir="c"] [data-only~="c"] { display: revert !important; }
+
+  /* ================= PAGE CHROME ================= */
+  .top { max-width: 1100px; margin: 0 auto; padding: 36px 24px 8px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; justify-content: space-between; }
+  .top h1 { font: 600 13px/1 system-ui, sans-serif; letter-spacing: .3em; text-transform: uppercase; color: #8b7b75; }
+  body[data-dir="c"] .top h1 { color: #b9998f; }
+  .dirs { display: flex; gap: 10px; flex-wrap: wrap; }
+  .dir { border: 1px solid rgba(0,0,0,.12); background: rgba(255,255,255,.55); border-radius: 14px; padding: 10px 14px; cursor: pointer; text-align: left; min-width: 200px; font-family: system-ui, sans-serif; }
+  .dir b { display: block; font-size: 14px; color: #2a2220; margin-bottom: 3px; }
+  .dir span { font-size: 12px; color: #6f625d; }
+  .dir.on { background: #2a2220; border-color: #2a2220; }
+  .dir.on b, .dir.on span { color: #fff; }
+  body[data-dir="c"] .dir { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
+  body[data-dir="c"] .dir b { color: #f6e9df; } body[data-dir="c"] .dir span { color: #b9998f; }
+  body[data-dir="c"] .dir.on { background: #D9B77E; } body[data-dir="c"] .dir.on b, body[data-dir="c"] .dir.on span { color: #2a1020; }
+
+  .canvas { display: flex; gap: 56px; justify-content: center; align-items: flex-start; padding: 28px 24px 24px; flex-wrap: wrap; }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .col-label { font: 500 11px/1 system-ui, sans-serif; letter-spacing: .32em; color: #8b7b75; }
+  .phone { width: 390px; height: 844px; border-radius: 50px; background: var(--bg); overflow: hidden; position: relative; box-shadow: 0 0 0 10px #1d1716, 0 30px 80px rgba(0,0,0,.25); }
+  .scroll { height: 100%; overflow-y: auto; scrollbar-width: none; position: relative; z-index: 1; }
+  .scroll::-webkit-scrollbar { display: none; }
+  .status { height: 47px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; font: 600 15px system-ui, sans-serif; color: var(--ink); }
+
+  /* palette strip */
+  .tokens { max-width: 860px; margin: 8px auto 90px; padding: 0 24px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; font: 400 11px system-ui, sans-serif; color: #8b7b75; }
+  .tk { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,.5); border-radius: 20px; padding: 5px 12px 5px 5px; }
+  body[data-dir="c"] .tk { background: rgba(255,255,255,.06); color: #b9998f; }
+  .tk i { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(0,0,0,.08); }
+  .fontline { width: 100%; text-align: center; margin-top: 6px; }
+
+  /* ================= SHARED COMPONENTS ================= */
+  .nav { display: flex; justify-content: space-between; align-items: center; padding: 4px 24px 0; }
+  .wordmark { font: 600 21px var(--en); letter-spacing: .16em; color: var(--ink); }
+  .nav a { font: 400 13px var(--b-font); color: var(--ink-2); text-decoration: none; }
+  .eyebrow { font: 500 11px/1 var(--b-font); letter-spacing: .32em; text-transform: uppercase; color: var(--mute); }
+  .ph { display: flex; align-items: center; justify-content: center; text-align: center; font: 400 11px/1.5 var(--b-font); color: var(--mute);
+    background: repeating-linear-gradient(135deg, var(--bg-2) 0 9px, transparent 9px 18px); border: 1px solid var(--line); }
+
+  .btn { display: flex; align-items: center; justify-content: center; height: 56px; width: 100%; border: none; cursor: pointer;
+    background: var(--cta); color: var(--on-cta); font: 500 16px var(--b-font); letter-spacing: .06em; border-radius: var(--radius); }
+  body[data-dir="a"] .btn { border-radius: 30px; box-shadow: 0 4px 0 #2E2017; }
+  body[data-dir="b"] .btn { border-radius: 30px; background: linear-gradient(100deg, #2E2747, #4B3F7A); box-shadow: 0 10px 30px rgba(116,87,217,.3); }
+  body[data-dir="c"] .btn { border-radius: 2px; letter-spacing: .2em; box-shadow: 0 0 0 1px #D9B77E, 0 0 0 4px #2A1020, 0 0 0 5px rgba(217,183,126,.5); }
+
+  .hero { padding: 26px 24px 20px; position: relative; }
+  .hero h2 { font-family: var(--h-font); color: var(--ink); margin: 16px 0 12px; }
+  .hero .sub { font: 400 15px/1.75 var(--b-font); color: var(--ink-2); margin-bottom: 24px; }
+  .proof { margin-top: 14px; font: 400 12px var(--b-font); color: var(--mute); text-align: center; }
+
+  .sec { padding: 30px 24px 0; }
+  .sec-title { font: 400 22px/1.4 var(--h-font); margin: 10px 0 16px; color: var(--ink); }
+  body[data-dir="b"] .sec-title { font-weight: 700; font-size: 20px; }
+  body[data-dir="c"] .sec-title { font-weight: 500; }
+
+  /* pillars */
+  .pillars { display: grid; gap: 12px; }
+  .pillar { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; gap: 14px; align-items: center; }
+  .pillar .art { width: 64px; height: 64px; flex-shrink: 0; border-radius: calc(var(--radius) * .6); }
+  .pillar h3 { font: 400 19px var(--h-font); color: var(--ink); margin-bottom: 4px; }
+  body[data-dir="b"] .pillar h3 { font-weight: 700; font-size: 17px; }
+  .pillar p { font: 400 13px/1.6 var(--b-font); color: var(--ink-2); }
+  .pillar .num { position: absolute; right: 16px; top: 12px; font: italic 500 15px var(--en); color: var(--accent-text); }
+
+  .quote { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 20px 18px; }
+  .quote blockquote { font: 400 17px/1.8 var(--h-font); color: var(--ink); }
+  .quote .meta { margin-top: 12px; display: flex; justify-content: space-between; font: 400 12px var(--b-font); color: var(--mute); }
+  .quote .hug { color: var(--accent-text); }
+  .close { padding: 34px 24px 46px; text-align: center; }
+  .close p { font: 400 20px var(--hand); color: var(--ink-2); margin-bottom: 16px; }
+  body[data-dir="a"] .close p { font-size: 26px; }
+  body[data-dir="b"] .close p, body[data-dir="c"] .close p { font-style: italic; }
+  .fine { margin-top: 12px; font: 400 11px var(--b-font); color: var(--mute); }
+
+  /* today card */
+  .tcard { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 18px 16px; }
+  .tc-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .tc-date { font: 500 13px var(--en); letter-spacing: .14em; color: var(--accent-text); }
+  .tc-tags { font: italic 400 14px var(--en); color: var(--mute); }
+  .fortune { font: 400 22px/1.5 var(--h-font); margin: 12px 0 14px; color: var(--ink); }
+  body[data-dir="b"] .fortune { font-weight: 700; font-size: 20px; }
+  body[data-dir="c"] .fortune { font-weight: 500; }
+  .row { display: flex; gap: 12px; align-items: center; padding: 11px 0; border-top: 1px solid var(--line); }
+  .row .k { font: 400 11px var(--b-font); letter-spacing: .2em; color: var(--mute); width: 46px; flex-shrink: 0; }
+  .row .v { font: 500 14px/1.5 var(--b-font); flex: 1; color: var(--ink); }
+  .row .v small { display: block; font-weight: 400; font-size: 12px; color: var(--mute); }
+  .sw { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06); }
+  .outfit { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 2px 0 12px; }
+  .outfit .ph { height: 96px; border-radius: calc(var(--radius) * .5); }
+  .lock { margin-top: 6px; display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: calc(var(--radius) * .6); background: var(--accent-soft); }
+  .lock span { font: 400 13px var(--b-font); color: var(--ink-2); }
+  .lock a { font: 500 13px var(--b-font); color: var(--accent-text); text-decoration: none; }
+
+  .greet { padding: 16px 24px 16px; }
+  .greet h2 { font: 400 30px/1.3 var(--h-font); color: var(--ink); margin-top: 8px; }
+  body[data-dir="b"] .greet h2 { font-weight: 900; }
+  body[data-dir="c"] .greet h2 { font-weight: 500; }
+  .streak { margin-top: 10px; display: flex; gap: 6px; align-items: center; font: 400 12px var(--b-font); color: var(--mute); }
+  .streak b { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+  .streak b.off { background: transparent; border: 1px solid var(--line); }
+  .streak span { margin-left: 6px; }
+
+  .moods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .mood { height: 70px; border-radius: calc(var(--radius) * .7); border: 1px solid var(--line); background: var(--card); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; font: 400 13px var(--b-font); color: var(--ink-2); cursor: pointer; transition: .2s; }
+  .mood i { width: 16px; height: 16px; border-radius: 50%; }
+  .mood.on { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
+  .write { margin-top: 10px; display: flex; align-items: center; padding: 15px 16px; border-radius: calc(var(--radius) * .7); border: 1px dashed var(--line); color: var(--mute); font: 400 14px var(--b-font); }
+  .write b { margin-left: auto; color: var(--accent-text); font-weight: 500; font-size: 13px; }
+
+  .profile { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+  .p-top { display: flex; justify-content: space-between; align-items: flex-end; }
+  .p-top strong { font: 500 34px var(--en); color: var(--accent-text); line-height: 1; }
+  .bar { height: 6px; border-radius: 3px; background: var(--bg-2); overflow: hidden; margin: 14px 0; }
+  .bar i { display: block; height: 100%; width: 68%; background: var(--accent); border-radius: 3px; }
+  .miss { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .miss .ic { width: 34px; height: 34px; border-radius: calc(var(--radius) * .5); background: var(--accent-soft); display: flex; align-items: center; justify-content: center; font: italic 500 14px var(--en); color: var(--accent-text); }
+  .miss div { flex: 1; font: 500 14px var(--b-font); color: var(--ink); }
+  .miss div small { display: block; font-weight: 400; font-size: 12px; color: var(--mute); }
+  .miss b { font: 500 12px var(--b-font); color: var(--accent-text); }
+
+  .tabbar { position: absolute; z-index: 2; bottom: 0; left: 0; right: 0; height: 86px; padding-bottom: 22px; display: grid; grid-template-columns: repeat(5, 1fr); align-items: center;
+    background: color-mix(in oklab, var(--bg) 86%, transparent); backdrop-filter: blur(16px); border-top: 1px solid var(--line); }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 5px; font: 400 11px var(--b-font); color: var(--mute); }
+  .tab i { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid currentColor; }
+  .tab.on { color: var(--accent-text); font-weight: 500; }
+  .tab.on i { background: var(--accent-soft); }
+
+  /* ================= A · 奶油日记 ================= */
+  body[data-dir="a"] .phone { background: var(--bg) radial-gradient(rgba(74,54,40,.05) 1px, transparent 1px) 0 0 / 14px 14px; }
+  body[data-dir="a"] .hero h2 { font-size: 38px; line-height: 1.25; }
+  body[data-dir="a"] .hero h2 em { font-style: normal; background: linear-gradient(transparent 62%, #FADBD0 62%); }
+  .tape { position: absolute; width: 74px; height: 22px; background: rgba(242,206,126,.55); top: -10px; left: 50%; transform: translateX(-50%) rotate(-3deg); }
+  .tape.pink { background: rgba(232,144,122,.35); }
+  .tape.green { background: rgba(169,197,160,.5); }
+  .a-collage { position: relative; height: 230px; margin: 4px 0 18px; }
+  .polaroid { position: absolute; background: #fff; padding: 9px 9px 30px; box-shadow: 0 6px 18px rgba(74,54,40,.14); }
+  .polaroid .ph { width: 130px; height: 140px; }
+  .polaroid span { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font: 20px var(--hand); color: var(--ink-2); }
+  .p1 { left: 4px; top: 24px; transform: rotate(-6deg); }
+  .p2 { left: 118px; top: 4px; transform: rotate(3deg); z-index: 2; }
+  .p3 { right: 0; top: 40px; transform: rotate(8deg); }
+  .sticker { position: absolute; z-index: 3; right: 30px; top: 0; width: 66px; height: 66px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; text-align: center; font: 16px/1.1 var(--hand); transform: rotate(12deg); }
+  body[data-dir="a"] .pillar { box-shadow: 3px 3px 0 var(--line); }
+  body[data-dir="a"] .pillar:nth-child(2) { transform: rotate(.6deg); }
+  body[data-dir="a"] .pillar:nth-child(3) { transform: rotate(-.5deg); }
+  body[data-dir="a"] .pillar .num { font: 22px var(--hand); }
+  body[data-dir="a"] .tcard, body[data-dir="a"] .quote { box-shadow: 0 8px 24px rgba(74,54,40,.08); background: var(--card) linear-gradient(transparent 31px, rgba(232,220,200,.6) 32px) 0 0 / 100% 32px; }
+  body[data-dir="a"] .tcard { transform: rotate(-.6deg); }
+  .hand-note { font: 22px var(--hand); color: var(--accent-text); transform: rotate(-4deg); display: inline-block; }
+
+  /* ================= B · 珍珠月光 ================= */
+  .b-glow { position: absolute; z-index: 0; inset: 0; pointer-events: none;
+    background: radial-gradient(60% 40% at 85% 8%, rgba(245,184,208,.55), transparent 70%), radial-gradient(55% 35% at 0% 30%, rgba(169,210,242,.5), transparent 70%), radial-gradient(60% 40% at 70% 70%, rgba(167,139,250,.28), transparent 70%); }
+  body[data-dir="b"] .hero h2 { font-size: 34px; line-height: 1.3; font-weight: 900; letter-spacing: -.01em; }
+  body[data-dir="b"] .hero h2 em { font-style: normal; background: linear-gradient(90deg, #7457D9, #D46A9A); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .pearl { width: 200px; height: 200px; border-radius: 50%; margin: 10px auto 6px; position: relative;
+    background: radial-gradient(circle at 34% 30%, #fff 0 8%, transparent 30%), conic-gradient(from 200deg, #F5D0E2, #E2D8FF, #CFE6FA, #F7E7F0, #DCD0FF, #F5D0E2);
+    box-shadow: inset -18px -24px 50px rgba(116,87,217,.25), inset 10px 10px 30px rgba(255,255,255,.9), 0 24px 60px rgba(167,139,250,.35); }
+  .pearl::after { content: "今日"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 700 15px var(--b-font); letter-spacing: .4em; color: rgba(46,39,71,.55); }
+  .moons { display: flex; justify-content: center; gap: 12px; margin: 14px 0 22px; }
+  .moons i { width: 14px; height: 14px; border-radius: 50%; background: #E3DCF5; position: relative; overflow: hidden; }
+  .moons i::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: #2E2747; transform: translateX(var(--m)); }
+  .spark { position: absolute; width: 14px; height: 14px; background: #fff; clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); filter: drop-shadow(0 0 6px rgba(167,139,250,.9)); }
+  body[data-dir="b"] .pillar, body[data-dir="b"] .tcard, body[data-dir="b"] .quote, body[data-dir="b"] .profile, body[data-dir="b"] .mood {
+    backdrop-filter: blur(18px); border-color: rgba(255,255,255,.8); box-shadow: 0 10px 30px rgba(116,87,217,.08), inset 0 1px 0 rgba(255,255,255,.9); }
+  body[data-dir="b"] .bar i, body[data-dir="b"] .streak b:not(.off) { background: linear-gradient(90deg, #A78BFA, #F5B8D0); }
+
+  /* ================= C · 丝绒夜 ================= */
+  body[data-dir="c"] .phone { background: radial-gradient(80% 50% at 50% 0%, #4A1B36, transparent 70%), radial-gradient(60% 40% at 100% 100%, #3B1530, transparent 70%), var(--bg); }
+  body[data-dir="c"] .hero { text-align: center; }
+  body[data-dir="c"] .hero h2 { font-size: 32px; line-height: 1.4; font-weight: 500; letter-spacing: .06em; }
+  body[data-dir="c"] .hero h2 em { font-style: normal; color: var(--accent-text); }
+  .arch { width: 210px; height: 270px; margin: 6px auto 4px; border-radius: 105px 105px 4px 4px; position: relative; padding: 8px; border: 1px solid rgba(217,183,126,.7); }
+  .arch .ph { width: 100%; height: 100%; border-radius: 97px 97px 2px 2px; border-color: rgba(217,183,126,.3); background: radial-gradient(circle at 50% 35%, rgba(232,180,184,.25), transparent 60%), repeating-linear-gradient(135deg, rgba(255,255,255,.03) 0 9px, transparent 9px 18px); }
+  .arch .rn { position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: var(--bg); padding: 0 12px; font: italic 500 20px var(--en); color: var(--accent); }
+  .orn { display: flex; align-items: center; gap: 12px; justify-content: center; color: var(--accent); font: italic 15px var(--en); margin: 22px 0 6px; }
+  .orn::before, .orn::after { content: ""; height: 1px; width: 60px; background: linear-gradient(90deg, transparent, rgba(217,183,126,.8)); }
+  .orn::after { transform: scaleX(-1); }
+  body[data-dir="c"] .pillar, body[data-dir="c"] .tcard, body[data-dir="c"] .profile { box-shadow: inset 0 0 0 4px var(--card), inset 0 0 0 5px rgba(217,183,126,.22); }
+  body[data-dir="c"] .pillar .art { border-radius: 32px 32px 3px 3px; }
+  body[data-dir="c"] .tcard { padding-top: 26px; }
+  body[data-dir="c"] .tc-head { justify-content: center; flex-direction: column; align-items: center; gap: 4px; }
+  body[data-dir="c"] .fortune { text-align: center; }
+  body[data-dir="c"] .eyebrow { color: var(--accent); }
+  body[data-dir="c"] .ph { color: #a58576; }
+  body[data-dir="c"] .tab.on i { background: var(--accent); }
+
+  /* tweaks */
+  #tweaks-toggle { position: fixed; bottom: 20px; right: 20px; z-index: 9999; width: 44px; height: 44px; border-radius: 50%; background: #1a1a1a; color: #fff; border: none; font-size: 18px; cursor: pointer; }
+  #tweaks-panel { position: fixed; bottom: 74px; right: 20px; z-index: 9998; width: 280px; background: #1a1a1a; color: #e0e0e0; border-radius: 12px; padding: 16px; display: none; font: 13px system-ui, sans-serif; }
+  #tweaks-panel.visible { display: block; }
+  #tweaks-panel h3 { margin: 0 0 12px; font-size: 14px; color: #fff; }
+  #tweaks-panel label { display: block; margin-bottom: 12px; }
+  #tweaks-panel select { width: 100%; padding: 5px; margin-top: 4px; }
+</style>
+</head>
+<body data-dir="a">
+
+<header class="top">
+  <h1>WTFTI · 视觉方向 v2</h1>
+  <div class="dirs">
+    <button class="dir" data-set="a"><b>A · 奶油日记</b><span>治愈手帐 · 纸胶带 · 拍立得</span></button>
+    <button class="dir" data-set="b"><b>B · 珍珠月光</b><span>珠光 · 月相 · 柔雾玻璃</span></button>
+    <button class="dir" data-set="c"><b>C · 丝绒夜</b><span>酒红丝绒 · 香槟金 · 拱门</span></button>
+  </div>
+</header>
+
+<div class="canvas">
+
+  <!-- ================= 01 HOME ================= -->
+  <div class="col">
+    <div class="col-label">01 · 首页 · 未登录</div>
+    <div class="phone" data-screen-label="01 Home">
+      <div class="b-glow" data-only="b"></div>
+      <div class="scroll">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="nav"><span class="wordmark">WTFTI</span><a href="#">登录</a></div>
+
+        <section class="hero">
+          <!-- A: collage -->
+          <div data-only="a">
+            <div class="a-collage">
+              <div class="polaroid p1"><div class="tape green"></div><div class="ph">穿搭照</div><span>今天穿这个</span></div>
+              <div class="polaroid p2"><div class="tape"></div><div class="ph">掌纹照</div><span>我的感情线</span></div>
+              <div class="polaroid p3"><div class="tape pink"></div><div class="ph">今日卡</div><span>宜说清楚</span></div>
+              <div class="sticker">90秒<br>测一下</div>
+            </div>
+          </div>
+          <!-- B: pearl -->
+          <div data-only="b" style="position:relative">
+            <span class="spark" style="left:40px;top:20px"></span><span class="spark" style="right:56px;top:140px;transform:scale(.7)"></span><span class="spark" style="left:80px;top:170px;transform:scale(.5)"></span>
+            <div class="pearl"></div>
+            <div class="moons"><i style="--m:100%"></i><i style="--m:60%"></i><i style="--m:20%"></i><i style="--m:-20%"></i><i style="--m:-60%"></i><i style="--m:-100%"></i></div>
+          </div>
+          <!-- C: arch -->
+          <div data-only="c">
+            <div class="arch"><div class="ph">人像 / 塔罗插画</div><span class="rn">— I —</span></div>
+          </div>
+
+          <div class="eyebrow" data-only="a b">FOR HER · 14 — 40</div>
+          <div class="orn" data-only="c">for her</div>
+          <h2 class="hero-title">懂你的<br><em>女生私人顾问</em></h2>
+          <p class="sub hero-sub">看清自己 · 变好看 · 有地方说心里话</p>
+          <button class="btn">90 秒，先测测你是谁</button>
+          <div class="proof">已有 70,000+ 个女生测过</div>
+        </section>
+
+        <section class="sec">
+          <div class="eyebrow">WHAT'S HERE</div>
+          <div class="sec-title">三件事，都关于你</div>
+          <div class="pillars">
+            <div class="pillar"><div class="tape" data-only="a"></div><div class="art ph">测</div><div><h3>测我</h3><p>我是什么样的人<br>他到底怎么想 · 掌纹 · 塔罗</p></div><span class="num">i</span></div>
+            <div class="pillar"><div class="tape pink" data-only="a"></div><div class="art ph">美</div><div><h3>美我</h3><p>适合我的颜色、妆和风格<br>AI 帮你换一身试试</p></div><span class="num">ii</span></div>
+            <div class="pillar"><div class="tape green" data-only="a"></div><div class="art ph">懂</div><div><h3>懂我</h3><p>说出来就好受一点<br>有人会抱抱你</p></div><span class="num">iii</span></div>
+          </div>
+        </section>
+
+        <section class="sec">
+          <div class="quote">
+            <div class="tape" data-only="a"></div>
+            <div class="eyebrow" style="margin-bottom:12px">FROM THE TREE HOLE</div>
+            <blockquote>「今天被领导当众夸了，没人可以说，想在这里说一下。」</blockquote>
+            <div class="meta"><span>匿名 · 23 岁</span><span class="hug">抱抱 238 · 我也是 41</span></div>
+          </div>
+        </section>
+
+        <section class="close">
+          <p>先认识自己，再说别的。</p>
+          <button class="btn">开始 90 秒测试</button>
+          <div class="fine">免费 · 不用注册 · 结果仅供娱乐与自我探索</div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 02 TODAY ================= -->
+  <div class="col">
+    <div class="col-label">02 · 今日 · 已登录首页</div>
+    <div class="phone" data-screen-label="02 Today">
+      <div class="b-glow" data-only="b"></div>
+      <div class="scroll" style="padding-bottom:100px">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="nav"><span class="wordmark" style="font-size:18px">WTFTI</span><a href="#">我的</a></div>
+
+        <section class="greet">
+          <div class="eyebrow">THURSDAY · OCT 16</div>
+          <h2>早呀，小雨</h2>
+          <div class="streak streak-row"><b></b><b></b><b></b><b></b><b></b><b class="off"></b><b class="off"></b><span>连续 5 天 · 再 2 天送深度报告</span></div>
+        </section>
+
+        <div style="padding:0 20px">
+          <div class="tcard">
+            <div class="tape" data-only="a"></div>
+            <div class="tc-head"><span class="tc-date">TODAY · 今日卡</span><span class="tc-tags">ENFP · 冷夏 · 双鱼</span></div>
+            <div class="fortune">今天适合把话说清楚，<br>别替别人想太多。</div>
+            <div class="row"><span class="k">幸运色</span><span class="sw" style="background:#8FA3BF"></span><span class="v">雾霾蓝<small>冷夏的你穿它显白，避开亮橘</small></span></div>
+            <div class="outfit"><div class="ph">上衣<br>雾霾蓝针织</div><div class="ph">下装<br>米白直筒</div><div class="ph">配饰<br>银色耳钉</div></div>
+            <div class="row"><span class="k">妆容</span><span class="sw" style="background:#B07A7A"></span><span class="v">低饱和豆沙唇<small>鹅蛋脸，腮红扫在颧骨偏外</small></span></div>
+            <div class="lock"><span>完整今日：感情 · 事业 · 宜忌</span><a href="#">会员解锁 →</a></div>
+          </div>
+          <div data-only="a" style="text-align:right;margin-top:10px"><span class="hand-note">↑ 今天就穿这身吧</span></div>
+        </div>
+
+        <section class="sec">
+          <div class="eyebrow">HOW ARE YOU</div>
+          <div class="sec-title">今天心情怎么样？</div>
+          <div class="moods">
+            <div class="mood"><i style="background:#F2CE7E"></i>开心</div>
+            <div class="mood on"><i style="background:#A9C5A0"></i>平静</div>
+            <div class="mood"><i style="background:#A9B6CC"></i>低落</div>
+            <div class="mood"><i style="background:#E8907A"></i>烦躁</div>
+          </div>
+          <div class="write">想多说两句？<b>写进树洞 →</b></div>
+        </section>
+
+        <section class="sec">
+          <div class="profile">
+            <div class="p-top"><div><div class="eyebrow">MY PROFILE</div><div class="sec-title" style="margin:8px 0 0">你的档案</div></div><strong>68%</strong></div>
+            <div class="bar"><i></i></div>
+            <div class="miss"><span class="ic">ii</span><div>拍一张掌纹<small>补全后，今日卡会加上感情线解读</small></div><b>去补 →</b></div>
+            <div class="miss"><span class="ic">iii</span><div>测一下色彩季型<small>已推测为冷夏，测完更准</small></div><b>去补 →</b></div>
+          </div>
+        </section>
+      </div>
+      <nav class="tabbar"><span class="tab on"><i></i>今日</span><span class="tab"><i></i>测我</span><span class="tab"><i></i>美我</span><span class="tab"><i></i>懂我</span><span class="tab"><i></i>我的</span></nav>
+    </div>
+  </div>
+</div>
+
+<div class="tokens" id="tokens"></div>
+
+<button id="tweaks-toggle" title="Tweaks">⚙</button>
+<div id="tweaks-panel">
+  <h3>Tweaks</h3>
+  <label>首页主标题<select id="tw-hero">
+    <option value="a">A · 懂你的女生私人顾问</option>
+    <option value="b">B · 看清自己，也被好好看见</option>
+    <option value="c">C · 今天穿什么、他什么意思、心里话说给谁</option>
+  </select></label>
+  <label>连续天数条<select id="tw-streak"><option value="on">显示</option><option value="off">隐藏</option></select></label>
+</div>
+
+<script>
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{"dir":"a","hero":"a","streak":"on"}/*EDITMODE-END*/;
+  const tweaks = { ...TWEAK_DEFAULTS, ...JSON.parse(localStorage.getItem('wtfti-v2-tweaks') || '{}') };
+  const q = new URLSearchParams(location.search).get('dir'); if (q) tweaks.dir = q;
+  const HERO = {
+    a: ['懂你的<br><em>女生私人顾问</em>', '看清自己 · 变好看 · 有地方说心里话'],
+    b: ['看清自己，<br>也被<em>好好看见</em>', '测一测、美一美、说一说，每天都有一点为你写的东西'],
+    c: ['今天穿什么<br>他什么意思<br><em>心里话说给谁</em>', '一个懂你的地方，全都在这儿'],
+  };
+  const TOKENS = {
+    a: [['底 cream','#FBF6EC'],['墨 cocoa','#4A3628'],['蜜桃 peach','#E8907A'],['抹茶 sage','#A9C5A0'],['奶黄 butter','#F2CE7E'],'标题 站酷小薇 · 手写 龙藏体 · 正文 思源黑体'],
+    b: [['底 pearl','#F7F4FC'],['墨 midnight','#2E2747'],['丁香 lilac','#A78BFA'],['樱粉 blush','#F5B8D0'],['天青 sky','#A9D2F2'],'标题 思源黑体 Heavy · 英文 Cormorant Italic'],
+    c: [['底 merlot','#2A1020'],['面 velvet','#3A1A2D'],['香槟金 gold','#D9B77E'],['玫瑰 rose','#E8B4B8'],['米白 ivory','#F6E9DF'],'标题 思源宋体 · 英文 Cormorant Garamond'],
+  };
+  function apply() {
+    document.body.dataset.dir = tweaks.dir;
+    document.querySelectorAll('.dir').forEach(b => b.classList.toggle('on', b.dataset.set === tweaks.dir));
+    document.querySelectorAll('.hero-title').forEach(e => e.innerHTML = HERO[tweaks.hero][0]);
+    document.querySelectorAll('.hero-sub').forEach(e => e.textContent = HERO[tweaks.hero][1]);
+    document.querySelectorAll('.streak-row').forEach(e => e.style.display = tweaks.streak === 'on' ? '' : 'none');
+    const t = TOKENS[tweaks.dir];
+    document.getElementById('tokens').innerHTML = t.slice(0, 5).map(([n, c]) => `<span class="tk"><i style="background:${c}"></i>${n} ${c}</span>`).join('') + `<div class="fontline">${t[5]}</div>`;
+    localStorage.setItem('wtfti-v2-tweaks', JSON.stringify(tweaks));
+  }
+  document.querySelectorAll('.dir').forEach(b => b.addEventListener('click', () => { tweaks.dir = b.dataset.set; apply(); }));
+  [['tw-hero','hero'],['tw-streak','streak']].forEach(([id,k]) => { const el = document.getElementById(id); el.value = tweaks[k]; el.addEventListener('change', () => { tweaks[k] = el.value; apply(); }); });
+  const panel = document.getElementById('tweaks-panel');
+  document.getElementById('tweaks-toggle').addEventListener('click', () => panel.classList.toggle('visible'));
+  document.querySelectorAll('.mood').forEach(m => m.addEventListener('click', () => { m.parentElement.querySelectorAll('.mood').forEach(x => x.classList.remove('on')); m.classList.add('on'); }));
+  apply();
+</script>
+</body>
+</html>

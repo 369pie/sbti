@@ -85,6 +85,6 @@ export const BRAND_LABEL: Record<PaywallBrand, string> = {
   wtfti: 'WTFTI 神域',
   soulti: 'SoulTI 灵魂镜像',
   cpti: 'CPTI 关系深测',
-  xpti: 'XPTI 关系沟通',
+  xpti: 'XPTI 恋爱 XP',
   wtfcard: 'WTF Card 多宇宙档案',
 };

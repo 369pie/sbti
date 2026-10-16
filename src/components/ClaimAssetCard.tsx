@@ -202,7 +202,7 @@ export function ClaimAssetCard({
         className={`relative overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-950 p-6 ${className}`}
       >
         {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-violet-text/10 to-accent/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10">
           {/* Title */}
@@ -220,7 +220,7 @@ export function ClaimAssetCard({
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={handlePrimaryAction}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-bg-primary font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-text to-accent/85 hover:from-violet-text hover:to-accent text-bg-primary font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {currentCopy.primaryButton}
               </button>
@@ -239,7 +239,7 @@ export function ClaimAssetCard({
           {/* Loading state */}
           {claimState === 'claiming' && (
             <div className="flex items-center justify-center py-2">
-              <div className="w-6 h-6 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-violet-text border-t-transparent rounded-full animate-spin" />
             </div>
           )}
 

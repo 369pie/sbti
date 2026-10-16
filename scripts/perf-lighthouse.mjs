@@ -3,7 +3,7 @@
  * Mobile Lighthouse runner for the 5 core WTFTI routes.
  *
  * Usage:
- *   node scripts/perf-lighthouse.mjs            # against http://localhost:3000
+ *   node scripts/perf-lighthouse.mjs            # against http://localhost:3006
  *   PERF_BASE=https://staging.wtfti.com node scripts/perf-lighthouse.mjs
  *
  * Requires `lighthouse` + `chrome-launcher` to be available. They are
@@ -22,7 +22,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const OUT_DIR = join(ROOT, 'docs/01-strategy/_perf');
 
-const BASE = process.env.PERF_BASE || 'http://localhost:3000';
+const BASE = process.env.PERF_BASE || 'http://localhost:3006';
 const ROUTES = [
   ['home', '/'],
   ['result-ctrl', '/result/ctrl/'],

@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WTFTI · 首页与今日 · 原型 v1</title>
+<!--
+  设计假设（v1）
+  - 依据 docs/01-strategy/wtfti-her-refocus-2026-10.md §5
+  - 沿用线上 Sakura 浅色 token（--color-*），暮紫深色作为 Tweaks 备选
+  - 对外零自造词：只说「测我 / 美我 / 懂我 / 今日 / 档案」
+  - 首页唯一主 CTA = 90 秒测试；今日页 = 档案驱动的每日卡 + 心情 + 档案完整度
+  - 图片区一律用占位，不画假插画
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Noto+Serif+SC:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FDF8F6; --bg-2: #F9EFEB; --bg-3: #F3E4E0; --card: #FFFFFF;
+    --ink: #3D2C23; --ink-2: #5C4035; --mute: #8B6D5E; --stone: #795157;
+    --rule: #EDDAD5; --rose: #CD8299; --rose-dust: #F1D2DB; --rose-text: #A24E63;
+    --gold: #D0AB7C; --gold-text: #8A6D3B; --sage: #B7C7A2; --sage-text: #5F7A45;
+    --cta-from: #8E3B4F; --cta-to: #812F42; --on-cta: #FDF8F6;
+    --display: "Cormorant Garamond", "Noto Serif SC", serif;
+    --serif: "Noto Serif SC", "Cormorant Garamond", serif;
+    --sans: "Noto Sans SC", "PingFang SC", sans-serif;
+  }
+  [data-theme="dusk"] {
+    --bg: #1a1530; --bg-2: #221b3d; --bg-3: #2b2349; --card: #251e40;
+    --ink: #F5F0E8; --ink-2: #E2D8CC; --mute: #B9AEC8; --stone: #CBB8D0;
+    --rule: rgba(201,166,118,.28); --rose: #C07A8E; --rose-dust: rgba(192,122,142,.22); --rose-text: #E7A9BA;
+    --gold: #C9A676; --gold-text: #E0C493; --sage-text: #B9CF9C;
+    --cta-from: #C07A8E; --cta-to: #A35F74; --on-cta: #1a1530;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #E9E2DE; font-family: var(--sans); color: var(--ink); min-height: 100vh; }
+  [data-theme="dusk"] body, body[data-theme="dusk"] { background: #0f0c1d; }
+
+  .canvas { display: flex; gap: 56px; justify-content: center; align-items: flex-start; padding: 48px 24px 96px; flex-wrap: wrap; }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .col-label { font: 500 12px/1 var(--sans); letter-spacing: .32em; text-transform: uppercase; color: #8B6D5E; }
+
+  /* phone */
+  .phone { width: 390px; height: 844px; border-radius: 48px; background: var(--bg); overflow: hidden; position: relative;
+    box-shadow: 0 0 0 10px #2a2220, 0 30px 80px rgba(61,44,35,.28); }
+  .scroll { height: 100%; overflow-y: auto; scrollbar-width: none; }
+  .scroll::-webkit-scrollbar { display: none; }
+  .status { height: 47px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; font: 600 15px var(--sans); color: var(--ink); }
+
+  .eyebrow { font: 500 11px/1 var(--sans); letter-spacing: .36em; text-transform: uppercase; color: var(--stone); }
+  .rule { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: .7; margin: 0 24px; }
+  .roman { font: italic 500 15px var(--display); color: var(--gold-text); }
+
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; height: 54px; border-radius: 27px; border: none; width: 100%;
+    background: linear-gradient(180deg, var(--cta-from), var(--cta-to)); color: var(--on-cta); font: 500 16px var(--sans); letter-spacing: .04em; cursor: pointer;
+    box-shadow: 0 8px 24px rgba(142,59,79,.22); }
+  .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--rule); box-shadow: none; height: 44px; font-size: 14px; }
+
+  .ph { background: repeating-linear-gradient(135deg, var(--bg-3) 0 10px, var(--bg-2) 10px 20px); border: 1px solid var(--rule);
+    display: flex; align-items: center; justify-content: center; color: var(--mute); font: 400 11px var(--sans); letter-spacing: .08em; text-align: center; }
+
+  /* ---------- HOME ---------- */
+  .nav { display: flex; justify-content: space-between; align-items: center; padding: 6px 24px 0; }
+  .wordmark { font: 600 22px var(--display); letter-spacing: .14em; }
+  .nav a { font: 400 13px var(--sans); color: var(--ink-2); text-decoration: none; }
+
+  .hero { padding: 40px 24px 28px; position: relative; }
+  .orbit { position: absolute; right: -60px; top: 18px; width: 220px; height: 220px; border-radius: 50%;
+    border: 1px solid var(--rule); transform: rotate(-18deg) scaleY(.55); pointer-events: none; }
+  .orbit::after { content: ""; position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--rose); top: 30px; left: 40px; box-shadow: 0 0 12px var(--rose); }
+  .hero h1 { font: 700 34px/1.28 var(--serif); margin: 18px 0 14px; letter-spacing: .01em; }
+  .hero h1 em { font-style: normal; color: var(--rose-text); }
+  .hero .sub { font: 400 15px/1.7 var(--sans); color: var(--ink-2); margin-bottom: 28px; }
+  .proof { margin-top: 14px; display: flex; align-items: center; gap: 10px; font: 400 12px var(--sans); color: var(--mute); }
+  .faces { display: flex; }
+  .faces i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--bg); margin-left: -7px; background: var(--rose-dust); }
+  .faces i:nth-child(2) { background: var(--gold); opacity: .6; } .faces i:nth-child(3) { background: var(--sage); }
+  .faces i:first-child { margin-left: 0; }
+
+  .get { padding: 30px 24px 8px; }
+  .get h2, .sec h2 { font: 700 20px/1.4 var(--serif); margin: 10px 0 18px; }
+  .preview { position: relative; height: 250px; }
+  .preview .card { position: absolute; width: 270px; left: 50%; }
+  .preview .card.back { transform: translateX(-38%) rotate(5deg); top: 8px; opacity: .55; }
+  .preview .card.front { transform: translateX(-60%) rotate(-3deg); top: 0; }
+
+  .pillars { padding: 26px 24px 8px; display: grid; gap: 12px; }
+  .pillar { background: var(--card); border: 1px solid var(--rule); border-radius: 20px; padding: 18px 18px 16px; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; }
+  .pillar h3 { font: 700 18px var(--serif); display: flex; align-items: baseline; gap: 10px; }
+  .pillar p { grid-column: 1; font: 400 13px/1.7 var(--sans); color: var(--ink-2); }
+  .pillar .go { grid-row: 1 / span 2; grid-column: 2; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--rule); display: flex; align-items: center; justify-content: center; color: var(--rose-text); font-size: 16px; }
+  .tags { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tag { font: 400 12px var(--sans); color: var(--stone); background: var(--bg-2); border-radius: 12px; padding: 5px 10px; }
+
+  .quote { margin: 26px 24px 0; padding: 22px 20px; border-radius: 20px; background: var(--bg-2); position: relative; }
+  .quote blockquote { font: 500 16px/1.75 var(--serif); }
+  .quote .meta { margin-top: 12px; display: flex; justify-content: space-between; font: 400 12px var(--sans); color: var(--mute); }
+  .quote .hug { color: var(--rose-text); }
+
+  .close { padding: 32px 24px 44px; text-align: center; }
+  .close p { font: italic 500 20px var(--display); color: var(--ink-2); margin-bottom: 16px; }
+  .fine { margin-top: 12px; font: 400 11px var(--sans); color: var(--mute); }
+
+  /* ---------- TODAY CARD (shared) ---------- */
+  .card { background: var(--card); border: 1px solid var(--rule); border-radius: 22px; padding: 18px; box-shadow: 0 10px 30px rgba(176,110,126,.10); }
+  .card-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .card-date { font: 500 13px var(--display); letter-spacing: .12em; color: var(--gold-text); }
+  .fortune { font: 700 21px/1.45 var(--serif); margin: 10px 0 14px; }
+  .row { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--rule); }
+  .row .k { font: 400 11px var(--sans); letter-spacing: .2em; color: var(--mute); width: 46px; flex-shrink: 0; }
+  .row .v { font: 500 14px/1.5 var(--sans); flex: 1; }
+  .row .v small { display: block; font-weight: 400; font-size: 12px; color: var(--mute); }
+  .sw { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; border: 1px solid var(--rule); }
+
+  /* ---------- TODAY ---------- */
+  .t-top { padding: 4px 24px 0; display: flex; justify-content: space-between; align-items: center; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--rose-dust); display: flex; align-items: center; justify-content: center; font: 600 14px var(--serif); color: var(--rose-text); }
+  .greet { padding: 18px 24px 16px; }
+  .greet h1 { font: 700 26px/1.3 var(--serif); }
+  .streak { margin-top: 10px; display: inline-flex; gap: 6px; align-items: center; }
+  .streak b { width: 10px; height: 10px; border-radius: 50%; background: var(--rose); }
+  .streak b.off { background: transparent; border: 1px solid var(--rule); }
+  .streak span { font: 400 12px var(--sans); color: var(--mute); margin-left: 6px; }
+  .today-card { margin: 0 20px; }
+  .outfit { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 4px 0 12px; }
+  .outfit .ph { height: 92px; border-radius: 12px; }
+  .lock { margin-top: 8px; display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 14px; background: var(--bg-2); }
+  .lock span { font: 400 13px var(--sans); color: var(--ink-2); }
+  .lock a { font: 500 13px var(--sans); color: var(--rose-text); text-decoration: none; }
+
+  .sec { padding: 28px 24px 0; }
+  .sec h2 { margin-bottom: 14px; }
+  .moods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .mood { height: 64px; border-radius: 16px; border: 1px solid var(--rule); background: var(--card); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font: 400 13px var(--sans); color: var(--ink-2); cursor: pointer; transition: .2s; }
+  .mood i { width: 14px; height: 14px; border-radius: 50%; }
+  .mood.on { border-color: var(--rose); background: var(--rose-dust); color: var(--ink); }
+  .write { margin-top: 10px; display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-radius: 16px; border: 1px dashed var(--rule); color: var(--mute); font: 400 14px var(--sans); }
+  .write b { margin-left: auto; color: var(--rose-text); font-weight: 500; font-size: 13px; }
+
+  .profile { background: var(--card); border: 1px solid var(--rule); border-radius: 20px; padding: 18px; }
+  .bar { height: 6px; border-radius: 3px; background: var(--bg-3); overflow: hidden; margin: 12px 0 14px; }
+  .bar i { display: block; height: 100%; width: 68%; background: linear-gradient(90deg, var(--rose), var(--gold)); border-radius: 3px; }
+  .p-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .p-top strong { font: 600 28px var(--display); color: var(--rose-text); }
+  .missing { display: grid; gap: 8px; }
+  .miss { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--bg-2); }
+  .miss .ic { width: 32px; height: 32px; border-radius: 10px; background: var(--card); border: 1px solid var(--rule); display: flex; align-items: center; justify-content: center; font: italic 500 13px var(--display); color: var(--gold-text); }
+  .miss div { flex: 1; font: 500 14px var(--sans); }
+  .miss div small { display: block; font-weight: 400; font-size: 12px; color: var(--mute); }
+  .miss b { font: 500 12px var(--sans); color: var(--rose-text); }
+
+  .tabbar { position: absolute; bottom: 0; left: 0; right: 0; height: 84px; padding-bottom: 20px; background: color-mix(in oklab, var(--bg) 88%, transparent);
+    backdrop-filter: blur(14px); border-top: 1px solid var(--rule); display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 5px; font: 400 11px var(--sans); color: var(--mute); }
+  .tab i { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid currentColor; }
+  .tab.on { color: var(--rose-text); font-weight: 500; }
+  .tab.on i { background: var(--rose-dust); }
+
+  /* tweaks */
+  #tweaks-toggle { position: fixed; bottom: 20px; right: 20px; z-index: 9999; width: 44px; height: 44px; border-radius: 50%; background: #1a1a1a; color: #fff; border: none; font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+  #tweaks-panel { position: fixed; bottom: 74px; right: 20px; z-index: 9998; width: 280px; background: #1a1a1a; color: #e0e0e0; border-radius: 12px; padding: 16px; display: none; font: 13px system-ui, sans-serif; box-shadow: 0 4px 20px rgba(0,0,0,.4); }
+  #tweaks-panel.visible { display: block; }
+  #tweaks-panel h3 { margin: 0 0 12px; font-size: 14px; color: #fff; }
+  #tweaks-panel label { display: block; margin-bottom: 12px; }
+  #tweaks-panel select { width: 100%; padding: 5px; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div class="canvas">
+
+  <!-- ============ 01 首页（未登录） ============ -->
+  <div class="col">
+    <div class="col-label">01 · 首页 · 未登录</div>
+    <div class="phone" data-screen-label="01 Home">
+      <div class="scroll">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="nav"><span class="wordmark">WTFTI</span><a href="#">登录</a></div>
+
+        <section class="hero">
+          <div class="orbit"></div>
+          <div class="eyebrow">FOR HER · 14 — 40</div>
+          <h1 id="hero-title">懂你的<br><em>女生私人顾问</em></h1>
+          <p class="sub" id="hero-sub">看清自己 · 变好看 · 有地方说心里话</p>
+          <button class="btn">90 秒，先测测你是谁 →</button>
+          <div class="proof"><span class="faces"><i></i><i></i><i></i></span>已有 70,000+ 个女生测过</div>
+        </section>
+
+        <div class="rule"></div>
+
+        <section class="get">
+          <div class="eyebrow">AFTER THE TEST</div>
+          <h2>测完，你会有一份自己的档案<br>和每天一张「今日卡」</h2>
+          <div class="preview">
+            <div class="card back"><div class="card-head"><span class="card-date">OCT 17</span><span class="roman">Fri.</span></div><div class="fortune">别急着回消息</div></div>
+            <div class="card front">
+              <div class="card-head"><span class="card-date">OCT 16 · THU</span><span class="roman">today</span></div>
+              <div class="fortune">今天适合把话说清楚</div>
+              <div class="row"><span class="k">幸运色</span><span class="sw" style="background:#8FA3BF"></span><span class="v">雾霾蓝<small>你是冷夏型</small></span></div>
+              <div class="row"><span class="k">妆容</span><span class="sw" style="background:#B07A7A"></span><span class="v">低饱和豆沙唇</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="pillars">
+          <div class="pillar">
+            <h3><span class="roman">I</span>测我</h3><span class="go">→</span>
+            <p>我是什么样的人，他到底怎么想</p>
+            <div class="tags"><span class="tag">人格测试</span><span class="tag">我和他</span><span class="tag">掌纹</span><span class="tag">塔罗</span></div>
+          </div>
+          <div class="pillar">
+            <h3><span class="roman">II</span>美我</h3><span class="go">→</span>
+            <p>我适合什么颜色、什么妆、什么风格</p>
+            <div class="tags"><span class="tag">色彩季型</span><span class="tag">脸型妆容</span><span class="tag">AI 换一身</span></div>
+          </div>
+          <div class="pillar">
+            <h3><span class="roman">III</span>懂我</h3><span class="go">→</span>
+            <p>说出来就好受一点，有人会抱抱你</p>
+            <div class="tags"><span class="tag">树洞</span><span class="tag">心情日记</span></div>
+          </div>
+        </section>
+
+        <section class="quote">
+          <div class="eyebrow" style="margin-bottom:12px">FROM THE TREE HOLE</div>
+          <blockquote>「今天被领导当众夸了，<br>没人可以说，想在这里说一下。」</blockquote>
+          <div class="meta"><span>匿名 · 23 岁</span><span class="hug">抱抱 238 · 我也是 41</span></div>
+        </section>
+
+        <section class="close">
+          <p>先认识自己，再说别的。</p>
+          <button class="btn">开始 90 秒测试</button>
+          <div class="fine">免费 · 不用注册 · 结果仅供娱乐与自我探索</div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 02 今日（已登录） ============ -->
+  <div class="col">
+    <div class="col-label">02 · 今日 · 已登录首页</div>
+    <div class="phone" data-screen-label="02 Today">
+      <div class="scroll" style="padding-bottom:100px">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="t-top"><span class="wordmark" style="font-size:18px">WTFTI</span><span class="avatar">雨</span></div>
+
+        <section class="greet">
+          <div class="eyebrow">THURSDAY · OCT 16</div>
+          <h1>早，小雨</h1>
+          <div class="streak" id="streak"><b></b><b></b><b></b><b></b><b></b><b class="off"></b><b class="off"></b><span>连续 5 天 · 再来 2 天送一份深度报告</span></div>
+        </section>
+
+        <div class="card today-card">
+          <div class="card-head"><span class="card-date">今日卡</span><span class="roman">ENFP · 冷夏 · 双鱼</span></div>
+          <div class="fortune">今天适合把话说清楚，<br>别替别人想太多。</div>
+          <div class="row"><span class="k">幸运色</span><span class="sw" style="background:#8FA3BF"></span><span class="v">雾霾蓝<small>冷夏型的你穿它显白，避开亮橘</small></span></div>
+          <div class="outfit"><div class="ph">上衣<br>雾霾蓝针织</div><div class="ph">下装<br>米白直筒</div><div class="ph">配饰<br>银色耳钉</div></div>
+          <div class="row"><span class="k">妆容</span><span class="sw" style="background:#B07A7A"></span><span class="v">低饱和豆沙唇<small>你是鹅蛋脸，腮红扫在颧骨偏外</small></span></div>
+          <div class="lock"><span>完整今日：感情 · 事业 · 宜忌</span><a href="#">会员解锁 →</a></div>
+        </div>
+
+        <section class="sec">
+          <div class="eyebrow">HOW ARE YOU</div>
+          <h2>今天心情怎么样？</h2>
+          <div class="moods">
+            <div class="mood"><i style="background:#E9CDAE"></i>开心</div>
+            <div class="mood on"><i style="background:#B7C7A2"></i>平静</div>
+            <div class="mood"><i style="background:#A9B6CC"></i>低落</div>
+            <div class="mood"><i style="background:#CD8299"></i>烦躁</div>
+          </div>
+          <div class="write">想多说两句？<b>写进树洞 →</b></div>
+        </section>
+
+        <section class="sec">
+          <div class="profile">
+            <div class="p-top"><div><div class="eyebrow">MY PROFILE</div><h2 style="margin:8px 0 0">你的档案</h2></div><strong>68%</strong></div>
+            <div class="bar"><i></i></div>
+            <div class="missing">
+              <div class="miss"><span class="ic">II</span><div>拍一张掌纹<small>补全后，今日卡会加上感情线解读</small></div><b>去补 →</b></div>
+              <div class="miss"><span class="ic">III</span><div>测一下色彩季型<small>已推测为冷夏，测完更准</small></div><b>去补 →</b></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <nav class="tabbar">
+        <span class="tab on"><i></i>今日</span><span class="tab"><i></i>测我</span><span class="tab"><i></i>美我</span><span class="tab"><i></i>懂我</span><span class="tab"><i></i>我的</span>
+      </nav>
+    </div>
+  </div>
+
+</div>
+
+<button id="tweaks-toggle" title="Tweaks">⚙</button>
+<div id="tweaks-panel">
+  <h3>Tweaks</h3>
+  <label>主题<select id="tw-theme"><option value="sakura">樱米白（线上浅色）</option><option value="dusk">暮紫（品牌深色）</option></select></label>
+  <label>首页主标题<select id="tw-hero">
+    <option value="a">A · 懂你的女生私人顾问</option>
+    <option value="b">B · 看清自己，也被好好看见</option>
+    <option value="c">C · 今天穿什么、他什么意思、心里话说给谁</option>
+  </select></label>
+  <label>连续天数条<select id="tw-streak"><option value="on">显示</option><option value="off">隐藏</option></select></label>
+</div>
+
+<script>
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{"theme":"sakura","hero":"a","streak":"on"}/*EDITMODE-END*/;
+  const tweaks = { ...TWEAK_DEFAULTS, ...JSON.parse(localStorage.getItem('wtfti-refocus-tweaks') || '{}') };
+  const HERO = {
+    a: ['懂你的<br><em>女生私人顾问</em>', '看清自己 · 变好看 · 有地方说心里话'],
+    b: ['看清自己，<br>也被<em>好好看见</em>', '测一测、美一美、说一说，每天都有一点为你写的东西'],
+    c: ['今天穿什么<br>他什么意思<br><em>心里话说给谁</em>', '一个懂你的地方，全都在这儿'],
+  };
+  function applyTweaks() {
+    document.body.dataset.theme = tweaks.theme === 'dusk' ? 'dusk' : '';
+    document.documentElement.dataset.theme = tweaks.theme === 'dusk' ? 'dusk' : '';
+    document.getElementById('hero-title').innerHTML = HERO[tweaks.hero][0];
+    document.getElementById('hero-sub').textContent = HERO[tweaks.hero][1];
+    document.getElementById('streak').style.display = tweaks.streak === 'on' ? '' : 'none';
+    localStorage.setItem('wtfti-refocus-tweaks', JSON.stringify(tweaks));
+  }
+  [['tw-theme','theme'],['tw-hero','hero'],['tw-streak','streak']].forEach(([id,k]) => {
+    const el = document.getElementById(id); el.value = tweaks[k];
+    el.addEventListener('change', () => { tweaks[k] = el.value; applyTweaks(); });
+  });
+  const panel = document.getElementById('tweaks-panel');
+  if (localStorage.getItem('cc-tweaks-visible') === 'true') panel.classList.add('visible');
+  document.getElementById('tweaks-toggle').addEventListener('click', () => {
+    panel.classList.toggle('visible'); localStorage.setItem('cc-tweaks-visible', panel.classList.contains('visible'));
+  });
+  document.querySelectorAll('.mood').forEach(m => m.addEventListener('click', () => {
+    document.querySelectorAll('.mood').forEach(x => x.classList.remove('on')); m.classList.add('on');
+  }));
+  applyTweaks();
+</script>
+</body>
+</html>

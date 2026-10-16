@@ -12,11 +12,13 @@ import {
 } from '@/lib/payment/xunhupay';
 import { getPaymentAvailabilityStatus, getPaymentBlockedPayload } from '@/lib/payment/availability';
 import { isMirrorPaymentStubMode } from '@/lib/mirror/payment-mode';
-import { createMirrorOrder, cleanupExpiredMirrorOrders } from '@/lib/mirror/order-store';
+import { createMirrorOrder, cleanupExpiredMirrorOrders, markMirrorOrderPaid } from '@/lib/mirror/order-store';
 import { rateLimit, resolveRateLimitKey, maybeCleanup } from '@/lib/perf/rate-limit';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 /** 灵镜充值档位 */
 const MIRROR_PACKS: Record<string, { credits: number; price: number; label: string }> = {
+  'mirror-archive': { credits: 20, price: 19.9, label: '灵镜三页诊断卡 · ¥19.9' },
   'mirror-10': { credits: 10, price: 10, label: '灵镜 10 次 · ¥10' },
   'mirror-30': { credits: 30, price: 30, label: '灵镜 30 次 · ¥30' },
 };
@@ -27,6 +29,19 @@ function isPaymentChannel(value: unknown): value is XunhupayPaymentChannel {
 
 function buildTradeOrderId(): string {
   return `mr_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+async function getOptionalUserId(): Promise<string | undefined> {
+  try {
+    const supabase = await createServerSupabaseClient();
+    await supabase.auth.getClaims().catch(() => null);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    return user?.id;
+  } catch {
+    return undefined;
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -70,8 +85,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid_payment_type' }, { status: 400 });
   }
   const paymentType = body.paymentType;
+  const userId = await getOptionalUserId();
 
-  cleanupExpiredMirrorOrders();
+  await cleanupExpiredMirrorOrders();
 
   const cfg = readXunhupayConfig(paymentType);
   const tradeOrderId = buildTradeOrderId();
@@ -83,12 +99,13 @@ export async function POST(req: NextRequest) {
   const callbackUrl = `${origin}/mirror/`;
 
   // 写入内存订单
-  createMirrorOrder({
+  await createMirrorOrder({
     tradeOrderId,
     channel: paymentType,
     pack,
     credits: meta.credits,
     amountYuan: meta.price,
+    userId,
   });
 
   // 无配置时 stub 或 fail
@@ -99,6 +116,7 @@ export async function POST(req: NextRequest) {
         { status: 503 },
       );
     }
+    await markMirrorOrderPaid(tradeOrderId);
     return NextResponse.json({
       stub: true,
       orderId: tradeOrderId,
@@ -106,6 +124,7 @@ export async function POST(req: NextRequest) {
       credits: meta.credits,
       price: meta.price,
       label: meta.label,
+      serverWalletEligible: Boolean(userId),
       url: `/mirror/?stub=1&channel=${paymentType}&orderId=${tradeOrderId}&pack=${pack}`,
     });
   }
@@ -132,6 +151,7 @@ export async function POST(req: NextRequest) {
       credits: meta.credits,
       price: meta.price,
       label: meta.label,
+      serverWalletEligible: Boolean(userId),
       url: order.url,
       qrcode: order.qrcode,
     });

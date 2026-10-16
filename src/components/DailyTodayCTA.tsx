@@ -14,7 +14,7 @@ export function DailyTodayCTA() {
 
   useEffect(() => {
     if (!mounted) return;
-    setTodaySlug(loadTodayResult());
+    queueMicrotask(() => setTodaySlug(loadTodayResult()));
   }, [mounted]);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export function DailyTodayCTA() {
       const s = Math.floor((ms % 60000) / 1000);
       setCountdown(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`);
     };
-    tick();
+    queueMicrotask(tick);
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [mounted, todaySlug]);
@@ -37,7 +37,7 @@ export function DailyTodayCTA() {
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
         <Link
           href="/daily/test"
-          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-teal-500 text-bg-primary font-medium text-base hover:bg-teal-600 transition-all duration-200"
+          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-sage text-bg-primary font-medium text-base hover:bg-sage/85 transition-all duration-200"
         >
           测一测今天开了什么模式
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -54,7 +54,7 @@ export function DailyTodayCTA() {
       <div className="flex flex-col items-center gap-4">
         <Link
           href={`/daily/result/${todaySlug}/`}
-          className="inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-teal-500 text-bg-primary font-medium text-base hover:bg-teal-600 transition-all duration-200"
+          className="inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-sage text-bg-primary font-medium text-base hover:bg-sage/85 transition-all duration-200"
         >
           {status?.emoji} 查看今日结果：{status?.name ?? todaySlug}
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -65,7 +65,7 @@ export function DailyTodayCTA() {
           <div className="text-center space-y-1">
             <div>
               <span className="text-xs text-text-muted">新模式 </span>
-              <span className="text-sm font-mono font-semibold text-teal-400">{countdown}</span>
+              <span className="text-sm font-mono font-semibold text-sage-text">{countdown}</span>
               <span className="text-xs text-text-muted"> 后刷新</span>
             </div>
             <p className="text-[11px] text-text-muted">
@@ -81,7 +81,7 @@ export function DailyTodayCTA() {
     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
       <Link
         href="/daily/test"
-        className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-teal-500 text-bg-primary font-medium text-base hover:bg-teal-600 transition-all duration-200"
+        className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-sage text-bg-primary font-medium text-base hover:bg-sage/85 transition-all duration-200"
       >
         测一测今天开了什么模式
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

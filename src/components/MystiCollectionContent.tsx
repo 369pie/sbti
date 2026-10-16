@@ -485,8 +485,10 @@ export function MystiCollectionContent() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    refreshCollection();
+    queueMicrotask(() => {
+      setMounted(true);
+      refreshCollection();
+    });
   }, []);
 
   // Listen for storage events (cross-tab sync)
@@ -552,7 +554,7 @@ export function MystiCollectionContent() {
         >
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-rose-500/20 flex items-center justify-center text-lg">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-accent/20 flex items-center justify-center text-lg">
                 📊
               </div>
               <div>
@@ -575,7 +577,7 @@ export function MystiCollectionContent() {
               initial={{ width: 0 }}
               animate={{ width: `${progressPct}%` }}
               transition={{ duration: 1.2, ease: 'easeOut', delay: 0.3 }}
-              className="h-full rounded-full bg-gradient-to-r from-violet-500 to-rose-500"
+              className="h-full rounded-full bg-gradient-to-r from-violet-500 to-accent"
             />
           </div>
 
@@ -584,7 +586,7 @@ export function MystiCollectionContent() {
             <span>0</span>
             <span className={totalCount >= 29 ? 'text-violet-400/60' : ''}>29 初窥</span>
             <span className={totalCount >= 100 ? 'text-violet-400/60' : ''}>100 小成</span>
-            <span className={totalCount >= 203 ? 'text-amber-400/60' : ''}>203 全收集!</span>
+            <span className={totalCount >= 203 ? 'text-gold-text/60' : ''}>203 全收集!</span>
           </div>
         </motion.div>
 
@@ -634,7 +636,7 @@ export function MystiCollectionContent() {
         >
           <Link
             href={withBasePath('/mysti/gacha/')}
-            className="block p-5 rounded-2xl bg-gradient-to-r from-violet-500/10 to-rose-500/10 border border-violet-500/20 hover:border-violet-500/40 transition-all group"
+            className="block p-5 rounded-2xl bg-gradient-to-r from-violet-500/10 to-accent/10 border border-violet-500/20 hover:border-violet-500/40 transition-all group"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">

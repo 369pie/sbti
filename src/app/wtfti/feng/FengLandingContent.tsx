@@ -311,7 +311,7 @@ export default function FengLandingContent() {
               className="text-[10px] font-mono tracking-[0.25em] uppercase block mb-3"
               style={{ color: `${NEON_ACCENT}aa` }}
             >
-              // SYSTEM_FEATURES
+              {'// SYSTEM_FEATURES'}
             </span>
             <h2
               className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight"
@@ -406,7 +406,7 @@ export default function FengLandingContent() {
                 className="text-[10px] font-mono tracking-[0.25em] uppercase block mb-3"
                 style={{ color: `${NEON_ACCENT}aa` }}
               >
-                // ARCHIVE_PREVIEW
+                {'// ARCHIVE_PREVIEW'}
               </span>
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight"

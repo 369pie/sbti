@@ -104,6 +104,8 @@ export async function GET(req: NextRequest) {
 
   const universeLabel = UNIVERSE_LABELS[universe] ?? 'HERMOSA';
   const tagLabel = tag && TAG_LABELS[tag] ? TAG_LABELS[tag] : '';
+  const styleOpt = sp.get('style') ?? 'dark';
+  const isLight = styleOpt === 'editorial';
 
   // 字号根据文本长度自适应：12 段
   const len = text.length;
@@ -118,45 +120,76 @@ export async function GET(req: NextRequest) {
           height: H,
           display: 'flex',
           flexDirection: 'column',
-          background: '#15102A',
+          background: isLight ? '#F5F0E8' : '#15102A',
           position: 'relative',
           fontFamily: '"Cormorant Garamond", "Noto Serif SC", serif',
-          color: '#F5F0E8',
+          color: isLight ? '#1A1530' : '#F5F0E8',
         }}
       >
-        {/* 暮紫 → 玫瑰 极淡晕 */}
-        <div
-          style={{
-            position: 'absolute',
-            top: -200,
-            left: -200,
-            width: 700,
-            height: 700,
-            display: 'flex',
-            background: 'radial-gradient(circle, rgba(192,122,142,0.18) 0%, rgba(192,122,142,0) 70%)',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            bottom: -150,
-            right: -150,
-            width: 600,
-            height: 600,
-            display: 'flex',
-            background: 'radial-gradient(circle, rgba(201,166,118,0.15) 0%, rgba(201,166,118,0) 70%)',
-          }}
-        />
-
-        {/* 角部装饰星屑 */}
-        <div style={{ position: 'absolute', top: 56, left: 56, display: 'flex', gap: 14 }}>
-          <StarSvg size={12} opacity={0.7} />
-          <StarSvg size={8} opacity={0.45} />
-        </div>
-        <div style={{ position: 'absolute', top: 56, right: 56, display: 'flex', gap: 14 }}>
-          <StarSvg size={8} opacity={0.45} />
-          <StarSvg size={12} opacity={0.7} />
-        </div>
+        {isLight ? (
+          <>
+            {/* 浅色版超大底纹字 */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: -40,
+                fontSize: 600,
+                lineHeight: 1,
+                color: '#C07A8E',
+                opacity: 0.05,
+                fontFamily: '"Cormorant Garamond", "Noto Serif SC", serif',
+                zIndex: 0,
+                letterSpacing: '-0.05em',
+              }}
+            >
+              {text.slice(0, 1)}
+            </div>
+            <div style={{ position: 'absolute', top: 56, left: 56, display: 'flex', gap: 14, zIndex: 10 }}>
+              <StarSvg size={12} opacity={0.6} />
+              <StarSvg size={8} opacity={0.4} />
+            </div>
+            <div style={{ position: 'absolute', top: 56, right: 56, display: 'flex', gap: 14, zIndex: 10 }}>
+              <StarSvg size={8} opacity={0.4} />
+              <StarSvg size={12} opacity={0.6} />
+            </div>
+          </>
+        ) : (
+          <>
+            {/* 暮紫 → 玫瑰 极淡晕 */}
+            <div
+              style={{
+                position: 'absolute',
+                top: -200,
+                left: -200,
+                width: 700,
+                height: 700,
+                display: 'flex',
+                background: 'radial-gradient(circle, rgba(192,122,142,0.18) 0%, rgba(192,122,142,0) 70%)',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                bottom: -150,
+                right: -150,
+                width: 600,
+                height: 600,
+                display: 'flex',
+                background: 'radial-gradient(circle, rgba(201,166,118,0.15) 0%, rgba(201,166,118,0) 70%)',
+              }}
+            />
+            {/* 角部装饰星屑 */}
+            <div style={{ position: 'absolute', top: 56, left: 56, display: 'flex', gap: 14 }}>
+              <StarSvg size={12} opacity={0.7} />
+              <StarSvg size={8} opacity={0.45} />
+            </div>
+            <div style={{ position: 'absolute', top: 56, right: 56, display: 'flex', gap: 14 }}>
+              <StarSvg size={8} opacity={0.45} />
+              <StarSvg size={12} opacity={0.7} />
+            </div>
+          </>
+        )}
 
         {/* Masthead */}
         <div
@@ -166,6 +199,7 @@ export async function GET(req: NextRequest) {
             alignItems: 'center',
             paddingTop: 110,
             gap: 18,
+            zIndex: 10,
           }}
         >
           <div
@@ -173,7 +207,7 @@ export async function GET(req: NextRequest) {
               display: 'flex',
               fontSize: 22,
               letterSpacing: '0.42em',
-              color: '#C9A676',
+              color: isLight ? '#C07A8E' : '#C9A676',
               fontWeight: 500,
             }}
           >
@@ -192,7 +226,7 @@ export async function GET(req: NextRequest) {
                 display: 'flex',
                 fontSize: 16,
                 letterSpacing: '0.32em',
-                color: '#F5F0E8',
+                color: isLight ? '#1A1530' : '#F5F0E8',
                 opacity: 0.55,
                 fontStyle: 'italic',
               }}
@@ -212,6 +246,7 @@ export async function GET(req: NextRequest) {
             justifyContent: 'center',
             flex: 1,
             padding: '60px 110px',
+            zIndex: 10,
           }}
         >
           {/* 起引号 */}
@@ -219,8 +254,8 @@ export async function GET(req: NextRequest) {
             style={{
               display: 'flex',
               fontSize: 110,
-              color: '#C9A676',
-              opacity: 0.5,
+              color: isLight ? '#C07A8E' : '#C9A676',
+              opacity: isLight ? 0.3 : 0.5,
               lineHeight: 1,
               marginBottom: -10,
               fontFamily: '"Cormorant Garamond", serif',
@@ -233,10 +268,10 @@ export async function GET(req: NextRequest) {
               display: 'flex',
               fontSize,
               lineHeight,
-              color: '#F5F0E8',
+              color: isLight ? '#1A1530' : '#F5F0E8',
               textAlign: 'center',
-              fontStyle: 'italic',
-              fontWeight: 400,
+              fontStyle: isLight ? 'normal' : 'italic',
+              fontWeight: isLight ? 600 : 400,
               maxWidth: 860,
               letterSpacing: '0.02em',
             }}
@@ -247,8 +282,8 @@ export async function GET(req: NextRequest) {
             style={{
               display: 'flex',
               fontSize: 110,
-              color: '#C9A676',
-              opacity: 0.5,
+              color: isLight ? '#C07A8E' : '#C9A676',
+              opacity: isLight ? 0.3 : 0.5,
               lineHeight: 1,
               marginTop: -10,
               fontFamily: '"Cormorant Garamond", serif',
@@ -267,11 +302,12 @@ export async function GET(req: NextRequest) {
               alignSelf: 'center',
               marginBottom: 24,
               padding: '8px 22px',
-              border: '1px solid #C9A676',
+              border: isLight ? '1px solid #C07A8E' : '1px solid #C9A676',
               borderRadius: 999,
               fontSize: 18,
               letterSpacing: '0.24em',
-              color: '#C9A676',
+              color: isLight ? '#C07A8E' : '#C9A676',
+              zIndex: 10,
             }}
           >
             # {tagLabel}
@@ -286,14 +322,16 @@ export async function GET(req: NextRequest) {
             alignItems: 'center',
             gap: 16,
             paddingBottom: 48,
+            zIndex: 10,
           }}
         >
           <div
             style={{
               display: 'flex',
               fontSize: 22,
-              fontStyle: 'italic',
-              color: '#C9A676',
+              fontStyle: 'normal',
+              fontWeight: 500,
+              color: isLight ? '#C07A8E' : '#C9A676',
               letterSpacing: '0.06em',
             }}
           >
@@ -304,7 +342,7 @@ export async function GET(req: NextRequest) {
               style={{
                 display: 'flex',
                 fontSize: 14,
-                color: '#F5F0E8',
+                color: isLight ? '#1A1530' : '#F5F0E8',
                 opacity: 0.4,
                 letterSpacing: '0.18em',
               }}
@@ -321,7 +359,8 @@ export async function GET(req: NextRequest) {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '28px 80px',
-            borderTop: '1px solid rgba(201,166,118,0.35)',
+            borderTop: isLight ? '1px solid rgba(192,122,142,0.2)' : '1px solid rgba(201,166,118,0.35)',
+            zIndex: 10,
           }}
         >
           <div
@@ -329,7 +368,7 @@ export async function GET(req: NextRequest) {
               display: 'flex',
               fontSize: 14,
               letterSpacing: '0.32em',
-              color: '#C9A676',
+              color: isLight ? '#C07A8E' : '#C9A676',
               opacity: 0.85,
             }}
           >
@@ -340,7 +379,7 @@ export async function GET(req: NextRequest) {
               display: 'flex',
               fontSize: 14,
               letterSpacing: '0.32em',
-              color: '#F5F0E8',
+              color: isLight ? '#1A1530' : '#F5F0E8',
               opacity: 0.5,
             }}
           >

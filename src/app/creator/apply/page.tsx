@@ -241,13 +241,13 @@ export default function CreatorApplyPage() {
         </label>
 
         {error && (
-          <div className="rounded-xl border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div className="rounded-xl border border-ember/40 bg-ember/10 px-3 py-2 text-sm text-ember">
             {error}
           </div>
         )}
 
         {applicationId && (
-          <div className="rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          <div className="rounded-xl border border-sage/50 bg-sage/15 px-3 py-2 text-sm text-sage-text">
             提交成功，申请编号：{applicationId}。你可以在个人中心查看当前审核状态。
           </div>
         )}

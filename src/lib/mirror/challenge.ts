@@ -6,7 +6,6 @@
  */
 
 const DELIMITER = '.';
-const SUMMARY_SEPARATOR = '~';
 
 export interface ChallengeData {
   mode: string;
@@ -86,7 +85,7 @@ export function parseChallengeFromUrl(searchParams: URLSearchParams): ChallengeD
 export function getModeDisplayName(mode: string): string {
   switch (mode) {
     case 'beauty': return '变美灵镜';
-    case 'fortune': return '命纹灵镜';
+    case 'fortune': return '旧命纹记录';
     case 'color': return '色彩诊断';
     case 'compare': return '风格对比';
     default: return '灵镜';

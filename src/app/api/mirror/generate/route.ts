@@ -2,7 +2,6 @@ import { NextResponse, type NextRequest } from 'next/server';
 import {
   ApimartImageError,
   buildBeautyMirrorPrompt,
-  buildFortuneMirrorPrompt,
   buildColorMirrorPrompt,
   buildCompareMirrorPrompt,
   isApimartConfigured,
@@ -11,6 +10,9 @@ import {
   type BeautyReportType,
 } from '@/lib/mirror/apimart';
 import { maybeCleanup, rateLimit, resolveRateLimitKey } from '@/lib/perf/rate-limit';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { SKU_COSTS } from '@/lib/wallet/ling-bi';
+import { applyLingBiTransaction, consumeServerLingBiBySku } from '@/lib/wallet/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -31,6 +33,18 @@ interface MirrorGenerateBody {
   compareStyles?: unknown;
   avoid?: unknown;
   consentAccepted?: unknown;
+  walletSpendId?: unknown;
+}
+
+interface MirrorGenerateDebit {
+  userId: string;
+  spendId: string;
+  skuKey: string;
+  mode: MirrorMode;
+  reportType?: BeautyReportType;
+  balance: number;
+  ledgerId?: string;
+  applied?: boolean;
 }
 
 function json(body: unknown, init?: ResponseInit) {
@@ -62,6 +76,122 @@ function validateImageDataUrl(value: unknown): string | null {
   if (!DATA_URI_PATTERN.test(normalized)) return null;
   if (imageByteSize(normalized) > MAX_IMAGE_BYTES) return null;
   return normalized;
+}
+
+function getMirrorSkuKey(mode: MirrorMode, reportType?: BeautyReportType): string {
+  return mode === 'beauty' && reportType === 'comprehensive'
+    ? 'mirror-archive'
+    : 'mirror-single';
+}
+
+function getModeLabel(mode: MirrorMode): string {
+  if (mode === 'color') return '色彩诊断';
+  if (mode === 'compare') return '风格对比';
+  return '灵镜 Atelier';
+}
+
+function parseWalletSpendId(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return /^[A-Za-z0-9_-]{8,160}$/.test(trimmed) ? trimmed : null;
+}
+
+async function getOptionalUserId(): Promise<string | null> {
+  try {
+    const supabase = await createServerSupabaseClient();
+    await supabase.auth.getClaims().catch(() => null);
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+    if (error || !user) return null;
+    return user.id;
+  } catch {
+    return null;
+  }
+}
+
+async function debitServerWalletForGenerate(params: {
+  userId: string;
+  spendId: string;
+  skuKey: string;
+  mode: MirrorMode;
+  reportType?: BeautyReportType;
+}): Promise<MirrorGenerateDebit | NextResponse> {
+  const sku = SKU_COSTS[params.skuKey];
+  if (!sku) {
+    return json({ ok: false, error: '当前灵镜档案类型暂不可用' }, { status: 400 });
+  }
+
+  const result = await consumeServerLingBiBySku(params.userId, params.skuKey, {
+    idempotencyKey: `mirror-generate:${params.spendId}`,
+    resourceId: `mirror:${params.spendId}`,
+    note: `${sku.label} · ${getModeLabel(params.mode)}`,
+    metadata: {
+      source: 'mirror_generate',
+      mode: params.mode,
+      reportType: params.reportType ?? null,
+      walletSpendId: params.spendId,
+    },
+  });
+
+  if (!result.ok) {
+    return json(
+      {
+        ok: false,
+        error: result.reason === 'insufficient' ? '灵币余额不足，请先充值。' : '灵币扣费失败，请稍后重试。',
+        reason: result.reason,
+        balance: result.balance,
+        required: result.required,
+      },
+      { status: result.reason === 'insufficient' ? 402 : 400 },
+    );
+  }
+
+  return {
+    userId: params.userId,
+    spendId: params.spendId,
+    skuKey: params.skuKey,
+    mode: params.mode,
+    reportType: params.reportType,
+    balance: result.balance,
+    ledgerId: result.ledgerId,
+    applied: result.applied,
+  };
+}
+
+async function refundServerWalletForGenerate(
+  debit: MirrorGenerateDebit | null,
+  reason: string,
+) {
+  if (!debit) return null;
+  const sku = SKU_COSTS[debit.skuKey];
+  if (!sku) return null;
+
+  try {
+    return await applyLingBiTransaction(debit.userId, {
+      delta: sku.cost,
+      source: 'refund',
+      idempotencyKey: `mirror-generate-refund:${debit.spendId}`,
+      resourceId: `mirror:${debit.spendId}`,
+      note: `${sku.label} · 生成失败退回`,
+      metadata: {
+        source: 'mirror_generate_refund',
+        reason,
+        debitLedgerId: debit.ledgerId ?? null,
+        debitApplied: debit.applied ?? null,
+        mode: debit.mode,
+        reportType: debit.reportType ?? null,
+        walletSpendId: debit.spendId,
+      },
+    });
+  } catch (error) {
+    console.error('[mirror-generate] wallet refund failed', {
+      spendId: debit.spendId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
 }
 
 function previewReport(vibe: string, reportType: BeautyReportType = 'comprehensive') {
@@ -109,19 +239,6 @@ function previewReport(vibe: string, reportType: BeautyReportType = 'comprehensi
   };
 }
 
-function fortunePreviewReport() {
-  return {
-    palette: ['暮紫', '金箔', '玫瑰陶土', '米白', '暗面紫'],
-    sections: [
-      { title: '气质关键词', body: '沉稳中带灵气，外冷内热型。' },
-      { title: '五官亮点', body: '眼型偏长、轮廓清晰，适合强调眼妆。' },
-      { title: '性格特质', body: '观察力强、审美敏锐。' },
-      { title: '适合方向', body: '创意、策划、内容创作领域。' },
-      { title: '一句总结', body: '你的面相自带「安静的说服力」。' },
-    ],
-  };
-}
-
 function colorPreviewReport() {
   return {
     palette: ['驼色', '焦糖', '铁锈红', '橄榄绿', '暖米白', '蜜桃金', '肉桂', '暖灰', '深棕'],
@@ -154,8 +271,14 @@ export async function POST(request: NextRequest) {
   }
 
   const mode = (typeof body.mode === 'string' ? body.mode : 'beauty') as MirrorMode;
-  if (!['beauty', 'fortune', 'color', 'compare'].includes(mode)) {
-    return json({ ok: false, error: '不支持的模式，可选 beauty / fortune / color / compare' }, { status: 400 });
+  if (mode === 'fortune') {
+    return json(
+      { ok: false, error: '命纹能力已迁移到灵鉴命书馆，请前往 /mysti/destiny/' },
+      { status: 410 },
+    );
+  }
+  if (!['beauty', 'color', 'compare'].includes(mode)) {
+    return json({ ok: false, error: '不支持的模式，可选 beauty / color / compare' }, { status: 400 });
   }
 
   if (body.consentAccepted !== true) {
@@ -188,18 +311,9 @@ export async function POST(request: NextRequest) {
   // Build mode-specific input & prompt
   let input;
   let prompt;
+  let reportType: BeautyReportType | undefined;
 
   switch (mode) {
-    case 'fortune':
-      input = {
-        imageDataUrl,
-        analysisType: clampString(body.analysisType, 80, '面相与气质综合分析'),
-        focusAreas: clampString(body.focusAreas, 80, '五官比例、脸型轮廓、气场特质'),
-        avoid: clampString(body.avoid, 80, '避免负面定论、恐吓性预言'),
-      };
-      prompt = buildFortuneMirrorPrompt(input);
-      break;
-
     case 'color':
       input = {
         imageDataUrl,
@@ -220,7 +334,7 @@ export async function POST(request: NextRequest) {
       break;
 
     default: {
-      const reportType = (typeof body.reportType === 'string' ? body.reportType : 'comprehensive') as BeautyReportType;
+      reportType = (typeof body.reportType === 'string' ? body.reportType : 'comprehensive') as BeautyReportType;
       input = {
         imageDataUrl,
         vibe: clampString(body.vibe, 80, '原生自然、干净有气色'),
@@ -233,10 +347,31 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  const userId = await getOptionalUserId();
+  let walletDebit: MirrorGenerateDebit | null = null;
+  if (userId) {
+    const spendId = parseWalletSpendId(body.walletSpendId);
+    if (!spendId) {
+      return json(
+        { ok: false, error: '缺少有效的灵币扣费凭证，请刷新页面后重试。' },
+        { status: 400 },
+      );
+    }
+
+    const debit = await debitServerWalletForGenerate({
+      userId,
+      spendId,
+      skuKey: getMirrorSkuKey(mode, reportType),
+      mode,
+      reportType,
+    });
+    if (debit instanceof NextResponse) return debit;
+    walletDebit = debit;
+  }
+
   if (!isApimartConfigured()) {
     let report;
     switch (mode) {
-      case 'fortune': report = fortunePreviewReport(); break;
       case 'color': report = colorPreviewReport(); break;
       case 'compare': report = comparePreviewReport(); break;
       default: {
@@ -254,6 +389,8 @@ export async function POST(request: NextRequest) {
       imageUrl: null,
       report,
       promptPreview: prompt.slice(0, 520),
+      serverWalletDebited: Boolean(walletDebit),
+      serverBalance: walletDebit?.balance ?? null,
     });
   }
 
@@ -265,15 +402,32 @@ export async function POST(request: NextRequest) {
       taskId: task.taskId,
       progress: task.status === 'submitted' ? 4 : 8,
       promptPreview: task.prompt.slice(0, 520),
+      serverWalletDebited: Boolean(walletDebit),
+      serverBalance: walletDebit?.balance ?? null,
     });
   } catch (error) {
+    const refund = await refundServerWalletForGenerate(
+      walletDebit,
+      error instanceof Error ? error.message : 'submit_failed',
+    );
+
     if (error instanceof ApimartImageError) {
       return json(
-        { ok: false, error: `图像任务提交失败：${error.message}` },
+        {
+          ok: false,
+          error: `图像任务提交失败：${error.message}`,
+          refunded: Boolean(refund?.ok),
+          serverBalance: refund?.balance ?? walletDebit?.balance ?? null,
+        },
         { status: error.statusCode },
       );
     }
 
-    return json({ ok: false, error: '图像任务提交失败，请稍后重试' }, { status: 502 });
+    return json({
+      ok: false,
+      error: '图像任务提交失败，请稍后重试',
+      refunded: Boolean(refund?.ok),
+      serverBalance: refund?.balance ?? walletDebit?.balance ?? null,
+    }, { status: 502 });
   }
 }

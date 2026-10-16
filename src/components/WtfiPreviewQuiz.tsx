@@ -114,7 +114,7 @@ function Intro({ onStart }: { onStart: () => void }) {
         <p className="text-base text-text-secondary leading-relaxed pt-2">
           这是 WTFTI 自有「情境人格理论」的 30 题预览版。
           基于 Mischel & Shoda (1995) CAPS
-          框架，本测试不告诉你"你是谁"，告诉你"在不同情境下你怎么反应"。
+          框架，本测试不告诉你&quot;你是谁&quot;，告诉你&quot;在不同情境下你怎么反应&quot;。
         </p>
       </div>
 
@@ -148,7 +148,7 @@ function Intro({ onStart }: { onStart: () => void }) {
         开始 · 30 题 · 约 5 分钟
       </button>
       <p className="text-[11px] text-text-muted text-center">
-        没有所谓的对错答案，只有"在那个场景下，你最可能怎么反应"。
+        没有所谓的对错答案，只有&quot;在那个场景下，你最可能怎么反应&quot;。
       </p>
     </section>
   );
@@ -275,7 +275,7 @@ function Result({
         <p className="text-sm tracking-[0.2em] uppercase text-text-muted">
           {personality.code} · {personality.rarity}
         </p>
-        <p className="text-base text-text-secondary italic">"{personality.tagline}"</p>
+        <p className="text-base text-text-secondary italic">&quot;{personality.tagline}&quot;</p>
       </div>
 
       <p className="text-base leading-relaxed">{personality.description}</p>
@@ -363,8 +363,8 @@ function Result({
           <div className="text-[11px] tracking-[0.25em] uppercase mb-1" style={{ color: 'var(--color-accent)' }}>
             隐藏触发
           </div>
-          {flags.contrastSelf && <div>● 您选择了"不同场景下是不同的人"——反差人格隐藏卡候选</div>}
-          {flags.drunkTrigger && <div>● 您选择了"醉酒后讲童年"——DRUNK 宇宙候选</div>}
+          {flags.contrastSelf && <div>● 您选择了&quot;不同场景下是不同的人&quot;——反差人格隐藏卡候选</div>}
+          {flags.drunkTrigger && <div>● 您选择了&quot;醉酒后讲童年&quot;——DRUNK 宇宙候选</div>}
         </div>
       )}
 
@@ -391,7 +391,7 @@ function Result({
       >
         本测试基于 Mischel & Shoda (1995){' '}
         <em>A Cognitive-Affective System Theory of Personality</em>{' '}
-        框架。WTFTI 主张人格不是稳定的特质，而是"情境 × 反应模式"的组合。
+        框架。WTFTI 主张人格不是稳定的特质，而是&quot;情境 × 反应模式&quot;的组合。
         测的宇宙越多，对你主人格的画像越精确。
       </div>
     </section>

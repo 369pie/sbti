@@ -1,8 +1,9 @@
 /**
  * SoulTI purchase verify (E-09 · stub)
  *
- * Confirms an order. Stub unlock (`stub=1`) only works when
- * `isSoultiPaymentStubMode()` is true. Production defaults to live and rejects stub.
+ * Confirms an order. In stub mode (SOULTI_PAYMENT_PROVIDER != 'live'), any
+ * order with `stub=1` is accepted. Real implementation should verify against
+ * provider webhook / server-to-server API.
  *
  * Side effect on success: when `sku=full-report` and we know the buyer's
  * email + slug (passed through query params), we record a
@@ -11,7 +12,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { isSoultiPaymentStubMode } from '@/lib/soulti/payment-mode';
 
 async function recordUnlock(opts: {
   orderId: string;
@@ -60,28 +60,15 @@ export async function GET(req: NextRequest) {
   const email = req.nextUrl.searchParams.get('email') ?? '';
   const slug = req.nextUrl.searchParams.get('slug') ?? '';
   const sku = req.nextUrl.searchParams.get('sku') ?? '';
+  const isLive = process.env.SOULTI_PAYMENT_PROVIDER === 'live';
+
   if (!orderId) {
     return NextResponse.json({ error: 'missing_orderId' }, { status: 400 });
   }
-
-  // Production / live: never accept stub=1 free unlocks.
-  if (!isSoultiPaymentStubMode()) {
-    if (stub) {
-      return NextResponse.json(
-        {
-          error: 'stub_disabled',
-          message: '假支付已关闭，无法通过 stub 解锁。',
-          orderId,
-          status: 'rejected',
-          provider: 'live',
-        },
-        { status: 403 },
-      );
-    }
-    // Real provider verification is not wired on this endpoint yet.
+  if (isLive) {
+    // Real provider check would happen here.
     return NextResponse.json({ orderId, status: 'pending', provider: 'live' });
   }
-
   if (!stub) {
     return NextResponse.json({ orderId, status: 'pending' });
   }

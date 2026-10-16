@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const DEFAULT_APP_URL = 'http://localhost:3000';
+const DEFAULT_APP_URL = 'http://localhost:3006';
 const DEFAULT_UNIVERSE_ID = 'da26127a-7fea-498d-9d10-15a2ff5aabac';
 const DEFAULT_PERSONALITY_SLUG = 'sigil-keeper';
 

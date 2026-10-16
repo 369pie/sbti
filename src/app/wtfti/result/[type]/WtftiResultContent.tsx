@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { WtftiPersonality } from '@/lib/wtfti-personalities';
 import { markCollected } from '@/lib/mysti/collection';
-import { WTFTI_PERSONALITIES, getWtftiTypeImage, getWtftiTypeThumbnailImage, getWtftiTypeMediumImage } from '@/lib/wtfti-personalities';
+import { WTFTI_PERSONALITIES, getWtftiTypeThumbnailImage, getWtftiTypeMediumImage } from '@/lib/wtfti-personalities';
 import type { DimensionScore } from '@/lib/scoring';
 import { getSiteUrl } from '@/lib/site';
 import type { WtftiShareImageHandle } from '@/components/WtftiShareImageGenerator';
@@ -15,16 +15,10 @@ const WtftiShareImageGenerator = dynamic(
   () => import('@/components/WtftiShareImageGenerator').then((m) => m.WtftiShareImageGenerator),
   { ssr: false },
 );
-import { UniverseSwitcher } from '@/components/UniverseSwitcher';
-import { CrossUniverseCTA } from '@/components/CrossUniverseCTA';
-import { WtfCardCTA } from '@/components/WtfCardCTA';
-import { UgcShareCTA } from '@/components/UgcShareCTA';
-import { IdentifyViralCTA } from '@/components/IdentifyViralCTA';
-import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
-import { UniverseProgressBar } from '@/components/UniverseProgressBar';
 import { TheoryAnchorCard } from '@/components/TheoryAnchorCard';
+import { TomorrowRitualCta } from '@/components/galaxy/TomorrowRitualCta';
 import { persistUniverseProfile } from '@/lib/wtfi/cci';
 import { projectLegacyToWtfi } from '@/lib/wtfi/dimension-alias';
 import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
@@ -152,14 +146,11 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
 
             {/* Tagline */}
             <p className="text-xl text-text-secondary max-w-md mx-auto">
-              "{p.tagline}"
+              &quot;{p.tagline}&quot;
             </p>
           </motion.div>
         </div>
       </section>
-
-      {/* Visual Universe Switcher */}
-      <UniverseSwitcher slug={p.slug} currentUniverseId="wtfti" />
 
       {/* WTF 一击 */}
       <section className="max-w-2xl mx-auto px-6 pb-8">
@@ -171,10 +162,10 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
           style={{ borderColor: `${p.color}30` }}
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
-            🎯 WTF 一击
+            WTF 一击
           </h2>
-          <p className="text-xl font-medium text-accent leading-relaxed">
-            "{p.copy.wtfHit}"
+          <p className="text-xl font-medium leading-relaxed" style={{ color: 'var(--color-rose-text)' }}>
+            &quot;{p.copy.wtfHit}&quot;
           </p>
         </motion.div>
       </section>
@@ -188,7 +179,7 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
           className="rounded-2xl border border-border-subtle bg-bg-elevated p-6 sm:p-8 shadow-sm"
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
-            🧬 OS 翻译：你的操作系统
+            OS 翻译：你的操作系统
           </h2>
           <p className="text-text-secondary leading-[1.8] text-base whitespace-pre-line">
             {p.copy.osTranslation}
@@ -205,7 +196,7 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
           className="rounded-2xl border border-border-subtle bg-bg-elevated p-6 sm:p-8 shadow-sm"
         >
           <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase mb-4">
-            📋 隐藏症状清单
+            隐藏症状清单
           </h2>
           <ul className="space-y-3">
             {p.copy.symptoms.map((s, i) => (
@@ -253,7 +244,6 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
           className="rounded-2xl border p-6 sm:p-8 text-center"
           style={{ borderColor: `${p.color}30`, background: `${p.color}08` }}
         >
-          <div className="text-3xl mb-3">🤯</div>
           <h3 className="text-lg font-semibold mb-2">分享你的 WTF 人格</h3>
           <p className="text-sm text-text-secondary mb-5 max-w-sm mx-auto">
             把结果发给朋友，看看谁更 WTF
@@ -293,21 +283,9 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
         </div>
       </section>
 
-      {/* Cross-universe exploration */}
-      <UniverseProgressBar currentUniverseId="wtfti" />
-
       {/* WTFTI 理论锚点：说明这个宇宙点亮了哪几条 W-T-F-I 轴 */}
       <section className="max-w-2xl mx-auto px-6 pb-6">
         <TheoryAnchorCard universe="wtfti" variant="light" />
-      </section>
-
-      <section className="max-w-2xl mx-auto px-6 pb-8">
-        <UniverseSwitcher slug={p.slug} currentUniverseId="wtfti" />
-      </section>
-
-      {/* Cross-universe CTA */}
-      <section className="max-w-2xl mx-auto px-6 pb-8">
-        <CrossUniverseCTA slug={p.slug} currentUniverseId="wtfti" />
       </section>
 
       {/* Other types */}
@@ -348,7 +326,7 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/wtfti/test/"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base hover:bg-accent/90 transition-all"
+            className="wtfti-cta-primary"
           >
             重新测试
           </Link>
@@ -368,6 +346,7 @@ export function WtftiResultContent({ wtftiPersonality: p, dimensionScores }: Pro
         accent={p.color}
       />
       <DailyCheckInCTA />
+      <TomorrowRitualCta fromModule="wtfti" source="wtfti-classic-result-tomorrow-cta" />
     </div>
   );
 }

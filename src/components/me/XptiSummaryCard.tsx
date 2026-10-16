@@ -16,10 +16,12 @@ export function XptiSummaryCard({ remote }: { remote?: XptiSummaryRemote }) {
   const [historyCount, setHistoryCount] = useState(0);
 
   useEffect(() => {
-    const last = loadXptiResult();
-    setSlug(last?.slug ?? null);
-    setHistoryCount(loadXptiHistory().length);
-    setHydrated(true);
+    queueMicrotask(() => {
+      const last = loadXptiResult();
+      setSlug(last?.slug ?? null);
+      setHistoryCount(loadXptiHistory().length);
+      setHydrated(true);
+    });
   }, []);
 
   const personality = useMemo(

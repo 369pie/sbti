@@ -21,12 +21,13 @@ interface CrossUniverseCTAProps {
 export function CrossUniverseCTA({ slug, currentUniverseId, theme }: CrossUniverseCTAProps) {
   const allPreviews = getUniversePreviews(slug, currentUniverseId);
   
-  // Get 3 random other universe previews
+  // Get 3 stable other universe previews.
   const randomPreviews = useMemo(() => {
     const others = allPreviews.filter(p => !p.isCurrentUniverse && p.status === 'live');
-    const shuffled = [...others].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 3);
-  }, [allPreviews]);
+    return [...others]
+      .sort((a, b) => stablePreviewRank(slug, a.universeId) - stablePreviewRank(slug, b.universeId))
+      .slice(0, 3);
+  }, [allPreviews, slug]);
 
   // Calculate progress
   const totalUniverses = allPreviews.length;
@@ -145,6 +146,15 @@ export function CrossUniverseCTA({ slug, currentUniverseId, theme }: CrossUniver
       </div>
     </motion.div>
   );
+}
+
+function stablePreviewRank(slug: string, universeId: string): number {
+  let hash = 0;
+  const key = `${slug}:${universeId}`;
+  for (let i = 0; i < key.length; i += 1) {
+    hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  }
+  return hash;
 }
 
 function PreviewMiniCard({

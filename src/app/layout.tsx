@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import Link from "next/link";
 import Script from "next/script";
-import { Noto_Serif_SC, Noto_Sans_SC, Cormorant_Garamond, Fraunces, JetBrains_Mono } from "next/font/google";
+import { Noto_Serif_SC, Noto_Sans_SC, Cormorant_Garamond, Fraunces, JetBrains_Mono, ZCOOL_XiaoWei, Long_Cang } from "next/font/google";
 import "./globals.css";
-import { Navigation } from "@/components/Navigation";
+import "./skins.css";
+import { HerNav } from "@/components/HerNav";
 import { AuthProvider } from "@/components/AuthProvider";
 import { FollowMeInline } from '@/components/FollowMeLinks';
 import { WebVitalsReporter } from '@/components/WebVitalsReporter';
@@ -12,7 +13,6 @@ import {
   WtftiThemeProvider,
 } from '@/components/wtfti/WtftiThemeProvider';
 import { WtftiThemeNoFlashScript } from '@/components/wtfti/WtftiThemeScript';
-import { WtftiThemeToggle } from '@/components/wtfti/WtftiThemeToggle';
 import { getLegacyRedirectScript, getSiteLabel, getSiteOrigin, getSiteUrl, isLegacyPagesBuild } from "@/lib/site";
 
 // ─── Typography system v3: Editorial Feminine ──────────────────────────────
@@ -60,14 +60,31 @@ const jetbrains = JetBrains_Mono({
   preload: false,
 });
 
+// Design system v3 (journal skin): headline + handwritten accent faces.
+const xiaowei = ZCOOL_XiaoWei({
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+  variable: "--font-xiaowei",
+  preload: false,
+});
+
+const longcang = Long_Cang({
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+  variable: "--font-longcang",
+  preload: false,
+});
+
 export const metadata: Metadata = {
   metadataBase: getSiteOrigin() ? new URL(getSiteOrigin()) : undefined,
   title: {
-    default: "WTFTI — 女生的情绪陪伴站 · 情侣关系沟通报告",
+    default: "WTFTI — 懂你的女生私人顾问",
     template: "%s | WTFTI",
   },
-  description: "先听懂今天的自己，再看清一段关系。每日一牌安顿情绪，XPTI 情侣关系报告帮你读懂 ta 的沟通方式，也被 ta 读懂。",
-  keywords: ["WTFTI", "情侣关系测试", "关系沟通", "XPTI", "情侣报告", "每日一牌", "塔罗", "情绪陪伴", "人格测试", "性格测试", "MBTI", "恋爱测试"],
+  description: "看清自己、变好看、有地方说心里话。90 秒人格测试，每天一张为你写的今日卡，还有一个敢说话的树洞。",
+  keywords: ["WTFTI", "女性人格测试", "人格测试", "性格测试", "MBTI", "今日运势", "塔罗", "掌纹", "色彩季型", "穿搭建议", "妆容建议", "树洞", "自我探索"],
   verification: {
     google: 'BzRtTDBXJV_X_JIZsMs0jPNwGrHIj7flfmUMjuJ1IwY',
   },
@@ -95,8 +112,8 @@ export const metadata: Metadata = {
         },
       },
   openGraph: {
-    title: "WTFTI — 女生的情绪陪伴站 · 情侣关系沟通报告",
-    description: "先听懂今天的自己，再看清一段关系。每日一牌安顿情绪，XPTI 情侣关系报告帮你读懂 ta 的沟通方式，也被 ta 读懂。",
+    title: "WTFTI — 懂你的女生私人顾问",
+    description: "看清自己、变好看、有地方说心里话。",
     type: "website",
     siteName: "WTFTI",
     locale: "zh_CN",
@@ -104,8 +121,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "WTFTI — 女生的情绪陪伴站 · 情侣关系沟通报告",
-    description: "先听懂今天的自己，再看清一段关系。每日一牌安顿情绪，XPTI 情侣关系报告帮你读懂 ta 的沟通方式，也被 ta 读懂。",
+    title: "WTFTI — 懂你的女生私人顾问",
+    description: "看清自己、变好看、有地方说心里话。",
   },
   icons: {
     icon: { url: '/favicon.svg', type: 'image/svg+xml' },
@@ -125,7 +142,7 @@ export default function RootLayout({
     <html
       lang="zh-CN"
       data-scroll-behavior="smooth"
-      className={`${notoSerifSC.variable} ${notoSansSC.variable} ${cormorant.variable} ${fraunces.variable} ${jetbrains.variable} h-full antialiased`}
+      className={`${notoSerifSC.variable} ${notoSansSC.variable} ${cormorant.variable} ${fraunces.variable} ${jetbrains.variable} ${xiaowei.variable} ${longcang.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body
@@ -147,7 +164,7 @@ export default function RootLayout({
                   '@type': 'WebSite',
                   name: 'WTFTI',
                   url: getSiteUrl('/'),
-                  description: 'WTFTI 是写给女生的情绪陪伴站：每日一牌安顿情绪，情侣关系报告帮你看懂你和 ta 怎么沟通、怎么靠近。',
+                  description: '懂你的女生私人顾问：人格测试、今日运势、穿搭妆容建议与树洞。',
                   inLanguage: 'zh-CN',
                 },
                 {
@@ -155,7 +172,7 @@ export default function RootLayout({
                   name: 'WTFTI',
                   url: getSiteUrl('/'),
                   logo: getSiteUrl('/favicon.svg'),
-                  description: 'WTFTI 女生情绪陪伴与情侣关系沟通测试：每日一牌、XPTI 情侣关系报告、三分钟经典人格测试。',
+                  description: '懂你的女生私人顾问：人格测试、今日运势、穿搭妆容建议与树洞。',
                 },
               ],
             }).replace(/</g, "\\u003c"),
@@ -188,22 +205,18 @@ export default function RootLayout({
         )}
         <AuthProvider>
           <WtftiThemeProvider>
-            <WtftiThemeToggle />
-            <Navigation />
+            <HerNav />
             <main className="flex-1">{children}</main>
           <footer className="border-t border-border-subtle py-8 px-6 text-center text-text-muted text-sm">
             <div className="max-w-5xl mx-auto">
               <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
-                <Link href="/card/" prefetch={false} className="hover:text-text-primary transition-colors">我的 WTF Card</Link>
-                <Link href="/types/" prefetch={false} className="hover:text-text-primary transition-colors">人设图鉴</Link>
-                <Link href="/guide/" prefetch={false} className="hover:text-text-primary transition-colors">测试说明</Link>
-                <Link href="/about/" prefetch={false} className="hover:text-text-primary transition-colors">关于测试</Link>
-                <Link href="/contact/" prefetch={false} className="hover:text-text-primary transition-colors">联系与社群</Link>
+                <Link href="/about/" prefetch={false} className="hover:text-text-primary transition-colors">关于</Link>
+                <Link href="/contact/" prefetch={false} className="hover:text-text-primary transition-colors">联系我们</Link>
                 <Link href="/privacy/" prefetch={false} className="hover:text-text-primary transition-colors">隐私说明</Link>
                 <Link href="/terms/" prefetch={false} className="hover:text-text-primary transition-colors">使用条款</Link>
               </div>
               <FollowMeInline />
-              <p>WTFTI 更适合拿来娱乐和自我观察，不适合作为严肃的心理诊断结果。</p>
+              <p>测试与玄学内容仅供娱乐与自我探索，不能替代专业的心理或医疗建议。</p>
               <p className="mt-2 opacity-60">What&apos;s The F* Type Inside</p>
               <p className="mt-2 opacity-50">SBTI 主题原创作者：B站 @Q肉儿串儿、如有侵权请联系</p>
             </div>

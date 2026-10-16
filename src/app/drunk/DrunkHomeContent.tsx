@@ -19,14 +19,14 @@ export default function DrunkHomeContent() {
       <section className="relative overflow-hidden">
         <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
           <div className="animate-fade-up">
-            <span className="inline-block text-xs font-mono tracking-[0.25em] text-text-muted mb-6 uppercase">
+            <span className="inline-block text-xs font-mono tracking-[0.25em] text-stone mb-6 uppercase">
               Drunk Persona · 酒后人设鉴定
             </span>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
               喝醉了的你
               <br />
-              <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 bg-clip-text text-transparent">是什么人设</span>
+              <span className="gradient-text">是什么人设</span>
             </h1>
 
             <p className="text-text-secondary text-lg sm:text-xl leading-relaxed max-w-xl mx-auto mb-10">
@@ -64,7 +64,7 @@ export default function DrunkHomeContent() {
             ].map(stat => (
               <div key={stat.label} className="bg-bg-secondary/60 px-4 py-6 text-center">
                 <div className="text-2xl font-semibold text-text-primary mb-1">{stat.value}</div>
-                <div className="text-xs text-text-muted">{stat.label}</div>
+                <div className="text-xs text-stone">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -74,7 +74,7 @@ export default function DrunkHomeContent() {
       {/* 5 Dimensions */}
       <section className="max-w-3xl mx-auto px-6 pb-20">
         <div className="animate-fade-up">
-          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-8">
+          <h2 className="text-sm font-mono tracking-wider text-stone uppercase text-center mb-8">
             五大醉态维度
           </h2>
 
@@ -94,7 +94,7 @@ export default function DrunkHomeContent() {
                   </span>
                   <div>
                     <div className="text-sm font-medium text-text-primary">{DRUNK_MODEL_NAMES[m.key]}</div>
-                    <div className="text-xs text-text-muted">{m.label}</div>
+                    <div className="text-xs text-stone">{m.label}</div>
                   </div>
                 </div>
               );
@@ -106,7 +106,7 @@ export default function DrunkHomeContent() {
       {/* 12 Personas Preview */}
       <section className="max-w-3xl mx-auto px-6 pb-24">
         <div className="animate-fade-up-delay-1">
-          <h2 className="text-sm font-mono tracking-wider text-text-muted uppercase text-center mb-8">
+          <h2 className="text-sm font-mono tracking-wider text-stone uppercase text-center mb-8">
             12 种酒后人设
           </h2>
 
