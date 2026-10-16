@@ -3,7 +3,7 @@ import NextImage from 'next/image';
 import { getLiveUniverses } from '@/lib/universes';
 import { withBasePath } from '@/lib/site';
 import { FollowMeCard, FollowMeFloating } from '@/components/FollowMeLinks';
-import type { MystiSku } from '@/lib/mysti/unlock';
+import { SKU_PRICES, type MystiSku } from '@/lib/mysti/unlock';
 import { WTFTI_PERSONALITIES, getWtftiTypeThumbnailImage } from '@/lib/wtfti-personalities';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -14,6 +14,9 @@ import { WTFTI_PERSONALITIES, getWtftiTypeThumbnailImage } from '@/lib/wtfti-per
  * priority: WTFTI / SoulTI flagships first, then relationships, then Mysti
  * (subscription) and WTFCard (collector).
  */
+/** XPTI 情侣关系报告价格 — 与 SKU_PRICES['xpti-couple-report'] 同源（src/lib/mysti/unlock.ts） */
+const XPTI_COUPLE_REPORT_PRICE = SKU_PRICES['xpti-couple-report'].price;
+
 /** Phase 0 首页收敛：只保留 3 个主入口 */
 const UNIVERSE_GRID: Array<{
   href: string;
@@ -245,7 +248,10 @@ export default function HomeContent() {
                 和 ta 一起测
                 <ArrowIcon />
               </span>
-              <span className="text-xs text-text-muted">免费开测 · 两人都测完即可生成关系报告，也可以双人各付一半</span>
+              <span className="text-sm font-medium text-text-primary">
+                ¥{XPTI_COUPLE_REPORT_PRICE} 解锁关系报告
+              </span>
+              <span className="text-xs text-text-muted">免费开测 · 也可以双人各付一半</span>
             </div>
           </Link>
         </div>
