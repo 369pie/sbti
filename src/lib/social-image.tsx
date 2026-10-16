@@ -2,20 +2,12 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { ImageResponse } from 'next/og';
 
-// Keep OG font assets tiny and self-contained so serverless deploys do not
-// depend on pruned node_modules files at runtime. Regenerate these subsets if
-// the Chinese copy in this image changes.
-//
-// On Vercel these files must be force-included via `outputFileTracingIncludes`
-// in next.config.ts. If a deploy ever loses them, fall back to no-font instead
-// of crashing the lambda (exit 128). Satori will draw boxes for unknown
-// glyphs, but the OG response still succeeds and X/WeChat will at least show
-// the gradient + ASCII.
+// OG / Twitter share image — cream journal palette (design system v3).
+// Fonts must be force-included via next.config outputFileTracingIncludes.
+
 async function tryReadFont(filename: string): Promise<Buffer | null> {
   try {
-    return await readFile(
-      join(process.cwd(), 'assets', 'fonts', filename),
-    );
+    return await readFile(join(process.cwd(), 'assets', 'fonts', filename));
   } catch (error) {
     if (
       error &&
@@ -26,7 +18,6 @@ async function tryReadFont(filename: string): Promise<Buffer | null> {
       console.warn('[social-image] optional font missing', { filename });
       return null;
     }
-
     throw error;
   }
 }
@@ -46,17 +37,22 @@ function loadSocialFonts(): Promise<{
       tryReadFont('noto-sans-sc-social-700.woff'),
     ]).then(([regular, bold]) => ({ regular, bold }));
   }
-
   return socialFontsPromise;
 }
 
-const featuredTypes = [
-  { code: 'CTRL', label: '拿捏者', background: 'linear-gradient(135deg, #f59e0b 0%, #fb923c 100%)' },
-  { code: 'BOSS', label: '控场王', background: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)' },
-  { code: 'CHILL', label: '无所谓', background: 'linear-gradient(135deg, #22c55e 0%, #06b6d4 100%)' },
-] as const;
+// Cream journal tokens (docs/04-design-growth/design/wtfti-design-system-v3-2026-10.md)
+const BG = '#FBF6EC';
+const CARD = '#FFFDF8';
+const INK = '#4A3628';
+const MUTE = '#8A7362';
+const LINE = '#E8DCC8';
+const PEACH = '#E8907A';
+const PEACH_SOFT = '#FADBD0';
+const SAGE = '#A9C5A0';
 
-export const socialImageAlt = 'WTFTI 多宇宙人格测试预览图，展示平台品牌与测试亮点';
+const chips = ['测我 · 看清自己', '美我 · 穿搭妆容', '懂我 · 树洞'] as const;
+
+export const socialImageAlt = 'WTFTI — 懂你的女生私人顾问';
 
 export const socialImageSize = {
   width: 1200,
@@ -78,22 +74,24 @@ export async function createSocialImageResponse() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background: 'linear-gradient(135deg, #FAF8F5 0%, #F2EFEA 55%, #EDE8E2 100%)',
-          color: '#2D2A26',
-          padding: '52px 56px',
+          background: BG,
+          color: INK,
+          padding: '56px 64px',
           position: 'relative',
           overflow: 'hidden',
+          fontFamily: 'Noto Sans SC',
         }}
       >
         <div
           style={{
             position: 'absolute',
-            top: '-120px',
-            right: '-80px',
-            width: '380px',
-            height: '380px',
+            top: '-100px',
+            right: '-60px',
+            width: '360px',
+            height: '360px',
             borderRadius: '999px',
-            background: 'rgba(224, 96, 136, 0.08)',
+            background: PEACH_SOFT,
+            opacity: 0.55,
           }}
         />
         <div
@@ -101,28 +99,26 @@ export async function createSocialImageResponse() {
             position: 'absolute',
             bottom: '-80px',
             left: '-40px',
-            width: '320px',
-            height: '320px',
+            width: '280px',
+            height: '280px',
             borderRadius: '999px',
-            background: 'rgba(14, 165, 196, 0.06)',
+            background: SAGE,
+            opacity: 0.22,
           }}
         />
 
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '780px' }}>
           <div
             style={{
               display: 'flex',
-              alignItems: 'center',
               alignSelf: 'flex-start',
               borderRadius: '999px',
-              border: '1px solid #DDD8D1',
-              background: '#FFFFFF',
-              padding: '12px 18px',
+              background: PEACH,
+              color: INK,
+              padding: '10px 22px',
               fontSize: '24px',
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color: '#e06088',
-              fontWeight: 600,
+              fontWeight: 700,
+              letterSpacing: '0.18em',
             }}
           >
             WTFTI
@@ -131,188 +127,58 @@ export async function createSocialImageResponse() {
           <div
             style={{
               display: 'flex',
-              flexDirection: 'column',
-              marginTop: '28px',
-              maxWidth: '760px',
+              marginTop: '36px',
+              fontSize: '64px',
+              lineHeight: 1.12,
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                fontSize: '88px',
-                lineHeight: 1,
-                fontWeight: 800,
-                letterSpacing: '-0.04em',
-              }}
-            >
-              What&apos;s your type?
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                marginTop: '14px',
-                fontSize: '40px',
-                lineHeight: 1.2,
-                color: '#2D2A26',
-                fontFamily: 'Noto Sans SC',
-                fontWeight: 700,
-              }}
-            >
-              WTFTI 多宇宙人格测试
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                marginTop: '18px',
-                fontSize: '30px',
-                lineHeight: 1.3,
-                color: '#6B6560',
-              }}
-            >
-              10+ universes, 100+ types, endless versions of you.
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                marginTop: '10px',
-                fontSize: '24px',
-                lineHeight: 1.3,
-                color: '#7A736D',
-                fontFamily: 'Noto Sans SC',
-              }}
-            >
-              同一个你，在不同宇宙里会被翻译成完全不同的人设
-            </div>
+            懂你的女生私人顾问
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              marginTop: '18px',
+              fontSize: '30px',
+              lineHeight: 1.4,
+              color: MUTE,
+            }}
+          >
+            看清自己 · 变好看 · 有地方说心里话
           </div>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div
-              style={{
-                display: 'flex',
-                gap: '14px',
-                alignItems: 'center',
-              }}
-            >
+          <div style={{ display: 'flex', gap: '12px' }}>
+            {chips.map((label) => (
               <div
+                key={label}
                 style={{
                   display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
                   borderRadius: '999px',
-                  background: 'rgba(224, 96, 136, 0.1)',
-                  border: '1px solid rgba(224, 96, 136, 0.3)',
-                  padding: '10px 16px 12px',
-                  color: '#e06088',
+                  border: `1px solid ${LINE}`,
+                  background: CARD,
+                  padding: '12px 18px',
+                  fontSize: '22px',
+                  color: INK,
                 }}
               >
-                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>10+ universes</div>
-                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>多个主题宇宙</div>
+                {label}
               </div>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  borderRadius: '999px',
-                  background: 'rgba(14, 165, 196, 0.1)',
-                  border: '1px solid rgba(14, 165, 196, 0.3)',
-                  padding: '10px 16px 12px',
-                  color: '#0ea5c4',
-                }}
-              >
-                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>100+ types</div>
-                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>100+ 张人设卡</div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  borderRadius: '999px',
-                  background: 'rgba(14, 165, 114, 0.1)',
-                  border: '1px solid rgba(14, 165, 114, 0.3)',
-                  padding: '10px 16px 12px',
-                  color: '#0ea572',
-                }}
-              >
-                <div style={{ display: 'flex', fontSize: '22px', fontWeight: 600 }}>WTF energy</div>
-                <div style={{ display: 'flex', marginTop: '4px', fontSize: '15px', fontFamily: 'Noto Sans SC' }}>荒诞又上头</div>
-              </div>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                marginTop: '24px',
-                fontSize: '20px',
-                color: '#9C9590',
-                alignItems: 'center',
-              }}
-            >
-              <span>wtfti.com</span>
-              <span style={{ display: 'flex', marginLeft: '12px', fontFamily: 'Noto Sans SC', letterSpacing: 0 }}>
-                中文语境人格测试
-              </span>
-            </div>
+            ))}
           </div>
-
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-end',
-              padding: '22px 24px',
-              borderRadius: '28px',
-              background: '#FFFFFF',
-              border: '1px solid #DDD8D1',
+              fontSize: '22px',
+              color: MUTE,
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                fontSize: '17px',
-                color: '#9C9590',
-                textTransform: 'uppercase',
-                letterSpacing: '0.12em',
-              }}
-            >
-              Featured types
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                marginTop: '6px',
-                fontSize: '16px',
-                color: '#8D867F',
-                fontFamily: 'Noto Sans SC',
-              }}
-            >
-              热门人设
-            </div>
-            <div style={{ display: 'flex', marginTop: '14px', gap: '10px' }}>
-              {featuredTypes.map((type) => (
-                <div
-                  key={type.code}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    width: '82px',
-                    height: '82px',
-                    borderRadius: '22px',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: type.background,
-                    color: '#FFFFFF',
-                  }}
-                >
-                  <div style={{ display: 'flex', fontSize: '20px', fontWeight: 800 }}>{type.code}</div>
-                  <div style={{ display: 'flex', marginTop: '4px', fontSize: '13px', fontFamily: 'Noto Sans SC' }}>
-                    {type.label}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <span>每天一张今日卡</span>
+            <span style={{ marginTop: '4px' }}>wtfti.com</span>
           </div>
         </div>
       </div>
