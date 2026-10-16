@@ -41,6 +41,7 @@ const ALLOWED_MODULES = new Set([
   'identify',
   'home',
   'auth',
+  'her_voice',
 ]);
 
 const MAX_EVENTS_PER_BATCH = 32;

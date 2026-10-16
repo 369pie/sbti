@@ -125,7 +125,7 @@ export default function CptiSquadClient() {
     <main className="min-h-screen bg-bg-primary text-text-primary px-4 py-10">
       <div className="max-w-3xl mx-auto space-y-8">
         <header className="space-y-3">
-          <p className="text-xs tracking-[0.4em] text-amber-300/70 uppercase">CPTI · Squad</p>
+          <p className="text-xs tracking-[0.4em] text-gold-soft/70 uppercase">CPTI · Squad</p>
           <h1 className="text-3xl md:text-4xl font-display">闺蜜组：4 个人，6 段关系</h1>
           <p className="text-sm text-text-secondary leading-relaxed">
             把你那群&ldquo;互相吐槽但谁也离不开谁&rdquo;的人拉进来。我们会算 6 段两两关系，还会给你们的组合贴一个标签：
@@ -162,7 +162,7 @@ export default function CptiSquadClient() {
                   className="w-32 px-3 py-2 rounded-lg bg-bg-primary border border-border text-sm"
                 />
                 {members.length > MIN && (
-                  <button onClick={() => removeSlot(i)} className="text-xs text-text-muted hover:text-rose-400">×</button>
+                  <button onClick={() => removeSlot(i)} className="text-xs text-text-muted hover:text-rose-text">×</button>
                 )}
               </div>
             ))}
@@ -188,10 +188,10 @@ export default function CptiSquadClient() {
         {analysis && (
           <section className="space-y-6">
             {/* aggregate card */}
-            <article className="p-6 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/5 via-rose-500/5 to-transparent space-y-4">
+            <article className="p-6 rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/5 via-accent/5 to-transparent space-y-4">
               <div className="flex items-baseline justify-between">
                 <h3 className="text-2xl font-display">{analysis.aggregate.vibeLabel}</h3>
-                <span className="font-mono text-xs text-amber-300/80">{analysis.aggregate.code}</span>
+                <span className="font-mono text-xs text-gold-soft/80">{analysis.aggregate.code}</span>
               </div>
               <p className="text-sm text-text-secondary italic">{analysis.aggregate.tagline}</p>
 
@@ -199,16 +199,16 @@ export default function CptiSquadClient() {
                 {analysis.aggregate.dimensions.map(d => (
                   <div key={d.id} className="text-center space-y-1">
                     <div className="text-[10px] text-text-muted">{d.label}</div>
-                    <div className="text-base font-mono text-amber-200">{d.score}</div>
+                    <div className="text-base font-mono text-gold-soft">{d.score}</div>
                     <div className="h-1 rounded-full bg-bg-secondary overflow-hidden">
-                      <div className="h-full bg-amber-400/80" style={{ width: `${d.score}%` }} />
+                      <div className="h-full bg-gold/80" style={{ width: `${d.score}%` }} />
                     </div>
                   </div>
                 ))}
               </div>
 
               <div className="pt-2 text-xs text-text-secondary">
-                平均匹配度 <span className="font-mono text-amber-200">{analysis.averageCompatibility}</span> ·
+                平均匹配度 <span className="font-mono text-gold-soft">{analysis.averageCompatibility}</span> ·
                 共 <span className="font-mono">{analysis.pairs.length}</span> 段关系
               </div>
             </article>
@@ -220,7 +220,7 @@ export default function CptiSquadClient() {
                 <ul className="space-y-2">
                   {analysis.highlights.map(h => (
                     <li key={h.role} className="flex items-baseline justify-between gap-3 text-sm">
-                      <span className="text-rose-300">{h.role}</span>
+                      <span className="text-rose-text">{h.role}</span>
                       <span className="text-text-primary">{h.memberNickname}</span>
                       <span className="flex-1 text-xs text-text-muted text-right">{h.basis}</span>
                     </li>
@@ -237,16 +237,16 @@ export default function CptiSquadClient() {
                   <Link
                     key={i}
                     href={`/cpti/relationship/${p.relationship.slug}/`}
-                    className="group p-4 rounded-xl border border-border hover:border-rose-500/40 bg-bg-secondary/30 hover:bg-bg-secondary/50 transition-all space-y-2"
+                    className="group p-4 rounded-xl border border-border hover:border-accent/40 bg-bg-secondary/30 hover:bg-bg-secondary/50 transition-all space-y-2"
                   >
                     <div className="flex items-center justify-between text-xs text-text-muted">
                       <span>{p.nicknameA} <span className="text-text-primary">×</span> {p.nicknameB}</span>
                       <span className="font-mono">{p.compatibility}</span>
                     </div>
-                    <div className="text-base font-display group-hover:text-rose-300 transition-colors">
+                    <div className="text-base font-display group-hover:text-rose-text transition-colors">
                       {p.relationship.name}
                     </div>
-                    <div className="text-[11px] text-amber-300/70">{p.rarityLabel}</div>
+                    <div className="text-[11px] text-gold-soft/70">{p.rarityLabel}</div>
                   </Link>
                 ))}
               </div>
@@ -259,7 +259,7 @@ export default function CptiSquadClient() {
                   <h4 className="text-sm font-medium">分享给你这群人</h4>
                   <button
                     onClick={copyShareLink}
-                    className="w-full py-3 rounded-xl border border-rose-500/30 bg-rose-500/10 text-sm text-rose-300 hover:bg-rose-500/15"
+                    className="w-full py-3 rounded-xl border border-accent/30 bg-accent/10 text-sm text-rose-text hover:bg-accent/15"
                   >
                     📋 复制带组合的专属链接
                   </button>
@@ -274,7 +274,7 @@ export default function CptiSquadClient() {
                   <Link
                     href="/cpti/pricing/?intent=squad"
                     onClick={() => trackSquad('cpti_squad_paywall_view', { size: filled.length })}
-                    className="block w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 text-bg-primary text-sm text-center font-medium hover:opacity-90"
+                    className="block w-full py-3 rounded-xl bg-gradient-to-r from-gold to-accent text-bg-primary text-sm text-center font-medium hover:opacity-90"
                   >
                     ¥39 解锁完整报告 →
                   </Link>

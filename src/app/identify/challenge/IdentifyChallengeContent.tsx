@@ -212,7 +212,7 @@ export function IdentifyChallengeContent() {
   if (shareToken && !previewResolved) {
     return (
       <div className="min-h-screen flex items-center justify-center px-6">
-        <div className="w-5 h-5 rounded-full border-2 border-pink-400 border-t-transparent animate-spin" />
+        <div className="w-5 h-5 rounded-full border-2 border-accent border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -227,7 +227,7 @@ export function IdentifyChallengeContent() {
         </p>
         <Link
           href="/identify/test/"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-bg-primary font-medium text-sm"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-accent to-rose-deep text-bg-primary font-medium text-sm"
         >
           开始测试 →
         </Link>
@@ -260,7 +260,7 @@ export function IdentifyChallengeContent() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-pink-500/30 bg-pink-500/10 text-sm text-pink-400 mb-6"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-sm text-rose-text mb-6"
             >
               🔔 有人用 21 个维度分析了你……
             </motion.div>
@@ -330,8 +330,8 @@ export function IdentifyChallengeContent() {
           <div className="space-y-2">
             {persona.symptoms.map((_, i) => (
               <div key={i} className="flex items-center gap-2.5">
-                <span className="flex-shrink-0 w-5 h-5 rounded border-2 border-pink-500/30 bg-pink-500/10 flex items-center justify-center">
-                  <svg className="w-3 h-3 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <span className="flex-shrink-0 w-5 h-5 rounded border-2 border-accent/30 bg-accent/10 flex items-center justify-center">
+                  <svg className="w-3 h-3 text-rose-text" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </span>
@@ -356,7 +356,7 @@ export function IdentifyChallengeContent() {
           {/* Path A: 自己也做一个 */}
           <Link
             href="/identify/test/"
-            className="block w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 text-bg-primary font-medium text-center text-base hover:from-pink-600 hover:to-rose-600 transition-all shadow-lg shadow-pink-500/20"
+            className="block w-full py-4 rounded-2xl bg-gradient-to-r from-accent to-rose-deep text-bg-primary font-medium text-center text-base hover:from-accent/85 hover:to-rose-deep/85 transition-all shadow-lg shadow-accent/20"
           >
             自己也做一个（解锁完整鉴定）→
           </Link>
@@ -364,7 +364,7 @@ export function IdentifyChallengeContent() {
           {/* Path B: 直接看 TA 怎么说 */}
           <Link
             href={directResultHref}
-            className="block w-full py-4 rounded-2xl border-2 border-dashed border-pink-500/20 bg-pink-500/5 text-center hover:bg-pink-500/10 transition-all"
+            className="block w-full py-4 rounded-2xl border-2 border-dashed border-accent/20 bg-accent/5 text-center hover:bg-accent/10 transition-all"
           >
             <span className="text-base font-medium text-text-primary">直接看 TA 怎么说你的</span>
             <br />

@@ -14,6 +14,7 @@ import { getPaymentAvailabilityStatus, getPaymentBlockedPayload } from '@/lib/pa
 import { isMystiPaymentStubMode } from '@/lib/mysti/payment-mode';
 import {
   createPendingMystiOrder,
+  hasPaidMystiSubscriptionOrderForDevice,
   updateMystiOrderStatus,
   type MystiOrderAttach,
 } from '@/lib/mysti/payment-store';
@@ -159,6 +160,25 @@ export async function POST(req: NextRequest) {
 
   if (!sku || !VALID_SKUS.has(sku) || !resourceId) {
     return NextResponse.json({ error: 'invalid_params' }, { status: 400 });
+  }
+
+  // 首月 intro 资格：服务端 fail-closed（UI 只是展示层）。
+  // stub 模式（本地/开发）跳过校验，方便联调。
+  if (sku === 'monthly-pass-intro' && !allowStub) {
+    if (!deviceId) {
+      return NextResponse.json({ error: 'intro_requires_device' }, { status: 400 });
+    }
+    try {
+      const everPaid = await hasPaidMystiSubscriptionOrderForDevice(deviceId);
+      if (everPaid) {
+        return NextResponse.json(
+          { error: 'intro_ineligible', message: '首月价仅限首次开通通行证。' },
+          { status: 403 },
+        );
+      }
+    } catch {
+      return NextResponse.json({ error: 'intro_check_failed' }, { status: 503 });
+    }
   }
 
   const cfg = readXunhupayConfig(paymentType);

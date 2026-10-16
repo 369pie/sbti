@@ -197,7 +197,7 @@ export async function fetchCreatorEarnings(
 
   // Fetch universe names
   const universeIds = [...universeMap.keys()];
-  let universeNames = new Map<string, string>();
+  const universeNames = new Map<string, string>();
   if (universeIds.length > 0) {
     const { data: universes } = await supabase
       .from('creator_universes')

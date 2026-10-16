@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
 import { MystiThemeProvider } from '@/components/MystiThemeProvider';
-import { MystiThemeToggle } from '@/components/MystiThemeToggle';
 import { MystiSubscriptionBoot } from '@/components/MystiSubscriptionBoot';
 import { MystiSubscriptionExpiryBanner } from '@/components/MystiSubscriptionExpiryBanner';
 import { getAutoTimeTheme } from '@/lib/mysti/themes-v2';
@@ -33,7 +32,6 @@ export default function MystiLayout({ children }: { children: React.ReactNode })
       <MystiSubscriptionBoot />
       <MystiSubscriptionExpiryBanner />
       {children}
-      <MystiThemeToggle />
     </MystiThemeProvider>
   );
 }

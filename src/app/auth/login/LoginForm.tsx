@@ -77,7 +77,7 @@ export function LoginForm() {
         </div>
 
         {registered && (
-          <div className="mb-6 p-3 rounded-xl bg-green-50 border border-green-200 text-sm text-green-700 text-center">
+          <div className="mb-6 p-3 rounded-xl bg-sage/10 border border-sage/45 text-sm text-sage-text text-center">
             ✅ 注册成功！请登录你的账号
           </div>
         )}
@@ -85,7 +85,7 @@ export function LoginForm() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600 text-center">
+            <div className="p-3 rounded-xl bg-ember/10 border border-ember/30 text-sm text-ember text-center">
               {error}
             </div>
           )}

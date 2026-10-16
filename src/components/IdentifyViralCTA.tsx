@@ -25,7 +25,7 @@ export function IdentifyViralCTA({ personalityName, variant = 'default' }: Props
         <div className={`rounded-2xl border p-5 sm:p-6 flex items-center gap-4 ${
           isXpti
             ? 'border-accent/20 bg-gradient-to-r from-accent/12 to-rose-deep/12'
-            : 'border-pink-500/15 bg-gradient-to-r from-pink-500/5 to-rose-500/5'
+            : 'border-accent/15 bg-gradient-to-r from-accent/5 to-accent/5'
         }`}>
           <div className="text-3xl flex-shrink-0">🔍</div>
           <div className="flex-1 min-w-0">
@@ -39,7 +39,7 @@ export function IdentifyViralCTA({ personalityName, variant = 'default' }: Props
           <Link
             href="/identify/"
             className={`flex-shrink-0 px-4 py-2 rounded-full text-bg-primary text-xs font-medium transition-colors ${
-              isXpti ? 'bg-accent hover:bg-rose-deep' : 'bg-pink-500 hover:bg-pink-600'
+              isXpti ? 'bg-accent hover:bg-rose-deep' : 'bg-accent hover:bg-accent/85'
             }`}
           >
             帮 ta 鉴定

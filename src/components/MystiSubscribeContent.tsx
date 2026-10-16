@@ -9,7 +9,9 @@ import { SKU_PRICES, type SubscriptionSku } from '@/lib/mysti/unlock';
 import { getPaymentAvailabilityStatus } from '@/lib/payment/availability';
 import {
   daysUntilExpiry,
+  fetchEverSubscribedFromServer,
   getActiveSubscription,
+  hasEverSubscribed,
   isSubscriber,
   syncSubscriptionFromServer,
 } from '@/lib/mysti/subscription';
@@ -36,11 +38,11 @@ const TIERS: TierDef[] = [
     bullets: [
       'WTFTI / SoulTI / CPTI / XPTI 深档自动解锁',
       '每日翻牌专属仪式',
-      '灵魂月报 + 全部 Plus 分享卡 自动解锁',
+      '每月小报告 + 全部 Plus 分享卡 自动解锁',
       '礼品卡 6 折 · 灵魂信 / 合盘报告 / 藏品卡 7 折',
       '到期自然结束 · 不自动续费',
     ],
-    cta: '开通月度通行证',
+    cta: '开通月度会员',
   },
   {
     sku: 'quarterly-pass',
@@ -52,7 +54,7 @@ const TIERS: TierDef[] = [
       '额外赠送：每月限定藏品卡 1 张',
       '到期前 7 天提醒续费',
     ],
-    cta: '开通季度通行证 ¥99',
+    cta: '开通季度会员 ¥99',
     recommended: true,
   },
   {
@@ -65,7 +67,7 @@ const TIERS: TierDef[] = [
       '额外赠送：年度限定藏品 N° 编号',
       '专属客服通道 + 年度灵魂书',
     ],
-    cta: '开通年度通行证 ¥299',
+    cta: '开通年度会员 ¥299',
   },
 ];
 
@@ -80,6 +82,7 @@ function SubscribeInner() {
   const [loading, setLoading] = useState<SubscriptionSku | null>(null);
   const [paymentType, setPaymentType] = useState<'wechat' | 'alipay'>('wechat');
   const [error, setError] = useState<string | null>(null);
+  const [introEligible, setIntroEligible] = useState(false);
 
   useEffect(() => {
     setHydrated(true);
@@ -103,7 +106,30 @@ function SubscribeInner() {
     } catch {
       /* noop */
     }
+    // 首月 intro 展示判定：本地历史无通行证 → 先按可享展示，再用服务端口径纠正
+    if (!hasEverSubscribed()) {
+      setIntroEligible(true);
+      void fetchEverSubscribedFromServer().then((ever) => {
+        if (ever) setIntroEligible(false);
+      });
+    }
   }, [fromSku]);
+
+  const tiers = useMemo<TierDef[]>(() => {
+    if (!introEligible) return TIERS;
+    const [monthly, ...rest] = TIERS;
+    return [
+      {
+        ...monthly,
+        sku: 'monthly-pass-intro',
+        badge: '首月特惠',
+        perMonth: '¥9.9 首月 · 之后按月 ¥19',
+        highlight: '第一次开通 · 30 天全权益 · 不自动续费',
+        cta: '首月 ¥9.9 开通',
+      },
+      ...rest,
+    ];
+  }, [introEligible]);
 
   const checkout = useCallback(
     async (sku: SubscriptionSku) => {
@@ -160,11 +186,11 @@ function SubscribeInner() {
   );
 
   const headline = useMemo(() => {
-    if (!hydrated) return '灵魂通行证';
+    if (!hydrated) return '暮光通行证';
     if (hasPass && activeSku) {
-      return `你已开通 · 还剩 ${days} 天`;
+      return `你已拥有 · 还剩 ${days} 天`;
     }
-    return '灵魂通行证';
+    return '暮光通行证';
   }, [hydrated, hasPass, activeSku, days]);
 
   return (
@@ -194,10 +220,74 @@ function SubscribeInner() {
             className="mt-3 text-sm leading-7 max-w-xl mx-auto"
             style={{ color: theme.textMuted, fontFamily: 'var(--font-serif)' }}
           >
-            把四大深档、月报、Plus 分享卡、每日仪式打包到一张通行证。
+            把神谕室的钥匙，留给自己。
             <br />
-            到期自然结束，不自动续费——这是我们对你最基本的尊重。
+            无限抽牌 · 合盘长文 · 历年命书 · 节气暗信 · 年度纪章。到期自然结束，不自动续费。
           </p>
+
+          {/* W4 · E4.5 · 三点价值说明 */}
+          <ul
+            className="mt-8 grid gap-3 text-left max-w-xl mx-auto sm:grid-cols-3 sm:gap-4"
+            style={{ listStyle: 'none', padding: 0 }}
+          >
+            {[
+              { num: '365', unit: '天', italic: '每天一句', tail: '只属于她的预兆' },
+              { num: '12', unit: '月', italic: '每月一封', tail: '写给她当下的灵魂信' },
+              { num: '1', unit: '次', italic: '价值 ¥39', tail: '「她的星图档案」赠送' },
+            ].map((it) => (
+              <li
+                key={it.num}
+                className="px-4 py-4"
+                style={{
+                  background: theme.cardSurface,
+                  border: `1px solid ${theme.cardBorder}`,
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 28,
+                    color: theme.accent,
+                    lineHeight: 1,
+                  }}
+                >
+                  {it.num}
+                  <span
+                    style={{
+                      fontSize: 12,
+                      marginLeft: 4,
+                      color: theme.textMuted,
+                      fontFamily: 'ui-monospace, "SF Mono", monospace',
+                      letterSpacing: '0.18em',
+                    }}
+                  >
+                    {it.unit}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontStyle: 'italic',
+                    fontSize: 14,
+                    color: theme.text,
+                    marginTop: 6,
+                  }}
+                >
+                  {it.italic}
+                </div>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: theme.textMuted,
+                    fontFamily: 'var(--font-serif)',
+                    marginTop: 2,
+                  }}
+                >
+                  {it.tail}
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
 
         {/* 当前订阅状态 */}
@@ -256,7 +346,7 @@ function SubscribeInner() {
 
         {/* 三档价位 */}
         <div className="grid sm:grid-cols-3 gap-4">
-          {TIERS.map(tier => {
+          {tiers.map(tier => {
             const meta = SKU_PRICES[tier.sku];
             const isActive = activeSku === tier.sku;
             const recommended = tier.recommended;
@@ -374,7 +464,7 @@ function SubscribeInner() {
             通行证 vs 单次购买
           </h3>
           <div className="grid grid-cols-3 gap-2 text-xs sm:text-sm">
-            <Row label="灵魂月报 · 月度生成" pass="自动解锁" single="¥6.9 / 月" theme={theme} />
+            <Row label="每月小报告 · 月度生成" pass="自动解锁" single="¥6.9 / 月" theme={theme} />
             <Row label="全部 Plus 分享卡" pass="去水印 · 金边" single="¥4.9 / 张" theme={theme} />
             <Row label="灵魂信 · 深度版" pass="7 折 · ¥6.9" single="¥9.9" theme={theme} />
             <Row label="双人合盘报告" pass="7 折 · ¥9" single="¥12.9" theme={theme} />

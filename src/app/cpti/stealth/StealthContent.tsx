@@ -37,7 +37,7 @@ export function StealthContent() {
         </p>
 
         {!hasProfile && mounted ? (
-          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 text-center">
+          <div className="rounded-2xl border border-gold/20 bg-gold/5 p-6 text-center">
             <div className="text-2xl mb-2">☝️</div>
             <p className="text-sm text-text-secondary mb-4">
               你需要先完成自己的CPTI测试
@@ -46,7 +46,7 @@ export function StealthContent() {
             </p>
             <Link
               href="/cpti/test"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium text-sm hover:bg-rose-600 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium text-sm hover:bg-accent/85 transition-all"
             >
               先测测自己的CP角色
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -63,7 +63,7 @@ export function StealthContent() {
                 value={nickname}
                 onChange={e => setNickname(e.target.value)}
                 maxLength={20}
-                className="w-full px-4 py-3 rounded-xl border border-border-subtle bg-bg-secondary text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-purple-500/40 transition-colors text-center"
+                className="w-full px-4 py-3 rounded-xl border border-border-subtle bg-bg-secondary text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-violet-text/40 transition-colors text-center"
               />
               <p className="text-xs text-text-muted mt-2">
                 代号仅用于显示，不会发送给任何人
@@ -71,7 +71,7 @@ export function StealthContent() {
             </div>
             <button
               onClick={() => setStarted(true)}
-              className="w-full py-3.5 rounded-xl bg-purple-500 text-bg-primary font-medium text-sm hover:bg-purple-600 transition-all cursor-pointer"
+              className="w-full py-3.5 rounded-xl bg-violet-text text-bg-primary font-medium text-sm hover:bg-violet-text/85 transition-all cursor-pointer"
             >
               开始偷偷测
             </button>

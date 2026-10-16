@@ -19,14 +19,14 @@
   --font-heading: var(--font-sans-sc), "Noto Sans SC", "PingFang SC",
     system-ui, sans-serif;
 
-  /* ─── Paper palette — Warm Oat（默认浅色 · 与 wtfti-light 同源）───── */
-  --color-bg-primary: #FBF6F0;       /* Warm Oat · 暖燕麦色 */
-  --color-bg-secondary: #F4E9DF;     /* Soft Sand · 柔沙色 */
-  --color-bg-tertiary: #EBDFD1;      /* Dusty Beige · 尘米色 */
+  /* ─── Paper palette — Sakura Blush 初樱（默认浅色 · 与 wtfti-light 同源）───── */
+  --color-bg-primary: #FDF8F6;       /* Sakura White · 樱米白 */
+  --color-bg-secondary: #F9EFEB;     /* Blush Sand · 淡樱沙 */
+  --color-bg-tertiary: #F3E4E0;      /* Petal Beige · 樱粉米 */
   --color-bg-elevated: #FFFFFF;
-  --color-paper: #FBF6F0;
-  --color-paper-deep: #F4E9DF;
-  --color-paper-warm: #F5EEE4;
+  --color-paper: #FDF8F6;
+  --color-paper-deep: #F9EFEB;
+  --color-paper-warm: #FAF2EF;
 
   /* Ink / text */
   --color-text-primary: #3D2C23;     /* Deep Espresso · 深浓缩棕色 */
@@ -35,34 +35,66 @@
   --color-ink: #3D2C23;
   --color-ink-soft: #5C4035;
   --color-ink-mute: #8B6D5E;
-  --color-stone: #A88B7D;
+  --color-stone: #795157;             /* 玫瑰灰棕，eyebrow/label 可读 */
 
   /* Rules & borders */
-  --color-border: #E0D0C0;
-  --color-border-subtle: #F0E4D8;
-  --color-rule: #E0D0C0;
-  --color-rule-soft: #F0E4D8;
+  --color-border: #EDDAD5;
+  --color-border-subtle: #F7E9E5;
+  --color-rule: #EDDAD5;
+  --color-rule-soft: #F7E9E5;
+  --color-border-input: #A5877B;      /* v2 §2.3 · 功能边界：输入框/可点区轮廓/焦点前态，≥3:1 */
 
-  /* Accent system — Warm Rose（Warm Rose 唯一主色 + Copper Gold + Matcha Leaf 三色奏鸣） */
-  --color-accent: #C9867D;
-  --color-accent-light: #E7C6C0;
-  --color-accent-dim: rgba(201, 134, 125, 0.12);
-  --color-rose: #C9867D;
-  --color-rose-dust: #E7C6C0;
-  --color-rose-deep: #A86B63;
-  --color-gold: #C9A676;             /* Copper Gold · 铜金（取代古典 gold） */
-  --color-gold-soft: #DDBFA3;
-  --color-gold-leaf: #C9A676;
-  --color-ember: #9C5C52;            /* deep rose · warning */
+  /* Accent system — Sakura Rose（初樱粉主色 + Champagne Gold + Matcha Leaf 三色奏鸣） */
+  --color-accent: #CD8299;            /* v2.1：初樱粉（装饰层；小字一律走 *-text 文字级 token） */
+  --color-accent-light: #F1D2DB;
+  --color-accent-dim: rgba(205, 130, 153, 0.12);
+  --color-rose: #CD8299;
+  --color-rose-dust: #F1D2DB;
+  --color-rose-deep: #B06E7E;
+  --color-gold: #D0AB7C;             /* Champagne Gold · 香槟金 */
+  --color-gold-soft: #E9CDAE;
+  --color-gold-leaf: #D0AB7C;
+  --color-ember: #A4525A;            /* deep rose · warning */
   --color-sage: #B7C7A2;             /* Matcha Leaf · success / CTA-2 */
   --color-gem: #9AB37A;              /* Matcha Leaf 深一档 */
 
-  /* Model colors — 跟随 Warm Oat 暖棕光谱 */
-  --color-model-self: #C9867D;
-  --color-model-emotion: #A86B63;
+  /* Accent 文字层（v2 §2.2 新增）— 链接/强调小字/标注专用，实测均 ≥4.5:1；装饰层 hex 禁作 <24px 文字 */
+  --color-rose-text: #A24E63;
+  --color-gold-text: #8A6D3B;
+  --color-sage-text: #5F7A45;
+  --color-violet-text: #7A5CD6;
+  /* Nebula 星云粉 — SUMMER BLUSH 遗产，仅装饰：hero 渐变停止色 / ≥32px 展示字 / 插画 */
+  --color-nebula-light: #E07AA0;
+
+  /* CTA 浆果玫瑰渐变（v2 §2.4 新增；v2.1 由咖啡玫瑰转浆果玫瑰，深度不减、on-accent 对比度不降） */
+  --color-cta-from: #8E3B4F;          /* 浆果玫瑰 · text-on-accent AAA */
+  --color-cta-to: #812F42;            /* 浆果深绛 · text-on-accent AAA */
+
+  /* Semantic surfaces — light defaults */
+  --color-text-on-accent: #FDF8F6;    /* 按钮上的文字 */
+  --color-border-strong: #D0AB7C;     /* 需要存在感的分割线/边框 */
+  --color-surface-hover: #FAF1ED;     /* hover 态表面色 */
+  --color-backdrop: rgba(61, 44, 35, 0.55);
+
+  /* Shadow system — light defaults (warm rose tint) */
+  --shadow-card: 0 18px 42px -34px color-mix(in oklab, var(--color-rose) 22%, transparent);
+  --shadow-elevated: 0 28px 90px -54px color-mix(in oklab, var(--color-rose) 18%, transparent);
+  --shadow-halo: var(--galaxy-rose-halo);
+
+  /* HER AURORA · 极光层增量（叠加在 rose/gold 之上，仅供 /her-voice/* 使用，不污染全局组件） */
+  --aurora-veil: #7DB7B0;             /* 极光青绿 / 鼠尾草偏冷 · hero accent / 正在亮 */
+  --aurora-rose: var(--color-rose);   /* 接光线 / 同光者轨道 · 复用玫瑰陶土 */
+  --aurora-halo: var(--color-gold-leaf); /* Halo SVG 主轨道 · 复用金箔 */
+  --aurora-keeper: #5C5366;           /* Aurora Keepers · 守光人话语 */
+  --aurora-night: #0F0B1F;            /* 长夜底 · 暮紫底再深一档 */
+  --aurora-dusk: #8C8290;             /* 已熄光 · 历史光归档色 */
+
+  /* Model colors — 跟随 Sakura Blush 初樱光谱 */
+  --color-model-self: #CE8A9E;
+  --color-model-emotion: #B06E7E;
   --color-model-attitude: #B7C7A2;
-  --color-model-action: #C9A676;
-  --color-model-social: #E7C6C0;
+  --color-model-action: #D0AB7C;
+  --color-model-social: #F1D2DB;
 
   /* Radius scale v3 */
   --radius-sharp: 0px;
@@ -137,53 +169,53 @@ header.sticky {
    Galaxy Twilight Palette · 人格神域统一设计 token（在 :root 暴露，可跨组件复用）
    ───────────────────────────────────────────────────────────────────────── */
 :root {
-  /* 暮光底 · 三层景深 */
-  --galaxy-ink-deep: #0F0A22;
-  --galaxy-ink: #1A1530;
-  --galaxy-ink-soft: #2A1C4D;
-  --galaxy-twilight: #3F2F6B;
+  /* 暮光底 · 三层景深（v2 §4.1：:root 默认值与 dark 覆写完全一致，消除"两个暮紫"） */
+  --galaxy-ink-deep: #0D081F;
+  --galaxy-ink: #161029;
+  --galaxy-ink-soft: #231A3D;
+  --galaxy-twilight: #352454;
 
   /* 羊皮纸 · 主内容色 */
   --galaxy-cream: #F5F0E8;
-  --galaxy-parchment: #EDE3D2;
-  --galaxy-mist: rgba(245, 240, 232, 0.65);
-  --galaxy-mist-faint: rgba(245, 240, 232, 0.35);
+  --galaxy-parchment: #E8E0D2;
+  --galaxy-mist: rgba(245, 240, 232, 0.62);
+  --galaxy-mist-faint: rgba(245, 240, 232, 0.28);
 
   /* Editorial 四色 */
-  --galaxy-rose: #C07A8E;
-  --galaxy-rose-soft: rgba(192, 122, 142, 0.22);
-  --galaxy-rose-glow: rgba(192, 122, 142, 0.28);
-  --galaxy-gold: #C9A676;
-  --galaxy-gold-soft: #D4B58A;
-  --galaxy-gold-faint: rgba(201, 166, 118, 0.35);
-  --galaxy-violet: #9C7CFF;
-  --galaxy-violet-soft: rgba(156, 124, 255, 0.22);
-  --galaxy-violet-glow: rgba(156, 124, 255, 0.28);
+  --galaxy-rose: #D4A59A;
+  --galaxy-rose-soft: rgba(212, 165, 154, 0.18);
+  --galaxy-rose-glow: rgba(212, 165, 154, 0.28);
+  --galaxy-gold: #D4B889;
+  --galaxy-gold-soft: #E8D7BC;
+  --galaxy-gold-faint: rgba(212, 184, 137, 0.28);
+  --galaxy-violet: #A88FE8;
+  --galaxy-violet-soft: rgba(168, 143, 232, 0.16);
+  --galaxy-violet-glow: rgba(168, 143, 232, 0.24);
   --galaxy-moon: #C9B6FF;
-  --galaxy-nebula: #FF9BB8;
+  --galaxy-nebula: #F0A8C0;
 
   /* 背景配方 · Hero / Section / 羊皮纸浮层 */
   --galaxy-bg-hero: radial-gradient(
-    ellipse 120% 70% at 50% 0%,
-    #3F2F6B 0%,
-    #1A1530 45%,
-    #0F0A22 100%
+    ellipse 130% 80% at 50% 0%,
+    #352454 0%,
+    #161029 48%,
+    #0D081F 100%
   );
   --galaxy-bg-section: radial-gradient(
-    ellipse 100% 60% at 50% 30%,
-    #2A1C4D 0%,
-    #1A1530 70%
+    ellipse 110% 70% at 50% 30%,
+    #231A3D 0%,
+    #161029 72%
   );
-  --galaxy-bg-paper: linear-gradient(180deg, #1A1530 0%, #211842 100%);
+  --galaxy-bg-paper: linear-gradient(180deg, #161029 0%, #1E1635 100%);
 
   /* 金箔细线 · 博物馆质感分割 */
-  --galaxy-hairline: linear-gradient(90deg, transparent, #C9A676 50%, transparent);
-  --galaxy-divider-gold: 1px solid rgba(201, 166, 118, 0.35);
+  --galaxy-hairline: linear-gradient(90deg, transparent, #D4B889 50%, transparent);
+  --galaxy-divider-gold: 1px solid rgba(212, 184, 137, 0.28);
 
   /* 光晕 · 克制使用 */
-  --galaxy-rose-halo: 0 0 60px rgba(192, 122, 142, 0.25),
-    0 0 120px rgba(192, 122, 142, 0.12);
-  --galaxy-violet-halo: 0 0 80px rgba(156, 124, 255, 0.22);
+  --galaxy-rose-halo: 0 0 60px rgba(212, 165, 154, 0.22),
+    0 0 120px rgba(212, 165, 154, 0.11);
+  --galaxy-violet-halo: 0 0 80px rgba(168, 143, 232, 0.20);
 
   /* 字体映射：galaxy 沿用站点 display / sans */
   --galaxy-font-display: var(--font-display);
@@ -201,78 +233,78 @@ header.sticky {
 body[data-theme='galaxy'],
 body[data-theme='wtfti-dark'] {
   /* ── Galaxy / cosmic tokens ────────────────────────────────────────── */
-  /* Ink layers — 干净的深灰/炭黑配色 */
-  --galaxy-ink-deep: #0B0B0F;
-  --galaxy-ink: #12121A;
-  --galaxy-ink-soft: #1E1E28;
-  --galaxy-twilight: #2D2D3A;
+  /* Ink layers — 暮光紫底，保留品牌宇宙仪式感 */
+  --galaxy-ink-deep: #0D081F;
+  --galaxy-ink: #161029;
+  --galaxy-ink-soft: #231A3D;
+  --galaxy-twilight: #352454;
 
-  /* Cream / parchment — 干净的米白/灰 */
-  --galaxy-cream: #F2F2F5;
-  --galaxy-parchment: #D8D8DF;
-  --galaxy-mist: rgba(242, 242, 245, 0.64);
-  --galaxy-mist-faint: rgba(242, 242, 245, 0.32);
+  /* Cream / parchment — 暖米白/羊皮纸 */
+  --galaxy-cream: #F5F0E8;
+  --galaxy-parchment: #E8E0D2;
+  --galaxy-mist: rgba(245, 240, 232, 0.62);
+  --galaxy-mist-faint: rgba(245, 240, 232, 0.28);
 
-  /* Accents — 干净的玫瑰金/铜金/冷金 */
+  /* Accents — 玫瑰金 / 金箔 / 紫罗兰 / 月光紫 */
   --galaxy-rose: #D4A59A;
   --galaxy-rose-soft: rgba(212, 165, 154, 0.18);
   --galaxy-rose-glow: rgba(212, 165, 154, 0.28);
   --galaxy-gold: #D4B889;
   --galaxy-gold-soft: #E8D7BC;
   --galaxy-gold-faint: rgba(212, 184, 137, 0.28);
-  --galaxy-violet: #9DB4D4;
-  --galaxy-violet-soft: rgba(157, 180, 212, 0.18);
-  --galaxy-violet-glow: rgba(157, 180, 212, 0.28);
-  --galaxy-moon: #B8C7D8;
-  --galaxy-nebula: #D4A59A;
+  --galaxy-violet: #A88FE8;
+  --galaxy-violet-soft: rgba(168, 143, 232, 0.16);
+  --galaxy-violet-glow: rgba(168, 143, 232, 0.24);
+  --galaxy-moon: #C9B6FF;
+  --galaxy-nebula: #F0A8C0;
 
-  /* Backgrounds — 干净的深色渐变 */
+  /* Backgrounds — 暮光紫渐变 */
   --galaxy-bg-hero: radial-gradient(
-    ellipse 120% 70% at 50% 0%,
-    #2D2D3A 0%,
-    #12121A 45%,
-    #0B0B0F 100%
+    ellipse 130% 80% at 50% 0%,
+    #352454 0%,
+    #161029 48%,
+    #0D081F 100%
   );
   --galaxy-bg-section: radial-gradient(
-    ellipse 100% 60% at 50% 30%,
-    #1E1E28 0%,
-    #12121A 70%
+    ellipse 110% 70% at 50% 30%,
+    #231A3D 0%,
+    #161029 72%
   );
-  --galaxy-bg-paper: linear-gradient(180deg, #12121A 0%, #1E1E28 100%);
+  --galaxy-bg-paper: linear-gradient(180deg, #161029 0%, #1E1635 100%);
 
   --galaxy-hairline: linear-gradient(90deg, transparent, #D4B889 50%, transparent);
   --galaxy-divider-gold: 1px solid rgba(212, 184, 137, 0.28);
 
   --galaxy-rose-halo: 0 0 60px rgba(212, 165, 154, 0.22),
     0 0 120px rgba(212, 165, 154, 0.11);
-  --galaxy-violet-halo: 0 0 80px rgba(157, 180, 212, 0.20);
+  --galaxy-violet-halo: 0 0 80px rgba(168, 143, 232, 0.20);
 
   /* ── SITE-WIDE paper-token overrides ────────────────────────────────
      翻转主站米白 paper token，让 Navigation / footer / 卡片 / 按钮 也跟随 dark
-     - bg: 三层深灰（外->内 越浅）
+     - bg: 三层暮光紫（外->内 越浅）
      - text: Cream → Parchment → Mist
      - rule: 半透明金
      - accent: 玫瑰金（干净高级）
      对比度校验：
-       Cream #F2F2F5 on #12121A  → 14.8:1 (AAA)
-       Parchment #D8D8DF on #12121A  → 11.5:1 (AAA)
-       Mist #B8C7D8 on #12121A    → 7.6:1  (AAA)
+       Cream #F5F0E8 on #161029  → 15.5:1 (AAA)
+       Parchment #E8E0D2 on #161029  → 13.0:1 (AAA)
+       Mist #B8A9C4 on #161029    → 8.9:1  (AAA)
   */
-  --color-bg-primary: #12121A;
-  --color-bg-secondary: #1E1E28;
-  --color-bg-tertiary: #282836;
-  --color-bg-elevated: #1E1E28;
-  --color-paper: #12121A;
-  --color-paper-deep: #0B0B0F;
-  --color-paper-warm: #1E1E28;
+  --color-bg-primary: #161029;
+  --color-bg-secondary: #231A3D;
+  --color-bg-tertiary: #2E2249;
+  --color-bg-elevated: #231A3D;
+  --color-paper: #161029;
+  --color-paper-deep: #0D081F;
+  --color-paper-warm: #231A3D;
 
-  --color-text-primary: #F2F2F5;
-  --color-text-secondary: #D8D8DF;
-  --color-text-muted: #B8C7D8;
-  --color-ink: #F2F2F5;
-  --color-ink-soft: #D8D8DF;
-  --color-ink-mute: #B8C7D8;
-  --color-stone: #B8C7D8;
+  --color-text-primary: #F5F0E8;
+  --color-text-secondary: #E8E0D2;
+  --color-text-muted: #B8A9C4;
+  --color-ink: #F5F0E8;
+  --color-ink-soft: #E8E0D2;
+  --color-ink-mute: #B8A9C4;
+  --color-stone: #B8A9C4;
 
   --color-border: rgba(212, 184, 137, 0.22);
   --color-border-subtle: rgba(212, 184, 137, 0.11);
@@ -289,13 +321,36 @@ body[data-theme='wtfti-dark'] {
   --color-gold-soft: #E8D7BC;
   --color-gold-leaf: #D4B889;
   --color-ember: #A86F62;
-  --color-sage: #9DB4D4;
-  --color-gem: #B8C7D8;
+  --color-sage: #A8C4A0;
+  --color-gem: #B8A9C4;
+
+  /* Accent 文字层 — dark 覆写（v2 §3.2：深色侧 accent 全部文字级达标，直接复用主 accent） */
+  --color-rose-text: #D4A59A;
+  --color-gold-text: #D4B889;
+  --color-sage-text: #A8C4A0;
+  --color-violet-text: #A88FE8;
+  --color-nebula-light: #F0A8C0;
+
+  /* CTA — dark 用玫瑰金→金箔渐变（v2 §3.3，实测 9.00/10.28:1 AAA） */
+  --color-cta-from: #D4A59A;
+  --color-cta-to: #D4B889;
+
+  /* Semantic surfaces — dark overrides */
+  --color-text-on-accent: #0D081F;    /* CTA 按钮深色底 */
+  --color-border-strong: rgba(212, 184, 137, 0.45);
+  --color-border-input: rgba(212, 184, 137, 0.55);  /* v2 §3.3 · 功能边界 ≈3.69:1 */
+  --color-surface-hover: #2E2249;     /* twilight 暖紫 */
+  --color-backdrop: rgba(13, 8, 31, 0.72);
+
+  /* Shadow system — dark overrides (violet tinted, cosmic) */
+  --shadow-card: 0 18px 42px -34px color-mix(in oklab, var(--galaxy-violet) 18%, transparent);
+  --shadow-elevated: 0 28px 90px -54px color-mix(in oklab, var(--galaxy-violet) 14%, transparent);
+  --shadow-halo: var(--galaxy-violet-halo);
 
   /* Model 配色 */
   --color-model-self: #D4A59A;
   --color-model-emotion: #B8877A;
-  --color-model-attitude: #9DB4D4;
+  --color-model-attitude: #A8C4A0;    /* v2 §3.4：冷蓝 #9DB4D4 是深色侧唯一冷色残留，归 sage 家族 */
   --color-model-action: #D4B889;
   --color-model-social: rgba(201, 134, 125, 0.22);
 
@@ -317,8 +372,8 @@ body[data-theme='wtfti-dark'] :focus-visible {
 body[data-theme='galaxy'].paper-texture,
 body[data-theme='wtfti-dark'].paper-texture {
   background-image:
-    radial-gradient(circle at 1px 1px, rgba(184, 199, 216, 0.025) 0.7px, transparent 0.9px),
-    radial-gradient(circle at 9px 7px, rgba(184, 199, 216, 0.015) 0.65px, transparent 0.8px);
+    radial-gradient(circle at 1px 1px, rgba(184, 169, 196, 0.025) 0.7px, transparent 0.9px),
+    radial-gradient(circle at 9px 7px, rgba(184, 169, 196, 0.015) 0.65px, transparent 0.8px);
   background-size: 18px 18px, 24px 24px;
 }
 
@@ -372,49 +427,50 @@ body[data-theme='wtfti-light'] {
   --galaxy-mist-faint: rgba(61, 44, 35, 0.34);
 
   /* Accents — Warm Rose / Copper Gold / Matcha Leaf 三色奏鸣 */
-  --galaxy-rose: #C9867D;                              /* Warm Rose */
-  --galaxy-rose-soft: rgba(201, 134, 125, 0.20);
-  --galaxy-rose-glow: rgba(201, 134, 125, 0.34);
-  --galaxy-gold: #C9A676;                              /* Copper Gold — 高级金 */
-  --galaxy-gold-soft: #DDBFA3;                         /* Warm Taupe */
-  --galaxy-gold-faint: rgba(201, 166, 118, 0.30);
-  --galaxy-violet: #B7C7A2;                            /* Matcha Leaf → 第二 accent */
-  --galaxy-violet-soft: rgba(183, 199, 162, 0.22);
-  --galaxy-violet-glow: rgba(183, 199, 162, 0.30);
-  --galaxy-moon: #F4E9DF;                              /* Soft Sand */
-  --galaxy-nebula: #EBDFD1;                            /* Dusty Beige */
+  --galaxy-rose: #CD8299;                              /* Sakura Rose 初樱粉 */
+  --galaxy-rose-soft: rgba(205, 130, 153, 0.20);
+  --galaxy-rose-glow: rgba(205, 130, 153, 0.32);
+  --galaxy-gold: #D0AB7C;                              /* Champagne Gold — 香槟金 */
+  --galaxy-gold-soft: #E9CDAE;                         /* Soft Champagne */
+  --galaxy-gold-faint: rgba(208, 171, 124, 0.30);
+  --galaxy-violet: #9C7CFF;                            /* Cosmic Violet — 紫罗兰 */
+  --galaxy-violet-soft: rgba(156, 124, 255, 0.22);
+  --galaxy-violet-glow: rgba(156, 124, 255, 0.30);
+  --galaxy-sage: #9AB37A;                              /* Matcha Leaf — 独立 sage */
+  --galaxy-moon: #F9EFEB;                              /* Blush Sand */
+  --galaxy-nebula: #F3E4E0;                            /* Petal Beige */
 
-  /* Hero / Section / Paper — 三段暖棕光带 */
+  /* Hero / Section / Paper — 三段初樱光带 */
   --galaxy-bg-hero: radial-gradient(
     ellipse 120% 80% at 50% 0%,
-    #F4E9DF 0%,
-    #FBF6F0 55%,
+    #F9EFEB 0%,
+    #FDF8F6 55%,
     #FFFFFF 100%
   );
   --galaxy-bg-section: radial-gradient(
     ellipse 110% 70% at 50% 25%,
-    #FBF6F0 0%,
-    #F4E9DF 70%
+    #FDF8F6 0%,
+    #F9EFEB 70%
   );
-  --galaxy-bg-paper: linear-gradient(180deg, #FFFFFF 0%, #FBF6F0 100%);
+  --galaxy-bg-paper: linear-gradient(180deg, #FFFFFF 0%, #FDF8F6 100%);
 
-  /* Hairline · 浅色态用 Warm Rose 半透明做发丝细线 */
-  --galaxy-hairline: linear-gradient(90deg, transparent, rgba(201, 134, 125, 0.55) 50%, transparent);
-  --galaxy-divider-gold: 1px solid rgba(201, 134, 125, 0.30);
+  /* Hairline · 浅色态用 Sakura Rose 半透明做发丝细线 */
+  --galaxy-hairline: linear-gradient(90deg, transparent, rgba(205, 130, 153, 0.55) 50%, transparent);
+  --galaxy-divider-gold: 1px solid rgba(205, 130, 153, 0.30);
 
   /* 光晕 · 极轻、无 bloom */
-  --galaxy-rose-halo: 0 12px 36px rgba(201, 134, 125, 0.20),
-    0 2px 8px rgba(201, 134, 125, 0.10);
-  --galaxy-violet-halo: 0 12px 36px rgba(183, 199, 162, 0.18);
+  --galaxy-rose-halo: 0 12px 36px rgba(205, 130, 153, 0.18),
+    0 2px 8px rgba(205, 130, 153, 0.09);
+  --galaxy-violet-halo: 0 12px 36px rgba(156, 124, 255, 0.18);
 
   /* ── 全站 paper token 覆写（Navigation / footer / 卡片 / 按钮 全部跟随）── */
-  --color-bg-primary: #FBF6F0;       /* Warm Oat */
-  --color-bg-secondary: #F4E9DF;     /* Soft Sand */
-  --color-bg-tertiary: #EBDFD1;      /* Dusty Beige */
+  --color-bg-primary: #FDF8F6;       /* Sakura White */
+  --color-bg-secondary: #F9EFEB;     /* Blush Sand */
+  --color-bg-tertiary: #F3E4E0;      /* Petal Beige */
   --color-bg-elevated: #FFFFFF;      /* 真白卡片 */
-  --color-paper: #FBF6F0;
-  --color-paper-deep: #F4E9DF;
-  --color-paper-warm: #F5EEE4;       /* Warm Oat + Warm Sand 混合 */
+  --color-paper: #FDF8F6;
+  --color-paper-deep: #F9EFEB;
+  --color-paper-warm: #FAF2EF;       /* Sakura White + Blush Sand 混合 */
 
   --color-text-primary: #3D2C23;     /* Deep Espresso — 高对比度 AAA */
   --color-text-secondary: #5C4035;   /* Espresso softer — AA body */
@@ -422,39 +478,50 @@ body[data-theme='wtfti-light'] {
   --color-ink: #3D2C23;
   --color-ink-soft: #5C4035;
   --color-ink-mute: #8B6D5E;
-  --color-stone: #A88B7D;             /* 装饰用暖棕 */
+  --color-stone: #795157;             /* 玫瑰灰棕，eyebrow/label 可读 */
 
-  --color-border: #E0D0C0;            /* 中性棕边框 */
-  --color-border-subtle: #F0E4D8;     /* 柔和棕边线 */
-  --color-rule: #E0D0C0;
-  --color-rule-soft: #F0E4D8;
+  --color-border: #EDDAD5;            /* 樱粉棕边框 */
+  --color-border-subtle: #F7E9E5;     /* 柔和樱粉边线 */
+  --color-rule: #EDDAD5;
+  --color-rule-soft: #F7E9E5;
 
-  --color-accent: #C9867D;            /* 唯一主 accent · Warm Rose */
-  --color-accent-light: #E7C6C0;
-  --color-accent-dim: rgba(201, 134, 125, 0.12);
-  --color-rose: #C9867D;
-  --color-rose-dust: #E7C6C0;
-  --color-rose-deep: #A86B63;         /* hover / pressed — 更深更易读 */
-  --color-gold: #C9A676;              /* Copper Gold — 真铜金 */
-  --color-gold-soft: #DDBFA3;
-  --color-gold-leaf: #C9A676;
-  --color-ember: #9C5C52;             /* deep rose · 错误/警告色 */
+  --color-accent: #CD8299;            /* v2.1：初樱粉（装饰层；小字走 *-text 文字级 token） */
+  --color-accent-light: #F1D2DB;
+  --color-accent-dim: rgba(205, 130, 153, 0.12);
+  --color-rose: #CD8299;
+  --color-rose-dust: #F1D2DB;
+  --color-rose-deep: #B06E7E;         /* hover / pressed — 更深更易读 */
+  --color-gold: #D0AB7C;              /* Champagne Gold — 香槟金 */
+  --color-gold-soft: #E9CDAE;
+  --color-gold-leaf: #D0AB7C;
+  --color-ember: #A4525A;             /* deep rose · 错误/警告色 */
   --color-sage: #B7C7A2;              /* Matcha Leaf · 成功/CTA-2 */
   --color-gem: #9AB37A;               /* Matcha Leaf 深一档 */
 
-  /* Model 配色 · 中性暖棕光谱 */
-  --color-model-self: #C9867D;        /* Warm Rose */
-  --color-model-emotion: #A86B63;     /* Rose Deep */
+  /* Semantic surfaces — light overrides */
+  --color-text-on-accent: #FDF8F6;    /* CTA 按钮浅色字 */
+  --color-border-strong: #D0AB7C;     /* 强金边框 */
+  --color-surface-hover: #FAF1ED;     /* Blush hover surface */
+  --color-backdrop: rgba(61, 44, 35, 0.55);
+
+  /* Shadow system — light overrides (sakura rose tint) */
+  --shadow-card: 0 18px 42px -34px color-mix(in oklab, var(--color-rose) 22%, transparent);
+  --shadow-elevated: 0 28px 90px -54px color-mix(in oklab, var(--color-rose) 18%, transparent);
+  --shadow-halo: var(--galaxy-rose-halo);
+
+  /* Model 配色 · 初樱光谱 */
+  --color-model-self: #CE8A9E;        /* Sakura Rose */
+  --color-model-emotion: #B06E7E;     /* Rose Deep */
   --color-model-attitude: #B7C7A2;    /* Matcha */
-  --color-model-action: #C9A676;      /* Copper Gold */
-  --color-model-social: #E7C6C0;      /* Warm Taupe */
+  --color-model-action: #D0AB7C;      /* Champagne Gold */
+  --color-model-social: #F1D2DB;      /* Rose Dust */
 
   background: var(--color-bg-primary);
   background-image: none;
   color: var(--color-text-primary);
 }
 body[data-theme='wtfti-light'] ::selection {
-  background: rgba(201, 134, 125, 0.36);
+  background: rgba(205, 130, 153, 0.32);
   color: var(--color-text-primary);
 }
 body[data-theme='wtfti-light'] :focus-visible {
@@ -501,9 +568,9 @@ body[data-wtfti-ritual='1'] section header {
   z-index: -2;
   pointer-events: none;
   background:
-    radial-gradient(circle at 16% 10%, color-mix(in oklab, var(--color-rose) 22%, transparent), transparent 34%),
-    radial-gradient(circle at 86% 18%, color-mix(in oklab, var(--color-gold) 18%, transparent), transparent 32%),
-    radial-gradient(circle at 54% 88%, color-mix(in oklab, var(--color-sage, var(--galaxy-violet)) 12%, transparent), transparent 36%),
+    radial-gradient(circle at 16% 10%, color-mix(in oklab, var(--color-rose) 13%, transparent), transparent 34%),
+    radial-gradient(circle at 86% 18%, color-mix(in oklab, var(--color-gold) 11%, transparent), transparent 32%),
+    radial-gradient(circle at 54% 88%, color-mix(in oklab, var(--color-sage, var(--galaxy-violet)) 8%, transparent), transparent 36%),
     linear-gradient(180deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 46%, var(--color-bg-primary) 100%);
 }
 .wtfti-site-shell::after {
@@ -565,7 +632,7 @@ body[data-wtfti-ritual='1'] .wtfti-site-shell::after {
   font-weight: 500;
   letter-spacing: 0.34em;
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: var(--color-stone);
 }
 .wtfti-eyebrow::before,
 .wtfti-eyebrow::after {
@@ -599,7 +666,7 @@ body[data-wtfti-ritual='1'] .wtfti-site-shell::after {
     linear-gradient(180deg, color-mix(in oklab, var(--color-bg-elevated) 92%, transparent), color-mix(in oklab, var(--color-bg-secondary) 72%, transparent));
   box-shadow:
     inset 0 1px 0 color-mix(in oklab, white 52%, transparent),
-    0 24px 70px -46px color-mix(in oklab, var(--color-rose) 55%, transparent);
+    var(--shadow-elevated);
   backdrop-filter: blur(18px) saturate(1.04);
   -webkit-backdrop-filter: blur(18px) saturate(1.04);
 }
@@ -607,15 +674,14 @@ body[data-theme='wtfti-dark'] .wtfti-panel,
 body[data-theme='galaxy'] .wtfti-panel {
   background:
     linear-gradient(180deg, color-mix(in oklab, var(--galaxy-ink-soft) 64%, transparent), color-mix(in oklab, var(--galaxy-ink) 76%, transparent));
-  box-shadow:
-    0 28px 90px -54px color-mix(in oklab, var(--galaxy-rose) 70%, transparent);
+  box-shadow: var(--shadow-elevated);
 }
 .wtfti-card {
   border: 1px solid var(--color-border-subtle);
   background: color-mix(in oklab, var(--color-bg-elevated) 86%, transparent);
   box-shadow:
     inset 0 1px 0 color-mix(in oklab, white 52%, transparent),
-    0 18px 42px -34px color-mix(in oklab, var(--color-text-primary) 34%, transparent);
+    var(--shadow-card);
   transition:
     transform 320ms var(--ease-editorial),
     border-color 320ms var(--ease-editorial),
@@ -627,7 +693,7 @@ body[data-theme='galaxy'] .wtfti-panel {
   border-color: color-mix(in oklab, var(--color-rose) 40%, var(--color-border-subtle));
   box-shadow:
     inset 0 1px 0 color-mix(in oklab, white 58%, transparent),
-    0 26px 60px -40px color-mix(in oklab, var(--color-rose) 56%, transparent);
+    var(--shadow-card);
 }
 .wtfti-card:active {
   transform: translateY(-1px) scale(0.99);
@@ -636,15 +702,13 @@ body[data-theme='galaxy'] .wtfti-panel {
 body[data-theme='wtfti-dark'] .wtfti-card,
 body[data-theme='galaxy'] .wtfti-card {
   background: color-mix(in oklab, var(--color-bg-elevated) 86%, transparent);
-  box-shadow:
-    0 18px 42px -34px color-mix(in oklab, var(--galaxy-rose) 34%, transparent);
+  box-shadow: var(--shadow-card);
 }
 
 body[data-theme='wtfti-dark'] .wtfti-card:hover,
 body[data-theme='galaxy'] .wtfti-card:hover {
   border-color: color-mix(in oklab, var(--galaxy-rose) 40%, var(--color-border-subtle));
-  box-shadow:
-    0 26px 60px -40px color-mix(in oklab, var(--galaxy-rose) 56%, transparent);
+  box-shadow: var(--shadow-card);
 }
 .wtfti-cta-primary,
 .wtfti-cta-secondary {
@@ -667,21 +731,19 @@ body[data-theme='galaxy'] .wtfti-card:hover {
   touch-action: manipulation;
 }
 .wtfti-cta-primary {
-  border: 1px solid color-mix(in oklab, var(--color-rose-deep) 70%, var(--color-gold-leaf));
-  color: var(--color-bg-primary);
-  background: linear-gradient(135deg, var(--color-rose-deep) 0%, var(--color-gold-leaf) 100%);
-  box-shadow: 0 18px 42px -28px color-mix(in oklab, var(--color-rose-deep) 80%, transparent);
-}
-body[data-theme='wtfti-light'] .wtfti-cta-primary {
-  color: var(--color-bg-primary);
+  /* v2 §2.4：深玫瑰渐变 — 修复浅字 on rose-deep→gold 实测 3.95/2.12:1 的上线缺陷 */
+  border: 1px solid color-mix(in oklab, var(--color-cta-from) 70%, var(--color-cta-to));
+  color: var(--color-text-on-accent);
+  background: linear-gradient(135deg, var(--color-cta-from) 0%, var(--color-cta-to) 100%);
+  box-shadow: var(--shadow-card);
 }
 
 body[data-theme='wtfti-dark'] .wtfti-cta-primary,
 body[data-theme='galaxy'] .wtfti-cta-primary {
   border: 1px solid color-mix(in oklab, var(--galaxy-rose) 70%, var(--galaxy-gold));
-  color: #0B0B0F;
+  color: var(--color-text-on-accent);
   background: linear-gradient(135deg, var(--galaxy-rose) 0%, var(--galaxy-gold) 100%);
-  box-shadow: 0 18px 42px -28px color-mix(in oklab, var(--galaxy-rose) 80%, transparent);
+  box-shadow: var(--shadow-card);
 }
 .wtfti-cta-secondary {
   border: 1px solid var(--color-border);
@@ -713,7 +775,7 @@ body[data-theme='galaxy'] .wtfti-cta-primary {
     color-mix(in oklab, var(--color-bg-elevated) 56%, transparent);
   box-shadow:
     inset 0 1px 0 color-mix(in oklab, white 36%, transparent),
-    var(--galaxy-rose-halo);
+    var(--shadow-halo);
 }
 .wtfti-orbit-ring {
   position: absolute;
@@ -730,7 +792,7 @@ body[data-theme='galaxy'] .wtfti-cta-primary {
 .wtfti-mini-card {
   border: 1px solid color-mix(in oklab, var(--color-gold) 24%, transparent);
   background: color-mix(in oklab, var(--color-bg-elevated) 82%, transparent);
-  box-shadow: 0 20px 48px -32px color-mix(in oklab, var(--color-rose) 62%, transparent);
+  box-shadow: var(--shadow-card);
 }
 .wtfti-roman {
   font-family: var(--font-editorial);
@@ -985,9 +1047,9 @@ html {
 }
 .btn-ink {
   background: var(--color-ink);
-  color: var(--color-bg-primary);
+  color: var(--color-text-on-accent);
   border: 1px solid var(--color-ink);
-  box-shadow: 0 14px 34px -24px color-mix(in oklab, var(--color-ink) 58%, transparent);
+  box-shadow: var(--shadow-card);
 }
 .btn-ink:hover {
   background: color-mix(in oklab, var(--color-ink) 85%, var(--color-rose-deep) 15%);
@@ -995,9 +1057,9 @@ html {
 }
 .btn-rose {
   background: var(--color-rose-deep);
-  color: var(--color-bg-primary);
+  color: var(--color-text-on-accent);
   border: 1px solid var(--color-rose-deep);
-  box-shadow: 0 16px 34px -24px color-mix(in oklab, var(--color-rose-deep) 70%, transparent);
+  box-shadow: var(--shadow-card);
 }
 .btn-rose:hover {
   background: var(--color-ember);
@@ -1011,7 +1073,7 @@ html {
 }
 .btn-ghost:hover {
   border-color: var(--color-ink);
-  box-shadow: 0 12px 28px -24px color-mix(in oklab, var(--color-ink) 45%, transparent);
+  box-shadow: var(--shadow-card);
 }
 .btn-gold {
   background: var(--color-gold-leaf);
@@ -1027,7 +1089,7 @@ body[data-theme='wtfti-dark'] .btn-ink,
 body[data-theme='galaxy'] .btn-ink {
   background: var(--galaxy-rose);
   border-color: var(--galaxy-rose);
-  color: #0B0B0F;
+  color: var(--color-text-on-accent);
 }
 
 body[data-theme='wtfti-dark'] .btn-ink:hover,
@@ -1040,7 +1102,7 @@ body[data-theme='wtfti-dark'] .btn-rose,
 body[data-theme='galaxy'] .btn-rose {
   background: var(--color-rose-deep);
   border-color: var(--color-rose-deep);
-  color: #0B0B0F;
+  color: var(--color-text-on-accent);
 }
 
 body[data-theme='wtfti-dark'] .btn-rose:hover,
@@ -1053,7 +1115,7 @@ body[data-theme='wtfti-dark'] .btn-gold,
 body[data-theme='galaxy'] .btn-gold {
   background: var(--galaxy-gold);
   border-color: var(--galaxy-gold);
-  color: #0B0B0F;
+  color: var(--color-text-on-accent);
 }
 
 body[data-theme='wtfti-dark'] .btn-gold:hover,
@@ -1073,7 +1135,7 @@ body[data-theme='galaxy'] .btn-gold:hover {
     );
   box-shadow:
     inset 0 1px 0 color-mix(in oklab, #fff 58%, transparent),
-    0 28px 80px -54px color-mix(in oklab, var(--color-rose) 55%, transparent);
+    var(--shadow-elevated);
 }
 
 body[data-theme='wtfti-dark'] .site-hero-card,
@@ -1084,8 +1146,7 @@ body[data-theme='galaxy'] .site-hero-card {
       color-mix(in oklab, var(--color-bg-elevated) 82%, transparent),
       color-mix(in oklab, var(--color-bg-secondary) 64%, transparent)
     );
-  box-shadow:
-    0 28px 80px -54px color-mix(in oklab, var(--galaxy-rose) 55%, transparent);
+  box-shadow: var(--shadow-elevated);
 }
 
 .site-code-mark {
@@ -1296,11 +1357,12 @@ body[data-theme='galaxy'] .site-code-mark {
 
 /* ── Navigation dropdown & link styles ── */
 .wtfti-global-nav {
+  /* 浅色：暖纸底（bg-primary），与米色正文同光源；不再用冷白 elevated */
   background:
     linear-gradient(
       180deg,
-      color-mix(in oklab, var(--color-bg-elevated) 92%, transparent),
-      color-mix(in oklab, var(--color-bg-elevated) 84%, transparent)
+      color-mix(in oklab, var(--color-bg-primary) 95%, transparent),
+      color-mix(in oklab, var(--color-bg-primary) 86%, transparent)
     );
   border-color: var(--color-border-subtle);
   color: var(--color-text-secondary);
@@ -1319,18 +1381,18 @@ body[data-theme='galaxy'] .site-code-mark {
 body[data-theme='wtfti-dark'] .wtfti-global-nav {
   background: var(--color-bg-elevated);
   background-image: none;
-  box-shadow: 0 18px 48px -32px rgba(0, 0, 0, 0.72);
+  box-shadow: var(--shadow-card);
 }
 
 body[data-theme='wtfti-dark'] .wtfti-global-nav-pill {
   background: color-mix(in oklab, var(--color-bg-secondary) 95%, transparent);
   box-shadow:
     inset 0 1px 0 color-mix(in oklab, var(--color-border) 40%, transparent),
-    0 14px 34px -24px rgba(0, 0, 0, 0.72);
+    var(--shadow-card);
 }
 
 body[data-theme='wtfti-light'] .wtfti-global-nav {
-  box-shadow: 0 10px 28px -24px rgba(77, 44, 47, 0.32);
+  box-shadow: var(--shadow-card);
 }
 
 .nav-link {
@@ -1339,14 +1401,12 @@ body[data-theme='wtfti-light'] .wtfti-global-nav {
 
 .nav-link-active {
   @apply bg-bg-elevated text-text-primary shadow-sm;
-  box-shadow: 0 8px 22px color-mix(in oklab, var(--color-text-primary) 8%, transparent);
+  box-shadow: var(--shadow-card);
 }
 
 .nav-dropdown {
   @apply absolute top-full z-50 rounded-[28px] border border-border-subtle bg-bg-elevated shadow-lg backdrop-blur-sm;
-  box-shadow:
-    0 24px 60px color-mix(in oklab, var(--color-text-primary) 12%, transparent),
-    0 8px 20px color-mix(in oklab, var(--color-text-primary) 5%, transparent);
+  box-shadow: var(--shadow-elevated);
   animation: nav-dropdown-in 150ms ease-out;
 }
 
@@ -1524,12 +1584,12 @@ body[data-theme='wtfti-light'] .wtfti-global-nav {
 .share-card-plus {
   position: relative;
   background:
-    linear-gradient(135deg, rgba(184,144,90,0.06), rgba(192,122,142,0.04)),
+    linear-gradient(135deg, color-mix(in oklab, var(--color-gold) 6%, transparent), color-mix(in oklab, var(--color-rose) 4%, transparent)),
     var(--color-paper);
-  border: 1px solid rgba(184,144,90,0.35);
+  border: 1px solid color-mix(in oklab, var(--color-gold) 35%, transparent);
   box-shadow:
-    0 0 0 1px rgba(184,144,90,0.12) inset,
-    0 12px 40px -16px rgba(184,144,90,0.32);
+    0 0 0 1px color-mix(in oklab, var(--color-gold) 12%, transparent) inset,
+    var(--shadow-card);
 }
 .share-card-plus::after {
   content: 'PLUS';
@@ -1547,21 +1607,21 @@ body[data-theme='wtfti-light'] .wtfti-global-nav {
 .share-card-atelier {
   position: relative;
   background:
-    radial-gradient(120% 80% at 30% 0%, rgba(201,166,118,0.10), transparent 60%),
-    linear-gradient(165deg, rgba(91,110,106,0.05), rgba(192,122,142,0.04)),
+    radial-gradient(120% 80% at 30% 0%, color-mix(in oklab, var(--color-gold) 10%, transparent), transparent 60%),
+    linear-gradient(165deg, color-mix(in oklab, var(--color-sage) 5%, transparent), color-mix(in oklab, var(--color-rose) 4%, transparent)),
     var(--color-paper-warm);
-  border: 1px solid rgba(184,144,90,0.55);
+  border: 1px solid color-mix(in oklab, var(--color-gold) 55%, transparent);
   box-shadow:
-    0 0 0 1px rgba(184,144,90,0.18) inset,
+    0 0 0 1px color-mix(in oklab, var(--color-gold) 18%, transparent) inset,
     0 0 0 6px var(--color-paper-warm),
-    0 0 0 7px rgba(184,144,90,0.40),
-    0 24px 60px -22px rgba(91,110,106,0.40);
+    0 0 0 7px color-mix(in oklab, var(--color-gold) 40%, transparent),
+    var(--shadow-elevated);
 }
 .share-card-atelier::before {
   content: '';
   position: absolute;
   inset: 6px;
-  border: 1px solid rgba(184,144,90,0.28);
+  border: 1px solid color-mix(in oklab, var(--color-gold) 28%, transparent);
   pointer-events: none;
   border-radius: inherit;
 }
@@ -1591,7 +1651,7 @@ body[data-theme='wtfti-light'] .wtfti-global-nav {
   color: var(--color-bg-elevated);
   font-family: var(--font-editorial);
   letter-spacing: 0.10em;
-  box-shadow: 0 10px 28px -10px rgba(168,90,110,0.50);
+  box-shadow: var(--shadow-card);
 }
 
 /* Gallery card collection styles - feminine elegant aesthetic */
@@ -1655,15 +1715,15 @@ body[data-theme='wtfti-light'] .wtfti-global-nav {
 /* Soft shadow effect for depth */
 .collection-shadow {
   box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.05),
-    0 8px 16px rgba(224, 96, 136, 0.1);
+    0 2px 4px color-mix(in oklab, var(--color-text-primary) 5%, transparent),
+    0 8px 16px color-mix(in oklab, var(--color-rose) 10%, transparent);
   transition: box-shadow 0.3s ease;
 }
 
 .collection-shadow:hover {
   box-shadow: 
-    0 4px 8px rgba(0, 0, 0, 0.08),
-    0 12px 24px rgba(224, 96, 136, 0.15);
+    0 4px 8px color-mix(in oklab, var(--color-text-primary) 8%, transparent),
+    0 12px 24px color-mix(in oklab, var(--color-rose) 15%, transparent);
 }
 
 /* Mysti quiz twinkle animation */
@@ -2401,10 +2461,589 @@ body[data-theme='wtfti-light'] .wtfti-global-nav {
   animation: nocturne-grain-shift 3s steps(4) infinite;
 }
 
+/* ═════════════════════════════════════════════════════════════════════════
+   Mirror Atelier · 灵镜形象档案馆专属视觉系统（Theme-Aware 深浅双模式）
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.mirror-atelier-shell {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+}
+
+/* 背景光晕 — 深浅自适应 */
+.mirror-atelier-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 16% 10%, color-mix(in oklab, var(--color-rose) 13%, transparent), transparent 34%),
+    radial-gradient(circle at 86% 18%, color-mix(in oklab, var(--color-gold) 11%, transparent), transparent 32%),
+    radial-gradient(circle at 54% 88%, color-mix(in oklab, var(--color-sage, var(--galaxy-violet)) 8%, transparent), transparent 36%),
+    linear-gradient(180deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 46%, var(--color-bg-primary) 100%);
+}
+
+/* 散点星屑 — 深浅自适应 */
+.mirror-atelier-shell::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.32;
+  background-image:
+    linear-gradient(115deg, transparent 0 46%, color-mix(in oklab, var(--color-rose) 14%, transparent) 46.2% 46.4%, transparent 46.6%),
+    radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--color-text-primary) 7%, transparent) 0.7px, transparent 0.9px);
+  background-size: 100% 100%, 22px 22px;
+  mask-image: linear-gradient(180deg, black, transparent 88%);
+}
+
+/* 玫瑰光晕装饰球 — theme-aware */
+.mirror-atelier-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(60px);
+  opacity: 0.22;
+}
+.mirror-atelier-orb--rose {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, color-mix(in oklab, var(--color-rose) 55%, transparent) 0%, transparent 70%);
+  top: -8%; right: -6%;
+  animation: wtfti-orb-breathe 8s ease-in-out infinite;
+}
+.mirror-atelier-orb--violet {
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, color-mix(in oklab, var(--color-sage) 55%, transparent) 0%, transparent 70%);
+  bottom: 12%; left: -4%;
+  animation: wtfti-orb-breathe 10s ease-in-out infinite 2s;
+}
+.mirror-atelier-orb--gold {
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, color-mix(in oklab, var(--color-gold) 55%, transparent) 0%, transparent 70%);
+  top: 40%; left: 50%;
+  animation: wtfti-orb-breathe 12s ease-in-out infinite 4s;
+}
+
+/* 椭圆轨道环 — theme-aware */
+.mirror-atelier-orbit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+.mirror-atelier-orbit__ring {
+  position: absolute;
+  border: 1px solid color-mix(in oklab, var(--color-gold) 14%, transparent);
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(-12deg) scaleX(1.4);
+}
+.mirror-atelier-orbit__ring:nth-child(1) { width: 140vw; height: 140vw; }
+.mirror-atelier-orbit__ring:nth-child(2) {
+  width: 110vw; height: 110vw;
+  transform: translate(-50%, -50%) rotate(22deg) scaleX(1.5);
+  border-color: color-mix(in oklab, var(--color-rose) 10%, transparent);
+}
+.mirror-atelier-orbit__ring:nth-child(3) {
+  width: 80vw; height: 80vw;
+  transform: translate(-50%, -50%) rotate(-6deg) scaleX(1.3);
+  border-color: color-mix(in oklab, var(--color-sage) 10%, transparent);
+}
+
+/* 档案面板 — theme-aware 玻璃 */
+.mirror-atelier-panel {
+  position: relative;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--color-bg-elevated) 78%, transparent) 0%, color-mix(in oklab, var(--color-bg-primary) 90%, transparent) 100%);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--color-text-primary) 6%, transparent),
+    var(--shadow-elevated),
+    0 0 60px color-mix(in oklab, var(--color-rose) 12%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* 上传圣坛 — theme-aware */
+.mirror-atelier-sanctum {
+  position: relative;
+  background:
+    radial-gradient(circle at 50% 45%, color-mix(in oklab, var(--color-rose) 8%, transparent), transparent 50%),
+    linear-gradient(180deg, color-mix(in oklab, var(--color-bg-elevated) 60%, transparent) 0%, color-mix(in oklab, var(--color-bg-primary) 80%, transparent) 100%);
+  border: 1.5px dashed color-mix(in oklab, var(--color-gold) 28%, transparent);
+  border-radius: 22px;
+  transition: border-color 420ms var(--ease-editorial), box-shadow 420ms var(--ease-editorial);
+}
+.mirror-atelier-sanctum:hover {
+  border-color: color-mix(in oklab, var(--color-gold) 50%, transparent);
+  box-shadow: 0 0 60px color-mix(in oklab, var(--color-rose) 12%, transparent);
+}
+
+/* 模式选择器 — 档案徽章 */
+.mirror-atelier-badge {
+  position: relative;
+  padding: 0.85rem 1.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: color-mix(in oklab, var(--color-bg-elevated) 55%, transparent);
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  transition: all 320ms var(--ease-editorial);
+  cursor: pointer;
+}
+.mirror-atelier-badge:hover {
+  border-color: var(--color-rule);
+  color: var(--color-text-primary);
+}
+.mirror-atelier-badge[data-active='true'] {
+  border-color: var(--color-rose);
+  background: color-mix(in oklab, var(--color-rose) 12%, transparent);
+  color: var(--color-rose);
+  box-shadow: 0 0 24px color-mix(in oklab, var(--color-rose) 10%, transparent);
+}
+.mirror-atelier-badge[data-active='true'][data-accent='gold'] {
+  border-color: var(--color-gold);
+  background: color-mix(in oklab, var(--color-gold) 12%, transparent);
+  color: var(--color-gold);
+  box-shadow: 0 0 24px color-mix(in oklab, var(--color-gold) 8%, transparent);
+}
+.mirror-atelier-badge[data-active='true'][data-accent='violet'] {
+  border-color: var(--color-sage);
+  background: color-mix(in oklab, var(--color-sage) 12%, transparent);
+  color: var(--color-sage);
+  box-shadow: 0 0 24px color-mix(in oklab, var(--color-sage) 8%, transparent);
+}
+
+/* 产品层级卡 — 罗马数字档案 */
+.mirror-atelier-tier {
+  position: relative;
+  padding: 1.75rem;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--color-bg-elevated) 65%, transparent) 0%, color-mix(in oklab, var(--color-bg-primary) 80%, transparent) 100%);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  transition: transform 420ms var(--ease-editorial), box-shadow 420ms var(--ease-editorial);
+}
+.mirror-atelier-tier:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card);
+}
+.mirror-atelier-tier__num {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 2.25rem;
+  line-height: 1;
+  color: var(--color-rose);
+  opacity: 0.65;
+}
+
+/* 结果档案页 */
+.mirror-atelier-archive {
+  position: relative;
+  background: linear-gradient(180deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+  border: 1px solid var(--color-border);
+  border-radius: 28px;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--color-text-primary) 5%, transparent),
+    var(--shadow-elevated);
+}
+
+/* 金色细分割线 */
+.mirror-atelier-rule {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.mirror-atelier-rule::before,
+.mirror-atelier-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-gold) 50%, transparent);
+}
+
+/* 历史档案抽屉 */
+.mirror-atelier-drawer {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--color-bg-primary) 96%, transparent) 0%, color-mix(in oklab, var(--color-bg-secondary) 98%, transparent) 100%);
+  border: 1px solid var(--color-border);
+  border-radius: 28px;
+  box-shadow: var(--shadow-elevated);
+  backdrop-filter: blur(24px);
+}
+
+/* 灵币余额徽标 */
+.mirror-atelier-balance {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: color-mix(in oklab, var(--color-gold) 10%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-gold) 18%, transparent);
+  border-radius: 999px;
+  color: var(--color-gold);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+/* 提交按钮 — 玫瑰金渐变（保持品牌色，文字固定浅色保证对比度） */
+.mirror-atelier-submit {
+  position: relative;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, var(--color-rose) 0%, var(--color-rose-deep) 100%);
+  color: var(--color-text-on-accent);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 320ms ease;
+  box-shadow: var(--shadow-card);
+}
+.mirror-atelier-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+}
+.mirror-atelier-submit:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.mirror-atelier-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* 输入框 — theme-aware */
+.mirror-atelier-input {
+  width: 100%;
+  padding: 0.875rem 1.125rem;
+  background: color-mix(in oklab, var(--color-bg-elevated) 60%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  outline: none;
+  transition: border-color 320ms ease, box-shadow 320ms ease;
+  resize: none;
+}
+.mirror-atelier-input::placeholder {
+  color: var(--color-text-muted);
+}
+.mirror-atelier-input:focus {
+  border-color: color-mix(in oklab, var(--color-gold) 50%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-gold) 8%, transparent);
+}
+
+/* 进度条 */
+.mirror-atelier-progress {
+  height: 3px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-gold) 12%, transparent);
+  overflow: hidden;
+}
+.mirror-atelier-progress__bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-rose) 0%, var(--color-gold) 100%);
+  transition: width 600ms var(--ease-editorial);
+}
+
+/* 动画入场 */
+.mirror-atelier-fade-in {
+  animation: wtfti-card-rise 720ms var(--ease-editorial) both;
+}
+.mirror-atelier-fade-in-delay-1 { animation-delay: 120ms; }
+.mirror-atelier-fade-in-delay-2 { animation-delay: 240ms; }
+.mirror-atelier-fade-in-delay-3 { animation-delay: 360ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mirror-atelier-orb--rose,
+  .mirror-atelier-orb--violet,
+  .mirror-atelier-orb--gold,
+  .mirror-atelier-fade-in,
+  .mirror-atelier-fade-in-delay-1,
+  .mirror-atelier-fade-in-delay-2,
+  .mirror-atelier-fade-in-delay-3 {
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .atelier-stamp-animate,
   .atelier-page-turn,
   .nocturne-grain::before {
     animation: none;
   }
+}
+
+/* ═══ Home V4 · 星野手账 Celestial Editorial（2026-08-15 视觉重构）═══
+   光线来自纸，不来自霓虹。light-first：浅色静态细点星野 + 天文图谱制图细节
+   （FIG. 编号 / 发丝金线 / 椭圆轨道）+ 双层标本卡 + 哑光星球。
+   暗色主题（wtfti-dark / galaxy）下自动换墨点配色，仪式流仍是暗色的家。
+   红线：小字用 *-text 文字级 token；无渐变字标；无发光球体；
+   prefers-reduced-motion 全量降级。 */
+
+/* ── 静态细点星野（浅色纸面上的墨点，无闪烁动画）── */
+.starfield-paper {
+  background-image:
+    radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--color-text-primary) 9%, transparent) 0.8px, transparent 1px),
+    radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--color-gold-text) 14%, transparent) 0.7px, transparent 0.95px);
+  background-size: 26px 26px, 44px 44px;
+  background-position: 0 0, 13px 29px;
+  mask-image: radial-gradient(ellipse 92% 80% at 50% 38%, black 26%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse 92% 80% at 50% 38%, black 26%, transparent 78%);
+}
+body[data-theme='wtfti-dark'] .starfield-paper,
+body[data-theme='galaxy'] .starfield-paper {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(245, 240, 232, 0.16) 0.8px, transparent 1px),
+    radial-gradient(circle at 1px 1px, rgba(212, 184, 137, 0.2) 0.7px, transparent 0.95px);
+}
+
+/* ── 发丝金分割线（图谱章节分隔）── */
+.hairline-gold {
+  display: block;
+  height: 1px;
+  border: 0;
+  margin: 0;
+  background: linear-gradient(90deg, transparent, var(--color-border-strong) 50%, transparent);
+  opacity: 0.55;
+}
+
+/* ── 双层标本卡：plate 外壳 + plate-core 内芯 ── */
+.plate {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 1.75rem;
+  background: color-mix(in oklab, var(--color-bg-secondary) 65%, transparent);
+  padding: 0.375rem;
+  box-shadow: var(--shadow-elevated);
+}
+.plate-core {
+  height: 100%;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: calc(1.75rem - 0.375rem);
+  background: var(--color-bg-elevated);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+body[data-theme='wtfti-dark'] .plate-core,
+body[data-theme='galaxy'] .plate-core {
+  box-shadow: inset 0 1px 0 rgba(245, 240, 232, 0.08);
+}
+
+/* ── 图谱轨道环（椭圆化由组件内 transform 完成）── */
+.orbit-fig {
+  position: absolute;
+  border: 1px solid color-mix(in oklab, var(--color-border-strong) 45%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.orbit-fig--rose {
+  border-color: color-mix(in oklab, var(--color-rose) 34%, transparent);
+}
+
+/* ── 哑光星球：内部层次 + 一道外投影，无辉光 bloom ── */
+.orb-matte {
+  background:
+    radial-gradient(circle at 34% 28%, #FFFDF9 0%, var(--color-gold-soft) 24%, var(--color-rose) 52%, var(--color-rose-deep) 76%, #6B4A56 100%);
+  box-shadow:
+    inset -10px -14px 30px rgba(61, 44, 35, 0.22),
+    inset 6px 8px 18px rgba(255, 253, 249, 0.5),
+    0 24px 48px -24px color-mix(in oklab, var(--color-rose-deep) 45%, transparent);
+}
+body[data-theme='wtfti-dark'] .orb-matte,
+body[data-theme='galaxy'] .orb-matte {
+  background:
+    radial-gradient(circle at 34% 28%, #F5F0E8 0%, var(--color-gold-soft) 22%, var(--color-rose) 50%, #5A3A52 78%, #241734 100%);
+  box-shadow:
+    inset -10px -14px 30px rgba(13, 8, 31, 0.5),
+    inset 6px 8px 18px rgba(245, 240, 232, 0.28),
+    0 24px 48px -20px rgba(13, 8, 31, 0.6);
+}
+
+/* ── CSS-only 入场（替代 framer-motion，SSR 无抖动）── */
+.rise-in {
+  animation: rise-in 900ms var(--ease-editorial) both;
+}
+.rise-in-1 { animation-delay: 120ms; }
+.rise-in-2 { animation-delay: 240ms; }
+.rise-in-3 { animation-delay: 380ms; }
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in,
+  .rise-in-1,
+  .rise-in-2,
+  .rise-in-3 {
+    animation: none;
+  }
+}
+
+/* ═══ Home V5 · 六神域（2026-08-16 化繁为简重构：暗色宇宙 × 六大核心门）═══ */
+
+/* 六动词轮播（SSR 安全：全量渲染 + 透明度时序） */
+.home-verb-stack {
+  position: relative;
+  display: inline-block;
+  min-width: 5.5em;
+  text-align: left;
+}
+.home-verb-stack > span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  opacity: 0;
+  animation: home-verb-cycle 18s ease-in-out infinite;
+}
+.home-verb-stack > span:nth-child(1) { animation-delay: 0s; }
+.home-verb-stack > span:nth-child(2) { animation-delay: 3s; }
+.home-verb-stack > span:nth-child(3) { animation-delay: 6s; }
+.home-verb-stack > span:nth-child(4) { animation-delay: 9s; }
+.home-verb-stack > span:nth-child(5) { animation-delay: 12s; }
+.home-verb-stack > span:nth-child(6) { animation-delay: 15s; }
+@keyframes home-verb-cycle {
+  0%, 2% { opacity: 0; transform: translateY(8px); }
+  5%, 14% { opacity: 1; transform: translateY(0); }
+  17%, 100% { opacity: 0; transform: translateY(-8px); }
+}
+
+/* 六大门：悬停升起 + 边框辉光 */
+.home-portal {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 420ms var(--ease-editorial),
+    border-color 420ms var(--ease-editorial),
+    box-shadow 420ms var(--ease-editorial);
+}
+.home-portal:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in oklab, var(--portal-accent, #D4A59A) 55%, transparent);
+  box-shadow:
+    0 18px 44px -22px color-mix(in oklab, var(--portal-accent, #D4A59A) 38%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--portal-accent, #D4A59A) 22%, transparent);
+}
+/* 门格底部呼吸光带 */
+.home-portal::after {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -40%;
+  height: 55%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, color-mix(in oklab, var(--portal-accent, #D4A59A) 26%, transparent) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 420ms var(--ease-editorial);
+  pointer-events: none;
+}
+.home-portal:hover::after {
+  opacity: 1;
+}
+/* 门格角标编号 */
+.home-portal-num {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-verb-stack > span { animation: none; opacity: 1; position: static; display: none; }
+  .home-verb-stack > span:first-child { display: inline; }
+  .home-portal, .home-portal::after { transition: none; }
+}
+
+/* ═══ Home V6 · 编辑部索引（去 AI 味：不对称、留白、大字排印、人话文案）═══ */
+
+/* 目录行：悬停金线滑出 + 行浮起，其余全部克制 */
+.home-index-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 1.25rem;
+  padding: 1.55rem 0.75rem;
+  border-bottom: 1px solid rgba(212, 184, 137, 0.12);
+  transition: background-color 300ms var(--ease-quiet);
+}
+.home-index-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 18%;
+  bottom: 18%;
+  width: 2px;
+  background: var(--row-accent, #D4A59A);
+  border-radius: 2px;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 320ms var(--ease-editorial);
+}
+.home-index-row:hover {
+  background: rgba(35, 26, 61, 0.35);
+}
+.home-index-row:hover::before {
+  transform: scaleY(1);
+}
+.home-index-num {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  color: var(--color-text-muted);
+  transition: color 300ms var(--ease-quiet);
+}
+.home-index-row:hover .home-index-num {
+  color: var(--row-accent, #D4A59A);
+}
+.home-index-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+.home-index-desc {
+  font-size: 0.86rem;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  max-width: 22em;
+  margin-top: 0.35rem;
+}
+.home-index-arrow {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--row-accent, #D4A59A);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 300ms var(--ease-quiet), transform 300ms var(--ease-editorial);
+}
+.home-index-row:hover .home-index-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 手写感小标注（SVG 箭头曲线在组件里，这里管浮起节奏） */
+.home-annot {
+  animation: home-annot-float 5s ease-in-out infinite alternate;
+}
+@keyframes home-annot-float {
+  from { transform: translateY(0); }
+  to { transform: translateY(-4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-annot { animation: none; }
 }

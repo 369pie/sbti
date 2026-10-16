@@ -10,18 +10,15 @@ import { Logo } from '@/components/Logo';
 
 // ─── Static data (intent-based 4-category architecture) ──────────────────────
 
-/** Mirror Lab — AI style analysis, standalone category */
-const MIRROR_ITEMS = [
-  { href: '/mirror/', label: '灵镜实验室', mark: '🔮', desc: '上传照片 · AI 生成风格报告', tag: 'NEW' as const },
-];
+// 2026-08-16：mirror 已从导航移除（9-30 gate 前降权，权威战略 §3.3）。
 
 /** "测自己" — 6 大核心入口（W3 重构：纳入 Mysti / WTFCard） */
 const HOT_PICKS = [
-  { href: '/wtfti/', label: 'WTFTI 人格神域', mark: 'W', desc: '90 秒召唤你的主神', tag: '主入口' as const },
+  { href: '/wtfti/', label: 'WTFTI 人格测试', mark: 'W', desc: '90 秒测出你的本命', tag: '主入口' as const },
   { href: '/xpti/', label: 'XPTI 恋爱XP', mark: 'XP', desc: '你的亲密偏好是什么？', tag: '热门' as const },
   { href: '/cpti/', label: 'CPTI 关系深测', mark: 'CP', desc: '你们的关系是什么型？', tag: '深度' as const },
   { href: '/soulti/', label: 'SoulTI 灵魂镜像', mark: 'S', desc: '安静地看见真正的自己', tag: '深度' as const },
-  { href: '/mysti/', label: 'Mysti 灵鉴', mark: 'M', desc: '塔罗 × 人格牌 · ¥19/月', tag: '通行证' as const },
+  { href: '/mysti/', label: '今日运势', mark: 'M', desc: '每天一张牌 · 一句签', tag: '会员' as const },
   { href: '/card/', label: 'WTF Card 收藏', mark: 'C', desc: '多宇宙人格档案 · ¥9.9', tag: '收藏' as const },
 ];
 
@@ -157,8 +154,8 @@ export function Navigation() {
 
   return (
     <>
-    <header className="wtfti-global-nav sticky top-0 z-50 bg-bg-elevated/90 backdrop-blur-md border-b border-border-subtle">
-      <nav className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4" aria-label="主导航">
+    <header className="wtfti-global-nav sticky top-0 z-50 bg-bg-primary/90 backdrop-blur-md border-b border-border-subtle">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-6" aria-label="主导航">
 
         {/* Logo */}
         <Link
@@ -170,271 +167,256 @@ export function Navigation() {
         </Link>
 
         {/* ── Desktop nav (intent-based 4 categories) ── */}
-        <div className="wtfti-global-nav-pill hidden md:flex items-center gap-1 rounded-full border border-border-subtle/90 bg-bg-secondary/75 p-1 shadow-[0_10px_28px_color-mix(in_oklab,var(--color-text-primary)_8%,transparent)] backdrop-blur">
+        <div className="hidden md:flex items-center gap-3">
+          <div className="wtfti-global-nav-pill flex items-center gap-1 rounded-full border border-border-subtle/90 bg-bg-secondary/75 p-1 shadow-[0_10px_28px_color-mix(in_oklab,var(--color-text-primary)_8%,transparent)] backdrop-blur">
 
-          {/* 测自己 dropdown */}
-          <div
-            ref={selfDD.ref}
-            className="relative"
-            onMouseEnter={selfDD.onMouseEnter}
-            onMouseLeave={selfDD.onMouseLeave}
-          >
-            <button
-              type="button"
-              onClick={() => selfDD.setOpen(v => !v)}
-              className={`nav-link inline-flex items-center gap-1.5 ${selfDD.open ? 'nav-link-active' : ''}`}
-              aria-expanded={selfDD.open}
-              aria-haspopup="true"
+            {/* 今日 · 统一日常入口（2026-08-16 权威战略 §10 裁决 3） */}
+            <Link
+              href="/today"
+              prefetch={false}
+              className="nav-link inline-flex items-center gap-1"
             >
-              测自己
-              <ChevronDown className={selfDD.open ? 'rotate-180' : ''} />
-            </button>
-            {selfDD.open && (
-              <div
-                className="nav-dropdown left-0 w-[42rem] max-w-[calc(100vw-3rem)] p-4"
-                onMouseEnter={selfDD.onMouseEnter}
-                onMouseLeave={selfDD.onMouseLeave}
+              <NavMark mark="TD" compact />
+              今日
+            </Link>
+
+            {/* 测自己 dropdown */}
+            <div
+              ref={selfDD.ref}
+              className="relative"
+              onMouseEnter={selfDD.onMouseEnter}
+              onMouseLeave={selfDD.onMouseLeave}
+            >
+              <button
+                type="button"
+                onClick={() => selfDD.setOpen(v => !v)}
+                className={`nav-link inline-flex items-center gap-1.5 ${selfDD.open ? 'nav-link-active' : ''}`}
+                aria-expanded={selfDD.open}
+                aria-haspopup="true"
               >
-                <div className="grid grid-cols-[1fr_0.88fr_1.1fr] gap-4">
-                  <section className="wtfti-panel rounded-[24px] p-4">
-                    <div className="mb-3 flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-[10px] font-mono tracking-[0.22em] text-text-muted uppercase">核心宇宙</p>
-                        <p className="mt-1 text-xs leading-5 text-text-muted">现阶段的四张主入口，从神域开始最容易上手。</p>
-                      </div>
-                      <span className="rounded-full border border-border-subtle bg-bg-elevated/80 px-2.5 py-1 text-[10px] font-semibold text-text-secondary shadow-sm">
-                        START HERE
-                      </span>
-                    </div>
-
-                    <div className="space-y-2.5">
-                      {HOT_PICKS.map(item => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          prefetch={false}
-                          onClick={selfDD.close}
-                          className="featured-nav-item group flex items-start gap-3 rounded-[22px] px-4 py-3.5"
-                        >
-                          <NavMark mark={item.mark} />
-                          <span className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-semibold text-text-primary">{item.label}</span>
-                              <span className="rounded-full border border-border-subtle bg-bg-elevated/75 px-2 py-0.5 text-[10px] font-semibold text-text-secondary">
-                                {item.tag}
-                              </span>
-                            </div>
-                            <span className="mt-1 block text-xs text-text-muted">{item.desc}</span>
-                          </span>
-                          <ArrowMark className="mt-1 text-text-muted transition-transform duration-200 group-hover:translate-x-0.5" />
-                        </Link>
-                      ))}
-                    </div>
-                  </section>
-
-                  <section className="rounded-[24px] border border-border-subtle bg-bg-elevated/90 p-4">
-                    <div className="mb-3 flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-[10px] font-mono tracking-[0.22em] text-text-muted uppercase">AI 灵镜</p>
-                        <p className="mt-1 text-xs leading-5 text-text-muted">上传一张照片，AI 帮你找到最适合的发型、色彩与妆容方向。</p>
-                      </div>
-                      <span className="rounded-full bg-gradient-to-r from-pink-400 to-rose-400 px-2.5 py-1 text-[10px] font-semibold text-white shadow-sm">
-                        NEW
-                      </span>
-                    </div>
-                    {MIRROR_ITEMS.map(item => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        prefetch={false}
-                        onClick={selfDD.close}
-                        className="featured-nav-item group flex items-start gap-3 rounded-[22px] px-4 py-3.5"
-                      >
-                        <NavMark mark="ML" />
-                        <span className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-text-primary">{item.label}</span>
-                            <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white bg-gradient-to-r from-pink-400 to-rose-400">
-                              {item.tag}
-                            </span>
-                          </div>
-                          <span className="mt-1 block text-xs text-text-muted">{item.desc}</span>
-                        </span>
-                        <ArrowMark className="mt-1 text-text-muted transition-transform duration-200 group-hover:translate-x-0.5" />
-                      </Link>
-                    ))}
-                  </section>
-
-                  <div className="space-y-4">
-                    <section className="rounded-[24px] border border-border-subtle bg-bg-elevated/90 p-4">
-                      <div className="mb-3 flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-[10px] font-mono tracking-[0.22em] text-text-muted uppercase">风格宇宙</p>
-                          <p className="mt-1 text-xs leading-5 text-text-muted">同一个你，放进不同宇宙里，会长成完全不同的人设。</p>
+                测自己
+                <ChevronDown className={selfDD.open ? 'rotate-180' : ''} />
+              </button>
+              {selfDD.open && (
+                <div
+                  className="nav-dropdown absolute left-1/2 -translate-x-1/2 mt-4 w-[56rem] max-w-[calc(100vw-1rem)] p-6 z-[100] origin-top"
+                  onMouseEnter={selfDD.onMouseEnter}
+                  onMouseLeave={selfDD.onMouseLeave}
+                >
+                  <div className="flex flex-col gap-6">
+                    {/* Top Row: Core & New Features */}
+                    <div className="grid grid-cols-12 gap-6">
+                      
+                      {/* Left: 核心宇宙 (HOT PICKS) */}
+                      <section className="col-span-8 rounded-[24px] bg-bg-primary/50 border border-border-subtle p-5">
+                        <div className="mb-4 flex items-center justify-between">
+                          <h3 className="font-serif text-lg font-medium text-text-primary tracking-wide">核心宇宙</h3>
+                          <span className="font-mono text-[10px] tracking-widest text-text-muted uppercase border border-border-subtle px-2 py-0.5 rounded-full">Start Here</span>
                         </div>
-                        <span className="rounded-full bg-bg-secondary px-2.5 py-1 text-[10px] font-medium text-text-secondary">
-                          {SELF_STYLE_ITEMS.length} 个宇宙
-                        </span>
+                        <div className="grid grid-cols-2 gap-3">
+                          {HOT_PICKS.map(item => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              prefetch={false}
+                              onClick={selfDD.close}
+                              className="group flex items-start gap-3 rounded-2xl px-3 py-3 hover:bg-bg-elevated transition-colors border border-transparent hover:border-border-subtle"
+                            >
+                              <div className="mt-0.5 shadow-sm rounded-full shrink-0">
+                                <NavMark mark={item.mark} compact />
+                              </div>
+                              <span className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-text-primary transition-colors group-hover:text-rose-text">{item.label}</span>
+                                  {item.tag && (
+                                    <span className="rounded-full bg-accent/10 px-1.5 py-0.5 text-[9px] font-medium text-accent">
+                                      {item.tag}
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="mt-1 block text-[11px] text-text-muted truncate">{item.desc}</span>
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
+                      </section>
+
+                      {/* Right: 轻松一测 */}
+                      <div className="col-span-4 flex flex-col gap-4">
+                        {/* 轻松一测 */}
+                        <section className="flex-1 rounded-[24px] bg-bg-primary/30 border border-border-subtle p-5">
+                          <h3 className="mb-3 font-serif text-lg font-medium text-text-primary tracking-wide">轻松一测</h3>
+                          <div className="grid grid-cols-1 gap-1">
+                            {CASUAL_TESTS.map(item => (
+                              <Link
+                                key={item.href}
+                                href={item.href}
+                                prefetch={false}
+                                onClick={selfDD.close}
+                                className="group flex items-center justify-between rounded-xl px-2 py-2 hover:bg-bg-elevated transition-colors"
+                              >
+                                <span className="font-medium text-sm text-text-primary group-hover:text-gold-text transition-colors">{item.label}</span>
+                                <span className="text-[11px] text-text-muted">{item.desc}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        </section>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2.5">
+                    </div>
+
+                    {/* Bottom Row: 风格宇宙 Chips */}
+                    <section className="rounded-[24px] bg-bg-elevated border border-border-subtle p-5 shadow-sm">
+                      <div className="mb-3 flex items-center justify-between">
+                        <h3 className="font-serif text-lg font-medium text-text-primary tracking-wide">风格宇宙</h3>
+                        <span className="text-[11px] text-text-muted font-medium">12 个平行宇宙</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
                         {SELF_STYLE_ITEMS.map(item => (
                           <Link
                             key={item.href}
                             href={item.href}
                             prefetch={false}
                             onClick={selfDD.close}
-                            className="flex min-w-0 items-start gap-3 rounded-[18px] border border-transparent bg-bg-primary/72 px-3.5 py-3 text-sm transition-[background-color,border-color,color] duration-200 hover:bg-bg-secondary hover:border-border-subtle"
+                            className="group flex items-center gap-2 rounded-full border border-border-subtle bg-bg-primary px-3 py-1.5 text-xs font-medium text-text-secondary transition-all hover:border-text-primary hover:text-text-primary hover:shadow-sm"
                           >
                             <span
-                              className="mt-1 h-2.5 w-2.5 rounded-full shrink-0 shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-bg-elevated)_72%,transparent)]"
+                              className="h-1.5 w-1.5 rounded-full"
                               style={{ background: item.accent }}
                             />
-                            <span className="min-w-0">
-                              <span className="block truncate font-medium text-text-primary">
-                                {item.label}
-                              </span>
-                              {item.isUgc && (
-                                <span className="mt-0.5 block text-[10px] font-medium tracking-[0.14em] text-text-muted uppercase">
-                                  Creator Universe
-                                </span>
-                              )}
-                            </span>
+                            {item.label}
+                            {item.isUgc && (
+                              <span className="text-[9px] font-mono tracking-wider text-text-muted/70 uppercase">UGC</span>
+                            )}
                           </Link>
                         ))}
                       </div>
                     </section>
 
-                    <section className="rounded-[24px] border border-border-subtle bg-bg-elevated/90 p-4">
-                      <div className="mb-3">
-                        <p className="text-[10px] font-mono tracking-[0.22em] text-text-muted uppercase">轻松一测</p>
-                        <p className="mt-1 text-xs leading-5 text-text-muted">不用进入大宇宙，几分钟也能测到一个有意思的小切面。</p>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2.5">
-                        {CASUAL_TESTS.map(item => (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            prefetch={false}
-                            onClick={selfDD.close}
-                            className="flex items-start gap-3 rounded-[18px] border border-transparent bg-bg-primary/72 px-3.5 py-3 text-sm transition-[background-color,border-color,color] duration-200 hover:bg-bg-secondary hover:border-border-subtle"
-                          >
-                            <NavMark mark={item.mark} compact />
-                            <span className="min-w-0">
-                              <span className="block font-medium text-text-primary">{item.label}</span>
-                              <span className="mt-0.5 block text-xs text-text-muted">{item.desc}</span>
-                            </span>
-                          </Link>
-                        ))}
-                      </div>
-                    </section>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* 测关系 dropdown */}
-          <div
-            ref={relDD.ref}
-            className="relative"
-            onMouseEnter={relDD.onMouseEnter}
-            onMouseLeave={relDD.onMouseLeave}
-          >
-            <button
-              type="button"
-              onClick={() => relDD.setOpen(v => !v)}
-              className={`nav-link inline-flex items-center gap-1.5 ${relDD.open ? 'nav-link-active' : ''}`}
-              aria-expanded={relDD.open}
-              aria-haspopup="true"
+            {/* 测关系 dropdown */}
+            <div
+              ref={relDD.ref}
+              className="relative"
+              onMouseEnter={relDD.onMouseEnter}
+              onMouseLeave={relDD.onMouseLeave}
             >
-              测关系
-              <ChevronDown className={relDD.open ? 'rotate-180' : ''} />
-            </button>
-            {relDD.open && (
-              <div
-                className="nav-dropdown w-64 left-0"
-                onMouseEnter={relDD.onMouseEnter}
-                onMouseLeave={relDD.onMouseLeave}
+              <button
+                type="button"
+                onClick={() => relDD.setOpen(v => !v)}
+                className={`nav-link inline-flex items-center gap-1.5 ${relDD.open ? 'nav-link-active' : ''}`}
+                aria-expanded={relDD.open}
+                aria-haspopup="true"
               >
-                {RELATIONSHIP_ITEMS.map(item => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    prefetch={false}
-                    onClick={relDD.close}
-                    className="nav-dropdown-item"
-                  >
-                    <NavMark mark={item.mark} compact />
-                    <span className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-text-primary">{item.label}</span>
-                        {'tag' in item && item.tag && (
-                          <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white bg-gradient-to-r from-pink-500 to-fuchsia-500">
-                            {item.tag}
-                          </span>
-                        )}
-                      </div>
-                      <span className="block text-xs text-text-muted mt-0.5">{item.desc}</span>
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+                测关系
+                <ChevronDown className={relDD.open ? 'rotate-180' : ''} />
+              </button>
+              {relDD.open && (
+                <div
+                  className="nav-dropdown absolute left-0 mt-4 w-[28rem] z-[100] p-4 origin-top-left"
+                  onMouseEnter={relDD.onMouseEnter}
+                  onMouseLeave={relDD.onMouseLeave}
+                >
+                  <div className="grid grid-cols-2 gap-2">
+                    {RELATIONSHIP_ITEMS.map(item => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        prefetch={false}
+                        onClick={relDD.close}
+                        className="group flex items-start gap-3 rounded-2xl px-3 py-3 hover:bg-bg-elevated transition-colors border border-transparent hover:border-border-subtle"
+                      >
+                        <div className="mt-0.5 shadow-sm rounded-full shrink-0">
+                          <NavMark mark={item.mark} compact />
+                        </div>
+                        <span className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-text-primary transition-colors group-hover:text-rose-text">{item.label}</span>
+                            {'tag' in item && item.tag && (
+                              <span className="rounded-full bg-gradient-to-r from-accent to-violet-text px-1.5 py-0.5 text-[9px] font-semibold text-white shadow-sm">
+                                {item.tag}
+                              </span>
+                            )}
+                          </div>
+                          <span className="block text-[11px] text-text-muted mt-1 truncate">{item.desc}</span>
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
-          {/* 发现 dropdown */}
-          <div
-            ref={discoverDD.ref}
-            className="relative"
-            onMouseEnter={discoverDD.onMouseEnter}
-            onMouseLeave={discoverDD.onMouseLeave}
-          >
-            <button
-              type="button"
-              onClick={() => discoverDD.setOpen(v => !v)}
-              className={`nav-link inline-flex items-center gap-1.5 ${discoverDD.open ? 'nav-link-active' : ''}`}
-              aria-expanded={discoverDD.open}
-              aria-haspopup="true"
+            {/* 发现 dropdown */}
+            <div
+              ref={discoverDD.ref}
+              className="relative"
+              onMouseEnter={discoverDD.onMouseEnter}
+              onMouseLeave={discoverDD.onMouseLeave}
             >
-              发现
-              <ChevronDown className={discoverDD.open ? 'rotate-180' : ''} />
-            </button>
-            {discoverDD.open && (
-              <div
-                className="nav-dropdown w-64 left-0"
-                onMouseEnter={discoverDD.onMouseEnter}
-                onMouseLeave={discoverDD.onMouseLeave}
+              <button
+                type="button"
+                onClick={() => discoverDD.setOpen(v => !v)}
+                className={`nav-link inline-flex items-center gap-1.5 ${discoverDD.open ? 'nav-link-active' : ''}`}
+                aria-expanded={discoverDD.open}
+                aria-haspopup="true"
               >
-                {DISCOVER_ITEMS.map(item => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    prefetch={false}
-                    onClick={discoverDD.close}
-                    className="nav-dropdown-item"
-                  >
-                    <NavMark mark={item.mark} compact />
-                    <span>
-                      <span className="font-medium text-text-primary">{item.label}</span>
-                      <span className="block text-xs text-text-muted mt-0.5">{item.desc}</span>
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+                发现
+                <ChevronDown className={discoverDD.open ? 'rotate-180' : ''} />
+              </button>
+              {discoverDD.open && (
+                <div
+                  className="nav-dropdown absolute left-0 mt-4 w-[18rem] z-[100] p-3 origin-top-left"
+                  onMouseEnter={discoverDD.onMouseEnter}
+                  onMouseLeave={discoverDD.onMouseLeave}
+                >
+                  <div className="flex flex-col gap-1">
+                    {DISCOVER_ITEMS.map(item => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        prefetch={false}
+                        onClick={discoverDD.close}
+                        className="group flex items-start gap-3 rounded-2xl px-3 py-3 hover:bg-bg-elevated transition-colors border border-transparent hover:border-border-subtle"
+                      >
+                        <div className="mt-0.5 shadow-sm rounded-full shrink-0">
+                          <NavMark mark={item.mark} compact />
+                        </div>
+                        <span className="min-w-0 flex-1">
+                          <span className="font-medium text-text-primary transition-colors group-hover:text-rose-text">{item.label}</span>
+                          <span className="block text-[11px] text-text-muted mt-1 truncate">{item.desc}</span>
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
-          {/* 她说 standalone link */}
-          <Link
-            href="/her-voice/"
-            prefetch={false}
-            className="nav-link inline-flex items-center gap-1"
-          >
-            <NavMark mark="HV" compact />
-            她说
-          </Link>
+            {/* 树洞 standalone link */}
+            <Link
+              href="/her-voice/"
+              prefetch={false}
+              className="nav-link inline-flex items-center gap-1"
+            >
+              <NavMark mark="HS" compact />
+              树洞
+            </Link>
+
+            {/* 漂流瓶 standalone link（P1） */}
+            <Link
+              href="/bottle"
+              prefetch={false}
+              className="nav-link inline-flex items-center gap-1"
+            >
+              <NavMark mark="BT" compact />
+              漂流瓶
+            </Link>
+          </div>
 
           {/* 我的 / 用户 */}
           {isAuthenticated ? (
@@ -449,53 +431,59 @@ export function Navigation() {
                 {(displayName || '?')[0].toUpperCase()}
               </button>
               {userDD.open && (
-                <div className="nav-dropdown right-0 w-44">
-                  <div className="px-4 py-2 border-b border-border-subtle">
+                <div className="nav-dropdown absolute right-0 mt-4 w-[14rem] z-[100] p-2 origin-top-right">
+                  <div className="px-3 py-3 mb-2 border-b border-border-subtle/50">
                     <p className="text-sm font-medium text-text-primary truncate">{displayName}</p>
                   </div>
-                  <Link href="/me/" prefetch={false} onClick={userDD.close} className="nav-dropdown-item">
-                    <NavMark mark="ME" compact /><span>个人中心</span>
-                  </Link>
-                  <Link href="/card/" prefetch={false} onClick={userDD.close} className="nav-dropdown-item">
-                    <NavMark mark="CD" compact /><span>我的 WTF Card</span>
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    disabled={isLoggingOut}
-                    className="nav-dropdown-item w-full text-left text-red-500 hover:text-red-600"
-                  >
-                    <NavMark mark="OUT" compact /><span>{isLoggingOut ? '退出中…' : '退出登录'}</span>
-                  </button>
+                  <div className="flex flex-col gap-1">
+                    <Link href="/me/" prefetch={false} onClick={userDD.close} className="group flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-bg-elevated transition-colors text-text-secondary hover:text-text-primary">
+                      <NavMark mark="ME" compact />
+                      <span className="text-sm font-medium">个人中心</span>
+                    </Link>
+                    <Link href="/card/" prefetch={false} onClick={userDD.close} className="group flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-bg-elevated transition-colors text-text-secondary hover:text-text-primary">
+                      <NavMark mark="CD" compact />
+                      <span className="text-sm font-medium">我的 WTF Card</span>
+                    </Link>
+                    <div className="h-px bg-border-subtle/50 my-1" />
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      disabled={isLoggingOut}
+                      className="group flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-ember/10 transition-colors text-ember hover:text-ember disabled:opacity-50"
+                    >
+                      <NavMark mark="OUT" compact />
+                      <span className="text-sm font-medium">{isLoggingOut ? '退出中…' : '退出登录'}</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           ) : (
-            <Link href="/card/" prefetch={false} className="nav-link">
+            <Link href="/card/" prefetch={false} className="nav-link hidden md:inline-flex">
               我的
             </Link>
           )}
-        </div>
 
-        {/* Desktop CTA / Login */}
-        {!authLoading && !isAuthenticated ? (
-          <Link
-            href="/auth/login/"
-            className="hidden md:inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-accent text-bg-primary text-sm font-medium hover:bg-accent/90 transition-colors shrink-0"
-          >
-            登录
-          </Link>
-        ) : (
-          <Link
-            href="/wtfti/galaxy/test/"
-            className="hidden md:inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-accent text-bg-primary text-sm font-medium hover:bg-accent/90 transition-colors shrink-0"
-          >
-            召唤主神
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </Link>
-        )}
+          {/* Desktop CTA / Login */}
+          {!authLoading && !isAuthenticated ? (
+            <Link
+              href="/auth/login/"
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-accent text-bg-primary text-sm font-medium hover:bg-accent/90 transition-colors shrink-0 whitespace-nowrap"
+            >
+              登录
+            </Link>
+          ) : (
+            <Link
+              href="/wtfti/galaxy/test/"
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-accent text-bg-primary text-sm font-medium hover:bg-accent/90 transition-colors shrink-0 whitespace-nowrap"
+            >
+              召唤主神
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          )}
+        </div>
 
         {/* ── Mobile hamburger ── */}
         <button
@@ -555,6 +543,36 @@ export function Navigation() {
               </>
             )}
 
+            {/* 今日 · 统一日常入口 */}
+            <Link
+              href="/today"
+              prefetch={false}
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-3 px-4 py-3.5 rounded-2xl border border-border-subtle bg-bg-secondary hover:bg-bg-elevated transition-colors"
+            >
+              <NavMark mark="TD" compact />
+              <span className="flex-1 min-w-0">
+                <span className="text-sm font-medium text-text-primary">今日</span>
+                <span className="block text-xs text-text-muted mt-0.5">每日一签 × 一张牌 × 月亮打卡 · 30 秒</span>
+              </span>
+              <ArrowMark />
+            </Link>
+
+            {/* 漂流瓶（P1） */}
+            <Link
+              href="/bottle"
+              prefetch={false}
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-3 px-4 py-3.5 rounded-2xl border border-border-subtle bg-bg-secondary hover:bg-bg-elevated transition-colors"
+            >
+              <NavMark mark="BT" compact />
+              <span className="flex-1 min-w-0">
+                <span className="text-sm font-medium text-text-primary">漂流瓶</span>
+                <span className="block text-xs text-text-muted mt-0.5">扔 3 个 / 捞 3 个 · 全匿名</span>
+              </span>
+              <ArrowMark />
+            </Link>
+
             {/* 测自己 — 热门推荐 */}
             <MobileSection title="测自己" subtitle="了解真实的自己">
               <div className="grid grid-cols-2 gap-2 mb-3">
@@ -568,28 +586,6 @@ export function Navigation() {
                   >
                     <NavMark mark={item.mark} compact />
                     <span className="text-sm font-medium truncate">{item.label}</span>
-                  </Link>
-                ))}
-              </div>
-              {/* AI 灵镜 */}
-              <p className="text-[10px] font-mono tracking-widest text-text-muted uppercase mb-2">AI 灵镜</p>
-              <div className="grid grid-cols-1 gap-2 mb-3">
-                {MIRROR_ITEMS.map(item => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    prefetch={false}
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl border border-pink-200/50 bg-gradient-to-r from-pink-50 to-rose-50 hover:from-pink-100 hover:to-rose-100 transition-colors"
-                  >
-                    <span className="text-lg">🔮</span>
-                    <span className="flex-1 min-w-0">
-                      <span className="text-sm font-medium text-text-primary">{item.label}</span>
-                      <span className="block text-xs text-text-muted mt-0.5">{item.desc}</span>
-                    </span>
-                    <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white bg-gradient-to-r from-pink-400 to-rose-400">
-                      NEW
-                    </span>
                   </Link>
                 ))}
               </div>
@@ -650,17 +646,17 @@ export function Navigation() {
               </div>
             </MobileSection>
 
-            {/* 她说 */}
+            {/* 树洞 */}
             <Link
               href="/her-voice/"
               prefetch={false}
               onClick={() => setMobileOpen(false)}
               className="wtfti-panel flex items-center gap-3 rounded-2xl px-4 py-3.5"
             >
-              <NavMark mark="HV" compact />
+              <NavMark mark="HS" compact />
               <span className="flex-1">
-                <span className="font-medium text-sm text-text-primary">她说 · Her Voice</span>
-                <span className="mt-0.5 block text-xs text-text-muted">女性声音广场 · 你的态度被听见</span>
+                <span className="font-medium text-sm text-text-primary">树洞 · 漂流瓶</span>
+                <span className="mt-0.5 block text-xs text-text-muted">现代女性的围炉 · 一起写下「她词条」</span>
               </span>
               <ArrowMark className="text-text-muted" />
             </Link>
@@ -708,7 +704,7 @@ export function Navigation() {
                     type="button"
                     onClick={() => { handleLogout(); setMobileOpen(false); }}
                     disabled={isLoggingOut}
-                    className="block w-full text-left px-3 py-2.5 rounded-xl text-sm text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    className="block w-full text-left px-3 py-2.5 rounded-xl text-sm text-ember hover:text-ember hover:bg-ember/10 transition-colors"
                   >
                     {isLoggingOut ? '退出中…' : '退出登录'}
                   </button>

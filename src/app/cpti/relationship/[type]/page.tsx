@@ -211,7 +211,7 @@ export default async function CptiRelationshipTypePage({ params }: PageProps) {
               <Link
                 key={r.slug}
                 href={`/cpti/relationship/${r.slug}/`}
-                className="group rounded-xl border border-border-subtle bg-bg-elevated p-4 text-center hover:border-rose-500/40 transition-all"
+                className="group rounded-xl border border-border-subtle bg-bg-elevated p-4 text-center hover:border-accent/40 transition-all"
               >
                 <div className="text-3xl mb-2">{r.emoji}</div>
                 <div className="text-xs sm:text-sm font-semibold text-text-primary">{r.name}</div>
@@ -226,7 +226,7 @@ export default async function CptiRelationshipTypePage({ params }: PageProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Link
               href="/cpti/gallery/"
-              className="rounded-xl border border-border-subtle bg-bg-elevated p-5 hover:border-rose-500/40 transition-all"
+              className="rounded-xl border border-border-subtle bg-bg-elevated p-5 hover:border-accent/40 transition-all"
             >
               <div className="text-xs font-mono tracking-wider text-text-muted uppercase mb-1">25 / 25</div>
               <div className="text-base font-semibold mb-1">查看关系图鉴 →</div>
@@ -234,7 +234,7 @@ export default async function CptiRelationshipTypePage({ params }: PageProps) {
             </Link>
             <Link
               href="/cpti/theory/"
-              className="rounded-xl border border-border-subtle bg-bg-elevated p-5 hover:border-rose-500/40 transition-all"
+              className="rounded-xl border border-border-subtle bg-bg-elevated p-5 hover:border-accent/40 transition-all"
             >
               <div className="text-xs font-mono tracking-wider text-text-muted uppercase mb-1">5 维度</div>
               <div className="text-base font-semibold mb-1">维度白皮书 →</div>

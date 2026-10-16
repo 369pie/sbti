@@ -215,31 +215,33 @@ export default function ShareTemplatesContent() {
 
   useEffect(() => {
     if (!mounted) return;
+    queueMicrotask(() => {
 
-    const card = loadCard();
-    const names: string[] = [];
-    const universeNames: string[] = [];
+      const card = loadCard();
+      const names: string[] = [];
+      const universeNames: string[] = [];
 
-    if (card) {
-      for (const uid of CARD_UNIVERSE_IDS) {
-        const r = card.results[uid];
-        if (r) {
-          const u = getUniverse(uid);
-          const resolved = resolvePersonality(uid, r.slug);
-          if (u && resolved) {
-            names.push(resolved.name);
-            universeNames.push(u.name);
+      if (card) {
+        for (const uid of CARD_UNIVERSE_IDS) {
+          const r = card.results[uid];
+          if (r) {
+            const u = getUniverse(uid);
+            const resolved = resolvePersonality(uid, r.slug);
+            if (u && resolved) {
+              names.push(resolved.name);
+              universeNames.push(u.name);
+            }
           }
         }
       }
-    }
 
-    setCtx({
-      names: names.length > 0 ? names : ['情绪小怪兽', '社恐大师', '浪漫泡泡'],
-      universeNames: universeNames.length > 0 ? universeNames : ['标准版', 'WTF毒舌版', '修仙2.0'],
-      totalLit: names.length || 3,
-      totalUniverses: CARD_UNIVERSE_IDS.length,
-      url: SHARE_SITE_URL,
+      setCtx({
+        names: names.length > 0 ? names : ['情绪小怪兽', '社恐大师', '浪漫泡泡'],
+        universeNames: universeNames.length > 0 ? universeNames : ['标准版', 'WTF毒舌版', '修仙2.0'],
+        totalLit: names.length || 3,
+        totalUniverses: CARD_UNIVERSE_IDS.length,
+        url: SHARE_SITE_URL,
+      });
     });
   }, [mounted]);
 

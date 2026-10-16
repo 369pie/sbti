@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ASSET_SYNC_EVENT } from '@/lib/assets/asset-contract';
 import { MYSTI_THEMES } from '@/lib/mysti/themes';
+import { useWtftiTheme } from '@/components/wtfti/WtftiThemeProvider';
 import type { MystiTheme } from '@/lib/mysti/types';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 import {
@@ -34,16 +35,11 @@ const MystiGachaShareImageGenerator = dynamic(
   () => import('@/components/MystiGachaShareImageGenerator').then((m) => m.MystiGachaShareImageGenerator),
   { ssr: false },
 );
-const THEME_STORAGE_KEY = 'mysti-theme-preference';
+
 
 export function MystiGachaContent() {
-  const [themeId, setThemeId] = useState<MystiTheme['id']>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-      if (stored === 'pale' || stored === 'celestial') return stored;
-    }
-    return 'celestial';
-  });
+  const { theme: wtftiTheme } = useWtftiTheme();
+  const themeId = wtftiTheme === 'dark' ? 'celestial' : 'pale';
 
   const [gachaResult, setGachaResult] = useState<GachaResult | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -80,8 +76,10 @@ export function MystiGachaContent() {
       setRarityDist(getRarityDistribution());
     };
 
-    setMounted(true);
-    refreshLocalState();
+    queueMicrotask(() => {
+      setMounted(true);
+      refreshLocalState();
+    });
     window.addEventListener(ASSET_SYNC_EVENT, refreshLocalState);
 
     trackMystiEvent('mysti_gacha_view');
@@ -99,15 +97,7 @@ export function MystiGachaContent() {
     return () => clearInterval(timer);
   }, [gachaResult]);
 
-  const toggleTheme = useCallback(() => {
-    setThemeId(prev => {
-      const next = prev === 'celestial' ? 'pale' : 'celestial';
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(THEME_STORAGE_KEY, next);
-      }
-      return next;
-    });
-  }, []);
+  
 
   const handleDraw = useCallback(() => {
     if (isDrawing || hasDrawnToday()) return;
@@ -205,14 +195,7 @@ export function MystiGachaContent() {
           >
             已收集 {collectionCount}/{collectionTotal}
           </div>
-          <button
-            onClick={toggleTheme}
-            className="px-3 py-1.5 rounded-full text-xs border transition-all hover:brightness-110"
-            style={{ borderColor: theme.divider, color: theme.accent, background: theme.accentSoft }}
-            aria-label="切换主题"
-          >
-            {theme.label}
-          </button>
+          
         </div>
       </div>
 
@@ -412,7 +395,7 @@ export function MystiGachaContent() {
                     className="text-sm italic mb-6"
                     style={{ color: theme.textMuted }}
                   >
-                    "{gachaResult.card.cardDescription}"
+                    &quot;{gachaResult.card.cardDescription}&quot;
                   </p>
 
                   {/* Tomorrow message */}

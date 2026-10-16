@@ -14,6 +14,7 @@
  *   ④ Chapter I  · 引力轴（rose）   ← 主题库 share 32%
  *   ⑤ Chapter II · 暗面之井（twilight）  ← 主题库 share 22% + 1 道 meme 题
  *   ⑥ SummonOverlay（4s）         → 屏幕震动 + 暗面苏醒预告
+ *   ⑥′ SigilSketching（C2）        → 主测答完、灵魂章前的中段奖励：印记勾勒（防弃测）
  *   ⑦ Chapter III · 命运织线（gold）  ← 主题库 share 46%
  *   ⑧ Chapter IV · 灵魂探针（aurora）← SoulProbeQuiz（6 题）
  *   ⑨ StardustSealing（C3）       → 写一封 30 天后给自己的信
@@ -28,6 +29,7 @@ import {
   MirrorSlider,
   PolaroidStack,
   SanctumGate,
+  SigilSketching,
   StardustSealing,
   TarotPull,
   TwoAmText,
@@ -78,6 +80,7 @@ type Phase =
   | { kind: 'chapter-question'; chapterIdx: 0 | 1 | 2; questionIdx: number }
   | { kind: 'meme' }
   | { kind: 'summon' }
+  | { kind: 'sigil' }
   | { kind: 'soul-intro' }
   | { kind: 'soul' }
   | { kind: 's-intro' }
@@ -202,7 +205,8 @@ export function RitualQuizRunner({
     setPhase({ kind: 'chapter-intro', chapterIdx: 2 });
   }, []);
 
-  const advanceFromSummon = useCallback(() => setPhase({ kind: 'soul-intro' }), []);
+  const advanceFromSummon = useCallback(() => setPhase({ kind: 'sigil' }), []);
+  const advanceFromSigil = useCallback(() => setPhase({ kind: 'soul-intro' }), []);
   const advanceFromSoulIntro = useCallback(() => setPhase({ kind: 'soul' }), []);
 
   const handleSoulComplete = useCallback((next: SoulAnswers) => {
@@ -509,6 +513,22 @@ export function RitualQuizRunner({
 
   if (phase.kind === 'summon') {
     return <SummonOverlay onComplete={advanceFromSummon} />;
+  }
+
+  if (phase.kind === 'sigil') {
+    // C2 · 印记勾勒：此刻主测题已全部答完，先算一张临时星图供 sigil 生成（不入库，finalize 时会重算）
+    const result = calculateResult(answers, QUESTIONS);
+    const projection = projectClassicResult(result);
+    const sigilGalaxy = buildGalaxyResult({
+      resultId: 'sigil-preview',
+      personalitySlug: result.personality.slug,
+      axesVector: projection.axes,
+    });
+    return (
+      <RitualPageShell>
+        <SigilSketching galaxy={sigilGalaxy} onDone={advanceFromSigil} />
+      </RitualPageShell>
+    );
   }
 
   if (phase.kind === 'soul-intro') {

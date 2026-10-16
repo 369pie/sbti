@@ -1,8 +1,8 @@
 /**
  * HERMOSA · 她的话｜留言读写
  *
- * GET  /api/hermosa/messages?universe=...&slug=...&tag=...&limit=24
- * POST /api/hermosa/messages   { universe, slug?, code?, text, signature?, tags? }
+ * GET  /api/hermosa/messages?universe=...&slug=...&tag=...&kind=...&limit=24
+ * POST /api/hermosa/messages   { universe, slug?, code?, text, signature?, tags?, kind?, metadata? }
  *
  * - 复用 soulti_wishes 模式：service_role 写入 + RLS 兜底。
  * - 限流：同 client_hash 1h ≤3 条。
@@ -13,12 +13,24 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createHash } from 'node:crypto';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import {
+  isHermosaAttributionMode,
+  isHermosaCurationStatus,
+  isHermosaKind,
+  isHermosaSafetyLevel,
   isHermosaTag,
+  isHermosaTopicWeek,
   isHermosaUniverse,
+  sanitizeContributionMetadata,
   sanitizeTags,
+  type HermosaAttributionMode,
+  type HermosaCurationStatus,
+  type HermosaContributionMetadata,
+  type HermosaKind,
+  type HermosaSafetyLevel,
   type HermosaTag,
   type HermosaUniverse,
 } from '@/lib/hermosa/tags';
+import { getCurrentHermosaTopic } from '@/lib/hermosa/topics';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -57,9 +69,16 @@ interface Row {
   universe: string;
   slug: string | null;
   code: string | null;
+  kind: HermosaKind;
   text: string;
   signature: string | null;
   tags: string[];
+  metadata: HermosaContributionMetadata;
+  topic_week: string | null;
+  curation_status: HermosaCurationStatus;
+  consent_to_feature: boolean;
+  attribution_mode: HermosaAttributionMode;
+  safety_level: HermosaSafetyLevel;
   echo_count: number;
   is_featured: boolean;
   status: string | null;
@@ -71,6 +90,11 @@ export async function GET(req: NextRequest) {
   const universe = sp.get('universe');
   const slug = sp.get('slug') || undefined;
   const tag = sp.get('tag');
+  const kind = sp.get('kind');
+  const topicWeek = sp.get('topic_week');
+  const curationStatus = sp.get('curation_status');
+  const safetyLevel = sp.get('safety_level');
+  const consented = sp.get('consented');
   const limitRaw = Number(sp.get('limit') ?? '24');
   const limit = Math.min(Math.max(Number.isFinite(limitRaw) ? limitRaw : 24, 1), 60);
 
@@ -81,9 +105,10 @@ export async function GET(req: NextRequest) {
 
   let q = admin
     .from('hermosa_messages')
-    .select('id,universe,slug,code,text,signature,tags,echo_count,is_featured,status,created_at')
+    .select('id,universe,slug,code,kind,text,signature,tags,metadata,topic_week,curation_status,consent_to_feature,attribution_mode,safety_level,echo_count,is_featured,status,lifecycle,inscribed_letter_slug,codex_atlas_slug,created_at')
     .eq('is_published', true)
     .eq('flagged', false)
+    .neq('safety_level', 'blocked')
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -95,6 +120,21 @@ export async function GET(req: NextRequest) {
   }
   if (tag && isHermosaTag(tag)) {
     q = q.contains('tags', [tag] as HermosaTag[]);
+  }
+  if (kind && isHermosaKind(kind)) {
+    q = q.eq('kind', kind);
+  }
+  if (topicWeek && isHermosaTopicWeek(topicWeek)) {
+    q = q.eq('topic_week', topicWeek);
+  }
+  if (curationStatus && isHermosaCurationStatus(curationStatus)) {
+    q = q.eq('curation_status', curationStatus);
+  }
+  if (safetyLevel && isHermosaSafetyLevel(safetyLevel)) {
+    q = q.eq('safety_level', safetyLevel);
+  }
+  if (consented === 'true') {
+    q = q.eq('consent_to_feature', true);
   }
 
   const { data, error } = await q;
@@ -112,6 +152,11 @@ interface PostBody {
   text?: string;
   signature?: string;
   tags?: unknown;
+  kind?: unknown;
+  metadata?: unknown;
+  topic_week?: unknown;
+  consent_to_feature?: unknown;
+  attribution_mode?: unknown;
 }
 
 export async function POST(req: NextRequest) {
@@ -143,10 +188,27 @@ export async function POST(req: NextRequest) {
       ? body.signature.replace(/[\r\n]/g, '').trim().slice(0, MAX_SIG_LEN) || null
       : null;
   const tags = sanitizeTags(body.tags);
+  const kindRaw = body.kind ?? 'voice';
+  if (!isHermosaKind(kindRaw)) {
+    return NextResponse.json({ ok: false, error: 'invalid_kind' }, { status: 400 });
+  }
+  const kind = kindRaw;
+  const metadata = sanitizeContributionMetadata(kind, body.metadata);
+  const topicWeekRaw = body.topic_week ?? getCurrentHermosaTopic().week;
+  if (!isHermosaTopicWeek(topicWeekRaw)) {
+    return NextResponse.json({ ok: false, error: 'invalid_topic_week' }, { status: 400 });
+  }
+  const attributionRaw = body.attribution_mode ?? (signature ? 'signature' : 'anonymous');
+  if (!isHermosaAttributionMode(attributionRaw)) {
+    return NextResponse.json({ ok: false, error: 'invalid_attribution_mode' }, { status: 400 });
+  }
+  const consentToFeature = body.consent_to_feature === true;
+  const flagged = shouldFlag(text) || shouldFlag(Object.values(metadata).join(' '));
+  const safetyLevel: HermosaSafetyLevel = flagged ? 'review' : 'safe';
 
   const admin = tryAdmin();
   if (!admin) {
-    console.info('[hermosa] noop (no supabase)', { universe, text });
+    console.info('[hermosa] noop (no supabase)', { universe, kind, text });
     return NextResponse.json({
       ok: true,
       persisted: false,
@@ -155,9 +217,16 @@ export async function POST(req: NextRequest) {
         universe,
         slug,
         code,
+        kind,
         text,
         signature,
         tags,
+        metadata,
+        topic_week: topicWeekRaw,
+        curation_status: 'new',
+        consent_to_feature: consentToFeature,
+        attribution_mode: attributionRaw,
+        safety_level: safetyLevel,
         echo_count: 0,
         is_featured: false,
         status: null,
@@ -187,14 +256,21 @@ export async function POST(req: NextRequest) {
     text,
     signature,
     tags,
+    kind,
+    metadata,
+    topic_week: topicWeekRaw,
+    curation_status: 'new',
+    consent_to_feature: consentToFeature,
+    attribution_mode: attributionRaw,
+    safety_level: safetyLevel,
     client_hash: hash,
-    flagged: shouldFlag(text),
+    flagged,
   };
 
   const { data: inserted, error: insertErr } = await admin
     .from('hermosa_messages')
     .insert(insertPayload)
-    .select('id,universe,slug,code,text,signature,tags,echo_count,is_featured,status,created_at')
+    .select('id,universe,slug,code,kind,text,signature,tags,metadata,topic_week,curation_status,consent_to_feature,attribution_mode,safety_level,echo_count,is_featured,status,lifecycle,inscribed_letter_slug,codex_atlas_slug,created_at')
     .single();
 
   if (insertErr) {

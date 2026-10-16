@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
-  title: '开始测试 — WTFTI 人格测试',
-  description: '同样的 15 维度测试，全新的 WTF 毒舌解读。答完直接落到你的 WTF 人格图鉴卡。',
+  title: '经典文本版测试 — WTFTI 人格宇宙',
+  description: 'WTFTI 经典文本版：15 维度快测，答完落到你的人格图鉴卡。想要完整仪式感，去人格神域花 90 秒召唤主神。',
   robots: { index: false, follow: true },
 };
 

@@ -16,7 +16,7 @@ const STORAGE_PREFIX = 'mysti-unlock-';
 export type SinglePurchaseSku =
   | 'soul-letter'        // ¥9.9 灵魂信
   | 'dual-report'        // ¥12.9 双人合盘报告
-  | 'monthly-report'     // ¥6.9 灵魂月报
+  | 'monthly-report'     // ¥6.9 每月小报告
   | 'gift-card'          // ¥39.9 灵魂礼品卡
   | 'festival-gift-card' // ¥49.9 节日限定礼品卡
   | 'besties-bundle'     // ¥69 闺蜜对箱
@@ -45,6 +45,7 @@ export type SinglePurchaseSku =
 /** 订阅类 */
 export type SubscriptionSku =
   | 'monthly-pass'       // ¥19/月
+  | 'monthly-pass-intro' // ¥9.9 首月（资格：该设备/用户从未买过任何通行证，服务端校验）
   | 'quarterly-pass'     // ¥99/季
   | 'yearly-pass'        // ¥299/年
   | 'creator-pass';      // ¥39/月（创作者）
@@ -106,7 +107,7 @@ export const SKU_PRICES: Record<MystiSku, { price: number; label: string; taglin
   // ── L1 单次内容 ─────────────────────────────────────────────
   'soul-letter': { price: 9.9, label: '灵魂信 · 深度版', tagline: '为你写的一封长信，5-8 屏深读' },
   'dual-report': { price: 12.9, label: '双人合盘报告', tagline: '关系的 8 个维度，看清你们之间' },
-  'monthly-report': { price: 6.9, label: '灵魂月报', tagline: '一整月的情绪 / 抽牌 / 选择回顾' },
+  'monthly-report': { price: 6.9, label: '每月小报告', tagline: '一整月的情绪 / 抽牌 / 选择回顾' },
   'share-plus': { price: 4.9, label: '分享卡 · Plus 精修', tagline: '去水印 + 金边精修，发圈不撞款' },
   'share-atelier': { price: 19.9, label: '分享卡 · N° 藏品版', tagline: '编号收藏卡，每张独一无二' },
 
@@ -137,15 +138,17 @@ export const SKU_PRICES: Record<MystiSku, { price: number; label: string; taglin
   'sigil-yearly': { price: 39, label: 'Sigil 灵魂印记 · 年度纪章册', tagline: '全年 12 章纪章 · 年度 SVG 高清下载 · PDF 收藏卷' },
 
   // ── L2 订阅 / 通行证 ──────────────────────────────────────
-  'monthly-pass': { price: 19, label: '灵魂月度通行证', tagline: '每日翻牌 + 全 Plus 分享卡 + 月报' },
-  'quarterly-pass': { price: 99, label: '灵魂季度通行证', tagline: '相当于 ¥33/月，最甜蜜点' },
-  'yearly-pass': { price: 299, label: '灵魂年度通行证', tagline: '¥25/月，铁粉无脑选' },
-  'creator-pass': { price: 39, label: '创作者 Plus 通行证', tagline: '高级题库 + 分润 30%' },
+  'monthly-pass': { price: 19, label: '月度会员', tagline: '每天一张牌 + 全部精修分享卡 + 月报' },
+  'monthly-pass-intro': { price: 9.9, label: '月度会员 · 首月', tagline: '首月体验价 · 30 天全权益，到期不自动续费' },
+  'quarterly-pass': { price: 99, label: '季度会员', tagline: '相当于 ¥33/月，最划算' },
+  'yearly-pass': { price: 299, label: '年度会员', tagline: '折合 ¥25/月，铁粉无脑选' },
+  'creator-pass': { price: 39, label: '创作者 Plus 会员', tagline: '高级题库 + 分润 30%' },
 };
 
 /** 订阅类 SKU 列表 */
 export const SUBSCRIPTION_SKUS: SubscriptionSku[] = [
   'monthly-pass',
+  'monthly-pass-intro',
   'quarterly-pass',
   'yearly-pass',
   'creator-pass',
@@ -192,6 +195,7 @@ export function isSubscriptionSku(sku: string): sku is SubscriptionSku {
 /** 订阅 SKU 对应的天数 */
 export const SUBSCRIPTION_DURATION_DAYS: Record<SubscriptionSku, number> = {
   'monthly-pass': 30,
+  'monthly-pass-intro': 30,
   'quarterly-pass': 92,
   'yearly-pass': 365,
   'creator-pass': 30,

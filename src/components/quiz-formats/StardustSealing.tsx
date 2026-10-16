@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useCallback, useState } from 'react';
 
 import { sealStardustLetter } from '@/lib/wtfi/letters-archive';
+import { subscribeLetterReminder } from '@/lib/wtfi/cloud-sync';
 
 import { WhisperInput } from './WhisperInput';
 
@@ -38,6 +39,20 @@ export function StardustSealing({
   const [text, setText] = useState('');
   const [sealed, setSealed] = useState<{ id: string; dueAt: string } | null>(null);
   const [notifGranted, setNotifGranted] = useState<boolean | null>(null);
+  const [reminderEmail, setReminderEmail] = useState('');
+  const [reminderState, setReminderState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
+
+  const handleReminderOptIn = useCallback(async () => {
+    if (!sealed || reminderState === 'sending') return;
+    const email = reminderEmail.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setReminderState('error');
+      return;
+    }
+    setReminderState('sending');
+    const ok = await subscribeLetterReminder(sealed.id, email);
+    setReminderState(ok ? 'done' : 'error');
+  }, [sealed, reminderEmail, reminderState]);
 
   const handleSeal = useCallback(async () => {
     const trimmed = text.trim();
@@ -185,6 +200,70 @@ export function StardustSealing({
             ✦ 浏览器通知已开启 · 30 天后会轻轻提醒你
           </p>
         ) : null}
+
+        {/* 到期邮件提醒订阅（Phase B 触达） */}
+        {reminderState === 'done' ? (
+          <p
+            style={{
+              margin: '14px auto 0',
+              maxWidth: 360,
+              fontSize: 12,
+              color: 'var(--color-gold)',
+              fontFamily: 'Noto Serif SC, serif',
+            }}
+          >
+            ✦ 到期那天，邮件会轻轻叫你回来。
+          </p>
+        ) : (
+          <div style={{ margin: '16px auto 0', maxWidth: 340 }}>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input
+                type="email"
+                value={reminderEmail}
+                onChange={(e) => {
+                  setReminderEmail(e.target.value);
+                  if (reminderState === 'error') setReminderState('idle');
+                }}
+                placeholder="留下邮箱，到期提醒你拆信（可选）"
+                aria-label="到期拆信邮件提醒邮箱"
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: 999,
+                  border: `1px solid ${reminderState === 'error' ? 'rgba(192,122,142,.6)' : 'rgba(201,166,118,.35)'}`,
+                  background: 'rgba(20,15,42,.5)',
+                  color: 'var(--color-bg-primary)',
+                  fontSize: 12,
+                  fontFamily: 'Noto Serif SC, serif',
+                  outline: 'none',
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleReminderOptIn}
+                disabled={reminderState === 'sending'}
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: 999,
+                  border: '1px solid rgba(201,166,118,.5)',
+                  background: 'rgba(201,166,118,.12)',
+                  color: 'var(--color-bg-primary)',
+                  fontSize: 11,
+                  letterSpacing: 2,
+                  cursor: reminderState === 'sending' ? 'wait' : 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {reminderState === 'sending' ? '…' : '提醒我'}
+              </button>
+            </div>
+            {reminderState === 'error' ? (
+              <p style={{ margin: '6px 2px 0', fontSize: 10.5, color: 'rgba(231,198,192,.75)' }}>
+                邮箱好像不太对，或订阅失败了 — 可以再试一次。
+              </p>
+            ) : null}
+          </div>
+        )}
 
         <div
           style={{

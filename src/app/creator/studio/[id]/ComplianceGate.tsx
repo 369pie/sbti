@@ -50,8 +50,8 @@ export function ComplianceGate({ universeId, refreshToken }: Props) {
   const tone = !report
     ? 'border-border-subtle bg-bg-secondary/40'
     : report.ok
-      ? 'border-emerald-400/30 bg-emerald-400/[0.04]'
-      : 'border-rose-400/40 bg-rose-400/[0.05]';
+      ? 'border-sage/30 bg-sage/[0.04]'
+      : 'border-rose-text/40 bg-rose-text/[0.05]';
 
   return (
     <div className={`rounded-xl border p-4 text-sm ${tone}`}>
@@ -82,13 +82,13 @@ export function ComplianceGate({ universeId, refreshToken }: Props) {
         </div>
       </div>
 
-      {error && <div className="mt-2 text-rose-300 text-xs">{error}</div>}
+      {error && <div className="mt-2 text-rose-text text-xs">{error}</div>}
 
       {report && (
         <div className="mt-2">
           <div
             className={`text-sm font-medium ${
-              report.ok ? 'text-emerald-300' : 'text-rose-300'
+              report.ok ? 'text-sage-text' : 'text-rose-text'
             }`}
           >
             {report.summary}
@@ -115,8 +115,8 @@ export function ComplianceGate({ universeId, refreshToken }: Props) {
 function IssueRow({ issue }: { issue: CopyIssue }) {
   const pillTone =
     issue.severity === 'error'
-      ? 'bg-rose-500/20 text-rose-200 border-rose-400/40'
-      : 'bg-amber-500/12 text-amber-200 border-amber-400/40';
+      ? 'bg-accent/20 text-rose-text border-rose-text/40'
+      : 'bg-gold/100/12 text-gold-soft border-gold/40';
 
   return (
     <li className="rounded-lg border border-border-subtle bg-bg-tertiary p-2.5">
@@ -130,10 +130,10 @@ function IssueRow({ issue }: { issue: CopyIssue }) {
         <span className="text-xs text-text-muted font-mono truncate">{issue.field}</span>
       </div>
       <div className="text-xs text-text-secondary">
-        命中：<span className="text-rose-200 font-mono">&ldquo;{issue.match}&rdquo;</span>
+        命中：<span className="text-rose-text font-mono">&ldquo;{issue.match}&rdquo;</span>
       </div>
       <div className="text-xs text-text-secondary mt-1">理由：{issue.reason}</div>
-      <div className="text-xs text-emerald-300/80 mt-0.5">建议：{issue.suggestion}</div>
+      <div className="text-xs text-sage-text/80 mt-0.5">建议：{issue.suggestion}</div>
     </li>
   );
 }

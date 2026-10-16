@@ -4,8 +4,8 @@
   "private": true,
   "packageManager": "pnpm@10.15.1",
   "scripts": {
-    "dev": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && next dev --webpack",
-    "dev:turbo": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && next dev",
+    "dev": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && next dev --webpack --port 3006",
+    "dev:turbo": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && next dev --port 3006",
     "build": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs && node scripts/build-export.mjs",
     "build:analyze": "ANALYZE=true node scripts/generate-gallery-thumbnails.mjs && ANALYZE=true node scripts/generate-medium-images.mjs && ANALYZE=true node scripts/build-export.mjs",
     "db:schema-smoke": "node scripts/check-supabase-schema.mjs",
@@ -16,7 +16,7 @@
     "images:medium": "node scripts/generate-medium-images.mjs",
     "images:all": "node scripts/generate-gallery-thumbnails.mjs && node scripts/generate-medium-images.mjs",
     "images:banti-launch": "node scripts/generate-banti-launch.mjs",
-    "start": "next start",
+    "start": "next start --port 3006",
     "lint": "eslint",
     "docs:metadata": "node scripts/check-doc-metadata.mjs"
   },

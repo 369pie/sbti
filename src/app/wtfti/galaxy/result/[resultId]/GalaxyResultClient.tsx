@@ -12,8 +12,11 @@ import { PriceAnchor } from '@/components/PriceAnchor';
 import {
   loadGalaxySessionById,
   loadLatestGalaxySession,
+  saveGalaxySession,
   type GalaxySession,
 } from '@/lib/wtfi/galaxy-session';
+import { fetchGalaxySessionFromCloud } from '@/lib/wtfi/cloud-sync';
+import { TomorrowRitualCta } from '@/components/galaxy/TomorrowRitualCta';
 import { trackGalaxyEvent } from '@/lib/wtfi/galaxy-analytics';
 import { basePath } from '@/lib/site';
 import { getDailyEphemeris } from '@/lib/wtfi/daily-ephemeris';
@@ -29,19 +32,37 @@ export default function GalaxyResultClient({ resultId }: { resultId: string }) {
       // 优先按 resultId 查，找不到再退到 latest（比如仪式还在前一个 tab 没同步）。
       const byId = loadGalaxySessionById(resultId);
       const fallback = byId ?? loadLatestGalaxySession();
-      if (fallback) {
-        setSession(fallback);
+      const apply = (s: GalaxySession) => {
+        setSession(s);
         setStatus('ready');
         trackGalaxyEvent('galaxy_result_view', {
-          slug: fallback.personalitySlug,
+          slug: s.personalitySlug,
           props: {
-            resultId: fallback.resultId,
-            hasShadow: Boolean(fallback.result.shadow),
+            resultId: s.resultId,
+            hasShadow: Boolean(s.result.shadow),
           },
         });
-      } else {
-        setStatus('missing');
+      };
+      if (fallback) {
+        apply(fallback);
+        return;
       }
+      // 本地 miss（换设备 / 清缓存）→ 云端按 resultId 拉回，并落回本地缓存。
+      void fetchGalaxySessionFromCloud(resultId).then((cloud) => {
+        if (cloud && cloud.result) {
+          const restored: GalaxySession = {
+            resultId: cloud.resultId,
+            createdAt: cloud.createdAt,
+            personalitySlug: cloud.personalitySlug,
+            result: cloud.result as GalaxySession['result'],
+            soulAnswers: cloud.soulAnswers as GalaxySession['soulAnswers'],
+          };
+          saveGalaxySession(restored);
+          apply(restored);
+        } else {
+          setStatus('missing');
+        }
+      });
     });
   }, [resultId]);
 
@@ -117,6 +138,7 @@ export default function GalaxyResultClient({ resultId }: { resultId: string }) {
             accent="#C07A8E"
           />
         </section>
+        <TomorrowRitualCta fromModule="galaxy" source="galaxy-result-tomorrow-cta" />
         <DeepArchiveCta resultId={session.resultId} slug={session.personalitySlug} />
         <GalaxyShareDock session={session} />
       </>

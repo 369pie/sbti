@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
 import { StardustDueBanner } from '@/components/galaxy/StardustDueBanner';
+import { PillarBreadcrumb } from '@/components/PillarBreadcrumb';
 import WtftiLandingContent from './WtftiLandingContent';
 
 const WTFTI_TAGLINE = 'WTFTI · 人格神域 — 90 秒被一位主神召唤，留下你的灵魂印记。';
@@ -59,6 +60,7 @@ export default function WtftiPage() {
         }) }}
       />
       <StardustDueBanner />
+      <PillarBreadcrumb pillar="I" label="WTFTI · 人格神域" hint="一次召唤，长期归属" />
       <WtftiLandingContent />
     </>
   );

@@ -150,7 +150,7 @@ export default function CreatorAdminContent() {
         </div>
 
         {loading && <div className="text-sm text-text-muted">加载中…</div>}
-        {error && <div className="text-sm text-rose-400">{error}</div>}
+        {error && <div className="text-sm text-rose-text">{error}</div>}
 
         {!loading && !error && items.length === 0 && (
           <div className="text-center py-16 text-text-muted text-sm">当前没有待审核的宇宙。</div>
@@ -180,13 +180,13 @@ export default function CreatorAdminContent() {
               </div>
 
               {u.review_note && (
-                <div className="mt-4 rounded-xl border border-amber-300/20 bg-amber-500/10 px-4 py-3">
-                  <div className="text-xs text-amber-300/80 mb-1">最近一次反馈</div>
-                  <div className="text-sm text-amber-100/90 font-medium">
+                <div className="mt-4 rounded-xl border border-gold/20 bg-gold/10 px-4 py-3">
+                  <div className="text-xs text-gold-soft/80 mb-1">最近一次反馈</div>
+                  <div className="text-sm text-gold-soft/90 font-medium">
                     {parseReviewFeedback(u.review_note)?.reason.label ?? '审核反馈'}
                   </div>
                   {parseReviewFeedback(u.review_note)?.note && (
-                    <div className="text-sm text-amber-100/70 mt-1 leading-7">
+                    <div className="text-sm text-gold-soft/70 mt-1 leading-7">
                       {parseReviewFeedback(u.review_note)?.note}
                     </div>
                   )}
@@ -235,7 +235,7 @@ export default function CreatorAdminContent() {
                   type="button"
                   disabled={busyId === u.id}
                   onClick={() => void act(u, 'reject')}
-                  className="px-4 py-2 text-sm rounded-xl border border-rose-400/40 text-rose-400 hover:bg-rose-400/10 disabled:opacity-40"
+                  className="px-4 py-2 text-sm rounded-xl border border-rose-text/40 text-rose-text hover:bg-rose-text/10 disabled:opacity-40"
                 >
                   驳回
                 </button>
@@ -243,7 +243,7 @@ export default function CreatorAdminContent() {
                   type="button"
                   disabled={busyId === u.id}
                   onClick={() => void act(u, 'approve')}
-                  className="px-4 py-2 text-sm rounded-xl bg-emerald-500 text-bg-primary hover:bg-emerald-600 disabled:opacity-40"
+                  className="px-4 py-2 text-sm rounded-xl bg-sage text-bg-primary hover:bg-sage/85 disabled:opacity-40"
                 >
                   通过 · 上线
                 </button>

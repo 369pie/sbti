@@ -463,10 +463,35 @@ export async function findLatestMystiGiftOrderForDevice(
 
 const SUBSCRIPTION_ORDER_SKUS = new Set<MystiSku>([
   'monthly-pass',
+  'monthly-pass-intro',
   'quarterly-pass',
   'yearly-pass',
   'creator-pass',
 ]);
+
+/**
+ * 首月 intro 资格：该设备从未有过一笔「已支付」的通行证订单。
+ * （pending 不算 — 只防真金白银买过的人重复享受首月价。）
+ */
+export async function hasPaidMystiSubscriptionOrderForDevice(deviceId: string): Promise<boolean> {
+  const client = admin();
+  const { data, error } = await client
+    .from('mysti_orders')
+    .select('sku, attach_json, status, device_id, resource_id')
+    .eq('device_id', deviceId)
+    .eq('status', 'paid')
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (error) {
+    if (isMissingColumnError(error, 'device_id')) return false;
+    throw new Error(`mysti_paid_subscription_lookup_failed:${error.message}`);
+  }
+
+  return (data ?? []).some((row) =>
+    SUBSCRIPTION_ORDER_SKUS.has(getMystiOrderSku(row as Pick<MystiOrderRow, 'sku' | 'attach_json'>)),
+  );
+}
 
 export async function findLatestMystiSubscriptionOrderForDevice(
   deviceId: string,

@@ -50,6 +50,9 @@ function readStoredTheme(): WtftiTheme {
 
 function applyTheme(next: WtftiTheme, persist = true) {
   if (typeof document === 'undefined') return;
+  // 宇宙暗色页（首页/today/bottle/letters）持锁期间不覆盖——
+  // 否则本 provider 的 hydrate effect 会把暗色页翻回 light（2026-08-17 白底白字 bug）。
+  if (document.body.dataset.cosmicLock === '1') return;
   const body = document.body;
   const html = document.documentElement;
   body.dataset.theme = `wtfti-${next}`;

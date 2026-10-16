@@ -116,7 +116,7 @@ export default function CptiConstellationClient() {
   const [hover, setHover] = useState<{ kind: 'node' | 'edge'; id: string } | null>(null);
 
   useEffect(() => {
-    setRecords(listCodexRecords());
+    queueMicrotask(() => setRecords(listCodexRecords()));
   }, []);
 
   const graph = useMemo(() => (records ? buildGraph(records) : { nodes: [], edges: [] }), [records]);
@@ -141,7 +141,7 @@ export default function CptiConstellationClient() {
     <main className="min-h-screen bg-bg-primary text-text-primary px-4 py-10">
       <div className="max-w-4xl mx-auto space-y-6">
         <header className="space-y-2 text-center">
-          <p className="text-xs tracking-[0.4em] text-amber-300/70 uppercase">CPTI · Constellation</p>
+          <p className="text-xs tracking-[0.4em] text-gold-soft/70 uppercase">CPTI · Constellation</p>
           <h1 className="text-3xl md:text-4xl font-display">你的关系星图</h1>
           <p className="text-sm text-text-secondary">
             {graph.nodes.length} 颗星 · {graph.edges.length} 条关系连线
@@ -206,7 +206,7 @@ export default function CptiConstellationClient() {
               const e = graph.edges[parseInt(hover.id, 10)];
               if (!e) return null;
               return (
-                <Link href={`/cpti/relationship/${e.relationshipSlug}/`} className="hover:text-rose-300">
+                <Link href={`/cpti/relationship/${e.relationshipSlug}/`} className="hover:text-rose-text">
                   ✦ <span className="font-medium" style={{ color: e.color }}>{e.label}</span> · 点击查看完整解读 →
                 </Link>
               );

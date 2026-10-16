@@ -29,6 +29,15 @@ const MODEL_CLASS: Record<ModelType, string> = {
 
 const emptySubscribe = () => () => {};
 
+const MYSTI_STAR_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  size: 1 + ((i * 7) % 20) / 10,
+  left: (i * 37) % 100,
+  top: (i * 53) % 100,
+  opacity: 0.2 + ((i * 11) % 50) / 100,
+  duration: 2 + ((i * 13) % 30) / 10,
+  delay: ((i * 17) % 20) / 10,
+}));
+
 interface QuizProps {
   /** Path prefix before /result/, e.g. '/wtfti' for /wtfti/result/[slug] */
   resultPrefix?: string;
@@ -282,19 +291,19 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
             background: `radial-gradient(circle at 50% 30%, rgba(123,97,255,0.08) 0%, transparent 60%)`,
           }} />
           {/* Star particles */}
-          {[...Array(20)].map((_, i) => (
+          {MYSTI_STAR_PARTICLES.map((particle, i) => (
             <div
               key={i}
               className="absolute rounded-full"
               style={{
-                width: `${Math.random() * 2 + 1}px`,
-                height: `${Math.random() * 2 + 1}px`,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
+                width: `${particle.size}px`,
+                height: `${particle.size}px`,
+                left: `${particle.left}%`,
+                top: `${particle.top}%`,
                 background: mystiTheme.accent,
-                opacity: Math.random() * 0.5 + 0.2,
-                animation: `twinkle ${Math.random() * 3 + 2}s ease-in-out infinite`,
-                animationDelay: `${Math.random() * 2}s`,
+                opacity: particle.opacity,
+                animation: `twinkle ${particle.duration}s ease-in-out infinite`,
+                animationDelay: `${particle.delay}s`,
               }}
             />
           ))}

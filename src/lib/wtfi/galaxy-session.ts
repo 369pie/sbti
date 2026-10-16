@@ -14,6 +14,7 @@
 
 import type { GalaxyResult } from './galaxy-types';
 import type { SoulAnswers } from './soul-resonance';
+import { scheduleWtftiCloudSync } from './cloud-sync';
 
 const LATEST_KEY = 'wtfti.galaxy.session.v1';
 const RESULT_KEY_PREFIX = 'wtfti.galaxy.session.v1.';
@@ -48,6 +49,7 @@ export function saveGalaxySession(session: GalaxySession): void {
   } catch {
     /* 配额耗尽 / JSON 失败 — 忽略 */
   }
+  scheduleWtftiCloudSync();
 }
 
 export function loadLatestGalaxySession(): GalaxySession | null {

@@ -249,7 +249,7 @@ export default function JoinContent() {
               <button
                 onClick={handleDirectMatch}
                 disabled={directMatching}
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base hover:bg-rose-600 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base hover:bg-accent/85 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {directMatching ? '配对中...' : '直接配对'}
               </button>
@@ -267,7 +267,7 @@ export default function JoinContent() {
           ) : (
             <button
               onClick={handleStartTest}
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base hover:bg-rose-600 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-bg-primary font-medium text-base hover:bg-accent/85 transition-all cursor-pointer"
             >
               开始测试
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -284,7 +284,7 @@ export default function JoinContent() {
                 exit={{ opacity: 0, y: -8 }}
                 className="mt-4"
               >
-                <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-500/20 bg-red-500/5 text-sm text-red-400">
+                <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-ember/20 bg-ember/5 text-sm text-ember">
                   <span>⚠</span>
                   <span>{resolvedError}</span>
                 </div>
@@ -337,7 +337,7 @@ export default function JoinContent() {
               onKeyDown={e => handleKeyDown(i, e)}
               onPaste={i === 0 ? handlePaste : undefined}
               disabled={loading}
-              className="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-mono font-semibold rounded-xl border border-border-subtle bg-bg-secondary text-text-primary placeholder:text-text-muted focus:outline-none focus:border-rose-500/40 focus:ring-1 focus:ring-rose-500/20 transition-all disabled:opacity-50"
+              className="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-mono font-semibold rounded-xl border border-border-subtle bg-bg-secondary text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-rose-500/20 transition-all disabled:opacity-50"
               autoFocus={i === 0}
             />
           ))}
@@ -352,7 +352,7 @@ export default function JoinContent() {
               exit={{ opacity: 0, y: -8 }}
               className="mb-6"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-red-500/20 bg-red-500/5 text-sm text-red-400">
+              <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-ember/20 bg-ember/5 text-sm text-ember">
                 <span>⚠</span>
                 <span>{error}</span>
               </div>
@@ -364,7 +364,7 @@ export default function JoinContent() {
         <button
           onClick={handleSubmit}
           disabled={code.length !== 6 || loading}
-          className="inline-flex items-center justify-center gap-2 w-full max-w-xs mx-auto px-8 py-3.5 rounded-xl bg-accent text-bg-primary font-medium text-base hover:bg-rose-600 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center justify-center gap-2 w-full max-w-xs mx-auto px-8 py-3.5 rounded-xl bg-accent text-bg-primary font-medium text-base hover:bg-accent/85 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {loading ? (
             <>

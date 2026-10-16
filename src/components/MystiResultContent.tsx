@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 import type { WtftiPersonality } from '@/lib/wtfti-personalities';
 import { getWtftiPersonality } from '@/lib/wtfti-personalities';
 import { MYSTI_THEMES } from '@/lib/mysti/themes';
+import { useWtftiTheme } from '@/components/wtfti/WtftiThemeProvider';
 import type { MystiTheme, MystiShareImageGeneratorHandle } from '@/lib/mysti/types';
 import { getMystiTarotData } from '@/lib/mysti/tarot-mapping';
 import { getDualInterpretation } from '@/lib/mysti/dual-interpretation';
@@ -31,7 +32,7 @@ interface Props {
   wtftiPersonality: WtftiPersonality;
 }
 
-const THEME_STORAGE_KEY = 'mysti-theme-preference';
+
 
 export function MystiResultContent({ wtftiPersonality }: Props) {
   const searchParams = useSearchParams();
@@ -85,15 +86,8 @@ export function MystiResultContent({ wtftiPersonality }: Props) {
     }
   }, [partnerPersonality, wtftiPersonality]);
 
-  const [themeId, setThemeId] = useState<MystiTheme['id']>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-      if (stored === 'pale' || stored === 'celestial') {
-        return stored;
-      }
-    }
-    return 'celestial';
-  });
+  const { theme: wtftiTheme } = useWtftiTheme();
+  const themeId = wtftiTheme === 'dark' ? 'celestial' : 'pale';
   const shareRef = useRef<MystiShareImageGeneratorHandle>(null);
 
   // Avoid setState-in-effect linter warning while handling SSR safely
@@ -103,15 +97,7 @@ export function MystiResultContent({ wtftiPersonality }: Props) {
     () => false,
   );
 
-  const toggleTheme = useCallback(() => {
-    setThemeId(prev => {
-      const next = prev === 'celestial' ? 'pale' : 'celestial';
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(THEME_STORAGE_KEY, next);
-      }
-      return next;
-    });
-  }, []);
+  
 
   const theme = MYSTI_THEMES[themeId];
   const data = getMystiTarotData(wtftiPersonality.slug);
@@ -137,14 +123,7 @@ export function MystiResultContent({ wtftiPersonality }: Props) {
         <Link href="/wtfti/" className="text-sm font-medium tracking-wide opacity-80 hover:opacity-100 transition-opacity" style={{ color: theme.textMuted }}>
           WTFTI · 灵鉴
         </Link>
-        <button
-          onClick={toggleTheme}
-          className="px-3 py-1.5 rounded-full text-xs border transition-all hover:brightness-110"
-          style={{ borderColor: theme.divider, color: theme.accent, background: theme.accentSoft }}
-          aria-label="切换主题"
-        >
-          {theme.label}
-        </button>
+        
       </div>
 
       {/* Main content */}
@@ -505,6 +484,9 @@ function SingleModeContent({
         </div>
       </motion.div>
 
+      {/* HER AURORA · W4 · E-N10 · 命格 × 极光时刻链路卡 */}
+      <AuroraInvitationCard personality={personality} theme={theme} mounted={mounted} delay={0.55} />
+
       {/* Retest + Home */}
       <motion.div
         initial={mounted ? { opacity: 0 } : false}
@@ -839,6 +821,9 @@ function DualModeContent({
         </div>
       </motion.div>
 
+      {/* HER AURORA · W4 · E-N10 · 命格 × 极光时刻链路卡（dual） */}
+      <AuroraInvitationCard personality={personality} theme={theme} mounted={mounted} delay={0.55} />
+
       {/* Retest */}
       <motion.div
         initial={mounted ? { opacity: 0 } : false}
@@ -1106,5 +1091,88 @@ function FlipCard({ theme, mounted, delay = 0, compact = false, className = '', 
         </motion.div>
       )}
     </div>
+  );
+}
+
+// HER AURORA · W4 · E-N10 · 命格 × 极光时刻链路卡
+// 用 personality.slug 哈希到一组「极光时刻」开场白，把抽牌结果接到 HER AURORA 主流。
+// 不显示进度数字、不强推；一行 italic 提示 + 一根金箔细线入口。
+const AURORA_PROMPTS = [
+  '今夜你的光，正等一句被点亮。',
+  '今夜的极光带，缺你那一束。',
+  '把这张牌之后没说完的话，写一句留给极光。',
+  '今夜值得被守光人挂念的那一句，是你的吗？',
+  '一句话也好。今夜的火塘留了一个位置给你。',
+  '极光会把今夜你写下的一句，收进五月号来信。',
+];
+
+function pickAuroraPrompt(slug: string): string {
+  let h = 0;
+  for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) >>> 0;
+  return AURORA_PROMPTS[h % AURORA_PROMPTS.length];
+}
+
+function AuroraInvitationCard({
+  personality,
+  theme,
+  mounted,
+  delay,
+}: {
+  personality: WtftiPersonality;
+  theme: MystiTheme;
+  mounted: boolean;
+  delay: number;
+}) {
+  const prompt = pickAuroraPrompt(personality.slug);
+  const onClick = () => {
+    try {
+      trackMystiEvent('mysti_aurora_invite_click', {
+        personality: personality.slug,
+        theme: theme.id,
+      });
+    } catch {
+      // analytics best-effort
+    }
+  };
+  return (
+    <motion.div
+      initial={mounted ? { opacity: 0, y: 14 } : false}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay }}
+      className="mt-5 rounded-2xl border p-5"
+      style={{
+        borderColor: theme.divider,
+        background: `linear-gradient(135deg, ${theme.cardSurface}48 0%, transparent 70%)`,
+      }}
+    >
+      <div
+        className="text-xs tracking-[0.32em] uppercase mb-2"
+        style={{ color: '#C9A676' }}
+      >
+        § HER AURORA · 极光时刻
+      </div>
+      <p
+        className="text-base italic mb-4"
+        style={{
+          color: theme.text,
+          fontFamily: 'var(--font-display, "Cormorant Garamond", "Noto Serif SC", serif)',
+          lineHeight: 1.65,
+        }}
+      >
+        {prompt}
+      </p>
+      <Link
+        href={withBasePath('/her-voice/#hv-compose')}
+        onClick={onClick}
+        className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.28em] pb-1 transition-opacity hover:opacity-80"
+        style={{
+          color: '#C9A676',
+          borderBottom: '1px solid #C9A676',
+          fontFamily: 'ui-monospace, "SF Mono", monospace',
+        }}
+      >
+        点亮一束极光 →
+      </Link>
+    </motion.div>
   );
 }

@@ -22,14 +22,14 @@ export default function LoveHomeContent() {
 
         <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
           <div className="animate-fade-up">
-            <span className="inline-block text-xs font-mono tracking-[0.25em] text-text-muted mb-6 uppercase">
+            <span className="inline-block text-xs font-mono tracking-[0.25em] text-stone mb-6 uppercase">
               Love Personality Type Indicator
             </span>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
               你谈恋爱时
               <br />
-              <span className="bg-gradient-to-r from-pink-400 via-rose-400 to-red-400 bg-clip-text text-transparent">是哪种恋爱人设</span>
+              <span className="gradient-text">是哪种恋爱人设</span>
             </h1>
 
             <p className="text-text-secondary text-lg sm:text-xl leading-relaxed max-w-xl mx-auto mb-10">
@@ -67,7 +67,7 @@ export default function LoveHomeContent() {
             ].map(stat => (
               <div key={stat.label} className="bg-bg-secondary/60 px-4 py-6 text-center">
                 <div className="text-2xl font-semibold text-text-primary font-mono tracking-tight">{stat.value}</div>
-                <div className="text-xs text-text-muted mt-1">{stat.label}</div>
+                <div className="text-xs text-stone mt-1">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -78,7 +78,7 @@ export default function LoveHomeContent() {
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="mb-12 animate-fade-up">
-            <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Dimensions</span>
+            <span className="text-xs font-mono tracking-[0.2em] text-stone uppercase block mb-3">Dimensions</span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">五个恋爱切面</h2>
           </div>
 
@@ -101,7 +101,7 @@ export default function LoveHomeContent() {
                     <div className="text-sm font-medium" style={{ color: color.base }}>
                       {LOVE_MODEL_NAMES[m.key]}
                     </div>
-                    <div className="text-xs text-text-muted mt-0.5">{m.label}</div>
+                    <div className="text-xs text-stone mt-0.5">{m.label}</div>
                   </div>
                 </div>
               );
@@ -114,7 +114,7 @@ export default function LoveHomeContent() {
       <section className="py-20 px-6 border-t border-border-subtle">
         <div className="max-w-3xl mx-auto">
           <div className="mb-12 animate-fade-up">
-            <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Types</span>
+            <span className="text-xs font-mono tracking-[0.2em] text-stone uppercase block mb-3">Types</span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">16 张恋爱人设卡</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -145,7 +145,7 @@ export default function LoveHomeContent() {
                     {p.code}
                   </div>
                   <div className="text-base font-medium text-text-primary">{p.name}</div>
-                  <p className="text-xs text-text-muted mt-1.5 line-clamp-1">{p.tagline}</p>
+                  <p className="text-xs text-stone mt-1.5 line-clamp-1">{p.tagline}</p>
                 </Link>
               </div>
             ))}
@@ -156,7 +156,7 @@ export default function LoveHomeContent() {
       {/* CTA */}
       <section className="py-20 px-6">
         <div className="max-w-md mx-auto text-center">
-          <p className="text-text-muted text-sm mb-6">准备好了吗？</p>
+          <p className="text-stone text-sm mb-6">准备好了吗？</p>
           <Link
             href="/love/test"
             className="inline-flex items-center gap-2 px-10 py-4 rounded-xl bg-accent text-bg-primary font-medium text-lg hover:brightness-110 transition-all duration-200"

@@ -29,7 +29,7 @@ If you need to reproduce Turbopack-specific behavior locally, run:
 pnpm run dev:turbo
 ```
 
-Open `http://localhost:3000` in your browser.
+Open `http://localhost:3006` in your browser.
 
 ## Common Commands
 

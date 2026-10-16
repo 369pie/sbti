@@ -18,25 +18,18 @@ export default function FlowerHomeContent() {
         <div className="max-w-2xl mx-auto px-6 pt-28 pb-24 text-center relative">
           <div className="animate-fade-up">
             {/* Pro badge */}
-            <span
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs tracking-[0.15em] mb-10"
-              style={{
-                color: '#e11d48',
-                background: 'rgba(225,29,72,0.06)',
-                border: '1px solid rgba(225,29,72,0.12)',
-              }}
-            >
+            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs tracking-[0.15em] mb-10 text-rose bg-rose/5 border border-rose/10">
               ✿ 花格鉴定
             </span>
 
-            <p className="text-base text-text-muted/70 mb-6 tracking-wider">
+            <p className="text-base text-stone/70 mb-6 tracking-wider">
               每个人心里都住着一朵花
             </p>
 
             <h1 className="text-3xl sm:text-4xl md:text-[2.75rem] font-semibold tracking-tight leading-[1.4] mb-5">
               你像自然界的
               <br />
-              <span className="bg-gradient-to-r from-amber-400 via-rose-400 to-pink-500 bg-clip-text text-transparent">
+              <span className="gradient-text">
                 哪朵花？
               </span>
             </h1>
@@ -47,22 +40,18 @@ export default function FlowerHomeContent() {
               找到属于你的那朵花。
             </p>
 
-            <p className="text-sm text-text-muted/50 mb-12">
+            <p className="text-sm text-stone/50 mb-12">
               4 大花格轴 · 20 道灵魂拷问 · 16 种花格
             </p>
 
             <Link
               href="/flower/test"
-              className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-bg-primary font-medium text-base transition-all duration-300 hover:brightness-110"
-              style={{
-                background: 'linear-gradient(135deg, #f59e0b, #ec4899)',
-                boxShadow: '0 8px 32px rgba(236,72,153,0.25)',
-              }}
+              className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-bg-primary font-medium text-base transition-all duration-300 hover:brightness-110 bg-gradient-to-r from-rose to-gold shadow-lg shadow-rose/20"
             >
               开始测试 →
             </Link>
 
-            <p className="mt-5 text-xs text-text-muted/50 tracking-wider">
+            <p className="mt-5 text-xs text-stone/50 tracking-wider">
               预计用时 3 分钟 · 测出你的专属花格
             </p>
           </div>
@@ -70,18 +59,17 @@ export default function FlowerHomeContent() {
           {/* Stats */}
           <div className="mt-20 flex items-center justify-center gap-8 sm:gap-14 animate-fade-up-delay-1">
             {[
-              { value: '4', label: '花格轴', color: '#f59e0b' },
-              { value: '16', label: '种花格', color: '#ec4899' },
-              { value: '3', label: '分钟', color: '#e11d48' },
+              { value: '4', label: '花格轴', color: 'text-gold' },
+              { value: '16', label: '种花格', color: 'text-rose' },
+              { value: '3', label: '分钟', color: 'text-rose-deep' },
             ].map(stat => (
               <div key={stat.label} className="text-center">
                 <div
-                  className="text-3xl sm:text-4xl font-semibold mb-1"
-                  style={{ color: stat.color }}
+                  className={`text-3xl sm:text-4xl font-semibold mb-1 ${stat.color}`}
                 >
                   {stat.value}
                 </div>
-                <div className="text-[11px] tracking-[0.15em] text-text-muted/50">
+                <div className="text-[11px] tracking-[0.15em] text-stone/50">
                   {stat.label}
                 </div>
               </div>
@@ -133,7 +121,7 @@ export default function FlowerHomeContent() {
       <section className="py-20 px-6">
         <div className="max-w-2xl mx-auto">
           <div className="mb-12 animate-fade-up">
-            <span className="text-[10px] tracking-[0.35em] text-text-muted/40 uppercase block mb-3">
+            <span className="text-[10px] tracking-[0.35em] text-stone/40 uppercase block mb-3">
               FOUR AXES · 四大花格轴
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
@@ -197,7 +185,7 @@ export default function FlowerHomeContent() {
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="mb-12 animate-fade-up">
-            <span className="text-[10px] tracking-[0.35em] text-text-muted/40 uppercase block mb-3">
+            <span className="text-[10px] tracking-[0.35em] text-stone/40 uppercase block mb-3">
               SIXTEEN FLOWERS · 十六朵花
             </span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
@@ -225,7 +213,7 @@ export default function FlowerHomeContent() {
                   {p.code}
                 </span>
                 <div className="text-sm font-semibold text-text-primary mb-0.5">{p.flower}</div>
-                <div className="text-xs text-text-muted">{p.name}</div>
+                <div className="text-xs text-stone">{p.name}</div>
               </Link>
             ))}
           </div>
@@ -236,11 +224,7 @@ export default function FlowerHomeContent() {
       <section className="py-16 px-6 text-center">
         <Link
           href="/flower/test"
-          className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-bg-primary font-medium text-base transition-all duration-300 hover:brightness-110"
-          style={{
-            background: 'linear-gradient(135deg, #f59e0b, #ec4899)',
-            boxShadow: '0 8px 32px rgba(236,72,153,0.25)',
-          }}
+          className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-bg-primary font-medium text-base transition-all duration-300 hover:brightness-110 bg-gradient-to-r from-rose to-gold shadow-lg shadow-rose/20"
         >
           测测你像哪朵花 →
         </Link>
@@ -248,7 +232,7 @@ export default function FlowerHomeContent() {
 
       {/* Footer links */}
       <section className="pb-24 px-6 text-center">
-        <div className="flex items-center justify-center gap-6 text-sm text-text-muted">
+        <div className="flex items-center justify-center gap-6 text-sm text-stone">
           <Link href="/" className="hover:text-text-secondary transition-colors">WTFTI</Link>
           <Link href="/xpti/" className="hover:text-text-secondary transition-colors">XPTI</Link>
           <Link href="/soulti/" className="hover:text-text-secondary transition-colors">SoulTI</Link>

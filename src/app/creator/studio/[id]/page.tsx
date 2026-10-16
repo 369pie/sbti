@@ -79,7 +79,7 @@ export default function UniverseEditorPage() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-bg-primary flex items-center justify-center text-red-600">
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center text-ember">
         {error || '未找到'}
       </div>
     );
@@ -155,18 +155,18 @@ export default function UniverseEditorPage() {
           </div>
         )}
         {u.status === 'review' && (
-          <div className="bg-yellow-500/10 rounded-xl px-4 py-3 mb-6 text-sm text-amber-600">
+          <div className="bg-gold/10 rounded-xl px-4 py-3 mb-6 text-sm text-gold-text">
             审核中 — 审核通过后将自动发布
           </div>
         )}
         {u.status === 'published' && (
-          <div className="bg-green-500/10 rounded-xl px-4 py-3 mb-6 flex items-center justify-between">
-            <span className="text-sm text-green-600">已发布</span>
+          <div className="bg-sage/10 rounded-xl px-4 py-3 mb-6 flex items-center justify-between">
+            <span className="text-sm text-sage-text">已发布</span>
             <a
               href={withBasePath(`/c/${u.slug}/test/`)}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-green-700 hover:text-green-200 transition-colors"
+              className="text-sm text-sage-text hover:text-sage-text transition-colors"
             >
               查看测试 ↗
             </a>
@@ -174,10 +174,10 @@ export default function UniverseEditorPage() {
         )}
 
         {u.status === 'draft' && reviewFeedback && (
-          <div className="mb-6 rounded-2xl border border-amber-300/20 bg-amber-500/10 px-4 py-4">
-            <div className="text-xs font-mono tracking-wider text-amber-700/75 uppercase mb-2">上次审核反馈</div>
-            <div className="text-sm text-amber-100 font-medium">{reviewFeedback.reason.label}</div>
-            <div className="text-sm text-amber-100/75 mt-2 leading-7">
+          <div className="mb-6 rounded-2xl border border-gold/20 bg-gold/100/10 px-4 py-4">
+            <div className="text-xs font-mono tracking-wider text-gold-text/75 uppercase mb-2">上次审核反馈</div>
+            <div className="text-sm text-gold-soft font-medium">{reviewFeedback.reason.label}</div>
+            <div className="text-sm text-gold-soft/75 mt-2 leading-7">
               {reviewFeedback.note || '管理员建议你根据上面的方向继续修改后再提交。'}
             </div>
           </div>
@@ -211,12 +211,12 @@ export default function UniverseEditorPage() {
                 onClick={() => setTab(item.tab)}
                 className={`rounded-xl border px-4 py-3 text-left transition-colors ${
                   item.done
-                    ? 'border-green-500/20 bg-green-500/10'
+                    ? 'border-sage/20 bg-sage/10'
                     : 'border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary'
                 }`}
               >
                 <div className="flex items-center gap-2 text-sm font-medium">
-                  <span className={item.done ? 'text-green-600' : 'text-text-muted'}>
+                  <span className={item.done ? 'text-sage-text' : 'text-text-muted'}>
                     {item.done ? '●' : '○'}
                   </span>
                   <span>{item.label}</span>

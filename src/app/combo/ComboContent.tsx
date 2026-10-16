@@ -201,7 +201,7 @@ function ComboResultDisplay({ result }: { result: ComboResult }) {
       {/* Top-right share button */}
       <button
         onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
-        className="absolute -top-2 right-0 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-purple-400 transition-all cursor-pointer z-10"
+        className="absolute -top-2 right-0 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-violet-text transition-all cursor-pointer z-10"
         title="生成分享图片"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -217,7 +217,7 @@ function ComboResultDisplay({ result }: { result: ComboResult }) {
           transition={{ delay: 0.2 }}
           className="text-center mb-6"
         >
-          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold border border-amber-400/30 bg-amber-400/10 text-amber-400">
+          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold border border-gold/30 bg-gold/10 text-gold-text">
             🥚 隐藏彩蛋组合
           </span>
         </motion.div>
@@ -232,11 +232,11 @@ function ComboResultDisplay({ result }: { result: ComboResult }) {
           {result.personality.emoji} {result.personality.code}
         </span>
         <span className="text-text-muted text-xs">×</span>
-        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border border-purple-400/30 bg-purple-400/10 text-purple-300">
+        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border border-violet-text/30 bg-violet-text/10 text-violet-text">
           {result.mbti.code}
         </span>
         <span className="text-text-muted text-xs">×</span>
-        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border border-cyan-400/30 bg-cyan-400/10 text-cyan-300">
+        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border border-violet-text/30 bg-violet-text/10 text-violet-text">
           {result.zodiac.emoji} {result.zodiac.name}
         </span>
       </div>
@@ -311,7 +311,7 @@ function ComboResultDisplay({ result }: { result: ComboResult }) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="text-2xl sm:text-3xl font-bold text-center mb-2 bg-gradient-to-r from-accent via-purple-400 to-cyan-400 bg-clip-text text-transparent"
+        className="text-2xl sm:text-3xl font-bold text-center mb-2 bg-gradient-to-r from-accent via-violet-text to-violet-text bg-clip-text text-transparent"
       >
         {result.title}
       </motion.h1>

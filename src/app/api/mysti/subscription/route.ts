@@ -56,7 +56,8 @@ export async function GET(req: NextRequest) {
 
     const restored = await ensureSubscriptionFromOrder(order);
     if (!restored || restored.expiresAt <= Date.now()) {
-      return NextResponse.json({ active: false });
+      // 已支付过通行证（哪怕已过期）→ 前端据此隐藏首月 intro 价
+      return NextResponse.json({ active: false, everSubscribed: true });
     }
 
     return NextResponse.json({

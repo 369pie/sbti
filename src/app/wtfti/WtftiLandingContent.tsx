@@ -10,10 +10,10 @@ const FEATURED = WTFTI_PERSONALITIES.slice(0, 8);
 const HERO_PREVIEW = WTFTI_PERSONALITIES.slice(0, 4);
 
 const HERO_POSITIONS = [
-  'left-0 top-[16%] rotate-[-7deg]',
-  'right-0 top-[5%] rotate-[5deg]',
-  'left-[8%] bottom-[7%] rotate-[4deg]',
-  'right-[9%] bottom-[15%] rotate-[-5deg]',
+  'left-[5%] top-[16%] rotate-[-6deg]',
+  'right-[5%] top-[11%] rotate-[5deg]',
+  'left-[7%] bottom-[9%] rotate-[4deg]',
+  'right-[6%] bottom-[14%] rotate-[-5deg]',
 ];
 
 const PANTHEON_PILLARS: Array<{
@@ -31,7 +31,7 @@ const PANTHEON_PILLARS: Array<{
     title: '主神召唤',
     body: '90 秒进入仪式，从 8 位主神中召唤属于你这一段人生的那一位。',
     href: '/wtfti/galaxy/test/',
-    accent: '#F59BB8',
+    accent: 'text-rose',
   },
   {
     roman: 'II',
@@ -39,7 +39,7 @@ const PANTHEON_PILLARS: Array<{
     title: '灵魂印记',
     body: '6 道五感探针：唱片、台词、色卡、电影、香水、触感，把人格变成可收藏的感官线索。',
     href: '/wtfti/profile/',
-    accent: '#C7D7A2',
+    accent: 'text-sage',
   },
   {
     roman: 'III',
@@ -47,7 +47,7 @@ const PANTHEON_PILLARS: Array<{
     title: '私人神龛',
     body: '召唤之后，你会拥有一座专属神龛，镜面、供奉、信物、仪式记录都存在这里。',
     href: '/wtfti/galaxy/test/',
-    accent: '#C9A676',
+    accent: 'text-gold',
     note: '完成召唤后自动生成专属入口',
   },
   {
@@ -56,7 +56,7 @@ const PANTHEON_PILLARS: Array<{
     title: '月相日课',
     body: '跟月亮走 12 期，每一期一句话，最终加冕大祭司，附 30 天 Future Letter。',
     href: '/wtfti/moon/',
-    accent: '#C9A676',
+    accent: 'text-gold',
   },
   {
     roman: 'V',
@@ -64,15 +64,15 @@ const PANTHEON_PILLARS: Array<{
     title: '召唤合奏',
     body: '你和 ta 各召唤一位主神，得到引力 G、共鸣 S 与一枚专属 Pair Sigil。',
     href: '/wtfti/duet/',
-    accent: '#C9867D',
+    accent: 'text-rose',
   },
   {
     roman: 'VI',
     eyebrow: 'Daily',
-    title: '今日天象签',
-    body: '每天一签，以主神视角写一段微叙事，留住归属感与每日回来的理由。',
-    href: '/wtfti/daily/',
-    accent: '#C7D7A2',
+    title: '一个今日',
+    body: '天象签 × 灵鉴抽牌 × 月相日课 × 待拆的信——每天回来 30 秒，完成今天的仪式。',
+    href: '/today',
+    accent: 'text-sage',
   },
 ];
 
@@ -118,15 +118,15 @@ export default function WtftiLandingContent() {
                 </Link>
               </div>
 
-              <div className="mt-10 grid max-w-2xl grid-cols-3 gap-3">
+              <div className="mt-12 grid max-w-2xl grid-cols-3 gap-5">
                 {[
                   { value: '8', label: '主神人格' },
                   { value: '6', label: '五感探针' },
                   { value: '12', label: '月相章节' },
                 ].map((stat) => (
-                  <div key={stat.label} className="wtfti-panel rounded-[1.25rem] px-4 py-5">
+                  <div key={stat.label} className="border-t pt-4" style={{ borderColor: 'var(--color-border)' }}>
                     <div className="stat-value text-3xl text-text-primary">{stat.value}</div>
-                    <div className="mt-1 text-[10px] font-mono uppercase tracking-[0.24em] text-text-muted">{stat.label}</div>
+                    <div className="mt-1 text-[10px] font-mono uppercase tracking-[0.24em] text-stone">{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -134,44 +134,64 @@ export default function WtftiLandingContent() {
           </div>
 
           <motion.div
-            className="relative mx-auto aspect-[4/5] w-full max-w-[470px]"
+            className="relative mx-auto w-full max-w-[470px]"
             initial={{ opacity: 0, scale: 0.96, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
             aria-label="WTFTI 人格神域卡片预览"
           >
-            <div className="wtfti-orbit-field absolute inset-[7%] rounded-[46%]" />
-            <div className="wtfti-orbit-ring" aria-hidden="true" />
-            <div className="wtfti-orbit-ring" aria-hidden="true" />
-            <div className="absolute left-1/2 top-1/2 grid h-[46%] w-[46%] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-border-subtle bg-bg-elevated/70 text-center backdrop-blur-md">
-              <div>
-                <div className="wtfti-roman text-6xl">VIII</div>
-                <div className="mt-2 text-[10px] font-mono uppercase tracking-[0.28em] text-text-muted">Soul Atlas</div>
+            <div className="plate aspect-[4/5]">
+              <div className="plate-core relative overflow-hidden">
+                <div aria-hidden className="starfield-paper absolute inset-0" />
+                <div className="relative flex items-baseline justify-between px-6 pt-5">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-stone">Fig. 02</span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-stone">Pantheon</span>
+                </div>
+                <div className="relative mx-6 mt-4"><span className="hairline-gold" /></div>
+                <div
+                  aria-hidden
+                  className="orbit-fig"
+                  style={{ left: '11%', right: '11%', top: '24%', bottom: '20%', transform: 'rotate(-16deg) scaleX(1.14)' }}
+                />
+                <div
+                  aria-hidden
+                  className="orbit-fig orbit-fig--rose"
+                  style={{ left: '3%', right: '3%', top: '33%', bottom: '29%', transform: 'rotate(26deg) scaleX(1.3)' }}
+                />
+                <div
+                  className="absolute left-1/2 top-1/2 grid h-[29%] w-[29%] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-border-subtle bg-bg-elevated text-center"
+                  style={{ boxShadow: 'var(--shadow-card)' }}
+                >
+                  <div>
+                    <div className="wtfti-roman text-5xl">VIII</div>
+                    <div className="mt-2 text-[9px] font-mono uppercase tracking-[0.28em] text-stone">Soul Atlas</div>
+                  </div>
+                </div>
+                {HERO_PREVIEW.map((personality, index) => (
+                  <Link
+                    key={personality.slug}
+                    href={`/wtfti/result/${personality.slug}/`}
+                    prefetch={false}
+                    className={`wtfti-mini-card group absolute w-[31%] overflow-hidden rounded-[1.25rem] p-2 transition-transform duration-300 hover:scale-[1.03] ${HERO_POSITIONS[index]}`}
+                  >
+                    <div className="aspect-square rounded-[0.9rem] bg-bg-secondary/70 p-3">
+                      <NextImage
+                        src={getWtftiTypeThumbnailImage(personality.slug)}
+                        alt={`${personality.wtftiName} 人格卡预览`}
+                        width={220}
+                        height={220}
+                        priority={index === 0}
+                        className="h-full w-full object-contain drop-shadow-md transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="mt-2 min-w-0 px-1 pb-1">
+                      <div className="truncate text-[10px] font-mono text-stone">{personality.code}</div>
+                      <div className="truncate text-sm font-medium text-text-primary">{personality.wtftiName}</div>
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
-            {HERO_PREVIEW.map((personality, index) => (
-              <Link
-                key={personality.slug}
-                href={`/wtfti/result/${personality.slug}/`}
-                prefetch={false}
-                className={`wtfti-mini-card group absolute w-[38%] overflow-hidden rounded-[1.25rem] p-2 transition-transform duration-300 hover:scale-[1.03] ${HERO_POSITIONS[index]}`}
-              >
-                <div className="aspect-square rounded-[0.9rem] bg-bg-secondary/70 p-3">
-                  <NextImage
-                    src={getWtftiTypeThumbnailImage(personality.slug)}
-                    alt={`${personality.wtftiName} 人格卡预览`}
-                    width={220}
-                    height={220}
-                    priority={index === 0}
-                    className="h-full w-full object-contain drop-shadow-md transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-                <div className="mt-2 min-w-0 px-1 pb-1">
-                  <div className="truncate text-[10px] font-mono text-text-muted">{personality.code}</div>
-                  <div className="truncate text-sm font-medium text-text-primary">{personality.wtftiName}</div>
-                </div>
-              </Link>
-            ))}
           </motion.div>
         </div>
       </section>
@@ -201,14 +221,14 @@ export default function WtftiLandingContent() {
               >
                 <Link href={pillar.href} prefetch={false} className="wtfti-card group flex h-full min-h-[230px] flex-col rounded-[1.5rem] p-6">
                   <div className="flex items-start justify-between gap-4">
-                    <span className="wtfti-roman text-5xl" style={{ color: pillar.accent }}>{pillar.roman}</span>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-text-muted">{pillar.eyebrow}</span>
+                    <span className={`wtfti-roman text-5xl ${pillar.accent}`}>{pillar.roman}</span>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-stone">{pillar.eyebrow}</span>
                   </div>
                   <h3 className="mt-7 text-2xl font-semibold text-text-primary">{pillar.title}</h3>
                   <p className="mt-3 text-sm leading-7 text-text-secondary">{pillar.body}</p>
-                  {pillar.note ? <p className="mt-3 text-xs italic text-text-muted">{pillar.note}</p> : null}
-                  <div className="mt-auto pt-6 text-sm font-medium" style={{ color: pillar.accent }}>
-                    进入仪式 <ArrowIcon className="ml-1 inline h-3.5 w-3.5 align-[-2px]" />
+                  {pillar.note ? <p className="mt-3 text-xs italic text-stone">{pillar.note}</p> : null}
+                  <div className="mt-auto pt-6 text-sm font-medium text-text-primary transition-colors duration-300 group-hover:text-text-primary">
+                    进入仪式 <span className={pillar.accent}><ArrowIcon className="ml-1 inline h-3.5 w-3.5 align-[-2px]" /></span>
                   </div>
                 </Link>
               </motion.div>
@@ -219,18 +239,20 @@ export default function WtftiLandingContent() {
 
       <section className="wtfti-section-tight">
         <div className="wtfti-container grid gap-4 lg:grid-cols-[0.86fr_1.14fr]">
-          <div className="wtfti-panel rounded-[1.75rem] p-7 md:p-9">
-            <span className="wtfti-eyebrow">Classic Archive</span>
-            <h2 className="wtfti-display mt-5 text-3xl md:text-5xl">
-              旧版毒舌还在，
-              <em>但不再是唯一入口。</em>
-            </h2>
-            <p className="wtfti-copy mt-5">
-              29 张 WTF 人格图鉴、4 段式毒舌、隐藏分支仍然在线。想快速回到经典文本版，也可以直接开始。
-            </p>
-            <Link href="/wtfti/test/" prefetch={false} className="wtfti-cta-secondary mt-7">
-              经典 WTFTI 文本版
-            </Link>
+          <div className="plate">
+            <div className="plate-core h-full p-7 md:p-9">
+              <span className="wtfti-eyebrow">Classic Archive</span>
+              <h2 className="wtfti-display mt-5 text-3xl md:text-5xl">
+                旧版毒舌还在，
+                <em>但不再是唯一入口。</em>
+              </h2>
+              <p className="wtfti-copy mt-5">
+                29 张 WTF 人格图鉴、4 段式毒舌、隐藏分支仍然在线。想快速回到经典文本版，也可以直接开始。
+              </p>
+              <Link href="/wtfti/test/" prefetch={false} className="wtfti-cta-secondary mt-7">
+                经典 WTFTI 文本版
+              </Link>
+            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -240,19 +262,19 @@ export default function WtftiLandingContent() {
                 title: '班TI 职场人格',
                 body: '把同一套人格内核放进会议、群聊、茶水间和下班前五分钟。',
                 href: '/wtfti/work/',
-                color: '#C7D7A2',
+                color: 'var(--color-sage)',
               },
               {
                 label: 'Mystic Mirror',
                 title: '灵鉴塔罗人格',
                 body: '同一套 WTFTI 人格内核，换成更神秘、柔软、可订阅的塔罗视角。',
                 href: '/mysti/',
-                color: '#C9867D',
+                color: 'var(--color-rose)',
               },
             ].map((item) => (
               <Link key={item.href} href={item.href} prefetch={false} className="wtfti-card flex min-h-[240px] flex-col rounded-[1.5rem] p-6">
                 <span className="wtfti-swatch" style={{ background: item.color }} />
-                <span className="mt-6 font-mono text-[10px] uppercase tracking-[0.24em] text-text-muted">{item.label}</span>
+                <span className="mt-6 font-mono text-[10px] uppercase tracking-[0.24em] text-stone">{item.label}</span>
                 <h3 className="mt-3 text-2xl font-semibold text-text-primary">{item.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-text-secondary">{item.body}</p>
                 <span className="mt-auto pt-6 text-sm font-medium text-text-primary">
@@ -289,7 +311,7 @@ export default function WtftiLandingContent() {
                   <span className="wtfti-swatch mt-1" style={{ background: universe.accent }} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-lg font-semibold text-text-primary">{universe.name}</span>
-                    <span className="mt-1 block truncate text-sm text-text-muted">{universe.shortName}</span>
+                    <span className="mt-1 block truncate text-sm text-stone">{universe.shortName}</span>
                     <span className="mt-5 inline-flex items-center text-sm font-medium" style={{ color: universe.accent }}>
                       开始测试 <ArrowIcon className="ml-1 h-3.5 w-3.5" />
                     </span>
@@ -334,9 +356,9 @@ export default function WtftiLandingContent() {
                     />
                   </div>
                   <div className="min-w-0 px-1 py-4 text-center">
-                    <div className="font-mono text-[10px] text-text-muted">{personality.number}</div>
+                    <div className="font-mono text-[10px] text-stone">{personality.number}</div>
                     <div className="mt-1 truncate text-sm font-semibold text-text-primary">{personality.wtftiName}</div>
-                    <div className="mt-1 truncate text-xs text-text-muted">{personality.code}</div>
+                    <div className="mt-1 truncate text-xs text-stone">{personality.code}</div>
                   </div>
                 </Link>
               </motion.div>

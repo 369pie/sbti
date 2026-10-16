@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getSiteUrl } from '@/lib/site';
 import { getDailyCard, formatDateCN } from '@/lib/mysti/daily-card';
+import { PillarBreadcrumb } from '@/components/PillarBreadcrumb';
 import { MystiDailyContent } from '@/components/MystiDailyContent';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -50,6 +51,7 @@ export default function MystiDailyPage() {
         </div>
       }
     >
+      <PillarBreadcrumb pillar="II" label="Mysti · 每日一牌" hint="今天息好一句" />
       <MystiDailyContent />
     </Suspense>
   );

@@ -24,9 +24,11 @@ export function CollectionWall() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadedCard = loadCard();
-    setCard(loadedCard);
-    setIsLoading(false);
+    queueMicrotask(() => {
+      const loadedCard = loadCard();
+      setCard(loadedCard);
+      setIsLoading(false);
+    });
   }, []);
 
   const liveUniverses = useMemo(() => {

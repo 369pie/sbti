@@ -37,15 +37,17 @@ export function SoultiShareCardSwitcher({
   const [variant, setVariantState] = useState<'day' | 'night'>('day');
 
   useEffect(() => {
-    const stored = window.sessionStorage.getItem(STORAGE_KEY);
-    if (stored === 'day' || stored === 'night') {
-      setVariantState(stored);
-      return;
-    }
-    const hour = new Date().getHours();
-    if (hour >= 22 || hour < 6) {
-      setVariantState('night');
-    }
+    queueMicrotask(() => {
+      const stored = window.sessionStorage.getItem(STORAGE_KEY);
+      if (stored === 'day' || stored === 'night') {
+        setVariantState(stored);
+        return;
+      }
+      const hour = new Date().getHours();
+      if (hour >= 22 || hour < 6) {
+        setVariantState('night');
+      }
+    });
   }, []);
 
   const setVariant = (v: 'day' | 'night') => {

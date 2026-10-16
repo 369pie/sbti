@@ -490,7 +490,7 @@ export function CptiRelationshipResult() {
           <p className="text-text-muted text-sm mb-6">请先完成CPTI配对测试。</p>
           <Link
             href="/cpti/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-rose-600 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-accent/85 transition-all"
           >
             开始测试
           </Link>
@@ -550,7 +550,7 @@ export function CptiRelationshipResult() {
                 {[0, 1, 2].map(i => (
                   <motion.div
                     key={i}
-                    className="w-1.5 h-1.5 rounded-full bg-rose-400"
+                    className="w-1.5 h-1.5 rounded-full bg-rose-text"
                     animate={{ opacity: [0.3, 1, 0.3] }}
                     transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.3 }}
                   />
@@ -907,7 +907,7 @@ export function CptiRelationshipResult() {
             {/* Backend sync badge + collection progress */}
             {backendData && !fromLink && (
               <div className="mt-4 flex flex-col items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border border-emerald-500/20 bg-emerald-500/5 text-emerald-500">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border border-sage/20 bg-sage/5 text-sage-text">
                   ✓ 已同步到双方图鉴
                 </span>
                 {backendData.collectionProgress != null && (
@@ -1018,16 +1018,16 @@ export function CptiRelationshipResult() {
                   </div>
 
                   {pair.pattern === 'both-high' && (
-                    <p className="text-xs text-emerald-400 mt-1.5">✦ 双高 — 你们在这个维度上都很强</p>
+                    <p className="text-xs text-sage-text mt-1.5">✦ 双高 — 你们在这个维度上都很强</p>
                   )}
                   {pair.pattern === 'both-low' && (
                     <p className="text-xs text-text-muted mt-1.5">双低 — 你们在这个维度上都偏弱</p>
                   )}
                   {pair.pattern === 'gap' && (
-                    <p className="text-xs text-amber-400 mt-1.5">⚡ 大差异 — 这个维度上你们截然不同</p>
+                    <p className="text-xs text-gold-text mt-1.5">⚡ 大差异 — 这个维度上你们截然不同</p>
                   )}
                   {pair.pattern === 'complement' && (
-                    <p className="text-xs text-sky-400 mt-1.5">互补 — 你们在这个维度上恰好互补</p>
+                    <p className="text-xs text-violet-text mt-1.5">互补 — 你们在这个维度上恰好互补</p>
                   )}
                 </div>
               );
@@ -1045,14 +1045,14 @@ export function CptiRelationshipResult() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
         >
-          <div className="rounded-2xl border border-purple-500/20 bg-purple-500/5 p-5 sm:p-6 text-center">
+          <div className="rounded-2xl border border-violet-text/20 bg-violet-text/5 p-5 sm:p-6 text-center">
             <div className="text-2xl mb-2">💌</div>
             <p className="text-sm text-text-secondary mb-3">
               把结果发给{nicknameA || 'ta'}，让ta也能看到你们的关系类型
             </p>
             <button
               onClick={copyReturnLink}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-purple-500/30 text-sm text-purple-400 hover:bg-purple-500/10 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-violet-text/30 text-sm text-violet-text hover:bg-violet-text/10 transition-all cursor-pointer"
             >
               {returnLinkCopied ? '已复制回传链接 ✓' : '📋 复制回传链接'}
             </button>
@@ -1128,7 +1128,7 @@ export function CptiRelationshipResult() {
             </label>
             {/* Cosign Mode toggle (S2.3) — pay or pass-covered */}
             {cosignUnlocked ? (
-              <label className="flex items-center gap-2 px-3 py-2 rounded-xl border border-amber-500/40 bg-amber-500/5 text-xs text-amber-200 cursor-pointer select-none">
+              <label className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gold/40 bg-gold/5 text-xs text-gold-soft cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={cosignShare}
@@ -1144,7 +1144,7 @@ export function CptiRelationshipResult() {
                   className="accent-amber-400"
                 />
                 <span>双签限定卡：金箔双线框 + COSIGN 印章</span>
-                <span className="ml-auto text-[10px] text-amber-300/70">已解锁</span>
+                <span className="ml-auto text-[10px] text-gold-text/70">已解锁</span>
               </label>
             ) : (
               <Link
@@ -1154,16 +1154,16 @@ export function CptiRelationshipResult() {
                     trackCptiEvent('cpti_cosign_invited', { relationship: relationship.slug });
                   }).catch(() => {});
                 }}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 to-transparent text-xs text-amber-300 hover:bg-amber-500/15 transition-all"
+                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gold/30 bg-gradient-to-r from-gold/10 to-transparent text-xs text-gold-text hover:bg-gold/15 transition-all"
               >
                 <span>✦</span>
                 <span>解锁双签金箔限定卡</span>
-                <span className="ml-auto font-mono text-amber-200">¥9.9</span>
+                <span className="ml-auto font-mono text-gold-soft">¥9.9</span>
               </Link>
             )}
-            <div className="space-y-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-3 text-xs text-amber-200">
+            <div className="space-y-2 rounded-xl border border-gold/30 bg-gold/5 px-3 py-3 text-xs text-gold-soft">
               <div className="flex items-center justify-between gap-3">
-                <span className="text-amber-300">季节限定皮肤</span>
+                <span className="text-gold-text">季节限定皮肤</span>
                 {availableSkins.length > 0 && (
                   <select
                     value={seasonSkin ?? ''}
@@ -1174,7 +1174,7 @@ export function CptiRelationshipResult() {
                         trackCptiEvent('cpti_seasonal_skin_applied', { skin: v, relationship: relationship.slug });
                       }
                     }}
-                    className="min-w-[180px] bg-transparent text-amber-200 text-xs outline-none cursor-pointer"
+                    className="min-w-[180px] bg-transparent text-gold-soft text-xs outline-none cursor-pointer"
                   >
                     <option value="" className="bg-bg-primary text-text-primary">— 不使用皮肤 —</option>
                     {availableSkins.map((id) => (
@@ -1193,16 +1193,16 @@ export function CptiRelationshipResult() {
                   return (
                     <div
                       key={skin.id}
-                      className={`flex items-center gap-3 rounded-lg border px-3 py-2 ${selected ? 'border-amber-300/60 bg-amber-400/10' : 'border-amber-500/20 bg-transparent'}`}
+                      className={`flex items-center gap-3 rounded-lg border px-3 py-2 ${selected ? 'border-gold/60 bg-gold/10' : 'border-gold/20 bg-transparent'}`}
                     >
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 text-[11px] text-amber-100">
+                        <div className="flex items-center gap-2 text-[11px] text-gold-soft">
                           <span>{skin.label}</span>
-                          <span className="rounded-full border border-amber-400/30 px-1.5 py-0.5 text-[10px] text-amber-300/80">
+                          <span className="rounded-full border border-gold/30 px-1.5 py-0.5 text-[10px] text-gold-text/80">
                             {active ? '本期开放' : '窗口外可购买'}
                           </span>
                         </div>
-                        <p className="mt-1 line-clamp-2 text-[11px] text-amber-100/70">{skin.tagline}</p>
+                        <p className="mt-1 line-clamp-2 text-[11px] text-gold-soft/70">{skin.tagline}</p>
                       </div>
                       {unlocked ? (
                         <button
@@ -1211,7 +1211,7 @@ export function CptiRelationshipResult() {
                             setSeasonSkin(skin.id);
                             trackCptiEvent('cpti_seasonal_skin_applied', { skin: skin.id, relationship: relationship.slug });
                           }}
-                          className={`rounded-lg px-3 py-1.5 text-[11px] ${selected ? 'bg-amber-300 text-text-primary' : 'border border-amber-400/40 text-amber-200 hover:bg-amber-400/10'}`}
+                          className={`rounded-lg px-3 py-1.5 text-[11px] ${selected ? 'bg-gold-soft text-text-primary' : 'border border-gold/40 text-gold-soft hover:bg-gold/10'}`}
                         >
                           {selected ? '使用中' : '使用这套'}
                         </button>
@@ -1220,7 +1220,7 @@ export function CptiRelationshipResult() {
                           type="button"
                           onClick={() => void handleUnlockSeasonalSkin(skin.id)}
                           disabled={seasonSkinPurchasing === skin.id}
-                          className="rounded-lg border border-amber-400/40 px-3 py-1.5 text-[11px] text-amber-200 hover:bg-amber-400/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="rounded-lg border border-gold/40 px-3 py-1.5 text-[11px] text-gold-soft hover:bg-gold/10 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {seasonSkinPurchasing === skin.id ? '创建订单…' : `¥${skin.unlockPrice} 解锁`}
                         </button>
@@ -1229,7 +1229,7 @@ export function CptiRelationshipResult() {
                   );
                 })}
               </div>
-              {seasonSkinError && <p className="text-[11px] text-rose-300">{seasonSkinError}</p>}
+              {seasonSkinError && <p className="text-[11px] text-rose-text">{seasonSkinError}</p>}
             </div>
             {shareMounted ? <CptiRelationshipShareImageGenerator ref={shareRef}
               relationship={relationship}

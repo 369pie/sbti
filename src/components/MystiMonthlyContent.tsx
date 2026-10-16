@@ -29,15 +29,17 @@ export function MystiMonthlyContent() {
   const [collected, setCollected] = useState<string[]>([]);
 
   useEffect(() => {
-    setMoods(getMoodEntriesForMonth(yyyymm));
-    setPairs(
-      getDualArchive().filter(p => {
-        const d = new Date(p.recordedAt);
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` === yyyymm;
-      }),
-    );
-    setCollected(getCollectionByUniverse('mysti'));
-    setHydrated(true);
+    queueMicrotask(() => {
+      setMoods(getMoodEntriesForMonth(yyyymm));
+      setPairs(
+        getDualArchive().filter(p => {
+          const d = new Date(p.recordedAt);
+          return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` === yyyymm;
+        }),
+      );
+      setCollected(getCollectionByUniverse('mysti'));
+      setHydrated(true);
+    });
   }, [yyyymm]);
 
   const dominantMood = useMemo(() => {

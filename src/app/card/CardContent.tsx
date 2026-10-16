@@ -300,7 +300,7 @@ function ProgressRing({ lit, total }: { lit: number; total: number }) {
           <motion.circle
             cx="40" cy="40" r={r}
             fill="none"
-            stroke={isMax ? '#f59e0b' : 'var(--color-accent)'}
+            stroke={isMax ? 'var(--color-gold)' : 'var(--color-accent)'}
             strokeWidth="6"
             strokeLinecap="round"
             strokeDasharray={circumference}
@@ -318,11 +318,11 @@ function ProgressRing({ lit, total }: { lit: number; total: number }) {
           />
         )}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`text-xl font-bold ${isMax ? 'text-amber-500' : 'text-text-primary'}`}>{lit}</span>
+          <span className={`text-xl font-bold ${isMax ? 'text-gold-text' : 'text-text-primary'}`}>{lit}</span>
           <span className="text-[10px] text-text-muted">/ {total}</span>
         </div>
       </div>
-      <span className={`text-xs font-medium ${isMax ? 'text-amber-500' : 'text-text-secondary'}`}>
+      <span className={`text-xs font-medium ${isMax ? 'text-gold-text' : 'text-text-secondary'}`}>
         {title}
       </span>
     </div>
@@ -379,13 +379,13 @@ function RelationshipCollection({
           <div className="flex flex-col items-center gap-2">
             <Link
               href="/cpti/"
-              className="inline-flex items-center gap-1.5 text-sm text-rose-400 hover:text-rose-300 transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm text-rose-text hover:text-rose-text/75 transition-colors"
             >
               去做CPTI测试 <ArrowIcon />
             </Link>
             <Link
               href="/cpti/gallery/"
-              className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-rose-400 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-rose-text transition-colors"
             >
               查看25种关系图鉴 <ArrowIcon className="h-3 w-3" />
             </Link>
@@ -432,7 +432,7 @@ function RelationshipCollection({
                           <>
                             <span
                               className={`absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full ${
-                                syncedSlugs.has(relType.slug) ? 'bg-emerald-400' : 'bg-amber-400/60'
+                                syncedSlugs.has(relType.slug) ? 'bg-sage' : 'bg-gold/60'
                               }`}
                               title={syncedSlugs.has(relType.slug) ? '已同步' : '仅本地'}
                             />
@@ -450,7 +450,7 @@ function RelationshipCollection({
                             <div className="text-[9px] mt-1 leading-tight truncate text-text-muted">
                               {relType.name}
                             </div>
-                            <div className="text-[8px] mt-0.5 text-rose-400/70 font-medium">
+                            <div className="text-[8px] mt-0.5 text-rose-text/70 font-medium">
                               去配对
                             </div>
                           </Link>
@@ -469,7 +469,7 @@ function RelationshipCollection({
         <div className="mt-3 text-center">
           <Link
             href="/cpti/gallery/"
-            className="inline-flex items-center gap-1 text-xs text-text-muted hover:text-rose-400 transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-text-muted hover:text-rose-text transition-colors"
           >
             查看完整图鉴 · 邀请更多人测试 <ArrowIcon className="h-3 w-3" />
           </Link>
@@ -478,10 +478,10 @@ function RelationshipCollection({
 
       {collected === total && (
         <div className="mt-3 text-center">
-          <p className="text-xs text-rose-400 mb-1">已集齐全部 {total} 种 CP 关系类型</p>
+          <p className="text-xs text-rose-text mb-1">已集齐全部 {total} 种 CP 关系类型</p>
           <Link
             href="/cpti/gallery/"
-            className="inline-flex items-center gap-1 text-xs text-text-muted hover:text-rose-400 transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-text-muted hover:text-rose-text transition-colors"
           >
             查看完整图鉴 <ArrowIcon className="h-3 w-3" />
           </Link>
@@ -818,7 +818,7 @@ function AppraisalSection() {
           <div className="flex items-center gap-3">
             <div className="flex-1 h-2 rounded-full bg-bg-secondary overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-violet-400 to-fuchsia-400 transition-[width] duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-violet-400 to-violet-text transition-[width] duration-500"
                 style={{ width: `${Math.min(100, (collectionCount / 70) * 100)}%` }}
               />
             </div>
@@ -1043,11 +1043,11 @@ export function CardContent() {
           <span
             className={`inline-flex items-center gap-1 text-[10px] font-normal px-1.5 py-0.5 rounded-full ${
               backendSynced
-                ? 'bg-emerald-500/10 text-emerald-400'
-                : 'bg-amber-500/10 text-amber-400'
+                ? 'bg-sage/10 text-sage-text'
+                : 'bg-gold/10 text-gold-text'
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${backendSynced ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${backendSynced ? 'bg-sage' : 'bg-gold'}`} />
             {backendSynced ? '已同步' : '仅本地'}
           </span>
         </p>

@@ -330,7 +330,7 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
       <section className="max-w-2xl mx-auto px-6 pb-12">
         <Link
           href="/cpti/gallery/"
-          className="group block rounded-2xl border border-border-subtle bg-bg-elevated hover:border-rose-500/40 transition-all p-6 sm:p-7"
+          className="group block rounded-2xl border border-border-subtle bg-bg-elevated hover:border-accent/40 transition-all p-6 sm:p-7"
         >
           <div className="flex items-center gap-4">
             <div className="text-3xl">📖</div>
@@ -342,7 +342,7 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
                 25 格可收集 · 看看你已点亮哪几格 · 还缺哪些
               </div>
             </div>
-            <span className="text-rose-500 group-hover:translate-x-1 transition-transform">→</span>
+            <span className="text-rose-text group-hover:translate-x-1 transition-transform">→</span>
           </div>
         </Link>
       </section>
@@ -484,19 +484,19 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
         >
           <Link
             href="/cpti/stealth"
-            className="block rounded-2xl border border-purple-500/20 bg-purple-500/5 p-5 sm:p-6 text-center hover:bg-purple-500/10 transition-all group"
+            className="block rounded-2xl border border-violet-text/20 bg-violet-text/5 p-5 sm:p-6 text-center hover:bg-violet-text/10 transition-all group"
           >
             <div className="flex items-center justify-center gap-3">
               <span className="text-2xl">🔮</span>
               <div className="text-left">
-                <div className="text-base font-medium text-purple-400 group-hover:text-purple-300 transition-colors">
+                <div className="text-base font-medium text-violet-text group-hover:text-violet-text transition-colors">
                   偊偊测一下
                 </div>
                 <div className="text-xs text-text-muted mt-0.5">
                   不用发链接，根据你对 ta 的了解来测你们的默契
                 </div>
               </div>
-              <svg className="w-5 h-5 text-text-muted group-hover:text-purple-400 transition-colors ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-5 h-5 text-text-muted group-hover:text-violet-text transition-colors ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </div>

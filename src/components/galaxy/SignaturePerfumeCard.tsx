@@ -85,7 +85,7 @@ export function SignaturePerfumeCard({ perfume, annotation }: Props) {
       {/* 个性化注解（仅 soul probe 用户） */}
       {annotation && (
         <p style={annotationStyle}>
-          <span style={{ color: 'var(--color-gold)', letterSpacing: '0.36em' }}>// </span>
+          <span style={{ color: 'var(--color-gold)', letterSpacing: '0.36em' }}>{'// '}</span>
           {annotation}
         </p>
       )}

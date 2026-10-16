@@ -35,7 +35,8 @@ export type ProductEventModule =
   | 'home'
   | 'auth'
   | 'wtfti'
-  | 'galaxy';
+  | 'galaxy'
+  | 'her_voice';
 
 export interface ProductEventInput {
   /** Optional. Defaults to current page pathname. */

@@ -3,6 +3,10 @@
     {
       "path": "/api/soulti/soul-letter/dispatch",
       "schedule": "30 13 * * *"
+    },
+    {
+      "path": "/api/wtfti/letters/remind",
+      "schedule": "45 14 * * *"
     }
   ],
   "redirects": [

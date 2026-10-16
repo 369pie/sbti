@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readXunhupayConfig, verifyXunhupayCallback } from '@/lib/payment/xunhupay';
 import { markMirrorOrderPaid, markMirrorOrderFailed, getMirrorOrder } from '@/lib/mirror/order-store';
+import { creditMirrorOrderToWallet } from '@/lib/mirror/wallet-credit';
 
 export async function POST(req: NextRequest) {
   let body: Record<string, string>;
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
   }
 
   // 查询内存订单
-  const order = getMirrorOrder(tradeOrderId);
+  const order = await getMirrorOrder(tradeOrderId);
   if (!order) {
     console.warn('[mirror-payment-notify] order not found', { tradeOrderId });
     // 虎皮椒要求返回 success，否则会重试
@@ -56,17 +57,28 @@ export async function POST(req: NextRequest) {
 
   if (status === 'OD') {
     // 支付成功
-    const result = markMirrorOrderPaid(tradeOrderId);
+    const result = (await markMirrorOrderPaid(tradeOrderId)) ?? (await getMirrorOrder(tradeOrderId));
     if (result) {
+      if (result.userId) {
+        try {
+          await creditMirrorOrderToWallet(result);
+        } catch (error) {
+          console.error('[mirror-payment-notify] wallet credit failed', {
+            tradeOrderId,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
       console.info('[mirror-payment-notify] order paid', {
         tradeOrderId,
         credits: result.credits,
         channel: result.channel,
+        serverWalletCredited: Boolean(result.walletCredit),
       });
     }
   } else {
     // 其他状态视为失败/取消
-    markMirrorOrderFailed(tradeOrderId);
+    await markMirrorOrderFailed(tradeOrderId);
     console.info('[mirror-payment-notify] order failed/cancelled', { tradeOrderId, status });
   }
 

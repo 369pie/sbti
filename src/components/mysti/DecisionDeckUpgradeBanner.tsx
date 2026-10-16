@@ -22,9 +22,11 @@ export function DecisionDeckUpgradeBanner() {
   const [pack, setPack] = useState(false);
 
   useEffect(() => {
-    setQuota(getQuotaStatus());
-    setPack(hasDecisionPack());
-    setHydrated(true);
+    queueMicrotask(() => {
+      setQuota(getQuotaStatus());
+      setPack(hasDecisionPack());
+      setHydrated(true);
+    });
   }, []);
 
   if (!hydrated || !quota) return null;

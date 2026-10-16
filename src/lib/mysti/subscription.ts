@@ -120,6 +120,33 @@ export function isSubscriber(now: number = Date.now()): boolean {
   return !!(env.active && env.active.expiresAt > now);
 }
 
+/** 是否曾经开通过任何通行证（本地口径；服务端口径以 subscription 接口的 everSubscribed 为准）— 首月 intro 展示判定 */
+export function hasEverSubscribed(): boolean {
+  const env = load();
+  return env.active != null || env.history.length > 0;
+}
+
+/**
+ * 服务端「曾经付过费买过通行证」口径 — 首月 intro 展示的最终裁决。
+ * 本地历史可能被清掉（换设备/清缓存），这里向 /api/mysti/subscription 要一次真相。
+ */
+export async function fetchEverSubscribedFromServer(): Promise<boolean | null> {
+  if (typeof window === 'undefined') return null;
+  const deviceId = getOrCreateDeviceId();
+  if (!deviceId) return null;
+  try {
+    const res = await fetch(
+      `/api/mysti/subscription?deviceId=${encodeURIComponent(deviceId)}`,
+      { cache: 'no-store' },
+    );
+    if (!res.ok) return null;
+    const data = (await res.json()) as { everSubscribed?: boolean };
+    return data.everSubscribed === true;
+  } catch {
+    return null;
+  }
+}
+
 /** 当前激活的订阅（如果已过期，返回 null） */
 export function getActiveSubscription(now: number = Date.now()): SubscriptionRecord | null {
   const env = load();

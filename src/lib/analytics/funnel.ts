@@ -28,7 +28,14 @@ export type FunnelEvent =
   | 'couple_invite_open'     // B 打开邀请页
   | 'couple_completed'       // 双方都完测 → 生成合并报告
   | 'theory_view'            // /xpti/theory/ 访问
-  | 'archive_replay';        // 老用户触发复测
+  | 'archive_replay'         // 老用户触发复测
+  // ── W3 · 新生 90 秒引导 /start/ ────────────────
+  | 'onboarding_start'       // 进入 /start/ 首屏
+  | 'onboarding_answer'      // 任一题作答
+  | 'onboarding_complete'    // 到达推荐支柱页
+  // ── Phase B · D30 信件留存动作 ────────────────
+  | 'letter_sealed'          // 封缄一封星尘信（收件箱 composer 或仪式收尾）
+  | 'letter_reminder_optin'; // 订阅到期邮件提醒
 
 export interface FunnelProps {
   module: FunnelModule;
@@ -113,6 +120,16 @@ function classifyFunnelStep(event: FunnelEvent): string {
       return 'theory';
     case 'archive_replay':
       return 'replay';
+    case 'onboarding_start':
+      return 'onboarding_start';
+    case 'onboarding_answer':
+      return 'onboarding_answer';
+    case 'onboarding_complete':
+      return 'onboarding_done';
+    case 'letter_sealed':
+      return 'letter_sealed';
+    case 'letter_reminder_optin':
+      return 'letter_reminder';
   }
 }
 

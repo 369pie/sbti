@@ -6,13 +6,29 @@
  * Auth: 共享 secret，env `ADMIN_HERMOSA_TOKEN`，未配置则拒绝。
  *       兼容 `ADMIN_FUNNEL_TOKEN`（同一管理员凭证可复用）。
  *
- * GET  /api/hermosa/admin?days=14       → { rows, summary, totalsByTag }
- * PATCH /api/hermosa/admin?id=...&token=... { status, status_note?, is_featured?, is_published?, flagged? }
+ * GET  /api/hermosa/admin?days=14       → { rows, summary, totalsByTag, totalsByKind }
+ * PATCH /api/hermosa/admin?id=...&token=... { status, curation_status?, safety_level?, ... }
  */
 
 import { NextResponse, type NextRequest } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
-import { HERMOSA_TAGS, type HermosaTag } from '@/lib/hermosa/tags';
+import {
+  HERMOSA_CURATION_STATUSES,
+  HERMOSA_KINDS,
+  HERMOSA_SAFETY_LEVELS,
+  HERMOSA_TAGS,
+  isHermosaAttributionMode,
+  isHermosaCurationStatus,
+  isHermosaKind,
+  isHermosaSafetyLevel,
+  isHermosaTopicWeek,
+  type HermosaAttributionMode,
+  type HermosaContributionMetadata,
+  type HermosaCurationStatus,
+  type HermosaKind,
+  type HermosaSafetyLevel,
+  type HermosaTag,
+} from '@/lib/hermosa/tags';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -38,9 +54,16 @@ interface Row {
   universe: string;
   slug: string | null;
   code: string | null;
+  kind: HermosaKind;
   text: string;
   signature: string | null;
   tags: string[];
+  metadata: HermosaContributionMetadata;
+  topic_week: string | null;
+  curation_status: HermosaCurationStatus;
+  consent_to_feature: boolean;
+  attribution_mode: HermosaAttributionMode;
+  safety_level: HermosaSafetyLevel;
   echo_count: number;
   is_featured: boolean;
   status: string | null;
@@ -64,14 +87,29 @@ export async function GET(req: NextRequest) {
 
   const days = Math.min(Math.max(Number(req.nextUrl.searchParams.get('days') ?? '14'), 1), 90);
   const sinceIso = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+  const kind = req.nextUrl.searchParams.get('kind');
+  const curationStatus = req.nextUrl.searchParams.get('curation_status');
+  const safetyLevel = req.nextUrl.searchParams.get('safety_level');
+  const topicWeek = req.nextUrl.searchParams.get('topic_week');
+  const consented = req.nextUrl.searchParams.get('consented');
 
   const admin = createAdminSupabaseClient();
-  const { data, error } = await admin
+  let query = admin
     .from('hermosa_messages')
-    .select('id,universe,slug,code,text,signature,tags,echo_count,is_featured,status,status_note,is_published,flagged,created_at')
+    .select('id,universe,slug,code,kind,text,signature,tags,metadata,topic_week,curation_status,consent_to_feature,attribution_mode,safety_level,echo_count,is_featured,status,status_note,is_published,flagged,created_at')
     .gte('created_at', sinceIso)
     .order('created_at', { ascending: false })
     .limit(500);
+
+  if (kind && isHermosaKind(kind)) query = query.eq('kind', kind);
+  if (curationStatus && isHermosaCurationStatus(curationStatus)) {
+    query = query.eq('curation_status', curationStatus);
+  }
+  if (safetyLevel && isHermosaSafetyLevel(safetyLevel)) query = query.eq('safety_level', safetyLevel);
+  if (topicWeek && isHermosaTopicWeek(topicWeek)) query = query.eq('topic_week', topicWeek);
+  if (consented === 'true') query = query.eq('consent_to_feature', true);
+
+  const { data, error } = await query;
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -94,6 +132,22 @@ export async function GET(req: NextRequest) {
   for (const r of rows) {
     totalsByUniverse[r.universe] = (totalsByUniverse[r.universe] ?? 0) + 1;
   }
+  const totalsByKind = Object.fromEntries(
+    HERMOSA_KINDS.map((k) => [k, 0]),
+  ) as Record<HermosaKind, number>;
+  const totalsByCurationStatus = Object.fromEntries(
+    HERMOSA_CURATION_STATUSES.map((s) => [s, 0]),
+  ) as Record<HermosaCurationStatus, number>;
+  const totalsBySafetyLevel = Object.fromEntries(
+    HERMOSA_SAFETY_LEVELS.map((s) => [s, 0]),
+  ) as Record<HermosaSafetyLevel, number>;
+  for (const r of rows) {
+    if (isHermosaKind(r.kind)) totalsByKind[r.kind] += 1;
+    if (isHermosaCurationStatus(r.curation_status)) {
+      totalsByCurationStatus[r.curation_status] += 1;
+    }
+    if (isHermosaSafetyLevel(r.safety_level)) totalsBySafetyLevel[r.safety_level] += 1;
+  }
 
   return NextResponse.json({
     days,
@@ -101,6 +155,9 @@ export async function GET(req: NextRequest) {
     total: rows.length,
     totalsByTag,
     totalsByUniverse,
+    totalsByKind,
+    totalsByCurationStatus,
+    totalsBySafetyLevel,
     rows,
   });
 }
@@ -112,9 +169,19 @@ interface PatchBody {
   is_published?: boolean;
   flagged?: boolean;
   featured_week?: string;
+  curation_status?: string;
+  consent_to_feature?: boolean;
+  attribution_mode?: string;
+  safety_level?: string;
+  topic_week?: string | null;
+  // HER AURORA · W3 · 极光生命周期字段
+  lifecycle?: string;
+  inscribed_letter_slug?: string | null;
+  codex_atlas_slug?: string | null;
 }
 
 const ALLOWED_STATUS = new Set(['heard', 'planned', 'shipped']);
+const ALLOWED_LIFECYCLE = new Set(['lit', 'caught', 'tended', 'inscribed', 'codex']);
 
 export async function PATCH(req: NextRequest) {
   const expected = getExpectedToken();
@@ -151,16 +218,88 @@ export async function PATCH(req: NextRequest) {
   if (typeof body.featured_week === 'string' && /^\d{4}-W\d{2}$/.test(body.featured_week)) {
     update.featured_week = body.featured_week;
   }
+  if (typeof body.curation_status === 'string' && isHermosaCurationStatus(body.curation_status)) {
+    update.curation_status = body.curation_status;
+  }
+  if (typeof body.consent_to_feature === 'boolean') {
+    update.consent_to_feature = body.consent_to_feature;
+  }
+  if (typeof body.attribution_mode === 'string' && isHermosaAttributionMode(body.attribution_mode)) {
+    update.attribution_mode = body.attribution_mode;
+  }
+  if (typeof body.safety_level === 'string' && isHermosaSafetyLevel(body.safety_level)) {
+    update.safety_level = body.safety_level;
+    if (body.safety_level === 'blocked') update.is_published = false;
+  }
+  if (body.topic_week === null) {
+    update.topic_week = null;
+  } else if (typeof body.topic_week === 'string' && isHermosaTopicWeek(body.topic_week)) {
+    update.topic_week = body.topic_week;
+  }
+  // HER AURORA · lifecycle 状态机：守光人手动推进一束光从 lit → caught → tended → inscribed → codex
+  if (typeof body.lifecycle === 'string' && ALLOWED_LIFECYCLE.has(body.lifecycle)) {
+    update.lifecycle = body.lifecycle;
+    if (body.lifecycle === 'tended') {
+      update.tended_at = new Date().toISOString();
+    }
+  }
+  if (body.inscribed_letter_slug === null) {
+    update.inscribed_letter_slug = null;
+  } else if (
+    typeof body.inscribed_letter_slug === 'string'
+    && /^\d{4}-\d{2}$/.test(body.inscribed_letter_slug)
+  ) {
+    update.inscribed_letter_slug = body.inscribed_letter_slug;
+    if (!update.lifecycle) update.lifecycle = 'inscribed';
+  }
+  if (body.codex_atlas_slug === null) {
+    update.codex_atlas_slug = null;
+  } else if (
+    typeof body.codex_atlas_slug === 'string'
+    && /^[a-z0-9-]{1,80}$/.test(body.codex_atlas_slug)
+  ) {
+    update.codex_atlas_slug = body.codex_atlas_slug;
+    if (!update.lifecycle) update.lifecycle = 'codex';
+  }
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: 'no_changes' }, { status: 400 });
   }
 
   const admin = createAdminSupabaseClient();
+  if (update.curation_status === 'published') {
+    const { data: current, error: currentError } = await admin
+      .from('hermosa_messages')
+      .select('consent_to_feature,safety_level,flagged,is_published')
+      .eq('id', id)
+      .single();
+
+    if (currentError) {
+      return NextResponse.json({ error: currentError.message }, { status: 500 });
+    }
+
+    const hasConsent =
+      typeof update.consent_to_feature === 'boolean'
+        ? update.consent_to_feature
+        : Boolean(current?.consent_to_feature);
+    const safetyLevel =
+      typeof update.safety_level === 'string' ? update.safety_level : current?.safety_level;
+    const isFlagged =
+      typeof update.flagged === 'boolean' ? update.flagged : Boolean(current?.flagged);
+
+    if (!hasConsent) {
+      return NextResponse.json({ error: 'missing_consent' }, { status: 409 });
+    }
+    if (isFlagged || safetyLevel !== 'safe') {
+      return NextResponse.json({ error: 'unsafe_for_publish' }, { status: 409 });
+    }
+    update.is_published = true;
+  }
+
   const { data, error } = await admin
     .from('hermosa_messages')
     .update(update)
     .eq('id', id)
-    .select('id,status,status_note,is_featured,is_published,flagged,featured_week')
+    .select('id,status,status_note,is_featured,is_published,flagged,featured_week,curation_status,consent_to_feature,attribution_mode,safety_level,topic_week,lifecycle,tended_at,inscribed_letter_slug,codex_atlas_slug')
     .single();
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

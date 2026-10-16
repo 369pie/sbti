@@ -63,11 +63,11 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: getSiteOrigin() ? new URL(getSiteOrigin()) : undefined,
   title: {
-    default: "WTFTI — 多宇宙人格测试平台",
+    default: "WTFTI — 人格宇宙与灵魂生活社区",
     template: "%s | WTFTI",
   },
-  description: "WTFTI (What's The F* Type Inside) 多宇宙人格测试平台。同一个你，在不同主题宇宙里有完全不同的人格翻译。经典版、修仙版、毒舌版、社畜版、鸟类版……来测测你到底是哪种人。",
-  keywords: ["WTFTI", "WTFTI 人格测试", "多宇宙人格测试", "人格测试", "性格测试", "MBTI", "人格类型", "CP配对", "打工人格", "心理测试", "修仙人格", "鸟类人格"],
+  description: "WTFTI 是为 18–32 岁中文女性打造的人格宇宙与灵魂生活社区。测一次看见自己，每天打开有一点 sign，和无数「她」一起把生活过成想要的样子。",
+  keywords: ["WTFTI", "人格宇宙", "灵魂陪伴", "灵魂碰撞", "女性人格测试", "自我探索", "人格测试", "性格测试", "MBTI", "女性社区", "玄学陪伴", "塔罗", "紫微", "八字", "星图档案", "她财富", "宝宝起名", "周公解梦", "HER AURORA"],
   verification: {
     google: 'BzRtTDBXJV_X_JIZsMs0jPNwGrHIj7flfmUMjuJ1IwY',
   },
@@ -95,8 +95,8 @@ export const metadata: Metadata = {
         },
       },
   openGraph: {
-    title: "WTFTI — 多宇宙人格测试平台",
-    description: "同一个你，在不同主题宇宙里有完全不同的人格翻译。经典、修仙、毒舌、社畜、鸟类……来测测你到底是哪种人。",
+    title: "WTFTI — 人格宇宙与灵魂生活社区",
+    description: "测一次看见自己，每天打开有一点 sign，和无数「她」一起把生活过成想要的样子。",
     type: "website",
     siteName: "WTFTI",
     locale: "zh_CN",
@@ -104,8 +104,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "WTFTI — 多宇宙人格测试平台",
-    description: "同一个你，在不同主题宇宙里有完全不同的人格翻译。经典、修仙、毒舌、社畜、鸟类……来测测你到底是哪种人。",
+    title: "WTFTI — 人格宇宙与灵魂生活社区",
+    description: "测一次看见自己，每天打开有一点 sign，和无数「她」一起把生活过成想要的样子。",
   },
   icons: {
     icon: { url: '/favicon.svg', type: 'image/svg+xml' },
@@ -194,9 +194,9 @@ export default function RootLayout({
           <footer className="border-t border-border-subtle py-8 px-6 text-center text-text-muted text-sm">
             <div className="max-w-5xl mx-auto">
               <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
+                <Link href="/today" prefetch={false} className="hover:text-text-primary transition-colors">每日签</Link>
                 <Link href="/card/" prefetch={false} className="hover:text-text-primary transition-colors">我的 WTF Card</Link>
                 <Link href="/types/" prefetch={false} className="hover:text-text-primary transition-colors">人设图鉴</Link>
-                <Link href="/mirror/" prefetch={false} className="hover:text-text-primary transition-colors">灵镜实验室</Link>
                 <Link href="/guide/" prefetch={false} className="hover:text-text-primary transition-colors">测试说明</Link>
                 <Link href="/about/" prefetch={false} className="hover:text-text-primary transition-colors">关于测试</Link>
                 <Link href="/creator/" prefetch={false} className="hover:text-text-primary transition-colors">创作者中心</Link>

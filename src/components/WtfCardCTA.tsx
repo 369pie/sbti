@@ -21,27 +21,29 @@ export function WtfCardCTA({ variant = 'default' }: Props) {
   const total = getTotalCount();
 
   useEffect(() => {
-    const card = loadCard();
-    if (!card) return;
+    queueMicrotask(() => {
+      const card = loadCard();
+      if (!card) return;
 
-    const count = getLitCount(card);
-    setLit(count);
+      const count = getLitCount(card);
+      setLit(count);
 
-    // Collect up to 3 most recent badges for visual display
-    const badges: { emoji: string; name: string; date: string }[] = [];
-    for (const uid of CARD_UNIVERSE_IDS) {
-      const r = card.results[uid];
-      if (r) {
-        const u = getUniverse(uid);
-        const resolved = resolvePersonality(uid, r.slug);
-        if (u && resolved) {
-          badges.push({ emoji: resolved.emoji || u.emoji, name: resolved.name, date: r.testedAt });
+      // Collect up to 3 most recent badges for visual display
+      const badges: { emoji: string; name: string; date: string }[] = [];
+      for (const uid of CARD_UNIVERSE_IDS) {
+        const r = card.results[uid];
+        if (r) {
+          const u = getUniverse(uid);
+          const resolved = resolvePersonality(uid, r.slug);
+          if (u && resolved) {
+            badges.push({ emoji: resolved.emoji || u.emoji, name: resolved.name, date: r.testedAt });
+          }
         }
       }
-    }
-    // Sort by testedAt desc and take top 3
-    badges.sort((a, b) => b.date.localeCompare(a.date));
-    setRecentBadges(badges.slice(0, 3));
+      // Sort by testedAt desc and take top 3
+      badges.sort((a, b) => b.date.localeCompare(a.date));
+      setRecentBadges(badges.slice(0, 3));
+    });
   }, []);
 
   return (

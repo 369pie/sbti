@@ -135,7 +135,7 @@ export function HogtiShareCard({ personality: p, character, house, shareUrl }: P
             className="text-center text-white/85 text-sm leading-relaxed italic mb-6"
             style={{ fontFamily: 'Georgia, serif' }}
           >
-            "{p.tagline}"
+            &quot;{p.tagline}&quot;
           </p>
 
           {/* Tags */}

@@ -67,11 +67,11 @@ function formatDeltaText(delta: OpsMetricDelta): string {
 
 function statusTone(item: OpsDataHealthItem['status']): string {
   if (item === 'durable') {
-    return 'border-emerald-200 bg-emerald-50 text-emerald-700';
+    return 'border-sage/45 bg-sage/15 text-sage-text';
   }
 
   if (item === 'partial') {
-    return 'border-amber-200 bg-amber-50 text-amber-700';
+    return 'border-ember/40 bg-ember/10 text-ember';
   }
 
   return 'border-border-subtle bg-bg-secondary text-text-secondary';
@@ -165,10 +165,10 @@ function AdminConfigState() {
   return (
     <div className="min-h-screen bg-bg-primary">
       <div className="mx-auto max-w-3xl px-6 py-20">
-        <div className="rounded-3xl border border-amber-300 bg-amber-50 p-8 sm:p-10">
-          <div className="text-xs font-mono uppercase tracking-[0.24em] text-amber-700">WTFTI Admin</div>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-amber-950">管理员白名单尚未配置</h1>
-          <p className="mt-4 text-base leading-8 text-amber-900/80">
+        <div className="rounded-3xl border border-gold/50 bg-gold/10 p-8 sm:p-10">
+          <div className="text-xs font-mono uppercase tracking-[0.24em] text-gold-text">WTFTI Admin</div>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-text-primary">管理员白名单尚未配置</h1>
+          <p className="mt-4 text-base leading-8 text-text-primary/80">
             需要先在服务端配置环境变量 <span className="font-mono">{ADMIN_USER_IDS_ENV}</span>，再使用内部看板。
           </p>
         </div>
@@ -211,10 +211,10 @@ function AdminErrorState({ message }: { message: string }) {
   return (
     <div className="min-h-screen bg-bg-primary">
       <div className="mx-auto max-w-3xl px-6 py-20">
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 p-8 sm:p-10">
-          <div className="text-xs font-mono uppercase tracking-[0.24em] text-rose-700">WTFTI Admin</div>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-rose-950">经营看板加载失败</h1>
-          <p className="mt-4 text-base leading-8 text-rose-900/80">{message}</p>
+        <div className="rounded-3xl border border-rose-dust/60 bg-rose-dust/25 p-8 sm:p-10">
+          <div className="text-xs font-mono uppercase tracking-[0.24em] text-ember">WTFTI Admin</div>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-text-primary">经营看板加载失败</h1>
+          <p className="mt-4 text-base leading-8 text-text-secondary">{message}</p>
         </div>
       </div>
     </div>
@@ -263,7 +263,7 @@ function FunnelCard({ funnel }: { funnel: OpsModuleFunnel }) {
                 <span>
                   {formatCount(step.sessions)} 会话 · {formatPercent(step.conversion)}
                   {previousStep ? (
-                    <span className={`ml-2 text-[11px] ${stepDrop > 30 ? 'text-rose-600' : 'text-text-muted'}`}>
+                    <span className={`ml-2 text-[11px] ${stepDrop > 30 ? 'text-ember' : 'text-text-muted'}`}>
                       流失 {stepDrop.toFixed(1)}%
                     </span>
                   ) : null}
@@ -319,7 +319,7 @@ function ProductInsightsSection({
               {insights.warnings.map((warning) => (
                 <div
                   key={warning}
-                  className="rounded-2xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm text-amber-900/80"
+                  className="rounded-2xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-text-primary/80"
                 >
                   {warning}
                 </div>
@@ -407,13 +407,13 @@ function ProductInsightsSection({
                       <div key={point.step}>
                         <div className="flex items-center justify-between text-xs text-text-secondary">
                           <span>{point.label}</span>
-                          <span className={point.drop > 30 ? 'text-rose-600' : 'text-text-muted'}>
+                          <span className={point.drop > 30 ? 'text-ember' : 'text-text-muted'}>
                             流失 {point.drop.toFixed(1)}% · 留下 {formatCount(point.sessions)} 会话
                           </span>
                         </div>
                         <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-bg-secondary">
                           <div
-                            className={`h-full rounded-full ${point.drop > 30 ? 'bg-rose-500/80' : 'bg-amber-500/70'}`}
+                            className={`h-full rounded-full ${point.drop > 30 ? 'bg-accent/80' : 'bg-gold/100/70'}`}
                             style={{ width: `${Math.min(100, point.drop)}%` }}
                           />
                         </div>
@@ -455,7 +455,7 @@ function ProductInsightsSection({
                       <td className="px-3 py-2 text-right text-text-secondary">{Math.round(row.lcpP75)}</td>
                       <td className="px-3 py-2 text-right text-text-secondary">{Math.round(row.inpP75)}</td>
                       <td className="px-3 py-2 text-right text-text-secondary">{row.clsP75.toFixed(2)}</td>
-                      <td className={`px-3 py-2 text-right ${row.lcpPoorShare > 30 ? 'text-rose-600' : 'text-text-secondary'}`}>
+                      <td className={`px-3 py-2 text-right ${row.lcpPoorShare > 30 ? 'text-ember' : 'text-text-secondary'}`}>
                         {formatPercent(row.lcpPoorShare)}
                       </td>
                     </tr>
@@ -495,7 +495,7 @@ function ProductInsightsSection({
                       <td className="px-3 py-2 text-right text-text-muted">{formatCount(row.previous)}</td>
                       <td
                         className={`px-3 py-2 text-right ${
-                          Number.isFinite(row.change) && row.change >= 0 ? 'text-emerald-600' : 'text-rose-600'
+                          Number.isFinite(row.change) && row.change >= 0 ? 'text-sage-text' : 'text-ember'
                         }`}
                       >
                         {formatChange(row.change)}
@@ -516,7 +516,7 @@ function ProductInsightsSection({
           {insights.warnings.map((warning) => (
             <div
               key={warning}
-              className="rounded-2xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-xs text-amber-900/80"
+              className="rounded-2xl border border-gold/40 bg-gold/10 px-4 py-3 text-xs text-text-primary/80"
             >
               {warning}
             </div>
@@ -629,16 +629,16 @@ export default async function CreatorAdminOpsPage() {
           </div>
         </div>
 
-        <div className="mt-6 rounded-3xl border border-amber-200 bg-amber-50/80 p-5 sm:p-6">
-          <div className="text-sm font-medium text-amber-900">当前页的可信口径</div>
-          <p className="mt-2 text-sm leading-7 text-amber-900/80">
+        <div className="mt-6 rounded-3xl border border-gold/40 bg-gold/10 p-5 sm:p-6">
+          <div className="text-sm font-medium text-text-primary">当前页的可信口径</div>
+          <p className="mt-2 text-sm leading-7 text-text-primary/80">
             可直接用于产品和运营判断的，是 Creator Universe、Identify、CPTI、创作者申请、结算与订单。
             First Look、Mysti、SoulTI 仍缺服务端事件表或结果表，需要下一阶段补埋点后再进入核心漏斗看板。
           </p>
           {data.warnings.length > 0 ? (
             <div className="mt-4 grid gap-2">
               {data.warnings.map((warning) => (
-                <div key={warning} className="rounded-2xl border border-amber-300/70 bg-bg-elevated px-4 py-3 text-sm text-amber-900/80">
+                <div key={warning} className="rounded-2xl border border-gold/70 bg-bg-elevated px-4 py-3 text-sm text-text-primary/80">
                   {warning}
                 </div>
               ))}
@@ -704,13 +704,13 @@ export default async function CreatorAdminOpsPage() {
             action={
               <div className="flex flex-wrap gap-2 text-xs text-text-muted">
                 <span className="inline-flex items-center gap-2 rounded-full border border-border-subtle px-3 py-1.5">
-                  <span className="size-2 rounded-full bg-rose-500" /> Creator UGC
+                  <span className="size-2 rounded-full bg-accent" /> Creator UGC
                 </span>
                 <span className="inline-flex items-center gap-2 rounded-full border border-border-subtle px-3 py-1.5">
-                  <span className="size-2 rounded-full bg-sky-500" /> Identify
+                  <span className="size-2 rounded-full bg-violet-text" /> Identify
                 </span>
                 <span className="inline-flex items-center gap-2 rounded-full border border-border-subtle px-3 py-1.5">
-                  <span className="size-2 rounded-full bg-amber-500" /> CPTI
+                  <span className="size-2 rounded-full bg-gold/100" /> CPTI
                 </span>
               </div>
             }
@@ -730,9 +730,9 @@ export default async function CreatorAdminOpsPage() {
                         <div className="flex h-full w-full max-w-8 items-end justify-center rounded-t-xl bg-bg-secondary/70">
                           {item.total > 0 ? (
                             <div className="flex h-full w-full flex-col-reverse overflow-hidden rounded-t-xl" style={{ height: `${barHeight}%` }}>
-                              <div className="bg-rose-500/85" style={{ height: `${(item.ugc / item.total) * 100}%` }} />
-                              <div className="bg-sky-500/85" style={{ height: `${(item.identify / item.total) * 100}%` }} />
-                              <div className="bg-amber-500/85" style={{ height: `${(item.cpti / item.total) * 100}%` }} />
+                              <div className="bg-accent/85" style={{ height: `${(item.ugc / item.total) * 100}%` }} />
+                              <div className="bg-violet-text/85" style={{ height: `${(item.identify / item.total) * 100}%` }} />
+                              <div className="bg-gold/100/85" style={{ height: `${(item.cpti / item.total) * 100}%` }} />
                             </div>
                           ) : (
                             <div className="h-2 w-full rounded-t-xl bg-border-subtle" />
@@ -822,7 +822,7 @@ export default async function CreatorAdminOpsPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <div className="truncate text-sm font-medium text-text-primary">{item.name}</div>
                         {item.isPaid ? (
-                          <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] text-emerald-700">
+                          <span className="rounded-full border border-sage/45 bg-sage/10 px-2 py-0.5 text-[11px] text-sage-text">
                             付费 {formatCurrency(item.priceCents)}
                           </span>
                         ) : null}
@@ -1008,7 +1008,7 @@ export default async function CreatorAdminOpsPage() {
                       </div>
                       <div className="text-right">
                         <div className="text-sm font-medium text-text-primary">{formatCurrency(item.amountCents)}</div>
-                        <div className="mt-1 text-xs text-amber-700">{item.status}</div>
+                        <div className="mt-1 text-xs text-gold-text">{item.status}</div>
                       </div>
                     </div>
                   </div>
@@ -1060,7 +1060,7 @@ export default async function CreatorAdminOpsPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <div className="truncate text-sm font-medium text-text-primary">{item.name}</div>
                         {item.isPaid ? (
-                          <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] text-emerald-700">
+                          <span className="rounded-full border border-sage/45 bg-sage/10 px-2 py-0.5 text-[11px] text-sage-text">
                             付费 {formatCurrency(item.priceCents)}
                           </span>
                         ) : (

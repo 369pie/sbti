@@ -4,9 +4,10 @@
 import type { Metadata } from 'next';
 
 import { LettersInbox } from '@/components/galaxy/LettersInbox';
+import { CosmicThemeBinder } from '@/components/wtfti/HomeCosmosThemeBinder';
 
 export const metadata: Metadata = {
-  title: '✦ Stardust Letters · 收信箱 · WTFTI',
+  title: '✦ 时间胶囊 · 收信箱 · WTFTI',
   description: '你写给 30 天后自己的星尘信件 — 到期即可拆封。',
 };
 
@@ -39,7 +40,7 @@ export default function LettersPage() {
             fontWeight: 600,
           }}
         >
-          ✦ Stardust Letters · 收信箱
+          ✦ 时间胶囊 · 收信箱
         </p>
         <h1
           style={{
@@ -62,11 +63,12 @@ export default function LettersPage() {
             lineHeight: 1.65,
           }}
         >
-          每一封星尘信件都封缄 30 天 — 到期可拆封。
-          这些信只存在你的浏览器里 · 不会上传。
+          每一颗时间胶囊封存 30 天，到期提醒你回来拆。
+          存在云端，换个设备它还在。
         </p>
       </header>
-      <LettersInbox />
+      <CosmicThemeBinder />
+  <LettersInbox />
       </div>
     </main>
   );

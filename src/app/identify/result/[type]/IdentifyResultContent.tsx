@@ -367,12 +367,12 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
                     onClick={() => toggleSymptom(i)}
                     className={`w-full flex items-start gap-3 px-4 py-3 rounded-xl border text-left transition-all cursor-pointer ${
                       checked
-                        ? 'border-pink-500/30 bg-pink-500/5'
+                        ? 'border-accent/30 bg-accent/5'
                         : 'border-border-subtle bg-bg-secondary/20 hover:bg-bg-secondary/40'
                     }`}
                   >
                     <span className={`flex-shrink-0 w-5 h-5 mt-0.5 rounded border-2 flex items-center justify-center transition-all ${
-                      checked ? 'border-pink-500 bg-pink-500' : 'border-border'
+                      checked ? 'border-accent bg-accent' : 'border-border'
                     }`}>
                       {checked && (
                         <svg className="w-3 h-3 text-bg-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -444,7 +444,7 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
       {/* Challenge CTA — "发给 TA 看看" (viral loop trigger) */}
       <section className="max-w-2xl mx-auto px-6 pb-12">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45, duration: 0.5 }}>
-          <div className="rounded-2xl border-2 border-pink-500/20 bg-gradient-to-b from-pink-500/10 to-transparent p-6 sm:p-8 text-center">
+          <div className="rounded-2xl border-2 border-accent/20 bg-gradient-to-b from-accent/10 to-transparent p-6 sm:p-8 text-center">
             <div className="text-3xl mb-3">📩</div>
             <h3 className="text-lg font-semibold mb-2">发给 {displayName} 看看准不准？</h3>
             <p className="text-sm text-text-secondary mb-5">
@@ -452,7 +452,7 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
             </p>
             <button
               onClick={copyChallenge}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-bg-primary font-medium text-sm hover:from-pink-600 hover:to-rose-600 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-accent to-rose-deep text-bg-primary font-medium text-sm hover:from-accent/85 hover:to-rose-deep/85 transition-all cursor-pointer"
             >
               {challengeCopied ? (
                 '已复制挑战链接 ✓'
@@ -500,7 +500,7 @@ export function IdentifyResultContent({ persona, dimensionScores }: Props) {
           <div className="space-y-3">
             {shareMounted ? <IdentifyShareImageGenerator ref={shareRef} persona={persona} dimensionScores={activeDimensionScores} friendName={friendName} /> : null}
             <button onClick={copyShareText}
-              className="w-full py-3 rounded-xl border border-pink-500/20 bg-pink-500/5 text-sm text-pink-400 hover:bg-pink-500/10 transition-all cursor-pointer">
+              className="w-full py-3 rounded-xl border border-accent/20 bg-accent/5 text-sm text-rose-text hover:bg-accent/10 transition-all cursor-pointer">
               {textCopied ? (
                 '已复制分享文案 ✓'
               ) : (

@@ -11,7 +11,7 @@ export default function BirdLandingContent() {
       <section className="relative overflow-hidden">
         <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center relative">
           <div className="animate-fade-up">
-            <span className="inline-block text-xs font-mono tracking-[0.25em] text-text-muted mb-6 uppercase">
+            <span className="inline-block text-xs font-mono tracking-[0.25em] text-stone mb-6 uppercase">
               WTFTI · 鸟类宇宙
             </span>
 
@@ -39,7 +39,7 @@ export default function BirdLandingContent() {
               <Link
                 href="/wtfti/"
                 prefetch={false}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-border-subtle text-text-muted text-sm hover:text-text-secondary hover:border-border transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-border-subtle text-stone text-sm hover:text-text-secondary hover:border-border transition-all"
               >
                 经典 WTFTI 版
               </Link>
@@ -55,7 +55,7 @@ export default function BirdLandingContent() {
             ].map(stat => (
               <div key={stat.label} className="bg-bg-elevated rounded-2xl border border-border-subtle px-4 py-6 text-center shadow-sm">
                 <div className="text-2xl font-semibold text-text-primary font-mono tracking-tight">{stat.value}</div>
-                <div className="text-xs text-text-muted mt-1">{stat.label}</div>
+                <div className="text-xs text-stone mt-1">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -66,7 +66,7 @@ export default function BirdLandingContent() {
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="mb-12 animate-fade-up">
-            <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Features</span>
+            <span className="text-xs font-mono tracking-[0.2em] text-stone uppercase block mb-3">Features</span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
               你不是人，你是鸟
             </h2>
@@ -101,7 +101,7 @@ export default function BirdLandingContent() {
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="mb-10 animate-fade-up">
-            <span className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase block mb-3">Gallery</span>
+            <span className="text-xs font-mono tracking-[0.2em] text-stone uppercase block mb-3">Gallery</span>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
               部分鸟格预览
             </h2>
@@ -129,13 +129,13 @@ export default function BirdLandingContent() {
                   />
                 </div>
                 <div className="font-medium text-sm text-text-primary truncate">{p.birdName}·{p.birdTitle}</div>
-                <div className="text-xs text-text-muted font-mono mt-1">{p.code}</div>
+                <div className="text-xs text-stone font-mono mt-1">{p.code}</div>
               </Link>
             ))}
           </div>
 
           <div className="text-center mt-8">
-            <span className="text-sm text-text-muted">
+            <span className="text-sm text-stone">
               还有 {BIRD_PERSONALITIES.length - FEATURED.length} 种鸟格等你解锁
             </span>
           </div>

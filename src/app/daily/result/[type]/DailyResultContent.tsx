@@ -114,7 +114,7 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
           {/* Top-right share button */}
           <button
             onPointerEnter={ensureShareMounted} onClick={triggerShareGenerate}
-            className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-teal-400 transition-all cursor-pointer"
+            className="absolute top-16 right-6 p-2.5 rounded-xl border border-border-subtle bg-bg-secondary/60 hover:bg-bg-secondary text-text-muted hover:text-sage-text transition-all cursor-pointer"
             title="生成分享图片"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -323,7 +323,7 @@ export function DailyResultContent({ status, dimensionScores }: Props) {
 
             <button
               onClick={copyShareText}
-              className="w-full py-3 rounded-xl border border-teal-500/20 bg-teal-500/5 text-sm text-teal-400 hover:bg-teal-500/10 transition-all cursor-pointer"
+              className="w-full py-3 rounded-xl border border-sage/20 bg-sage/5 text-sm text-sage-text hover:bg-sage/10 transition-all cursor-pointer"
             >
               {textCopied ? '已复制分享文案 ✓' : '📋 复制分享文案'}
             </button>

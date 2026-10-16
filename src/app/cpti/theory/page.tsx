@@ -176,7 +176,7 @@ export default function CptiTheoryPage() {
                     <Link
                       key={r.slug}
                       href={`/cpti/relationship/${r.slug}/`}
-                      className="group rounded-xl border border-border-subtle bg-bg-elevated p-3 text-center hover:border-rose-500/40 transition-all"
+                      className="group rounded-xl border border-border-subtle bg-bg-elevated p-3 text-center hover:border-accent/40 transition-all"
                     >
                       <div className="text-2xl mb-1.5">{r.emoji}</div>
                       <div className="text-xs sm:text-sm font-semibold text-text-primary truncate">{r.name}</div>
@@ -212,7 +212,7 @@ export default function CptiTheoryPage() {
         <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
           <Link
             href="/cpti/test/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent text-bg-primary font-semibold hover:bg-rose-600 transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent text-bg-primary font-semibold hover:bg-accent/85 transition-colors"
           >
             开始测试 <span>→</span>
           </Link>

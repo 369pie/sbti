@@ -65,7 +65,7 @@ export default function EarningsDashboard() {
   }, []);
 
   useEffect(() => {
-    void fetchData();
+    queueMicrotask(() => void fetchData());
   }, [fetchData]);
 
   const handleWithdraw = async () => {
@@ -121,13 +121,13 @@ export default function EarningsDashboard() {
   }
 
   const statusLabels: Record<string, { text: string; cls: string }> = {
-    confirmed: { text: '已确认', cls: 'text-green-600' },
-    refunded: { text: '已退款', cls: 'text-red-600' },
-    disputed: { text: '争议中', cls: 'text-amber-600' },
-    pending: { text: '处理中', cls: 'text-amber-600' },
-    processing: { text: '打款中', cls: 'text-blue-600' },
-    completed: { text: '已到账', cls: 'text-green-600' },
-    rejected: { text: '已拒绝', cls: 'text-red-600' },
+    confirmed: { text: '已确认', cls: 'text-sage-text' },
+    refunded: { text: '已退款', cls: 'text-ember' },
+    disputed: { text: '争议中', cls: 'text-gold-text' },
+    pending: { text: '处理中', cls: 'text-gold-text' },
+    processing: { text: '打款中', cls: 'text-violet-text' },
+    completed: { text: '已到账', cls: 'text-sage-text' },
+    rejected: { text: '已拒绝', cls: 'text-ember' },
   };
 
   return (
@@ -150,7 +150,7 @@ export default function EarningsDashboard() {
         {/* KPI Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           <div className="bg-bg-secondary rounded-xl p-4 text-center">
-            <div className="text-xl font-bold text-green-600">
+            <div className="text-xl font-bold text-sage-text">
               {formatCents(earnings.totalNetCents)}
             </div>
             <div className="text-[10px] text-text-muted mt-1">累计收益</div>
@@ -168,7 +168,7 @@ export default function EarningsDashboard() {
             <div className="text-[10px] text-text-muted mt-1">订单数</div>
           </div>
           <div className="bg-bg-secondary rounded-xl p-4 text-center">
-            <div className="text-xl font-bold text-amber-600">
+            <div className="text-xl font-bold text-gold-text">
               {formatCents(earnings.pendingSettlementCents)}
             </div>
             <div className="text-[10px] text-text-muted mt-1">提现中</div>
@@ -179,7 +179,7 @@ export default function EarningsDashboard() {
         <button
           onClick={handleWithdraw}
           disabled={withdrawing || earnings.availableBalanceCents < 10000}
-          className="w-full py-3 mb-8 rounded-xl bg-green-600/12 text-green-600 font-medium text-sm hover:bg-green-600/18 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="w-full py-3 mb-8 rounded-xl bg-sage/12 text-sage-text font-medium text-sm hover:bg-sage/18 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           {withdrawing ? '提交中…' : `申请提现 · 可用 ${formatCents(earnings.availableBalanceCents)}`}
         </button>
@@ -214,7 +214,7 @@ export default function EarningsDashboard() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-green-600 font-medium">{formatCents(u.netCents)}</div>
+                    <div className="text-sage-text font-medium">{formatCents(u.netCents)}</div>
                     <div className="text-[10px] text-text-muted">创作者收益</div>
                   </div>
                 </div>
@@ -238,7 +238,7 @@ export default function EarningsDashboard() {
                       </span>
                     </div>
                     <span className="text-text-secondary">{formatCents(o.amount_cents)}</span>
-                    <span className="text-green-600/80">+{formatCents(o.creator_earning_cents)}</span>
+                    <span className="text-sage-text/80">+{formatCents(o.creator_earning_cents)}</span>
                     <span className={`text-xs ${st.cls}`}>{st.text}</span>
                   </div>
                 );
@@ -270,7 +270,7 @@ export default function EarningsDashboard() {
                       {s.completed_at && ` · 到账：${new Date(s.completed_at).toLocaleDateString('zh-CN')}`}
                     </div>
                     {s.admin_note && (
-                      <div className="text-xs text-amber-600/60 mt-1">备注：{s.admin_note}</div>
+                      <div className="text-xs text-gold-text/60 mt-1">备注：{s.admin_note}</div>
                     )}
                   </div>
                 );
@@ -285,7 +285,7 @@ export default function EarningsDashboard() {
           <p>创作者收入 = (实际营收 - 渠道成本 6%) × 创作者分成比例</p>
           <p>分成比例：免费版 60% · 专业版 65% · 商业版 70% · 企业版 75%</p>
           <p>提现最低金额 ¥100 · 每月 1 日生成上月结算单 · 1-3 个工作日到账</p>
-          <p className="text-amber-600/40 mt-2">⚠️ 当前为模拟支付模式（Phase 0.5），无实际扣款</p>
+          <p className="text-gold-text/40 mt-2">⚠️ 当前为模拟支付模式（Phase 0.5），无实际扣款</p>
         </div>
       </div>
     </div>

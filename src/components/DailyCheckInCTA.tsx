@@ -24,7 +24,7 @@ export function DailyCheckInCTA({ variant = 'default' }: Props) {
 
   useEffect(() => {
     if (!mounted) return;
-    setTodaySlug(loadTodayResult());
+    queueMicrotask(() => setTodaySlug(loadTodayResult()));
   }, [mounted]);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export function DailyCheckInCTA({ variant = 'default' }: Props) {
       const m = Math.floor((ms % 3600000) / 60000);
       setCountdown(`${h}小时${m}分`);
     };
-    tick();
+    queueMicrotask(tick);
     const id = setInterval(tick, 60000);
     return () => clearInterval(id);
   }, [mounted, todaySlug]);
@@ -49,12 +49,12 @@ export function DailyCheckInCTA({ variant = 'default' }: Props) {
         <div className={`rounded-2xl border p-4 flex items-center gap-3 ${
           isXpti
             ? 'border-accent/20 bg-gradient-to-r from-accent/12 to-rose-deep/12'
-            : 'border-teal-500/15 bg-gradient-to-r from-teal-500/5 to-emerald-500/5'
+            : 'border-sage/15 bg-gradient-to-r from-sage/5 to-sage/5'
         }`}>
           <div className="text-2xl flex-shrink-0">{status?.emoji ?? '🎲'}</div>
           <div className="flex-1 min-w-0">
             <p className="text-xs text-text-muted">
-              今日模式: <span className={`font-medium ${isXpti ? 'text-text-secondary' : 'text-teal-600'}`}>{status?.name ?? todaySlug}</span>
+              今日模式: <span className={`font-medium ${isXpti ? 'text-text-secondary' : 'text-sage-text'}`}>{status?.name ?? todaySlug}</span>
             </p>
             {countdown && (
               <p className="text-[11px] text-text-muted mt-0.5">
@@ -67,7 +67,7 @@ export function DailyCheckInCTA({ variant = 'default' }: Props) {
             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               isXpti
                 ? 'text-text-secondary bg-accent/20 hover:bg-accent/30'
-                : 'text-teal-600 bg-teal-500/10 hover:bg-teal-500/20'
+                : 'text-sage-text bg-sage/10 hover:bg-sage/20'
             }`}
           >
             查看
@@ -84,7 +84,7 @@ export function DailyCheckInCTA({ variant = 'default' }: Props) {
         className={`group flex items-center gap-3 rounded-2xl border p-4 transition-all ${
           isXpti
             ? 'border-accent/20 bg-gradient-to-r from-accent/12 to-rose-deep/12 hover:border-accent/35'
-            : 'border-teal-500/15 bg-gradient-to-r from-teal-500/5 to-emerald-500/5 hover:border-teal-500/30'
+            : 'border-sage/15 bg-gradient-to-r from-sage/5 to-sage/5 hover:border-sage/30'
         }`}
       >
         <div className="text-2xl flex-shrink-0">🎲</div>
@@ -93,7 +93,7 @@ export function DailyCheckInCTA({ variant = 'default' }: Props) {
           <p className="text-xs text-text-muted mt-0.5">6 道快问 · 每天题目不一样</p>
         </div>
         <svg
-          className={`w-4 h-4 text-text-muted group-hover:translate-x-0.5 transition-all flex-shrink-0 ${isXpti ? 'group-hover:text-text-secondary' : 'group-hover:text-teal-500'}`}
+          className={`w-4 h-4 text-text-muted group-hover:translate-x-0.5 transition-all flex-shrink-0 ${isXpti ? 'group-hover:text-text-secondary' : 'group-hover:text-sage-text'}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
