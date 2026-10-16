@@ -32,6 +32,16 @@ const nextConfig: NextConfig = {
   },
   basePath,
   allowedDevOrigins: ['127.0.0.1'],
+  // Route convergence (docs/01-strategy/wtfti-her-refocus-2026-10.md §7).
+  // Temporary (307) until the new structure settles; flip to permanent later.
+  async redirects() {
+    const toTest = ['bird', 'flower', 'fanrenti', 'work', 'drunk', 'love', 'identify', 'daily', 'cp', 'jueti', 'squad', 'rank', 'combo', 'puzzle', 'gacha'];
+    const toHome = ['creator', 'ugc', 'c', 'lingjian', 'her-books', 'her-wealth', 'weekly', 'theory', 'guide', 'share-templates'];
+    return [
+      ...toTest.map((r) => ({ source: `/${r}/:path*`, destination: '/start/', permanent: false })),
+      ...toHome.map((r) => ({ source: `/${r}/:path*`, destination: '/', permanent: false })),
+    ];
+  },
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
     NEXT_PUBLIC_SITE_BASE_PATH: process.env.NEXT_PUBLIC_SITE_BASE_PATH ?? '',

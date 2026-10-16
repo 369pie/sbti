@@ -15,7 +15,7 @@ export function WtftiThemeNoFlashScript() {
     try {
       var b = document.body;
       var p = location.pathname;
-      var cosmic = p === '/' || /(^|\\/)today\\/?$/.test(p) || /(^|\\/)bottle\\/?$/.test(p) || /(^|\\/)wtfti\\/letters\\/?$/.test(p);
+      var cosmic = /(^|\\/)today\\/?$/.test(p) || /(^|\\/)bottle\\/?$/.test(p) || /(^|\\/)wtfti\\/letters\\/?$/.test(p);
       if (cosmic) {
         b.dataset._cosmicPrev = b.dataset.theme || '';
         b.dataset.theme = 'wtfti-dark';
