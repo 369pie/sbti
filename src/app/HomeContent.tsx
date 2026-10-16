@@ -155,24 +155,18 @@ export default function HomeContent() {
               </p>
             </div>
 
-          {/* Primary CTA row */}
+          {/* Primary CTA row — XPTI 情侣关系报告主推 */}
           <div className="mt-12 sm:mt-16 flex flex-wrap items-center gap-4">
-            <Link href="/mysti/daily/" prefetch={false} className="btn btn-ink">
-              今日一牌
+            <Link href="/xpti/test/" prefetch={false} className="btn btn-ink">
+              测测我们怎么沟通
               <ArrowIcon />
             </Link>
-            <Link href="/cpti/" prefetch={false} className="btn btn-ghost">
-              我们合不合
-            </Link>
-            <Link href="/test/" prefetch={false} className="btn btn-ghost">
-              经典测试
+            <Link href="/mysti/daily/" prefetch={false} className="btn btn-ghost">
+              今日一牌
             </Link>
           </div>
           <p className="mt-4 text-xs text-text-muted">
-            想看关系沟通画像？
-            <Link href="/xpti/" prefetch={false} className="underline underline-offset-2 hover:text-text-secondary transition-colors ml-1">
-              打开 XPTI 关系沟通
-            </Link>
+            一个人也能测，拉上 ta 一起测，就能解锁你们的关系报告。
           </p>
           </div>
 
@@ -217,6 +211,44 @@ export default function HomeContent() {
         </div>
 
         <hr className="editorial-rule-soft max-w-5xl mx-6 sm:mx-auto" />
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          N°01½ XPTI 情侣关系报告 · 主推卡
+         ══════════════════════════════════════════════════════════════════════ */}
+      <section className="pt-16 sm:pt-20 px-6 sm:px-10">
+        <div className="max-w-5xl mx-auto">
+          <Link
+            href="/xpti/test/"
+            prefetch={false}
+            className="group block rounded-[2rem] border border-border-subtle bg-bg-elevated p-8 sm:p-10 shadow-sm transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-md"
+            style={{ background: 'var(--color-paper-warm)' }}
+          >
+            <div className="flex items-center gap-3 mb-5">
+              <CodeMark className="text-[10px]">XC</CodeMark>
+              <span className="eyebrow">XPTI · 关系沟通 · 最受欢迎</span>
+            </div>
+            <h2 className="section-headline text-3xl sm:text-4xl mb-4">
+              你们不是不爱，<span className="editorial-italic" style={{ color: 'var(--color-rose-deep)' }}>只是没说对</span>
+            </h2>
+            <p className="text-base sm:text-lg leading-[1.85] text-text-secondary max-w-2xl mb-6">
+              吵架后谁先低头、委屈时想听什么、哪句话最容易戳中 ta——情侣关系报告把你们的沟通方式放在一起看，
+              帮你读懂 ta，也被 ta 读懂。
+            </p>
+            <ul className="grid gap-3 sm:grid-cols-3 text-sm text-text-secondary mb-8">
+              <li>· 双人合并雷达：一眼看清你们哪里合拍、哪里拧巴</li>
+              <li>· 6 类张力配对：冷战、翻旧账、报喜不报忧……各有解法</li>
+              <li>· 24 句对话脚本：下次想说软话时，直接用得上</li>
+            </ul>
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="btn btn-ink">
+                和 ta 一起测
+                <ArrowIcon />
+              </span>
+              <span className="text-xs text-text-muted">免费开测 · 两人都测完即可生成关系报告，也可以双人各付一半</span>
+            </div>
+          </Link>
+        </div>
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
