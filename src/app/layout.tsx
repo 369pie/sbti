@@ -63,11 +63,11 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: getSiteOrigin() ? new URL(getSiteOrigin()) : undefined,
   title: {
-    default: "WTFTI — 多宇宙人格测试平台",
+    default: "WTFTI — 女生的情绪陪伴站 · 情侣关系沟通报告",
     template: "%s | WTFTI",
   },
-  description: "WTFTI (What's The F* Type Inside) 多宇宙人格测试平台。同一个你，在不同主题宇宙里有完全不同的人格翻译。经典版、修仙版、毒舌版、社畜版、鸟类版……来测测你到底是哪种人。",
-  keywords: ["WTFTI", "WTFTI 人格测试", "多宇宙人格测试", "人格测试", "性格测试", "MBTI", "人格类型", "CP配对", "打工人格", "心理测试", "修仙人格", "鸟类人格"],
+  description: "先听懂今天的自己，再看清一段关系。每日一牌安顿情绪，XPTI 情侣关系报告帮你读懂 ta 的沟通方式，也被 ta 读懂。",
+  keywords: ["WTFTI", "情侣关系测试", "关系沟通", "XPTI", "情侣报告", "每日一牌", "塔罗", "情绪陪伴", "人格测试", "性格测试", "MBTI", "恋爱测试"],
   verification: {
     google: 'BzRtTDBXJV_X_JIZsMs0jPNwGrHIj7flfmUMjuJ1IwY',
   },
@@ -95,8 +95,8 @@ export const metadata: Metadata = {
         },
       },
   openGraph: {
-    title: "WTFTI — 多宇宙人格测试平台",
-    description: "同一个你，在不同主题宇宙里有完全不同的人格翻译。经典、修仙、毒舌、社畜、鸟类……来测测你到底是哪种人。",
+    title: "WTFTI — 女生的情绪陪伴站 · 情侣关系沟通报告",
+    description: "先听懂今天的自己，再看清一段关系。每日一牌安顿情绪，XPTI 情侣关系报告帮你读懂 ta 的沟通方式，也被 ta 读懂。",
     type: "website",
     siteName: "WTFTI",
     locale: "zh_CN",
@@ -104,8 +104,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "WTFTI — 多宇宙人格测试平台",
-    description: "同一个你，在不同主题宇宙里有完全不同的人格翻译。经典、修仙、毒舌、社畜、鸟类……来测测你到底是哪种人。",
+    title: "WTFTI — 女生的情绪陪伴站 · 情侣关系沟通报告",
+    description: "先听懂今天的自己，再看清一段关系。每日一牌安顿情绪，XPTI 情侣关系报告帮你读懂 ta 的沟通方式，也被 ta 读懂。",
   },
   icons: {
     icon: { url: '/favicon.svg', type: 'image/svg+xml' },
@@ -147,7 +147,7 @@ export default function RootLayout({
                   '@type': 'WebSite',
                   name: 'WTFTI',
                   url: getSiteUrl('/'),
-                  description: 'WTFTI 多宇宙人格测试平台。同一个你，在不同主题宇宙里有完全不同的人格翻译。',
+                  description: 'WTFTI 是写给女生的情绪陪伴站：每日一牌安顿情绪，情侣关系报告帮你看懂你和 ta 怎么沟通、怎么靠近。',
                   inLanguage: 'zh-CN',
                 },
                 {
@@ -155,7 +155,7 @@ export default function RootLayout({
                   name: 'WTFTI',
                   url: getSiteUrl('/'),
                   logo: getSiteUrl('/favicon.svg'),
-                  description: 'WTFTI 多宇宙人格测试平台，提供经典、修仙、毒舌、社畜等多种主题人格测试。',
+                  description: 'WTFTI 女生情绪陪伴与情侣关系沟通测试：每日一牌、XPTI 情侣关系报告、三分钟经典人格测试。',
                 },
               ],
             }).replace(/</g, "\\u003c"),
