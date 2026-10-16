@@ -12,7 +12,7 @@ import { useAuth } from '@/components/AuthProvider';
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('next') || '/card/';
+  const redirectTo = searchParams.get('next') || '/today/';
   const registered = searchParams.get('registered') === '1';
 
   const { refresh } = useAuth();
@@ -67,13 +67,12 @@ export function LoginForm() {
   }, [isBusy, login, password, redirectTo, router, refresh]);
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4 py-12">
+    <div className="skin-journal min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="text-4xl mb-3">🔮</div>
-          <h1 className="text-2xl font-bold font-heading text-text-primary">欢迎回来</h1>
-          <p className="text-sm text-text-muted mt-1.5">登录后同步你的人格衣橱</p>
+          <h1 className="s-title text-[30px]">欢迎回来</h1>
+          <p className="text-sm mt-1.5" style={{ color: 'var(--s-mute)' }}>登录后，你的档案和今日卡会回来</p>
         </div>
 
         {registered && (

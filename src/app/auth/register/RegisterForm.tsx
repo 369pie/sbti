@@ -6,12 +6,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { finalizeClaimedSession, stageAnonymousSourceForMerge } from '@/lib/auth/claimed-session';
 import { getApiPath } from '@/lib/api';
+import { enqueueProductEvent } from '@/lib/analytics/product-events';
 import { getSupabaseBrowserConfigHelpMessage, isSupabaseConfigError } from '@/lib/supabase/env';
 
 export function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('next') || '/card/';
+  const redirectTo = searchParams.get('next') || '/today/';
   const { refresh } = useAuth();
 
   const [username, setUsername] = useState('');
@@ -19,6 +20,7 @@ export function RegisterForm() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [birthYear, setBirthYear] = useState('');
   const [error, setError] = useState('');
   const [phase, setPhase] = useState<'idle' | 'submitting' | 'redirecting'>('idle');
   const [showPassword, setShowPassword] = useState(false);
@@ -37,11 +39,15 @@ export function RegisterForm() {
     if (password.length > 72) return '密码最多72位';
     if (password !== confirmPassword) return '两次密码输入不一致';
     if (nickname && nickname.trim().length > 30) return '昵称最多30个字符';
+    const year = Number(birthYear);
+    const thisYear = new Date().getFullYear();
+    if (!/^\d{4}$/.test(birthYear) || year < thisYear - 100 || year > thisYear) return '请填写出生年份，例如 2001';
+    if (thisYear - year < 14) return 'WTFTI 目前只对 14 岁以上开放，过几年再来找我们呀';
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return '邮箱格式不正确';
     }
     return null;
-  }, [username, nickname, password, confirmPassword, email]);
+  }, [username, nickname, password, confirmPassword, email, birthYear]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +73,7 @@ export function RegisterForm() {
           password,
           email: email.trim() || undefined,
           nickname: nickname.trim() || undefined,
+          birthYear: Number(birthYear),
         }),
       });
 
@@ -76,6 +83,8 @@ export function RegisterForm() {
         setError(data.error || '注册失败');
         return;
       }
+
+      enqueueProductEvent('auth', 'register_complete', { props: { next: redirectTo } });
 
       if (data.autoSignedIn) {
         // Server signed us in — refresh client auth state and go
@@ -102,16 +111,15 @@ export function RegisterForm() {
         setPhase('idle');
       }
     }
-  }, [isBusy, username, nickname, password, email, redirectTo, refresh, router, validate]);
+  }, [isBusy, username, nickname, password, email, birthYear, redirectTo, refresh, router, validate]);
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4 py-12">
+    <div className="skin-journal min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="text-4xl mb-3">✨</div>
-          <h1 className="text-2xl font-bold font-heading text-text-primary">创建账号</h1>
-          <p className="text-sm text-text-muted mt-1.5">注册后永久保存你的人格图鉴</p>
+          <h1 className="s-title text-[30px]">保存你的档案</h1>
+          <p className="text-sm mt-1.5" style={{ color: 'var(--s-mute)' }}>换手机、换浏览器，档案和今日卡都不会丢</p>
         </div>
 
         {/* Form */}
@@ -154,6 +162,24 @@ export function RegisterForm() {
               maxLength={30}
               disabled={isBusy}
             />
+          </div>
+
+          <div>
+            <label htmlFor="birthYear" className="block text-sm font-medium text-text-secondary mb-1.5">
+              出生年份 <span className="text-accent">*</span>
+            </label>
+            <input
+              id="birthYear"
+              type="text"
+              inputMode="numeric"
+              autoComplete="bday-year"
+              value={birthYear}
+              onChange={e => setBirthYear(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              placeholder="例如 2001"
+              className="auth-input"
+              disabled={isBusy}
+            />
+            <p className="mt-1 text-xs text-text-muted">只用来确认年龄和生成今日卡，不会公开</p>
           </div>
 
           <div>

@@ -135,3 +135,18 @@
 @media (max-width: 767px) {
   body:has(.her-tabbar) > main { padding-bottom: 72px; }
 }
+
+/* Auth forms inside the journal skin. */
+.skin-journal .auth-input {
+  background: var(--s-card);
+  border-color: var(--s-line);
+  color: var(--s-ink);
+  border-radius: 14px;
+}
+.skin-journal .auth-input:focus { border-color: var(--s-accent); box-shadow: 0 0 0 3px var(--s-accent-soft); }
+.skin-journal .auth-button {
+  background: var(--s-cta);
+  color: var(--s-on-cta);
+  border-radius: 30px;
+  box-shadow: 0 4px 0 #2E2017;
+}

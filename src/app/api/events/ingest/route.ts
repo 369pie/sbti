@@ -42,6 +42,11 @@ const ALLOWED_MODULES = new Set([
   'home',
   'auth',
   'her_voice',
+  // Sent by the client tracker but previously missing here (silently dropped).
+  'wtfti',
+  'xpti',
+  'galaxy',
+  'wtfcard',
 ]);
 
 const MAX_EVENTS_PER_BATCH = 32;

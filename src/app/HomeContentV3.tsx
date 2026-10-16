@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import styles from './home-v3.module.css';
+import { HomeTracker } from './HomeTracker';
 
 // Homepage per docs/01-strategy/wtfti-her-refocus-2026-10.md §5.1, skin: journal.
 // One primary CTA (90s test); everything else explains what she gets afterwards.
@@ -13,6 +14,7 @@ const PILLARS = [
 export default function HomeContentV3() {
   return (
     <div className={`skin-journal ${styles.page}`}>
+      <HomeTracker />
       <section className={styles.hero}>
         <div className={styles.collage} aria-hidden="true">
           <div className={`s-polaroid ${styles.p1}`}>
@@ -49,7 +51,7 @@ export default function HomeContentV3() {
           懂你的<br /><em>女生私人顾问</em>
         </h1>
         <p className={styles.sub}>看清自己 · 变好看 · 有地方说心里话</p>
-        <Link href="/start/" prefetch={false} className="s-btn">90 秒，先测测你是谁</Link>
+        <Link href="/start/" prefetch={false} className="s-btn" data-track="hero">90 秒，先测测你是谁</Link>
         <p className={styles.proof}>已经有 7 万+ 人来过这里</p>
       </section>
 
@@ -82,7 +84,7 @@ export default function HomeContentV3() {
         <h2 className={`s-title ${styles.h2}`}>三件事，都关于你</h2>
         <div className={styles.pillars}>
           {PILLARS.map((p) => (
-            <Link key={p.href} href={p.href} prefetch={false} className={`s-card ${styles.pillar}`}>
+            <Link key={p.href} href={p.href} prefetch={false} className={`s-card ${styles.pillar}`} data-track={`pillar:${p.title}`}>
               <div className={`s-tape ${p.tape}`} />
               <span className={`s-hand ${styles.num}`}>{p.num}</span>
               <h3 className={`s-title ${styles.h3}`}>{p.title}</h3>
@@ -106,7 +108,7 @@ export default function HomeContentV3() {
 
       <section className={styles.close}>
         <p className="s-hand">先认识自己，再说别的。</p>
-        <Link href="/start/" prefetch={false} className="s-btn">开始 90 秒测试</Link>
+        <Link href="/start/" prefetch={false} className="s-btn" data-track="close">开始 90 秒测试</Link>
         <p className={styles.fine}>免费 · 不用注册 · 结果仅供娱乐与自我探索</p>
       </section>
     </div>

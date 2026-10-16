@@ -5,11 +5,12 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { username, password, email, nickname } = body as {
+    const { username, password, email, nickname, birthYear } = body as {
       username?: string;
       password?: string;
       email?: string;
       nickname?: string;
+      birthYear?: number;
     };
 
     // ── Validate ──
@@ -41,6 +42,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '昵称最多30个字符' }, { status: 400 });
     }
 
+    // 14+ only (docs/01-strategy/wtfti-her-refocus-2026-10.md §8).
+    const thisYear = new Date().getFullYear();
+    if (!Number.isInteger(birthYear) || birthYear! < thisYear - 100 || birthYear! > thisYear) {
+      return NextResponse.json({ error: '请填写出生年份' }, { status: 400 });
+    }
+    if (thisYear - birthYear! < 14) {
+      return NextResponse.json({ error: 'WTFTI 目前只对 14 岁以上开放' }, { status: 403 });
+    }
+
     // ── Create user via admin client (bypasses email confirmation) ──
     const authEmail = trimmedEmail || `${trimmedUsername}@wtfti.local`;
     const admin = createAdminSupabaseClient();
@@ -57,6 +67,7 @@ export async function POST(request: NextRequest) {
         nickname: trimmedNickname,
         display_name: trimmedNickname || trimmedUsername,
         has_real_email: !!trimmedEmail,
+        birth_year: birthYear,
       },
     });
 
