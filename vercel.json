@@ -7,13 +7,20 @@
     {
       "path": "/api/wtfti/letters/remind",
       "schedule": "45 14 * * *"
+    },
+    {
+      "path": "/api/push/dispatch",
+      "schedule": "0 0 * * *"
     }
   ],
   "redirects": [
     {
       "source": "/:path*",
       "has": [
-        { "type": "host", "value": "wtfti.com" }
+        {
+          "type": "host",
+          "value": "wtfti.com"
+        }
       ],
       "destination": "https://www.wtfti.com/:path*",
       "permanent": true
@@ -21,7 +28,10 @@
     {
       "source": "/:path*",
       "has": [
-        { "type": "host", "value": "sbtinb.com" }
+        {
+          "type": "host",
+          "value": "sbtinb.com"
+        }
       ],
       "destination": "https://www.wtfti.com/:path*",
       "permanent": true
@@ -29,7 +39,10 @@
     {
       "source": "/:path*",
       "has": [
-        { "type": "host", "value": "www.sbtinb.com" }
+        {
+          "type": "host",
+          "value": "www.sbtinb.com"
+        }
       ],
       "destination": "https://www.wtfti.com/:path*",
       "permanent": true

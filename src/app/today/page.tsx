@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { TodayClient } from './TodayClient';
 import { CosmicThemeBinder } from '@/components/wtfti/HomeCosmosThemeBinder';
+import { DailyReminderToggle } from '@/components/DailyReminderToggle';
 
 export const metadata: Metadata = {
   title: '✦ 一个今日 · Today · WTFTI',
@@ -13,6 +14,12 @@ export default function TodayPage() {
   return (
     <>
       <CosmicThemeBinder />
+      {/* Interim placement until /today is rebuilt in P1. */}
+      <div className="skin-journal px-6 py-4">
+        <div className="mx-auto max-w-md">
+          <DailyReminderToggle />
+        </div>
+      </div>
       <TodayClient />
     </>
   );
