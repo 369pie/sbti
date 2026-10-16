@@ -85,6 +85,11 @@ export function RegisterForm() {
       }
 
       enqueueProductEvent('auth', 'register_complete', { props: { next: redirectTo } });
+      // P0 funnel step 3: 建档 (explicit; register_complete alone is not enough for the gate query).
+      enqueueProductEvent('auth', 'archive_created', {
+        step: 'archive',
+        props: { next: redirectTo, birth_year: Number(birthYear) },
+      });
 
       if (data.autoSignedIn) {
         // Server signed us in — refresh client auth state and go

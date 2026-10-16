@@ -55,13 +55,10 @@ export async function POST(request: NextRequest) {
     const authEmail = trimmedEmail || `${trimmedUsername}@wtfti.local`;
     const admin = createAdminSupabaseClient();
 
-    // Try to create — if the placeholder email already exists, Supabase will reject it
-    // (getUserByEmail was removed in newer supabase-js versions)
-
     const { data, error } = await admin.auth.admin.createUser({
       email: authEmail,
       password,
-      email_confirm: true, // Auto-confirm — no verification email needed
+      email_confirm: true,
       user_metadata: {
         username: trimmedUsername,
         nickname: trimmedNickname,
@@ -72,7 +69,6 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      // Handle duplicate email
       if (error.message?.includes('already been registered') || error.message?.includes('already exists')) {
         return NextResponse.json({ error: '该用户名已被注册' }, { status: 409 });
       }
@@ -83,7 +79,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '注册失败，请稍后重试' }, { status: 500 });
     }
 
-    // ── Auto-sign in the new user via the regular client ──
+    // P0 archive stub: upsert her_profiles so birth_year lives on a real table.
+    const { error: profileError } = await admin.from('her_profiles').upsert(
+      {
+        user_id: data.user.id,
+        birth_year: birthYear,
+        nickname: trimmedNickname || trimmedUsername,
+        completeness_pct: 10,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id' },
+    );
+    if (profileError) {
+      // Non-fatal: user exists; ops can backfill. Log for migration readiness.
+      console.error('[api/auth/register] her_profiles upsert failed', profileError.message);
+    }
+
     const supabase = await createServerSupabaseClient();
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: authEmail,
@@ -91,11 +102,11 @@ export async function POST(request: NextRequest) {
     });
 
     if (signInError) {
-      // User created but auto-login failed — still redirect to login
       return NextResponse.json({
         success: true,
         userId: data.user.id,
         autoSignedIn: false,
+        archiveCreated: !profileError,
       });
     }
 
@@ -103,6 +114,7 @@ export async function POST(request: NextRequest) {
       success: true,
       userId: data.user.id,
       autoSignedIn: true,
+      archiveCreated: !profileError,
     });
   } catch (err) {
     console.error('[api/auth/register] unexpected error:', err);
