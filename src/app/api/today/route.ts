@@ -28,6 +28,8 @@ interface HerProfileRow {
   has_persona: boolean;
   has_color_season: boolean;
   has_palm: boolean;
+  has_face: boolean;
+  color_season: string | null;
   last_visit_date: string | null;
   streak_count: number;
 }
@@ -50,7 +52,7 @@ export const GET = withClaimedAuth(async (_req: NextRequest, _ctx, user: User) =
   const { data: existing, error: selectError } = await admin
     .from('her_profiles')
     .select(
-      'user_id, birth_year, nickname, completeness_pct, has_persona, has_color_season, has_palm, last_visit_date, streak_count',
+      'user_id, birth_year, nickname, completeness_pct, has_persona, has_color_season, has_palm, has_face, color_season, last_visit_date, streak_count',
     )
     .eq('user_id', user.id)
     .maybeSingle();
@@ -74,6 +76,8 @@ export const GET = withClaimedAuth(async (_req: NextRequest, _ctx, user: User) =
         has_persona: false,
         has_color_season: false,
         has_palm: false,
+        has_face: false,
+        color_season: null,
         last_visit_date: null,
         streak_count: 0,
       };
@@ -93,6 +97,8 @@ export const GET = withClaimedAuth(async (_req: NextRequest, _ctx, user: User) =
       has_persona: profile.has_persona ?? false,
       has_color_season: profile.has_color_season ?? false,
       has_palm: profile.has_palm ?? false,
+      has_face: profile.has_face ?? false,
+      color_season: profile.color_season ?? null,
       last_visit_date: streak.lastVisitDate,
       streak_count: streak.streakCount,
       updated_at: new Date().toISOString(),
@@ -102,7 +108,7 @@ export const GET = withClaimedAuth(async (_req: NextRequest, _ctx, user: User) =
       .from('her_profiles')
       .upsert(upsertPayload, { onConflict: 'user_id' })
       .select(
-        'user_id, birth_year, nickname, completeness_pct, has_persona, has_color_season, has_palm, last_visit_date, streak_count',
+        'user_id, birth_year, nickname, completeness_pct, has_persona, has_color_season, has_palm, has_face, color_season, last_visit_date, streak_count',
       )
       .maybeSingle();
 
@@ -122,13 +128,11 @@ export const GET = withClaimedAuth(async (_req: NextRequest, _ctx, user: User) =
     (displayFallback !== '旅行者' ? displayFallback : '') ||
     '你';
 
-  // color_season label is not stored on her_profiles yet (only has_color_season bool).
-  // Seed still varies by userId + date + birthYear + persona/palm flags.
   const card = generateTodayCard({
     userId: user.id,
     dateISO: todayISO,
     birthYear: profile.birth_year ?? metaBirth,
-    colorSeason: null,
+    colorSeason: profile.has_color_season ? profile.color_season : null,
     hasPersona: profile.has_persona,
     hasPalm: profile.has_palm,
   });

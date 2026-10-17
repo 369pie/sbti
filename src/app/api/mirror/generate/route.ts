@@ -11,6 +11,14 @@ import {
 } from '@/lib/mirror/apimart';
 import { maybeCleanup, rateLimit, resolveRateLimitKey } from '@/lib/perf/rate-limit';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import {
+  consumeTryOnFreeIfAvailable,
+  hasBlockedGarment,
+  isUnder18,
+  loadBirthYearForUser,
+  peekTryOnQuota,
+  TRY_ON_FREE_CAP,
+} from '@/lib/mirror/try-on-quota';
 import { SKU_COSTS } from '@/lib/wallet/ling-bi';
 import { applyLingBiTransaction, consumeServerLingBiBySku } from '@/lib/wallet/server';
 
@@ -96,7 +104,7 @@ function parseWalletSpendId(value: unknown): string | null {
   return /^[A-Za-z0-9_-]{8,160}$/.test(trimmed) ? trimmed : null;
 }
 
-async function getOptionalUserId(): Promise<string | null> {
+async function getOptionalUser(): Promise<{ id: string; birthYearMeta: number | null; isAnonymous: boolean } | null> {
   try {
     const supabase = await createServerSupabaseClient();
     await supabase.auth.getClaims().catch(() => null);
@@ -105,7 +113,9 @@ async function getOptionalUserId(): Promise<string | null> {
       error,
     } = await supabase.auth.getUser();
     if (error || !user) return null;
-    return user.id;
+    const birthYearMeta =
+      typeof user.user_metadata?.birth_year === 'number' ? (user.user_metadata.birth_year as number) : null;
+    return { id: user.id, birthYearMeta, isAnonymous: Boolean(user.is_anonymous) };
   } catch {
     return null;
   }
@@ -347,13 +357,54 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const userId = await getOptionalUserId();
+  const sessionUser = await getOptionalUser();
+  const userId = sessionUser?.id ?? null;
   let walletDebit: MirrorGenerateDebit | null = null;
-  if (userId) {
+  let tryOnFree: { applied: boolean; remaining: number; cap: number } | null = null;
+
+  // Under-18: block swimsuit/lingerie style keywords (plan §8)
+  if (mode === 'compare' && userId) {
+    const birthYear =
+      (await loadBirthYearForUser(userId)) ?? sessionUser?.birthYearMeta ?? null;
+    const styleText = `${clampString(body.compareStyles, 120, '')} ${clampString(body.avoid, 80, '')} ${clampString(body.vibe, 80, '')}`;
+    if (isUnder18(birthYear) && hasBlockedGarment(styleText)) {
+      return json(
+        {
+          ok: false,
+          error: '未满 18 岁不能使用泳装/内衣类换装。换一套日常风格再试吧。',
+          reason: 'under18_garment_blocked',
+        },
+        { status: 403 },
+      );
+    }
+  }
+
+  let pendingFreeTryOn = false;
+  if (userId && mode === 'compare' && !sessionUser?.isAnonymous) {
+    const quota = await peekTryOnQuota(userId);
+    if (quota.remaining > 0) {
+      pendingFreeTryOn = true;
+      tryOnFree = { applied: true, remaining: quota.remaining - 1, cap: TRY_ON_FREE_CAP };
+    } else {
+      tryOnFree = { applied: false, remaining: 0, cap: TRY_ON_FREE_CAP };
+    }
+  }
+
+  const skipWallet = pendingFreeTryOn;
+
+  if (userId && !skipWallet) {
     const spendId = parseWalletSpendId(body.walletSpendId);
     if (!spendId) {
       return json(
-        { ok: false, error: '缺少有效的灵币扣费凭证，请刷新页面后重试。' },
+        {
+          ok: false,
+          error:
+            mode === 'compare'
+              ? '本月免费换装次数已用完，请充值灵币或换个账号月额度。'
+              : '缺少有效的灵币扣费凭证，请刷新页面后重试。',
+          reason: mode === 'compare' ? 'try_on_quota_exhausted' : 'missing_spend_id',
+          tryOnFree,
+        },
         { status: 400 },
       );
     }
@@ -369,6 +420,17 @@ export async function POST(request: NextRequest) {
     walletDebit = debit;
   }
 
+
+  async function finalizeTryOnFree(): Promise<{ applied: boolean; remaining: number; cap: number } | null> {
+    if (!pendingFreeTryOn || !userId) return tryOnFree;
+    const consumed = await consumeTryOnFreeIfAvailable(userId);
+    return {
+      applied: consumed.freeApplied,
+      remaining: consumed.remaining,
+      cap: TRY_ON_FREE_CAP,
+    };
+  }
+
   if (!isApimartConfigured()) {
     let report;
     switch (mode) {
@@ -381,6 +443,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const freeMeta = await finalizeTryOnFree();
     return json({
       ok: true,
       status: 'completed',
@@ -391,11 +454,13 @@ export async function POST(request: NextRequest) {
       promptPreview: prompt.slice(0, 520),
       serverWalletDebited: Boolean(walletDebit),
       serverBalance: walletDebit?.balance ?? null,
+      tryOnFree: freeMeta,
     });
   }
 
   try {
     const task = await submitMirrorTask(mode, input);
+    const freeMeta = await finalizeTryOnFree();
     return json({
       ok: true,
       status: task.status,
@@ -404,6 +469,7 @@ export async function POST(request: NextRequest) {
       promptPreview: task.prompt.slice(0, 520),
       serverWalletDebited: Boolean(walletDebit),
       serverBalance: walletDebit?.balance ?? null,
+      tryOnFree: freeMeta,
     });
   } catch (error) {
     const refund = await refundServerWalletForGenerate(

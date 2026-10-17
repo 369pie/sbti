@@ -1,0 +1,135 @@
+.page {
+  min-height: 100vh;
+  padding: 20px 20px 96px;
+}
+
+.inner {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.back {
+  display: inline-block;
+  font-size: 13px;
+  color: var(--s-mute);
+  text-decoration: none;
+  margin-bottom: 14px;
+}
+
+.hi {
+  font-size: 26px;
+  line-height: 1.35;
+  margin: 8px 0 8px;
+}
+
+.lead {
+  font-size: 14px;
+  color: var(--s-ink-2);
+  line-height: 1.65;
+  margin: 0 0 18px;
+}
+
+.card {
+  padding: 18px 16px;
+  margin-bottom: 14px;
+}
+
+.q {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0 0 10px;
+  color: var(--s-ink);
+}
+
+.opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.opt {
+  border: 1px solid var(--s-line);
+  background: var(--s-bg-2);
+  color: var(--s-ink-2);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.optOn {
+  background: var(--s-accent-soft);
+  color: var(--s-accent-text);
+  border-color: var(--s-accent);
+}
+
+.consent {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--s-mute);
+  line-height: 1.55;
+  margin: 8px 0 14px;
+}
+
+.err {
+  color: var(--s-accent-text);
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+
+.preview {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--s-line);
+  margin-bottom: 10px;
+}
+
+.fileBtn {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px dashed var(--s-line);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--s-accent-text);
+  cursor: pointer;
+}
+
+.fileBtn input {
+  display: none;
+}
+
+.resultTitle {
+  font-size: 24px;
+  margin: 6px 0 8px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.chip {
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--s-bg-2);
+  border: 1px solid var(--s-line);
+  color: var(--s-ink-2);
+}
+
+.chipAvoid {
+  opacity: 0.65;
+  text-decoration: line-through;
+}
+
+.guest {
+  text-align: center;
+  padding: 20px;
+}

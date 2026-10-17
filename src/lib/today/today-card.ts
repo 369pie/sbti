@@ -148,7 +148,7 @@ export function generateTodayCard(input: TodayCardInput): TodayCard {
 }
 
 export interface ArchiveGap {
-  key: 'persona' | 'color_season' | 'palm' | 'birth_year';
+  key: 'persona' | 'color_season' | 'palm' | 'face' | 'birth_year';
   label: string;
   href: string;
 }
@@ -158,19 +158,21 @@ export function computeArchiveGaps(profile: {
   has_persona?: boolean | null;
   has_color_season?: boolean | null;
   has_palm?: boolean | null;
+  has_face?: boolean | null;
   completeness_pct?: number | null;
 }): { pct: number; gaps: ArchiveGap[] } {
   const gaps: ArchiveGap[] = [];
   if (!profile.has_persona) gaps.push({ key: 'persona', label: '人格类型', href: '/start/' });
-  if (!profile.has_color_season) gaps.push({ key: 'color_season', label: '色彩季型', href: '/mirror/' });
-  if (!profile.has_palm) gaps.push({ key: 'palm', label: '掌纹', href: '/start/' });
+  if (!profile.has_color_season) gaps.push({ key: 'color_season', label: '色彩季型', href: '/mirror/color/' });
+  if (!profile.has_palm) gaps.push({ key: 'palm', label: '掌纹', href: '/mirror/palm/' });
+  if (!profile.has_face) gaps.push({ key: 'face', label: '脸型妆容', href: '/mirror/face/' });
   if (!profile.birth_year) gaps.push({ key: 'birth_year', label: '出生年份', href: '/auth/register/' });
 
   const stored = profile.completeness_pct;
   const pct =
     typeof stored === 'number' && stored >= 0
       ? stored
-      : Math.min(100, Math.round(((4 - gaps.length) / 4) * 100));
+      : Math.min(100, Math.round(((5 - gaps.length) / 5) * 100));
 
   return { pct, gaps };
 }
