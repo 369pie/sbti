@@ -162,8 +162,8 @@ export function computeArchiveGaps(profile: {
 }): { pct: number; gaps: ArchiveGap[] } {
   const gaps: ArchiveGap[] = [];
   if (!profile.has_persona) gaps.push({ key: 'persona', label: '人格类型', href: '/start/' });
-  if (!profile.has_color_season) gaps.push({ key: 'color_season', label: '色彩季型', href: '/mirror/' });
-  if (!profile.has_palm) gaps.push({ key: 'palm', label: '掌纹', href: '/start/' });
+  if (!profile.has_color_season) gaps.push({ key: 'color_season', label: '色彩季型', href: '/mirror/color/' });
+  if (!profile.has_palm) gaps.push({ key: 'palm', label: '掌纹', href: '/mirror/palm/' });
   if (!profile.birth_year) gaps.push({ key: 'birth_year', label: '出生年份', href: '/auth/register/' });
 
   const stored = profile.completeness_pct;

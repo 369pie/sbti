@@ -1,0 +1,109 @@
+/* /mirror 美我 hub — cream journal */
+
+.page {
+  min-height: 100vh;
+  padding: 20px 20px 96px;
+}
+
+.inner {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.hero {
+  margin-bottom: 22px;
+}
+
+.hi {
+  font-size: 28px;
+  line-height: 1.35;
+  margin: 8px 0 8px;
+}
+
+.hi em {
+  font-style: normal;
+  background: linear-gradient(transparent 62%, var(--s-accent-soft) 62%);
+}
+
+.lead {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--s-ink-2);
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  gap: 14px;
+}
+
+.card {
+  display: block;
+  padding: 18px 16px 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s;
+}
+
+.card:active {
+  transform: translateY(2px);
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.cardTitle {
+  font-size: 20px;
+  margin: 0;
+}
+
+.badge {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--s-accent-text);
+  background: var(--s-accent-soft);
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.badgeMuted {
+  color: var(--s-mute);
+  background: var(--s-bg-2);
+}
+
+.desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--s-ink-2);
+  margin: 0 0 10px;
+}
+
+.cta {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--s-accent-text);
+}
+
+.note {
+  margin-top: 20px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--s-mute);
+}
+
+.guest {
+  margin-top: 16px;
+  padding: 16px;
+}
+
+.guest p {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--s-ink-2);
+}

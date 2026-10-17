@@ -4,6 +4,7 @@
 
 import { useRef, useState, useEffect, useCallback, type ChangeEvent, type FormEvent } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { recordMirrorResult } from '@/lib/wtf-card';
 import { buildChallengeUrl, type ChallengeData } from '@/lib/mirror/challenge';
 import {
@@ -465,6 +466,13 @@ export default function MirrorClient() {
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [fileName, setFileName] = useState('');
   const [mode, setMode] = useState<MirrorMode>('beauty');
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const m = searchParams.get('mode');
+    if (m === 'beauty' || m === 'color' || m === 'compare' || m === 'fortune') {
+      setMode(m);
+    }
+  }, [searchParams]);
   const [vibe, setVibe] = useState(VIBE_OPTIONS[0]);
   const [hairConstraint, setHairConstraint] = useState(HAIR_OPTIONS[0]);
   const [seasonHint, setSeasonHint] = useState(COLOR_SEASON_HINTS[0]);

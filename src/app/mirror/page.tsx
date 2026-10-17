@@ -1,16 +1,16 @@
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/lib/site';
-import MirrorClient from './MirrorClient';
+import { MirrorHubClient } from './MirrorHubClient';
 
 const MIRROR_DESCRIPTION =
-  '灵镜 · 形象档案馆：上传一张照片，AI 给你三页式整体诊断卡（色彩 / 妆发 / 穿搭），看见你将成为的样子。';
+  '美我：色彩季型、脸型妆容、静态换装与掌纹——写进你的档案，让今日更懂你。';
 
 export const metadata: Metadata = {
-  title: '灵镜 · 形象档案馆 · WTFTI',
+  title: '美我 · WTFTI',
   description: MIRROR_DESCRIPTION,
   alternates: { canonical: '/mirror/' },
   openGraph: {
-    title: '灵镜 · 形象档案馆 · WTFTI',
+    title: '美我 · WTFTI',
     description: MIRROR_DESCRIPTION,
     url: getSiteUrl('/mirror/'),
     type: 'website',
@@ -18,11 +18,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '灵镜 · 形象档案馆 · WTFTI',
+    title: '美我 · WTFTI',
     description: MIRROR_DESCRIPTION,
   },
 };
 
 export default function MirrorPage() {
-  return <MirrorClient />;
+  return <MirrorHubClient />;
 }
