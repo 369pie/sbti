@@ -1,28 +1,12 @@
 import type { Metadata } from 'next';
 
 import { TodayClient } from './TodayClient';
-import { CosmicThemeBinder } from '@/components/wtfti/HomeCosmosThemeBinder';
-import { DailyReminderToggle } from '@/components/DailyReminderToggle';
-import { DailyEmailToggle } from '@/components/DailyEmailToggle';
 
 export const metadata: Metadata = {
-  title: '✦ 一个今日 · Today · WTFTI',
-  description:
-    '今日天象签 × 灵鉴抽牌 × 月相日课 × 待拆的星尘信——她每天回来一次的地方。',
+  title: '今日 · WTFTI',
+  description: '每天一张只写给你的今日卡：运势、幸运色、妆容一句，跟着你的档案走。',
 };
 
 export default function TodayPage() {
-  return (
-    <>
-      <CosmicThemeBinder />
-      {/* Interim placement until /today is rebuilt in P1. */}
-      <div className="skin-journal px-6 py-4">
-        <div className="mx-auto flex max-w-md flex-col gap-3">
-          <DailyReminderToggle />
-          <DailyEmailToggle />
-        </div>
-      </div>
-      <TodayClient />
-    </>
-  );
+  return <TodayClient />;
 }

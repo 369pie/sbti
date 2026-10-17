@@ -20,7 +20,6 @@ const FirstLookShareImageGenerator = dynamic(
   { ssr: false },
 );
 import type { FirstLookShareImageGeneratorHandle } from '@/components/FirstLookShareImageGenerator';
-import { getLiveUniverses } from '@/lib/universes';
 import { withBasePath } from '@/lib/site';
 
 interface FirstLookResultContentProps {
@@ -71,14 +70,9 @@ export function FirstLookResultContent({ slug }: FirstLookResultContentProps) {
   return (
     <div className="min-h-screen paper-texture" style={{ background: 'var(--color-paper)' }}>
       <ResultHero archetype={archetype} />
-      <DeepDivePanel
-        archetype={archetype}
-        deepDive={deepDive}
-        slug={slug}
-        sessionReady={ready}
-      />
+      <NextStepToday slug={slug} />
+      <SoftDeepLinks deepDive={deepDive} slug={slug} sessionReady={ready} />
       <SecondaryActions archetype={archetype} onSharePoster={() => shareRef.current?.download()} />
-      <UniverseDetour slug={slug} />
       <FooterMeta />
       <FirstLookShareImageGenerator ref={shareRef} archetype={archetype} />
     </div>
@@ -227,126 +221,81 @@ function RarityBadge({ rarity, accent }: { rarity: 'S' | 'A' | 'B' | 'C'; accent
   );
 }
 
-// ─── Deep dive panel ────────────────────────────────────────────────────────
 
-interface DeepDivePanelProps {
-  archetype: FirstLookArchetype;
-  deepDive: Array<{ target: DeepDiveTarget; match: number }>;
-  slug: string;
-  sessionReady: boolean;
-}
+// ─── P1 single next step (refocus §5.1) ─────────────────────────────────────
 
-function DeepDivePanel({ archetype, deepDive, slug, sessionReady }: DeepDivePanelProps) {
-  if (!sessionReady) return null;
-  const primary = deepDive[0];
-  const rest = deepDive.slice(1);
-
+function NextStepToday({ slug }: { slug: string }) {
   return (
-    <section className="max-w-3xl mx-auto px-6 sm:px-10 py-16">
-      <div className="text-center mb-10">
+    <section className="max-w-3xl mx-auto px-6 sm:px-10 py-14">
+      <div className="text-center mb-8">
         <span className="serial-number text-xs mr-2">02</span>
         <span className="text-[10px] tracking-[0.35em] uppercase text-text-muted">
-          Your Next Room · 你的深潜方向
+          Next · 下一步
         </span>
       </div>
-
-      {primary && (
-        <PrimaryDeepDive archetype={archetype} target={primary.target} match={primary.match} slug={slug} />
-      )}
-
-      {rest.length > 0 && (
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {rest.map(d => (
-            <SecondaryDeepDive key={d.target} target={d.target} match={d.match} slug={slug} />
-          ))}
-        </div>
-      )}
+      <Link
+        href="/today/"
+        prefetch={false}
+        onClick={() => trackFirstLook('first_look_deep_click', { target: 'today', match: 100, slug, tier: 'primary' })}
+        className="block text-center group"
+        style={{
+          background: 'var(--color-ink)',
+          color: 'var(--color-paper)',
+          borderRadius: '999px',
+          padding: '18px 28px',
+          fontSize: 16,
+          letterSpacing: '0.04em',
+        }}
+      >
+        明天来看你的第一张今日卡
+        <span className="inline-block ml-2 transition-transform group-hover:translate-x-1" aria-hidden>→</span>
+      </Link>
+      <p className="mt-4 text-center text-sm text-text-muted">
+        <Link
+          href="/today/#remind"
+          prefetch={false}
+          className="underline underline-offset-4"
+          onClick={() => trackFirstLook('first_look_deep_click', { target: 'today_remind', match: 0, slug, tier: 'secondary' })}
+        >
+          开启提醒，明天叫我一声
+        </Link>
+      </p>
     </section>
   );
 }
 
-function PrimaryDeepDive({
-  archetype,
-  target,
-  match,
+function SoftDeepLinks({
+  deepDive,
   slug,
+  sessionReady,
 }: {
-  archetype: FirstLookArchetype;
-  target: DeepDiveTarget;
-  match: number;
+  deepDive: Array<{ target: DeepDiveTarget; match: number }>;
   slug: string;
+  sessionReady: boolean;
 }) {
-  const meta = DEEP_DIVE_META[target];
+  if (!sessionReady || deepDive.length === 0) return null;
   return (
-    <Link
-      href={meta.href}
-      prefetch={false}
-      onClick={() => trackFirstLook('first_look_deep_click', { target, match, slug, tier: 'primary' })}
-      className="block relative group overflow-hidden"
-      style={{
-        background: `linear-gradient(135deg, ${archetype.accent} 0%, ${archetype.accent}cc 100%)`,
-        borderRadius: 'var(--radius-card)',
-        padding: '28px 28px',
-        color: '#FFFDF9',
-      }}
-    >
-      <div className="flex items-start justify-between gap-6">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 text-[10px] tracking-[0.35em] uppercase opacity-80 mb-3">
-            <span>Primary match · 主推荐</span>
-            <span>· {match}%</span>
-          </div>
-          <p className="editorial-display text-2xl sm:text-[28px] leading-[1.2]">
-            {meta.label}
-          </p>
-          <p className="mt-2 text-sm opacity-85">{meta.tagline}</p>
-          <p className="mt-4 text-xs leading-[1.7] opacity-80 max-w-sm whitespace-pre-line">
-            {archetype.deepDiveInvite}
-          </p>
-        </div>
-        <div className="text-5xl sm:text-6xl leading-none" aria-hidden>
-          {meta.emoji}
-        </div>
-      </div>
-      <div className="mt-6 flex items-center justify-between text-xs tracking-[0.25em] uppercase opacity-90">
-        <span>点此入场</span>
-        <span className="inline-block transition-transform duration-500 group-hover:translate-x-1" aria-hidden>
-          →
-        </span>
-      </div>
-    </Link>
-  );
-}
-
-function SecondaryDeepDive({ target, match, slug }: { target: DeepDiveTarget; match: number; slug: string }) {
-  const meta = DEEP_DIVE_META[target];
-  return (
-    <Link
-      href={meta.href}
-      prefetch={false}
-      onClick={() => trackFirstLook('first_look_deep_click', { target, match, slug, tier: 'secondary' })}
-      className="block relative group p-5 transition-colors"
-      style={{
-        background: 'var(--color-bg-elevated)',
-        border: '1px solid var(--color-rule-soft)',
-        borderRadius: 'var(--radius-card)',
-      }}
-    >
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <span className="text-[10px] tracking-[0.3em] uppercase text-text-muted">
-          Also for you · {match}%
-        </span>
-        <span className="text-xl" aria-hidden>{meta.emoji}</span>
-      </div>
-      <p className="editorial-display text-lg" style={{ color: 'var(--color-ink)' }}>
-        {meta.label}
+    <section className="max-w-3xl mx-auto px-6 sm:px-10 pb-8">
+      <p className="text-center text-[11px] tracking-[0.28em] uppercase text-text-muted mb-4">
+        想继续深挖也可以
       </p>
-      <p className="mt-1 text-xs text-text-muted">{meta.tagline}</p>
-      <span
-        className="absolute left-5 bottom-3 h-px w-6 transition-all duration-500 group-hover:w-16"
-        style={{ background: meta.accent }}
-      />
-    </Link>
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+        {deepDive.map((d) => {
+          const meta = DEEP_DIVE_META[d.target];
+          return (
+            <Link
+              key={d.target}
+              href={meta.href}
+              prefetch={false}
+              onClick={() => trackFirstLook('first_look_deep_click', { target: d.target, match: d.match, slug, tier: 'soft' })}
+              className="text-sm underline underline-offset-4 text-text-secondary"
+            >
+              {meta.label}
+            </Link>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
@@ -407,58 +356,6 @@ function SecondaryActions({
         >
           复制分享文案
         </button>
-      </div>
-    </section>
-  );
-}
-
-// ─── Universe detour ────────────────────────────────────────────────────────
-
-function UniverseDetour({ slug }: { slug: string }) {
-  const detourUniverseIds = ['xpti', 'cpti', 'flower', 'bird', 'banti', 'kings'] as const;
-  const live = getLiveUniverses();
-  const picks = detourUniverseIds
-    .map(id => live.find(u => u.id === id))
-    .filter((u): u is NonNullable<typeof u> => Boolean(u));
-
-  return (
-    <section className="max-w-3xl mx-auto px-6 sm:px-10 pb-20">
-      <div className="flex items-center gap-3 mb-6">
-        <span className="serial-number text-xs">03</span>
-        <span className="text-[10px] tracking-[0.35em] uppercase text-text-muted">
-          也想看看别的宇宙？
-        </span>
-        <span className="h-px flex-1" style={{ background: 'var(--color-rule-soft)' }} />
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {picks.map(u => (
-          <Link
-            key={u.id}
-            href={u.landingPath}
-            prefetch={false}
-            onClick={() => trackFirstLook('first_look_deep_click', { target: u.id, match: 0, slug, tier: 'detour', to_path: u.landingPath })}
-            className="group relative block p-4 transition-colors"
-            style={{
-              background: 'var(--color-bg-elevated)',
-              border: '1px solid var(--color-rule-soft)',
-              borderRadius: 'var(--radius-card)',
-            }}
-          >
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">{u.emoji}</span>
-              <span className="text-[10px] tracking-[0.25em] uppercase text-text-muted">
-                {u.shortName}
-              </span>
-            </div>
-            <p className="text-sm font-medium" style={{ color: 'var(--color-ink)' }}>
-              {u.name}
-            </p>
-            <span
-              className="absolute left-4 bottom-2 h-px w-6 transition-all duration-500 group-hover:w-12"
-              style={{ background: u.accent }}
-            />
-          </Link>
-        ))}
       </div>
     </section>
   );

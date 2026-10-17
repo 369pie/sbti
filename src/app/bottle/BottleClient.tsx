@@ -1,41 +1,49 @@
 'use client';
 
 /**
- * /bottle · 漂流瓶（P1 MVP）
- * 扔出去的是心事，捞起来的也是。规则：扔 3/天 · 捞 3/天（测过才能捞）· 回 5/天。
+ * /bottle · 懂我 · 树洞 v1
+ * 私密写下 → AI 温和回应 → 可选匿名公开（先审后发）→ 别人只能抱抱 / 我也是
  */
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
+import { enqueueProductEvent } from '@/lib/analytics/product-events';
+import { trackFunnelEvent } from '@/lib/analytics/funnel';
+import { getApiPath } from '@/lib/api';
 import { getOrCreateAnonymousSession } from '@/lib/supabase/auth';
 import { tryCreateBrowserSupabaseClient } from '@/lib/supabase/client';
-import { loadLatestGalaxySession } from '@/lib/wtfi/galaxy-session';
-import { WTFTI_PERSONALITIES } from '@/lib/wtfti-personalities';
-import { trackFunnelEvent } from '@/lib/analytics/funnel';
 
-interface Bottle {
+import styles from './bottle.module.css';
+
+interface Post {
   id: string;
   content: string;
-  personaTag: string | null;
   hugs: number;
-  replies: number;
+  alsoMe: number;
+  visibility: 'private' | 'public_pending' | 'public';
+  aiReply: string | null;
+  riskLevel: string;
+  status: string;
+  createdAt: string;
   mine?: boolean;
   hugged?: boolean;
+  iAlsoMe?: boolean;
 }
 
-interface BottleState {
-  eligible: boolean;
-  todayThrown: number;
-  throwLimit: number;
-  todayPicked: number;
-  pickLimit: number;
-  myBottles: Bottle[];
-  pickedToday: Bottle[];
+interface Crisis {
+  headline: string;
+  body: string;
+  hotlines: Array<{ region: string; name: string; contact: string }>;
 }
 
-const GOLD = 'var(--color-gold-leaf, #C9A676)';
-const ROSE = 'var(--color-rose, #C07A8E)';
+interface StatePayload {
+  ok?: boolean;
+  todayWritten: number;
+  writeLimit: number;
+  mine: Post[];
+  feed: Post[];
+}
 
 async function api<T>(path: string, opts?: RequestInit): Promise<{ status: number; body: T | null }> {
   const supabase = tryCreateBrowserSupabaseClient();
@@ -45,28 +53,20 @@ async function api<T>(path: string, opts?: RequestInit): Promise<{ status: numbe
     ...opts,
     headers: { 'Content-Type': 'application/json', ...(opts?.headers ?? {}) },
   });
-  const body = res.ok || res.status < 500 ? await res.json().catch(() => null) : null;
-  return { status: res.status, body: body as T | null };
+  const body = (await res.json().catch(() => null)) as T | null;
+  return { status: res.status, body };
 }
 
 export function BottleClient() {
-  const [state, setState] = useState<BottleState | null>(null);
+  const [state, setState] = useState<StatePayload | null>(null);
   const [draft, setDraft] = useState('');
-  const [throwMsg, setThrowMsg] = useState<string | null>(null);
-  const [picking, setPicking] = useState(false);
-  const [replyDraft, setReplyDraft] = useState<Record<string, string>>({});
-  const [replyMsg, setReplyMsg] = useState<Record<string, string>>({});
-
-  const personaTag = useMemo(() => {
-    if (typeof window === 'undefined') return null;
-    const session = loadLatestGalaxySession();
-    if (!session?.personalitySlug) return null;
-    const p = WTFTI_PERSONALITIES.find((x) => x.slug === session.personalitySlug);
-    return p ? `${p.wtftiName}` : null;
-  }, []);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastCrisis, setLastCrisis] = useState<Crisis | null>(null);
+  const [lastPost, setLastPost] = useState<Post | null>(null);
 
   const load = useCallback(async () => {
-    const { body } = await api<BottleState>('/api/bottles');
+    const { body } = await api<StatePayload>(getApiPath('/bottles/'));
     if (body) setState(body);
   }, []);
 
@@ -75,292 +75,220 @@ export function BottleClient() {
     queueMicrotask(() => void load());
   }, [load]);
 
-  const handleThrow = useCallback(async () => {
+  const handleWrite = useCallback(async () => {
     const content = draft.trim();
-    if (!content || !state) return;
-    setThrowMsg(null);
-    const { status, body } = await api<{ status?: string }>('/api/bottles', {
+    if (!content || busy) return;
+    setBusy(true);
+    setError(null);
+    setLastCrisis(null);
+    const { status, body } = await api<{
+      ok?: boolean;
+      error?: string;
+      message?: string;
+      post?: Post;
+      crisis?: Crisis | null;
+    }>(getApiPath('/bottles/'), {
       method: 'POST',
-      body: JSON.stringify({ action: 'throw', content, personaTag }),
+      body: JSON.stringify({ action: 'write', content }),
     });
+    setBusy(false);
     if (status === 429) {
-      setThrowMsg('今天扔够 3 个啦，明天再来。');
+      setError('今天写够啦，明天再来。先去看看别人的树洞，给一个抱抱。');
       return;
     }
-    if (status === 200 && body?.status === 'rejected') {
-      setThrowMsg('这句过不了审（涉导流或敏感词），换一句试试。');
+    if (status === 400 || !body?.ok) {
+      setError(body?.message || '没写进去，换一句再试试。');
       return;
     }
-    if (status === 200) {
-      setDraft('');
-      setThrowMsg('扔出去了。等有缘人捞到它。');
-      try {
-        trackFunnelEvent('letter_sealed', { module: 'wtfti', source: 'bottle-throw' });
-      } catch {
-        /* noop */
-      }
-      void load();
-      return;
-    }
-    setThrowMsg('没扔出去，网络打了个盹，再试一次。');
-  }, [draft, state, personaTag, load]);
-
-  const handlePick = useCallback(async () => {
-    if (picking) return;
-    setPicking(true);
-    const { status } = await api('/api/bottles', {
-      method: 'POST',
-      body: JSON.stringify({ action: 'pick' }),
+    setDraft('');
+    setLastPost(body.post ?? null);
+    setLastCrisis(body.crisis ?? null);
+    enqueueProductEvent('home', 'treehole_post', {
+      step: 'write',
+      props: { risk: body.crisis ? 'self_harm' : 'ok' },
     });
-    if (status === 403) {
-      setState((s) => (s ? { ...s, eligible: false } : s));
-    } else {
-      await load();
-    }
-    setPicking(false);
-  }, [picking, load]);
+    void load();
+  }, [busy, draft, load]);
 
-  const handleReply = useCallback(
-    async (bottleId: string) => {
-      const content = (replyDraft[bottleId] ?? '').trim();
-      if (!content) return;
-      const { status, body } = await api<{ status?: string }>('/api/bottles', {
-        method: 'POST',
-        body: JSON.stringify({ action: 'reply', bottleId, content }),
-      });
-      if (status === 429) {
-        setReplyMsg((m) => ({ ...m, [bottleId]: '今天回够 5 句了。' }));
+  const handlePublish = useCallback(
+    async (id: string) => {
+      setBusy(true);
+      const { body } = await api<{ ok?: boolean; message?: string; error?: string; crisis?: Crisis | null }>(
+        getApiPath('/bottles/'),
+        { method: 'POST', body: JSON.stringify({ action: 'request_publish', bottleId: id }) },
+      );
+      setBusy(false);
+      if (body?.crisis) setLastCrisis(body.crisis);
+      if (!body?.ok) {
+        setError(body?.message || '暂时不能公开');
         return;
       }
-      if (status === 200 && body?.status === 'rejected') {
-        setReplyMsg((m) => ({ ...m, [bottleId]: '这句过不了审，换一句。' }));
-        return;
-      }
-      if (status === 200) {
-        setReplyDraft((d) => ({ ...d, [bottleId]: '' }));
-        setReplyMsg((m) => ({ ...m, [bottleId]: '回上了。' }));
-        return;
-      }
-      setReplyMsg((m) => ({ ...m, [bottleId]: '没回上，再试一次。' }));
-    },
-    [replyDraft],
-  );
-
-  const handleHug = useCallback(
-    async (bottleId: string) => {
-      await api('/api/bottles', {
-        method: 'POST',
-        body: JSON.stringify({ action: 'hug', bottleId }),
-      });
+      setError(null);
+      setLastPost((p) => (p && p.id === id ? { ...p, visibility: 'public_pending' } : p));
       void load();
     },
     [load],
   );
 
-  const remainingPick = state ? Math.max(0, state.pickLimit - state.todayPicked) : 0;
+  const react = useCallback(
+    async (id: string, kind: 'hug' | 'also_me') => {
+      const { status, body } = await api<{ ok?: boolean }>(getApiPath('/bottles/'), {
+        method: 'POST',
+        body: JSON.stringify({ action: kind, bottleId: id }),
+      });
+      if (status === 200 && body?.ok) {
+        enqueueProductEvent('home', 'treehole_hug', { step: kind, props: { kind } });
+        void load();
+      }
+    },
+    [load],
+  );
+
+  const remaining = state ? Math.max(0, state.writeLimit - state.todayWritten) : null;
 
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        background: 'radial-gradient(ellipse 100% 60% at 50% 0%, #2a1c4d 0%, #1a1530 38%, #0F0A22 100%)',
-        color: '#F5F0E8',
-        fontFamily: 'var(--font-display), "Cormorant Garamond", "Noto Serif SC", serif',
-      }}
-    >
-      <div style={{ margin: '0 auto', maxWidth: 640, padding: '56px 18px 96px' }}>
-        {/* header */}
-        <header style={{ textAlign: 'center', marginBottom: 36 }}>
-          <p style={{ margin: 0, fontSize: 10, letterSpacing: 7, color: GOLD, textTransform: 'uppercase', fontWeight: 600 }}>
-            ✦ 漂流瓶 · 树洞
-          </p>
-          <h1 style={{ margin: '10px 0 8px', fontSize: 32, fontStyle: 'italic', fontWeight: 500, lineHeight: 1.15 }}>
-            扔出去的是心事，
-            <br />
-            捞起来的也是。
-          </h1>
-          <p style={{ margin: '0 auto', maxWidth: 420, fontSize: 12.5, color: 'rgba(245,240,232,.6)', lineHeight: 1.7 }}>
-            全匿名。扔 3 个 / 天 · 捞 3 个 / 天 · 回 5 句 / 天
+    <main className={`skin-journal ${styles.page}`}>
+      <div className={styles.inner}>
+        <header className={styles.hero}>
+          <p className="s-eyebrow">懂我 · 树洞</p>
+          <h1 className={`s-title ${styles.h1}`}>想说的，先说给我听</h1>
+          <p className={styles.sub}>
+            默认只有你自己和我能看见。想匿名公开的话，会先过审再出现；别人只能抱抱，或点「我也是」——不能私信。
           </p>
         </header>
 
-        {/* 扔瓶子 */}
-        <section style={panelStyle}>
-          <p style={eyebrowStyle}>扔一个 · Say it</p>
+        <section className={`s-card ${styles.compose}`}>
+          <div className="s-tape" />
+          <p className="s-eyebrow">Write</p>
+          <h2 className={`s-title ${styles.composeTitle}`}>今天想说点什么？</h2>
           <textarea
+            className={styles.textarea}
             value={draft}
-            onChange={(e) => setDraft(e.target.value.slice(0, 100))}
-            placeholder="最近的一句心事、一句牢骚、一句没处说的话——写完扔出去。"
-            rows={3}
-            maxLength={100}
-            aria-label="漂流瓶内容"
-            style={textareaStyle}
+            maxLength={500}
+            placeholder="比如：今天被夸了，想找个地方说一下……"
+            onChange={(e) => setDraft(e.target.value)}
           />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 12 }}>
-            {personaTag && (
-              <span style={{ fontSize: 11, color: ROSE, border: '1px solid rgba(192,122,142,.4)', borderRadius: 999, padding: '4px 12px' }}>
-                附上我的标签：{personaTag}
-              </span>
-            )}
-            <span style={{ fontSize: 10.5, color: 'rgba(245,240,232,.4)', marginLeft: 'auto' }}>
-              {draft.length}/100 · 今日剩 {state ? Math.max(0, state.throwLimit - state.todayThrown) : 3} 个
-            </span>
+          <div className={styles.meta}>
+            <span>{remaining != null ? `今天还能写 ${remaining} 次` : '…'}</span>
+            <span>{draft.trim().length}/500</span>
           </div>
-          <button type="button" onClick={handleThrow} disabled={!draft.trim()} style={{ ...primaryBtnStyle, marginTop: 14, opacity: draft.trim() ? 1 : 0.45 }}>
-            扔出去
+          <button type="button" className="s-btn" disabled={busy || !draft.trim()} onClick={() => void handleWrite()}>
+            {busy ? '在听…' : '写进树洞'}
           </button>
-          {throwMsg && <p style={{ marginTop: 10, fontSize: 12, color: GOLD }}>{throwMsg}</p>}
+          <p className={styles.hint}>写完会收到一句温柔回应。自伤相关内容会一直私密，并显示援助热线。</p>
+          {error ? <p className={styles.error}>{error}</p> : null}
         </section>
 
-        {/* 捞瓶子 */}
-        <section style={panelStyle}>
-          <p style={eyebrowStyle}>捞一捞 · Fish</p>
-          {state === null ? (
-            <p style={{ fontSize: 13, color: 'rgba(245,240,232,.5)' }}>海面校准中…</p>
-          ) : !state.eligible ? (
-            <div style={{ textAlign: 'center', padding: '10px 0' }}>
-              <p style={{ fontSize: 13.5, lineHeight: 1.8, color: 'rgba(245,240,232,.8)', margin: '0 0 14px' }}>
-                捞瓶子得先做个测试——瓶子只发给测过的人。
+        {lastCrisis ? (
+          <aside className={styles.crisis} role="alert">
+            <h3>{lastCrisis.headline}</h3>
+            <p>{lastCrisis.body}</p>
+            {lastCrisis.hotlines.map((h) => (
+              <p key={`${h.region}-${h.name}`} className={styles.hotline}>
+                <strong>{h.region}</strong> · {h.name}：{h.contact}
               </p>
-              <Link href="/wtfti/feng/test/" prefetch={false} style={primaryBtnStyle as React.CSSProperties}>
-                先去玩疯TI →
-              </Link>
+            ))}
+          </aside>
+        ) : null}
+
+        {lastPost?.aiReply ? (
+          <section className={`s-card ${styles.compose}`}>
+            <div className="s-tape s-tape--peach" />
+            <div className={styles.aiBox}>
+              <div className={styles.aiLabel}>AI 回应 · 只给你</div>
+              <p className={styles.aiText}>{lastPost.aiReply}</p>
             </div>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={handlePick}
-                disabled={picking || remainingPick === 0}
-                style={{ ...primaryBtnStyle, opacity: picking || remainingPick === 0 ? 0.45 : 1 }}
-              >
-                {remainingPick === 0 ? '今天捞完了，明天再来' : picking ? '捞着呢…' : `捞一捞（今日剩 ${remainingPick} 个）`}
-              </button>
-              {state.pickedToday.length > 0 && (
-                <div style={{ display: 'grid', gap: 12, marginTop: 16 }}>
-                  {state.pickedToday.map((b) => (
-                    <div key={b.id} style={bottleCardStyle}>
-                      {b.personaTag && (
-                        <p style={{ margin: '0 0 6px', fontSize: 10.5, letterSpacing: 1, color: ROSE }}>{b.personaTag}</p>
-                      )}
-                      <p style={{ margin: '0 0 12px', fontSize: 14, lineHeight: 1.75, fontFamily: 'Noto Serif SC, serif' }}>
-                        {b.content}
-                      </p>
-                      <div style={{ display: 'flex', gap: 8 }}>
-                        <input
-                          value={replyDraft[b.id] ?? ''}
-                          onChange={(e) => setReplyDraft((d) => ({ ...d, [b.id]: e.target.value.slice(0, 100) }))}
-                          placeholder="回一句…"
-                          aria-label="回复这个瓶子"
-                          style={{ ...textareaStyle, flex: 1, padding: '8px 14px', borderRadius: 999, fontSize: 12.5 }}
-                        />
-                        <button type="button" onClick={() => handleReply(b.id)} disabled={!(replyDraft[b.id] ?? '').trim()} style={smallBtnStyle}>
-                          回
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleHug(b.id)}
-                          style={{ ...smallBtnStyle, borderColor: 'rgba(192,122,142,.45)', color: b.hugged ? ROSE : '#F5F0E8' }}
-                        >
-                          {b.hugged ? '抱过了' : '抱抱'}
-                        </button>
-                      </div>
-                      {replyMsg[b.id] && <p style={{ margin: '8px 0 0', fontSize: 11.5, color: GOLD }}>{replyMsg[b.id]}</p>}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
+            {lastPost.riskLevel === 'ok' && lastPost.visibility === 'private' ? (
+              <div className={styles.publishRow}>
+                <button
+                  type="button"
+                  className={styles.ghostBtn}
+                  disabled={busy}
+                  onClick={() => void handlePublish(lastPost.id)}
+                >
+                  匿名公开（先审后发）
+                </button>
+                <span className={styles.chip}>公开后别人只能抱抱 / 我也是</span>
+              </div>
+            ) : null}
+            {lastPost.visibility === 'public_pending' ? (
+              <p className={styles.hint}>已排队审核，通过后才会出现在下面。</p>
+            ) : null}
+          </section>
+        ) : null}
+
+        <section className={styles.section}>
+          <p className="s-eyebrow">Feed</p>
+          <h2 className={`s-title ${styles.secTitle}`}>树洞里的一句话</h2>
+          {!state ? <p className={styles.empty}>加载中…</p> : null}
+          {state && state.feed.length === 0 ? (
+            <p className={styles.empty}>还没有过审的公开内容。你写下的第一句，也许会成为别人的抱抱。</p>
+          ) : null}
+          {state?.feed.map((p) => (
+            <article key={p.id} className={`s-card ${styles.card}`}>
+              <p className={styles.body}>{p.content}</p>
+              <p className={styles.chip}>匿名 · 抱抱 {p.hugs} · 我也是 {p.alsoMe}</p>
+              <div className={styles.actions}>
+                <button
+                  type="button"
+                  className={`${styles.react} ${p.hugged ? styles.reactOn : ''}`}
+                  onClick={() => void react(p.id, 'hug')}
+                >
+                  {p.hugged ? '已抱抱' : '抱抱'}
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.react} ${p.iAlsoMe ? styles.reactOn : ''}`}
+                  onClick={() => void react(p.id, 'also_me')}
+                >
+                  {p.iAlsoMe ? '已点我也是' : '我也是'}
+                </button>
+              </div>
+            </article>
+          ))}
         </section>
 
-        {/* 我的瓶子 */}
-        <section style={panelStyle}>
-          <p style={eyebrowStyle}>我扔出去的 · Mine</p>
-          {state && state.myBottles.length > 0 ? (
-            <div style={{ display: 'grid', gap: 10 }}>
-              {state.myBottles.map((b) => (
-                <div key={b.id} style={{ ...bottleCardStyle, opacity: 0.85 }}>
-                  <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, fontFamily: 'Noto Serif SC, serif' }}>{b.content}</p>
-                  <p style={{ margin: '6px 0 0', fontSize: 11, color: 'rgba(245,240,232,.45)' }}>
-                    被捞 {b.replies + b.hugs > 0 ? '过' : '……等风来'} · 抱抱 ×{b.hugs} · 回复 ×{b.replies}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p style={{ fontSize: 12.5, color: 'rgba(245,240,232,.45)' }}>还没扔过。上面那个框，就是海。</p>
-          )}
-        </section>
+        {state && state.mine.length > 0 ? (
+          <section className={styles.section}>
+            <p className="s-eyebrow">Mine</p>
+            <h2 className={`s-title ${styles.secTitle}`}>我写过的</h2>
+            {state.mine.map((p) => (
+              <article key={p.id} className={`s-card ${styles.card}`}>
+                <p className={styles.chip}>
+                  {p.visibility === 'private'
+                    ? '私密'
+                    : p.visibility === 'public_pending'
+                      ? '审核中'
+                      : '已公开'}
+                  {p.riskLevel === 'self_harm' ? ' · 仅自己可见' : ''}
+                </p>
+                <p className={styles.body}>{p.content}</p>
+                {p.aiReply ? (
+                  <div className={styles.aiBox}>
+                    <div className={styles.aiLabel}>当时的回应</div>
+                    <p className={styles.aiText}>{p.aiReply}</p>
+                  </div>
+                ) : null}
+                {p.visibility === 'private' && p.riskLevel === 'ok' ? (
+                  <div className={styles.publishRow}>
+                    <button type="button" className={styles.ghostBtn} onClick={() => void handlePublish(p.id)}>
+                      匿名公开（先审后发）
+                    </button>
+                  </div>
+                ) : null}
+              </article>
+            ))}
+          </section>
+        ) : null}
 
-        <footer style={{ marginTop: 32, textAlign: 'center', fontSize: 10.5, color: 'rgba(245,240,232,.35)', letterSpacing: 1 }}>
-          内容先审后发 · 涉导流与违规内容会被拦下 · WTFTI
-        </footer>
+        <p className={styles.fine}>
+          <Link href="/today/" prefetch={false} style={{ color: 'var(--s-accent-text)' }}>
+            回今日
+          </Link>
+          {' · '}
+          仅供情绪陪伴，不能替代专业帮助
+        </p>
       </div>
     </main>
   );
 }
-
-const panelStyle: React.CSSProperties = {
-  padding: '24px 24px 22px',
-  marginBottom: 20,
-  borderRadius: 16,
-  border: '1px solid rgba(201,166,118,.18)',
-  background: 'rgba(26,21,48,.55)',
-};
-
-const eyebrowStyle: React.CSSProperties = {
-  margin: '0 0 12px',
-  fontSize: 9.5,
-  letterSpacing: 4,
-  color: 'rgba(201,166,118,.75)',
-  textTransform: 'uppercase',
-  fontWeight: 600,
-};
-
-const textareaStyle: React.CSSProperties = {
-  width: '100%',
-  boxSizing: 'border-box',
-  padding: '12px 14px',
-  borderRadius: 12,
-  border: '1px solid rgba(245,240,232,.14)',
-  background: 'rgba(20,15,42,.45)',
-  color: '#F5F0E8',
-  fontSize: 13.5,
-  lineHeight: 1.8,
-  fontFamily: 'Noto Serif SC, serif',
-  outline: 'none',
-  resize: 'vertical',
-};
-
-const primaryBtnStyle: React.CSSProperties = {
-  display: 'inline-block',
-  padding: '11px 26px',
-  borderRadius: 999,
-  border: 'none',
-  background: 'linear-gradient(120deg, #C07A8E, #C9A676)',
-  color: '#1A1530',
-  fontSize: 13,
-  fontWeight: 600,
-  letterSpacing: '0.06em',
-  cursor: 'pointer',
-  textDecoration: 'none',
-};
-
-const smallBtnStyle: React.CSSProperties = {
-  padding: '8px 16px',
-  borderRadius: 999,
-  border: '1px solid rgba(201,166,118,.4)',
-  background: 'transparent',
-  color: '#F5F0E8',
-  fontSize: 12,
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
-};
-
-const bottleCardStyle: React.CSSProperties = {
-  padding: '16px 16px 14px',
-  borderRadius: 12,
-  border: '1px solid rgba(245,240,232,.1)',
-  background: 'rgba(20,15,42,.5)',
-};

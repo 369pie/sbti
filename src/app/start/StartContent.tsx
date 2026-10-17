@@ -353,31 +353,39 @@ function RecommendedPillar({ pillar, onReset }: { pillar: Pillar; onReset: () =>
         {meta.italic}
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-10">
+      {/* P1: single next step — 今日卡 (refocus §5.1 / §7) */}
+      <div className="flex flex-col gap-3 mb-6">
         <Link
-          href={meta.href}
-          className="inline-flex items-center gap-3 px-7 py-3.5 text-sm transition-transform hover:translate-x-0.5"
+          href="/today/"
+          className="inline-flex items-center justify-center gap-3 px-7 py-3.5 text-sm transition-transform hover:translate-x-0.5"
           style={{
             background: meta.accent,
             color: 'var(--color-bg-elevated)',
             fontFamily: 'var(--font-display)',
           }}
         >
-          {meta.cta}
+          明天来看你的第一张今日卡
           <span aria-hidden>→</span>
         </Link>
         <Link
-          href={meta.secondaryHref}
-          className="inline-flex items-center gap-3 px-7 py-3.5 text-sm transition-colors"
+          href="/today/#remind"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs"
           style={{
-            border: `1px solid ${meta.accent}`,
             color: meta.accent,
             fontFamily: 'var(--font-display)',
+            textDecoration: 'underline',
+            textUnderlineOffset: 3,
           }}
         >
-          {meta.secondaryCta}
+          开启提醒，明天叫我一声
         </Link>
       </div>
+      <p className="mb-8 text-[13px]" style={{ color: 'var(--color-text-muted)' }}>
+        想先逛逛也行：
+        <Link href={meta.href} style={{ color: meta.accent, marginLeft: 6 }}>{meta.cta}</Link>
+        <span style={{ margin: '0 6px', opacity: 0.5 }}>·</span>
+        <Link href={meta.secondaryHref} style={{ color: meta.accent }}>{meta.secondaryCta}</Link>
+      </p>
 
       <div
         className="pt-6 flex flex-wrap items-center justify-between gap-4 text-[12px]"
