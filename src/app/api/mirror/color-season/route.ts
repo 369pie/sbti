@@ -89,7 +89,7 @@ export const POST = withClaimedAuth(async (req: NextRequest, _ctx, user: User) =
     typeof user.user_metadata?.birth_year === 'number' ? (user.user_metadata.birth_year as number) : null;
   const flagResult = await upsertHerProfileFlags(
     user.id,
-    { has_color_season: true },
+    { has_color_season: true, color_season: result.season },
     { birthYear: metaBirth },
   );
 
@@ -100,6 +100,7 @@ export const POST = withClaimedAuth(async (req: NextRequest, _ctx, user: User) =
       ? {
           has_palm: flagResult.profile.has_palm,
           has_color_season: flagResult.profile.has_color_season,
+          color_season: flagResult.profile.color_season,
           completeness_pct: flagResult.profile.completeness_pct,
         }
       : null,

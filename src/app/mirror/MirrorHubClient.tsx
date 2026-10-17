@@ -1,8 +1,7 @@
 'use client';
 
 /**
- * /mirror · 美我 hub（P2 slice · refocus §4 美我）
- * journal skin；入口：色彩季型 / 妆容脸型 / 静态换装 / 掌纹
+ * /mirror · 美我 hub（P2 · refocus §4）
  */
 
 import Link from 'next/link';
@@ -17,33 +16,46 @@ const CARDS = [
     href: '/mirror/color/',
     title: '色彩季型',
     badge: '写入档案',
-    desc: '三道小问题（可加自拍），告诉你适合什么颜色——写进「她的档案」，今日幸运色会更准。',
+    desc: '三道小问题（可加自拍），季型标签写入档案，今日幸运色会更准。',
     cta: '测我的季型 →',
     tone: 'accent' as const,
+    lined: true,
   },
   {
-    href: '/mirror/atelier/?mode=beauty',
+    href: '/mirror/face/',
     title: '脸型 · 妆容',
-    badge: '灵镜 Atelier',
-    desc: '上传一张照片，AI 给妆发建议。深度报告按次扣灵币（付费点稍后接会员额度）。',
-    cta: '去做妆容诊断 →',
-    tone: 'muted' as const,
+    badge: '写入档案',
+    desc: '自述脸型 + 可选自拍，固定妆容库建议。深度 AI 妆发仍在灵镜 Atelier。',
+    cta: '看我的妆容建议 →',
+    tone: 'accent' as const,
+    lined: false,
   },
   {
     href: '/mirror/atelier/?mode=compare',
     title: '静态换装',
-    badge: '附属功能',
-    desc: '单张试衣约十几秒。尝鲜用，不做实时视频——按次付费。',
+    badge: '每月 3 次免费',
+    desc: '单张试衣约十几秒。登录用户每月 3 次免费，超出扣灵币。未满 18 岁不做泳装内衣类。',
     cta: '换一身试试 →',
     tone: 'muted' as const,
+    lined: false,
   },
   {
     href: '/mirror/palm/',
     title: '掌纹',
     badge: '仪式感',
-    desc: '拍一张手掌，在照片上标出你的四条主线。照片只用于本次，处理完即丢弃。',
+    desc: '拍掌心，照片上标出四条主线；同图同手结果一致。照片处理完即丢弃。',
     cta: '去看掌纹 →',
     tone: 'accent' as const,
+    lined: false,
+  },
+  {
+    href: '/mirror/atelier/?mode=beauty',
+    title: '灵镜 Atelier',
+    badge: '按次灵币',
+    desc: '深度妆发 / 色彩 / 风格对比生成。尝鲜后按次付费。',
+    cta: '打开 Atelier →',
+    tone: 'muted' as const,
+    lined: false,
   },
 ] as const;
 
@@ -61,19 +73,19 @@ export function MirrorHubClient() {
             变好看，从<em>认识自己</em>开始
           </h1>
           <p className={styles.lead}>
-            色彩、妆容、换装、掌纹——每一项都会写进你的档案，让「今日」更像为你写的。
+            色彩、脸型妆容、换装、掌纹——写进档案，让「今日」更像为你写的。
           </p>
         </header>
 
         <div className={styles.grid}>
           {CARDS.map((c) => (
             <Link
-              key={c.href}
+              key={c.href + c.title}
               href={c.href}
               prefetch={false}
-              className={`s-card ${c.href.includes('color') ? 's-card--lined' : ''} ${styles.card}`}
+              className={`s-card ${c.lined ? 's-card--lined' : ''} ${styles.card}`}
             >
-              {c.href.includes('color') ? <span className="s-tape s-tape--peach" aria-hidden /> : null}
+              {c.lined ? <span className="s-tape s-tape--peach" aria-hidden /> : null}
               <div className={styles.cardTop}>
                 <h2 className={`s-title ${styles.cardTitle}`}>{c.title}</h2>
                 <span className={`${styles.badge} ${c.tone === 'muted' ? styles.badgeMuted : ''}`}>

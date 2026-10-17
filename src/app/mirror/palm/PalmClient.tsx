@@ -61,6 +61,7 @@ export function PalmClient() {
   const [error, setError] = useState<string | null>(null);
   const [reading, setReading] = useState<PalmReadingResult | null>(null);
   const [completeness, setCompleteness] = useState<number | null>(null);
+  const [replayed, setReplayed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -106,6 +107,7 @@ export function PalmClient() {
         ok?: boolean;
         error?: string;
         reading?: PalmReadingResult;
+        replayed?: boolean;
         profile?: { completeness_pct?: number } | null;
       };
       if (!res.ok || !data.ok || !data.reading) {
@@ -120,6 +122,7 @@ export function PalmClient() {
         return;
       }
       setReading(data.reading);
+      setReplayed(Boolean(data.replayed));
       setCompleteness(data.profile?.completeness_pct ?? null);
       setPhase('done');
       // Drop heavy payload from memory after success — keep preview for overlay only.
@@ -243,6 +246,7 @@ export function PalmClient() {
             {reading && phase === 'done' ? (
               <div className={`s-card ${styles.card}`}>
                 {reading.stub ? <span className={styles.stubTag}>演示解读</span> : null}
+                {replayed ? <span className={styles.stubTag}>同图复读 · 结果一致</span> : null}
                 <p className={styles.meta}>
                   {reading.hand === 'left' ? '左手' : '右手'} · {reading.handShapeLabel}
                   {completeness != null ? ` · 档案 ${completeness}%` : ''}

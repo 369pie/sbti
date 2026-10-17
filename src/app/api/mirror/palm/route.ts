@@ -1,12 +1,19 @@
 /**
- * POST /api/mirror/palm — palm photo → structured reading + has_palm stub on her_profiles.
- * Image is processed in-memory only; never written to storage/DB.
+ * POST /api/mirror/palm — palm photo → fixed-bank reading + has_palm + palm_summary.
+ * Same image fingerprint + hand ⇒ same result (replay from palm_summary when match).
+ * Image never stored.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import type { User } from '@supabase/supabase-js';
 
-import { upsertHerProfileFlags } from '@/lib/her/profile-flags';
-import { analyzePalmFromImage, type PalmHand } from '@/lib/mirror/palm-reading';
+import { loadPalmSummary, upsertHerProfileFlags } from '@/lib/her/profile-flags';
+import {
+  analyzePalmFromImage,
+  fingerprintImageDataUrl,
+  readingFromStoredSummary,
+  serializePalmSummary,
+  type PalmHand,
+} from '@/lib/mirror/palm-reading';
 import { maybeCleanup, rateLimit, resolveRateLimitKey } from '@/lib/perf/rate-limit';
 import { withClaimedAuth } from '@/lib/supabase/with-auth';
 
@@ -43,9 +50,7 @@ export const POST = withClaimedAuth(async (req: NextRequest, _ctx, user: User) =
     windowMs: 60_000,
     limit: 8,
   });
-  if (!limited.allowed) {
-    return json({ error: 'rate_limited' }, { status: 429 });
-  }
+  if (!limited.allowed) return json({ error: 'rate_limited' }, { status: 429 });
 
   let body: unknown;
   try {
@@ -55,29 +60,34 @@ export const POST = withClaimedAuth(async (req: NextRequest, _ctx, user: User) =
   }
 
   const record = (body && typeof body === 'object' ? body : {}) as Record<string, unknown>;
-  if (record.consentAccepted !== true) {
-    return json({ error: 'consent_required' }, { status: 400 });
-  }
+  if (record.consentAccepted !== true) return json({ error: 'consent_required' }, { status: 400 });
 
   const hand: PalmHand = record.hand === 'left' ? 'left' : 'right';
   const imageDataUrl = validateImageDataUrl(record.imageDataUrl);
-  if (!imageDataUrl) {
-    return json({ error: 'invalid_image' }, { status: 400 });
-  }
+  if (!imageDataUrl) return json({ error: 'invalid_image' }, { status: 400 });
 
-  const reading = await analyzePalmFromImage({ imageDataUrl, hand });
+  const fingerprint = fingerprintImageDataUrl(imageDataUrl);
+  const stored = await loadPalmSummary(user.id);
+  let reading = stored ? readingFromStoredSummary(stored, hand, fingerprint) : null;
+  let replayed = false;
+  if (!reading) {
+    reading = await analyzePalmFromImage({ imageDataUrl, hand });
+  } else {
+    replayed = true;
+  }
 
   const metaBirth =
     typeof user.user_metadata?.birth_year === 'number' ? (user.user_metadata.birth_year as number) : null;
   const flagResult = await upsertHerProfileFlags(
     user.id,
-    { has_palm: true },
+    { has_palm: true, palm_summary: serializePalmSummary(reading) },
     { birthYear: metaBirth },
   );
 
   return json({
     ok: true,
     reading,
+    replayed,
     profile: flagResult.ok
       ? {
           has_palm: flagResult.profile.has_palm,
@@ -86,7 +96,6 @@ export const POST = withClaimedAuth(async (req: NextRequest, _ctx, user: User) =
         }
       : null,
     profileError: flagResult.ok ? null : flagResult.error,
-    // Explicit: photo not stored
     photoRetained: false,
   });
 });

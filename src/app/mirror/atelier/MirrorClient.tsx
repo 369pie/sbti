@@ -46,12 +46,13 @@ interface MirrorApiResponse {
   report?: PreviewReport;
   promptPreview?: string;
   error?: string;
-  reason?: 'insufficient' | 'invalid-cost' | 'transaction-failed';
+  reason?: 'insufficient' | 'invalid-cost' | 'transaction-failed' | 'under18_garment_blocked' | 'try_on_quota_exhausted' | 'missing_spend_id';
   balance?: number;
   required?: number;
   refunded?: boolean;
   serverWalletDebited?: boolean;
   serverBalance?: number | null;
+  tryOnFree?: { applied?: boolean; remaining?: number; cap?: number } | null;
 }
 
 type WalletSource = 'local' | 'server';
@@ -80,7 +81,8 @@ const VIBE_OPTIONS = ['原生自然', '清冷通勤', '约会玫瑰', '暗黑辣
 const HAIR_OPTIONS = ['可剪可染', '只改造型', '保留长发', '保留短发'];
 const COLOR_SEASON_HINTS = ['自动判断', '偏春季型', '偏夏季型', '偏秋季型', '偏冬季型'];
 const COLOR_DEPTHS = ['完整报告', '快速诊断'];
-const COMPARE_STYLE_OPTIONS = ['原生自然', '清冷通勤', '约会玫瑰', '暗黑辣妹'];
+const COMPARE_STYLE_OPTIONS = ['原生自然', '清冷通勤', '约会玫瑰', '暗黑辣妹', '泳装度假', '轻奢内衣风'] as const;
+const ADULT_ONLY_COMPARE_STYLES = new Set(['泳装度假', '轻奢内衣风']);
 const BEAUTY_REPORT_TYPES: { value: BeautyReportType; label: string; desc: string }[] = [
   { value: 'comprehensive', label: '三页诊断卡', desc: '色彩 + 妆发 + 穿搭一次成档' },
   { value: 'hairstyle', label: '发型专项', desc: '1 灵币轻体验' },
@@ -473,6 +475,33 @@ export default function MirrorClient() {
       setMode(m);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/mirror/try-on-quota/', { credentials: 'include', cache: 'no-store' });
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          ok?: boolean;
+          remaining?: number;
+          cap?: number;
+          under18?: boolean;
+        };
+        if (cancelled || !data?.ok) return;
+        if (typeof data.remaining === 'number') setTryOnRemaining(data.remaining);
+        if (typeof data.cap === 'number') setTryOnCap(data.cap);
+        setUnder18(Boolean(data.under18));
+      } catch {
+        /* guest / offline */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+
   const [vibe, setVibe] = useState(VIBE_OPTIONS[0]);
   const [hairConstraint, setHairConstraint] = useState(HAIR_OPTIONS[0]);
   const [seasonHint, setSeasonHint] = useState(COLOR_SEASON_HINTS[0]);
@@ -493,6 +522,14 @@ export default function MirrorClient() {
   const [showHistory, setShowHistory] = useState(false);
   const [avoid, setAvoid] = useState('厚重黑发贴脸、荧光色、过度滤镜');
   const [consentAccepted, setConsentAccepted] = useState(false);
+  const [tryOnRemaining, setTryOnRemaining] = useState<number | null>(null);
+  const [tryOnCap, setTryOnCap] = useState(3);
+  const [under18, setUnder18] = useState(false);
+
+  useEffect(() => {
+    if (!under18) return;
+    setCompareStyles((prev) => prev.filter((s) => !ADULT_ONLY_COMPARE_STYLES.has(s)));
+  }, [under18]);
   const [state, setState] = useState<FlowState>('idle');
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -505,6 +542,10 @@ export default function MirrorClient() {
   const isBusy = state === 'submitting' || state === 'polling';
   const canSubmit = !!imageDataUrl && consentAccepted && !isBusy;
   const currentSku = SKU_COSTS[getMirrorSkuKey(mode, beautyReportType)];
+  const compareStyleOptions = COMPARE_STYLE_OPTIONS.filter(
+    (s) => !under18 || !ADULT_ONLY_COMPARE_STYLES.has(s),
+  );
+  const usingFreeTryOn = mode === 'compare' && tryOnRemaining != null && tryOnRemaining > 0;
 
   const refreshServerWalletBalance = useCallback(async () => {
     try {
@@ -830,11 +871,14 @@ export default function MirrorClient() {
     setState('submitting');
     setProgress(2);
 
-    const spent = await consumeLingBiForGenerate(
-      skuKey,
-      `${sku.label} · ${getModeLabel(mode)}`,
-      spendId,
-    );
+    let spent = true;
+    if (!usingFreeTryOn) {
+      spent = await consumeLingBiForGenerate(
+        skuKey,
+        `${sku.label} · ${getModeLabel(mode)}`,
+        spendId,
+      );
+    }
     if (!spent) {
       if (pollRunRef.current === runId) {
         setState('idle');
@@ -873,6 +917,14 @@ export default function MirrorClient() {
       const data = (await response.json().catch(() => ({}))) as MirrorApiResponse;
 
       if (!response.ok || data.ok === false) {
+        if (data.reason === 'under18_garment_blocked') {
+          throw new Error(data.error || '未满 18 岁不能使用泳装/内衣类换装。');
+        }
+        if (data.reason === 'try_on_quota_exhausted') {
+          setTryOnRemaining(0);
+          setShowTopUp(true);
+          throw new Error(data.error || '本月免费换装已用完，请充值灵币。');
+        }
         if (response.status === 402 || data.reason === 'insufficient') {
           const balance = typeof data.balance === 'number' ? data.balance : lingBiBalance;
           setLingBiBalance(balance);
@@ -885,6 +937,11 @@ export default function MirrorClient() {
           setWalletSource('server');
         }
         throw new Error(data.error || '图像任务提交失败');
+      }
+
+      if (data.tryOnFree && typeof data.tryOnFree.remaining === 'number') {
+        setTryOnRemaining(data.tryOnFree.remaining);
+        if (typeof data.tryOnFree.cap === 'number') setTryOnCap(data.tryOnFree.cap);
       }
 
       if (data.serverWalletDebited && typeof data.serverBalance === 'number') {
@@ -1360,8 +1417,19 @@ export default function MirrorClient() {
                     <p className="mb-3 text-[0.65rem] uppercase tracking-[0.32em]" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-gold)' }}>
                       Compare Styles（选 2-3 个）
                     </p>
+                    {tryOnRemaining != null ? (
+                      <p className="mb-3 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                        本月免费换装剩余 <strong style={{ color: 'var(--color-gold)' }}>{tryOnRemaining}</strong> / {tryOnCap}
+                        {usingFreeTryOn ? ' · 本次不扣灵币' : ' · 超出后扣灵币'}
+                        {under18 ? ' · 未满18岁已隐藏泳装/内衣风' : ''}
+                      </p>
+                    ) : (
+                      <p className="mb-3 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                        登录后每月 {tryOnCap} 次免费静态换装；未满 18 岁不做泳装内衣类。
+                      </p>
+                    )}
                     <div className="grid grid-cols-2 gap-2.5">
-                      {COMPARE_STYLE_OPTIONS.map(option => {
+                      {compareStyleOptions.map(option => {
                         const selected = compareStyles.includes(option);
                         return (
                           <button
