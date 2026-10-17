@@ -1,0 +1,288 @@
+/* /today — cream journal skin (design-system v3). Tokens via .skin-journal. */
+
+.page {
+  min-height: 100vh;
+  padding: 20px 20px 96px;
+}
+
+.inner {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.greeting {
+  margin-bottom: 18px;
+}
+
+.hi {
+  font-size: 28px;
+  line-height: 1.35;
+  margin: 8px 0 6px;
+}
+
+.hi em {
+  font-style: normal;
+  background: linear-gradient(transparent 62%, var(--s-accent-soft) 62%);
+}
+
+.streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--s-ink-2);
+  background: var(--s-bg-2);
+  border: 1px solid var(--s-line);
+  border-radius: 999px;
+  padding: 5px 12px;
+}
+
+.streak strong {
+  color: var(--s-accent-text);
+  font-weight: 600;
+}
+
+.card {
+  padding: 22px 18px 14px;
+  margin-bottom: 16px;
+  transform: rotate(-0.5deg);
+}
+
+.cardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.date {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--s-accent-text);
+}
+
+.tag {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--s-mute);
+}
+
+.fortune {
+  font-size: 22px;
+  line-height: 1.5;
+  margin: 14px 0 12px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid var(--s-line);
+}
+
+.k {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--s-mute);
+  width: 46px;
+  flex-shrink: 0;
+}
+
+.sw {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid var(--s-line);
+}
+
+.v {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.v small {
+  display: block;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--s-mute);
+}
+
+.memberHint {
+  margin: 8px 0 4px;
+  font-size: 12px;
+  color: var(--s-mute);
+  text-align: center;
+}
+
+.mood {
+  padding: 18px 16px 14px;
+  margin-bottom: 16px;
+}
+
+.moodTitle {
+  font-size: 16px;
+  margin: 4px 0 12px;
+}
+
+.moodRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.moodBtn {
+  flex: 1;
+  min-width: 64px;
+  padding: 10px 8px;
+  border-radius: 14px;
+  border: 1px solid var(--s-line);
+  background: var(--s-bg-2);
+  color: var(--s-ink);
+  font-size: 13px;
+  line-height: 1.3;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.moodBtnSelected {
+  background: var(--s-accent-soft);
+  border-color: var(--s-accent);
+  color: var(--s-accent-text);
+}
+
+.moodNote {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--s-mute);
+}
+
+.moodLink {
+  color: var(--s-accent-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.archive {
+  padding: 18px 16px 16px;
+  margin-bottom: 16px;
+}
+
+.archiveHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.archivePct {
+  font-size: 13px;
+  color: var(--s-accent-text);
+  font-weight: 500;
+}
+
+.bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--s-bg-2);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.barFill {
+  height: 100%;
+  background: var(--s-accent);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.gaps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gap {
+  font-size: 12px;
+  color: var(--s-ink-2);
+  background: var(--s-bg-2);
+  border: 1px solid var(--s-line);
+  border-radius: 12px;
+  padding: 6px 10px;
+  text-decoration: none;
+}
+
+.gap:hover {
+  border-color: var(--s-accent);
+  color: var(--s-accent-text);
+}
+
+.reminders {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 12px 4px;
+}
+
+.guest {
+  text-align: center;
+  padding: 48px 16px 32px;
+}
+
+.guestTitle {
+  font-size: 28px;
+  line-height: 1.35;
+  margin: 12px 0 10px;
+}
+
+.guestSub {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--s-ink-2);
+  margin-bottom: 24px;
+}
+
+.guestActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  border-radius: 30px;
+  border: 1px solid var(--s-line);
+  color: var(--s-ink);
+  font-size: 15px;
+  background: var(--s-card);
+  text-decoration: none;
+}
+
+.loading {
+  text-align: center;
+  padding: 64px 16px;
+  color: var(--s-mute);
+  font-size: 14px;
+}
+
+.error {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--s-accent-text);
+  font-size: 14px;
+}
+
+.fine {
+  margin-top: 20px;
+  font-size: 11px;
+  color: var(--s-mute);
+  text-align: center;
+}
