@@ -22,6 +22,8 @@ export interface TodayCard {
   fortune: string;
   luckyColor: { name: string; hex: string; tip: string };
   makeup: string;
+  /** Member-only: 穿搭示意一句（P3 完整今日） */
+  outfit: string;
   /** Soft index into the bank (debug / analytics). */
   seedKey: string;
 }
@@ -109,6 +111,21 @@ const MAKEUP_TIPS = [
   '今天美甲如果要补，选裸粉或奶茶就好。',
 ] as const;
 
+const OUTFIT_TIPS = [
+  '今天内搭同色系，外套留一点对比就好。',
+  '今天试试幸运色当丝巾或袜子，点缀就够。',
+  '今天选宽松版型，舒服比贴身更有气场。',
+  '今天鞋子选干净的浅色，整个人会亮一档。',
+  '今天半身裙 + 简单上衣，少一层心累。',
+  '今天牛仔可以配柔色针织，刚柔刚好。',
+  '今天包包选小的，少带一点也轻松。',
+  '今天帽子或发箍点一下，头饰比新衣服便宜。',
+  '今天叠穿两层薄的，比一件厚的更利落。',
+  '今天配饰只留一样：耳环或项链，二选一。',
+  '今天下装选直筒，走路姿态会更稳。',
+  '今天颜色不超过三种，画面会干净很多。',
+] as const;
+
 const SEASON_COLOR_HINT: Record<string, { name: string; hex: string; tip: string }> = {
   冷夏: { name: '雾霾蓝', hex: '#8FA3BF', tip: '你是冷夏型，穿它显白，避开亮橘' },
   暖春: { name: '蜜桃杏', hex: '#E8B48A', tip: '你是暖春型，柔暖色最衬你' },
@@ -126,6 +143,7 @@ export function generateTodayCard(input: TodayCardInput): TodayCard {
 
   const fortune = pick(FORTUNES, rand);
   const makeup = pick(MAKEUP_TIPS, rand);
+  const outfit = pick(OUTFIT_TIPS, rand);
 
   const seasonKey = input.colorSeason?.trim() ?? '';
   const seasonHit = seasonKey && SEASON_COLOR_HINT[seasonKey];
@@ -143,6 +161,7 @@ export function generateTodayCard(input: TodayCardInput): TodayCard {
     fortune,
     luckyColor,
     makeup,
+    outfit,
     seedKey,
   };
 }

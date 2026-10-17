@@ -5,6 +5,7 @@
 
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { shanghaiDateISO } from '@/lib/today/date';
+import { isHerMemberActive, MEMBER_TRY_ON_CAP } from '@/lib/her/membership';
 
 export const TRY_ON_FREE_CAP = 3;
 
@@ -38,14 +39,17 @@ export async function consumeTryOnFreeIfAvailable(userId: string): Promise<TryOn
 
   const { data: row } = await admin
     .from('her_profiles')
-    .select('user_id, try_on_month, try_on_free_used')
+    .select('user_id, try_on_month, try_on_free_used, is_member, member_expires_at')
     .eq('user_id', userId)
     .maybeSingle();
 
+  const cap = isHerMemberActive(row)
+    ? MEMBER_TRY_ON_CAP
+    : TRY_ON_FREE_CAP;
   const sameMonth = row?.try_on_month === month;
   const used = sameMonth ? Number(row?.try_on_free_used ?? 0) : 0;
 
-  if (used >= TRY_ON_FREE_CAP) {
+  if (used >= cap) {
     return { month, used, remaining: 0, freeApplied: false };
   }
 
@@ -62,7 +66,7 @@ export async function consumeTryOnFreeIfAvailable(userId: string): Promise<TryOn
       .eq('user_id', userId);
     if (error) {
       console.error('[try-on-quota] update failed', error.message);
-      return { month, used, remaining: Math.max(0, TRY_ON_FREE_CAP - used), freeApplied: false };
+      return { month, used, remaining: Math.max(0, cap - used), freeApplied: false };
     }
   } else {
     const { error } = await admin.from('her_profiles').insert({
@@ -74,14 +78,14 @@ export async function consumeTryOnFreeIfAvailable(userId: string): Promise<TryOn
     });
     if (error) {
       console.error('[try-on-quota] insert failed', error.message);
-      return { month, used, remaining: Math.max(0, TRY_ON_FREE_CAP - used), freeApplied: false };
+      return { month, used, remaining: Math.max(0, cap - used), freeApplied: false };
     }
   }
 
   return {
     month,
     used: nextUsed,
-    remaining: Math.max(0, TRY_ON_FREE_CAP - nextUsed),
+    remaining: Math.max(0, cap - nextUsed),
     freeApplied: true,
   };
 }
@@ -91,12 +95,15 @@ export async function peekTryOnQuota(userId: string): Promise<Omit<TryOnQuota, '
   const month = shanghaiMonthKey();
   const { data: row } = await admin
     .from('her_profiles')
-    .select('try_on_month, try_on_free_used')
+    .select('try_on_month, try_on_free_used, is_member, member_expires_at')
     .eq('user_id', userId)
     .maybeSingle();
+  const cap = isHerMemberActive(row)
+    ? MEMBER_TRY_ON_CAP
+    : TRY_ON_FREE_CAP;
   const sameMonth = row?.try_on_month === month;
   const used = sameMonth ? Number(row?.try_on_free_used ?? 0) : 0;
-  return { month, used, remaining: Math.max(0, TRY_ON_FREE_CAP - used) };
+  return { month, used, remaining: Math.max(0, cap - used) };
 }
 
 export async function loadBirthYearForUser(userId: string): Promise<number | null> {

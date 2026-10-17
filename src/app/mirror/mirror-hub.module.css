@@ -107,3 +107,18 @@
   font-size: 14px;
   color: var(--s-ink-2);
 }
+
+.memberSlot {
+  margin-top: 18px;
+}
+
+.guestMember {
+  padding: 18px 16px 16px;
+}
+
+.guestMemberText {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--s-ink-2);
+  margin: 6px 0 14px;
+}

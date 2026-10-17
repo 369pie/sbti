@@ -138,7 +138,7 @@ export const SKU_PRICES: Record<MystiSku, { price: number; label: string; taglin
   'sigil-yearly': { price: 39, label: 'Sigil 灵魂印记 · 年度纪章册', tagline: '全年 12 章纪章 · 年度 SVG 高清下载 · PDF 收藏卷' },
 
   // ── L2 订阅 / 通行证 ──────────────────────────────────────
-  'monthly-pass': { price: 19, label: '月度会员', tagline: '每天一张牌 + 全部精修分享卡 + 月报' },
+  'monthly-pass': { price: 19, label: '月度会员', tagline: '完整今日 + 美我月额度 + 深度报告 8 折 · 到期不自动续费' },
   'monthly-pass-intro': { price: 9.9, label: '月度会员 · 首月', tagline: '首月体验价 · 30 天全权益，到期不自动续费' },
   'quarterly-pass': { price: 99, label: '季度会员', tagline: '相当于 ¥33/月，最划算' },
   'yearly-pass': { price: 299, label: '年度会员', tagline: '折合 ¥25/月，铁粉无脑选' },

@@ -76,6 +76,8 @@ export function PremiumPaywall({
 
   const [unlocked, setUnlocked] = useState<boolean>(() => isUnlocked(sku, resourceId));
   const [hasPass, setHasPass] = useState(false);
+  /** P3 her_profiles membership — discount only (does not free-unlock passCovers). */
+  const [herMemberDiscount, setHerMemberDiscount] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [paymentType, setPaymentType] = useState<'wechat' | 'alipay'>('wechat');
@@ -112,6 +114,17 @@ export function PremiumPaywall({
           } catch {
             /* noop */
           }
+        }
+      })
+      .catch(() => {});
+
+    // P3: her_profiles membership → deep-report 8折 (cross-device)
+    fetch('/api/her/membership/', { credentials: 'include', cache: 'no-store' })
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = (await res.json()) as { isMember?: boolean; deepDiscount?: number };
+        if (data.isMember && (data.deepDiscount ?? 0) > 0) {
+          setHerMemberDiscount(true);
         }
       })
       .catch(() => {});
@@ -288,7 +301,8 @@ export function PremiumPaywall({
     return <div data-paywall="unlocked">{children}</div>;
   }
 
-  const finalPrice = passDiscount > 0 && hasPass ? discountedPrice : meta.price;
+  const applyMemberPrice = passDiscount > 0 && (hasPass || herMemberDiscount);
+  const finalPrice = applyMemberPrice ? discountedPrice : meta.price;
   const lockedMinHeightClass = teaserBullets && teaserBullets.length > 0
     ? 'min-h-[420px] sm:min-h-[400px]'
     : 'min-h-[360px] sm:min-h-[340px]';
@@ -360,15 +374,19 @@ export function PremiumPaywall({
 
               {passDiscount > 0 ? (
                 <p className="text-xs mb-5" style={{ color: theme.textSubtle }}>
-                  <s>¥{meta.price.toFixed(1)}</s>{' '}
-                  <span style={{ color: theme.accentGold }}>
-                    会员价 ¥{discountedPrice.toFixed(1)}
-                  </span>
-                  {!hasPass && (
+                  {applyMemberPrice ? (
                     <>
+                      <s>¥{meta.price.toFixed(1)}</s>{' '}
+                      <span style={{ color: theme.accentGold }}>
+                        会员价 ¥{discountedPrice.toFixed(1)}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      ¥{meta.price.toFixed(1)}
                       {' · '}
                       <Link
-                        href={`/mysti/subscribe/?from=${encodeURIComponent(sku)}`}
+                        href={`/today/?from=${encodeURIComponent(sku)}`}
                         className="underline"
                         style={{ color: theme.accent }}
                         onClick={() => {
@@ -383,7 +401,7 @@ export function PremiumPaywall({
                           }
                         }}
                       >
-                        以后全部 7 折
+                        会员 8 折 · ¥{discountedPrice.toFixed(1)}
                       </Link>
                     </>
                   )}
@@ -428,9 +446,9 @@ export function PremiumPaywall({
                 {loading ? '正在创建订单…' : `✦ 解锁 · ¥${finalPrice.toFixed(1)}`}
               </button>
 
-              {!hasPass && (passCovers || passDiscount > 0) && (
+              {!(hasPass || herMemberDiscount) && (passCovers || passDiscount > 0) && (
                 <Link
-                  href={`/mysti/subscribe/?from=${encodeURIComponent(sku)}`}
+                  href={`/today/?from=${encodeURIComponent(sku)}`}
                   onClick={() => {
                     try {
                       trackMystiEvent('mysti_subscribe_view', {

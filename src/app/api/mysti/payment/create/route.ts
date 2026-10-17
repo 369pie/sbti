@@ -12,8 +12,12 @@ import {
 } from '@/lib/payment/xunhupay';
 import { getPaymentAvailabilityStatus, getPaymentBlockedPayload } from '@/lib/payment/availability';
 import { isMystiPaymentStubMode } from '@/lib/mysti/payment-mode';
+import { getAuthUser } from '@/lib/supabase/middleware';
+import { loadHerMembership } from '@/lib/her/membership';
+import { passDiscountForSku } from '@/lib/mysti/subscription';
 import {
   createPendingMystiOrder,
+  findActiveSubscriptionByDevice,
   hasPaidMystiSubscriptionOrderForDevice,
   updateMystiOrderStatus,
   type MystiOrderAttach,
@@ -154,6 +158,10 @@ export async function POST(req: NextRequest) {
   const paymentType = body.paymentType ?? 'wechat';
   const ref = (body.ref ?? '').slice(0, 32);
   const deviceId = (body.deviceId ?? '').slice(0, 64) || undefined;
+  // Bind claimed session so monthly-pass can write her_profiles.is_member
+  const auth = await getAuthUser();
+  const userId =
+    auth.user && !auth.user.is_anonymous ? auth.user.id : undefined;
   const redirect = safeRedirectPath(body.redirect);
   const metadata = sanitizeGiftMetadata(body.metadata);
   const allowStub = isMystiPaymentStubMode();
@@ -183,6 +191,31 @@ export async function POST(req: NextRequest) {
 
   const cfg = readXunhupayConfig(paymentType);
   const meta = SKU_PRICES[sku];
+  // P3：会员深度报告 8 折——服务端定价，不信任前端标价
+  let chargePrice = meta.price;
+  const discountRate = passDiscountForSku(sku);
+  if (discountRate > 0) {
+    let eligible = false;
+    if (userId) {
+      try {
+        const mem = await loadHerMembership(userId);
+        if (mem.isMember) eligible = true;
+      } catch {
+        /* soft */
+      }
+    }
+    if (!eligible && deviceId) {
+      try {
+        const sub = await findActiveSubscriptionByDevice(deviceId);
+        if (sub) eligible = true;
+      } catch {
+        /* soft */
+      }
+    }
+    if (eligible) {
+      chargePrice = +(meta.price * (1 - discountRate)).toFixed(2);
+    }
+  }
   const tradeOrderId = buildTradeOrderId();
 
   const origin = req.nextUrl.origin;
@@ -208,7 +241,8 @@ export async function POST(req: NextRequest) {
       stub: true,
       orderId: tradeOrderId,
       sku,
-      price: meta.price,
+      price: chargePrice,
+      listPrice: meta.price,
       label: meta.label,
       // 前端会识别 stub 标志直接走"假装支付成功"路径
       url: `/mysti/payment/return?stub=1&channel=${paymentType}&orderId=${tradeOrderId}&sku=${sku}&resourceId=${encodeURIComponent(resourceId)}&redirect=${encodeURIComponent(redirect)}`,
@@ -231,16 +265,17 @@ export async function POST(req: NextRequest) {
       sku,
       resourceId,
       title: meta.label,
-      amountCents: Math.round(meta.price * 100),
+      amountCents: Math.round(chargePrice * 100),
       redirectPath: redirect,
       referralCode: ref || undefined,
       deviceId,
+      userId,
       attachJson,
     });
 
     const order = await createXunhupayOrder(cfg, {
       tradeOrderId,
-      totalFee: meta.price,
+      totalFee: chargePrice,
       title: meta.label,
       paymentType,
       userAgent,
@@ -256,7 +291,8 @@ export async function POST(req: NextRequest) {
       orderId: tradeOrderId,
       providerOrderId: order.orderId,
       sku,
-      price: meta.price,
+      price: chargePrice,
+      listPrice: meta.price,
       label: meta.label,
       url: order.url,
       qrcode: order.qrcode,
