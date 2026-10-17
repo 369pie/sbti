@@ -225,7 +225,7 @@ export function TodayClient() {
           )}
         </section>
 
-        <div className={styles.reminders}>
+        <div className={styles.reminders} id="remind">
           <DailyReminderToggle />
           <DailyEmailToggle />
         </div>

@@ -1,18 +1,12 @@
 import type { Metadata } from 'next';
 
 import { BottleClient } from './BottleClient';
-import { CosmicThemeBinder } from '@/components/wtfti/HomeCosmosThemeBinder';
 
 export const metadata: Metadata = {
-  title: '✦ 漂流瓶 · 树洞 · WTFTI',
-  description: '匿名扔个瓶子说说心事，每天捞三个陌生人的瓶子——回一句，或者抱抱。',
+  title: '懂我 · 树洞 · WTFTI',
+  description: '写下心情，先收到一句温柔回应。想匿名公开会先过审；别人只能抱抱或点「我也是」。',
 };
 
 export default function BottlePage() {
-  return (
-    <>
-      <CosmicThemeBinder />
-      <BottleClient />
-    </>
-  );
+  return <BottleClient />;
 }
