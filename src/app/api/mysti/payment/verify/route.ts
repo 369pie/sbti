@@ -13,10 +13,12 @@ import {
   ensureGiftCardIssued,
   ensureSubscriptionFromOrder,
   findMystiOrder,
+  getMystiOrderDeviceId,
   getMystiOrderRedirectPath,
   getMystiOrderSku,
   markMystiOrderVerified,
 } from '@/lib/mysti/payment-store';
+import { syncHerMembershipFromPaidOrder } from '@/lib/her/membership';
 import { reconcileMystiOrderFromProvider } from '@/lib/mysti/payment-reconcile';
 import { maybeCleanup, rateLimit, resolveRateLimitKey } from '@/lib/perf/rate-limit';
 
@@ -119,6 +121,17 @@ export async function GET(req: NextRequest) {
     await markMystiOrderVerified(order.trade_order_id);
     const giftCard = await ensureGiftCardIssued(order);
     const subscription = await ensureSubscriptionFromOrder(order);
+
+    try {
+      await syncHerMembershipFromPaidOrder({
+        user_id: order.user_id,
+        device_id: getMystiOrderDeviceId(order) ?? order.device_id,
+        sku: getMystiOrderSku(order),
+        expiresAtMs: subscription?.expiresAt ?? null,
+      });
+    } catch (memErr) {
+      console.warn('[mysti.payment.verify] her membership sync failed', memErr);
+    }
 
     return NextResponse.json({
       paid: true,

@@ -17,6 +17,7 @@ import {
 } from '@/lib/today/date';
 import { nextStreak } from '@/lib/today/streak';
 import { computeArchiveGaps, generateTodayCard } from '@/lib/today/today-card';
+import { statusFromRow } from '@/lib/her/membership';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +33,8 @@ interface HerProfileRow {
   color_season: string | null;
   last_visit_date: string | null;
   streak_count: number;
+  is_member: boolean | null;
+  member_expires_at: string | null;
 }
 
 function json(body: unknown, init?: ResponseInit) {
@@ -52,7 +55,7 @@ export const GET = withClaimedAuth(async (_req: NextRequest, _ctx, user: User) =
   const { data: existing, error: selectError } = await admin
     .from('her_profiles')
     .select(
-      'user_id, birth_year, nickname, completeness_pct, has_persona, has_color_season, has_palm, has_face, color_season, last_visit_date, streak_count',
+      'user_id, birth_year, nickname, completeness_pct, has_persona, has_color_season, has_palm, has_face, color_season, last_visit_date, streak_count, is_member, member_expires_at',
     )
     .eq('user_id', user.id)
     .maybeSingle();
@@ -80,6 +83,8 @@ export const GET = withClaimedAuth(async (_req: NextRequest, _ctx, user: User) =
         color_season: null,
         last_visit_date: null,
         streak_count: 0,
+        is_member: false,
+        member_expires_at: null,
       };
 
   const streak = nextStreak(
@@ -108,7 +113,7 @@ export const GET = withClaimedAuth(async (_req: NextRequest, _ctx, user: User) =
       .from('her_profiles')
       .upsert(upsertPayload, { onConflict: 'user_id' })
       .select(
-        'user_id, birth_year, nickname, completeness_pct, has_persona, has_color_season, has_palm, has_face, color_season, last_visit_date, streak_count',
+        'user_id, birth_year, nickname, completeness_pct, has_persona, has_color_season, has_palm, has_face, color_season, last_visit_date, streak_count, is_member, member_expires_at',
       )
       .maybeSingle();
 
@@ -139,6 +144,11 @@ export const GET = withClaimedAuth(async (_req: NextRequest, _ctx, user: User) =
 
   const archive = computeArchiveGaps(profile);
   const hour = shanghaiHour();
+  const membership = statusFromRow({
+    is_member: profile.is_member,
+    member_expires_at: profile.member_expires_at,
+  });
+  const isMember = membership.isMember;
 
   return json({
     ok: true,
@@ -153,7 +163,18 @@ export const GET = withClaimedAuth(async (_req: NextRequest, _ctx, user: User) =
       fortune: card.fortune,
       luckyColor: card.luckyColor,
       makeup: card.makeup,
+      // P3：完整今日仅会员可见穿搭示意
+      outfit: isMember ? card.outfit : null,
       dateISO: card.dateISO,
+      full: isMember,
+    },
+    membership: {
+      isMember,
+      expiresAt: membership.expiresAt,
+      tryOnCap: membership.tryOnCap,
+      deepDiscount: membership.deepDiscount,
+      renewHint: membership.renewHint,
+      priceLabel: '¥19/月',
     },
     archive: {
       completenessPct: archive.pct,

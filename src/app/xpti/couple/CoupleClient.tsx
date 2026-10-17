@@ -810,6 +810,14 @@ function MergedView({
             <span style={{ marginLeft: 8, color: PALETTE.gold }}>（本报告已解锁）</span>
           )}
         </p>
+        <p style={{ fontSize: 12, color: PALETTE.wine, margin: '0 0 12px', lineHeight: 1.6 }}>
+          会员可享「我和他」深度报告 <strong>8 折</strong>
+          （服务端按会员价下单）·{' '}
+          <Link href="/today/" style={{ color: PALETTE.gold, textDecoration: 'underline' }}>
+            去今日开通 ¥19/月
+          </Link>
+          ，到期不自动续费。
+        </p>
 
         <PremiumPaywall
           sku={activeSku}

@@ -286,3 +286,8 @@
   color: var(--s-mute);
   text-align: center;
 }
+
+.memberCard {
+  padding: 18px 16px 16px;
+  margin-bottom: 16px;
+}

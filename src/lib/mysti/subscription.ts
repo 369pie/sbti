@@ -185,6 +185,7 @@ export function passCoversSingleSku(sku: string): boolean {
 /** 通行证 C 端权益是否覆盖某个 SKU（含 7 折） */
 export function passDiscountForSku(sku: string): number {
   // 折扣 0~1。0 表示不打折。
+  // P3 会员：深度报告（含「我和他」）统一 8 折。
   switch (sku) {
     case 'gift-card':
     case 'festival-gift-card':
@@ -193,6 +194,13 @@ export function passDiscountForSku(sku: string): number {
     case 'dual-report':
     case 'share-atelier':
       return 0.3; // 7 折 = 折扣 0.3
+    case 'xpti-couple-report':
+    case 'xpti-couple-half':
+    case 'cpti-deep-relationship':
+    case 'xpti-deep-xp':
+    case 'soulti-deep-mirror':
+    case 'wtfti-deep-pantheon':
+      return 0.2; // 8 折（P3 会员深度报告）
     default:
       return 0;
   }

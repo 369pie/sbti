@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * /today · 已登录首页（P1 slice A · refocus §5.2）
- * 奶油日记 skin-journal；今日卡由档案确定性生成；连续天数写 her_profiles。
+ * /today · 已登录首页（P1 + P3 会员）
+ * 奶油日记 skin-journal；今日卡由档案确定性生成；会员解锁完整今日。
  */
 
 import Link from 'next/link';
@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { DailyEmailToggle } from '@/components/DailyEmailToggle';
 import { DailyReminderToggle } from '@/components/DailyReminderToggle';
+import { MembershipSubscribeCard } from '@/components/MembershipSubscribeCard';
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
 import { getApiPath } from '@/lib/api';
 import type { ArchiveGap } from '@/lib/today/today-card';
@@ -26,7 +27,17 @@ interface TodayPayload {
     fortune: string;
     luckyColor: { name: string; hex: string; tip: string };
     makeup: string;
+    outfit: string | null;
     dateISO: string;
+    full: boolean;
+  };
+  membership: {
+    isMember: boolean;
+    expiresAt: string | null;
+    tryOnCap: number;
+    deepDiscount: number;
+    renewHint: string;
+    priceLabel: string;
   };
   archive: {
     completenessPct: number;
@@ -74,7 +85,6 @@ export function TodayClient() {
   }, []);
 
   useEffect(() => {
-    // Preserve P0 funnel: module landing for /today.
     trackFunnelEvent('module_landing_view', { module: 'wtfti', source: '/today' });
     void load();
   }, [load]);
@@ -131,6 +141,8 @@ export function TodayClient() {
   const { data } = state;
   const streakLabel =
     data.streak.count <= 1 ? '今天是第 1 天' : `连续第 ${data.streak.count} 天`;
+  const isMember = data.membership?.isMember === true;
+  const full = data.card.full === true || isMember;
 
   return (
     <main className={`skin-journal ${styles.page}`}>
@@ -151,7 +163,7 @@ export function TodayClient() {
           <div className="s-tape" />
           <div className={styles.cardHead}>
             <span className={`s-en ${styles.date}`}>TODAY · 今日卡</span>
-            <span className={`s-en ${styles.tag}`}>只给你</span>
+            <span className={`s-en ${styles.tag}`}>{full ? '会员完整版' : '只给你'}</span>
           </div>
           <p className={`s-title ${styles.fortune}`}>{data.card.fortune}</p>
           <div className={styles.row}>
@@ -170,8 +182,28 @@ export function TodayClient() {
               <small>{data.card.makeup}</small>
             </span>
           </div>
-          <p className={styles.memberHint}>完整今日（穿搭示意 + 更细建议）· 会员稍后开放</p>
+          {full && data.card.outfit ? (
+            <div className={styles.row}>
+              <span className={styles.k}>穿搭</span>
+              <i className={styles.sw} style={{ background: data.card.luckyColor.hex }} aria-hidden="true" />
+              <span className={styles.v}>
+                今日示意
+                <small>{data.card.outfit}</small>
+              </span>
+            </div>
+          ) : (
+            <p className={styles.memberHint}>完整今日含穿搭示意 · 会员 ¥19/月 · 到期不自动续费</p>
+          )}
         </article>
+
+        <MembershipSubscribeCard
+          redirectPath="/today/"
+          skin="journal"
+          variant="card"
+          isMember={isMember}
+          expiresAt={data.membership?.expiresAt ?? null}
+          className={styles.memberCard}
+        />
 
         <section className={`s-card ${styles.mood}`}>
           <div className="s-tape s-tape--peach" />
@@ -194,7 +226,6 @@ export function TodayClient() {
             <Link href="/bottle/" prefetch={false} className={styles.moodLink}>
               写进树洞
             </Link>
-            （树洞 AI 回应下一轮上线）
           </p>
         </section>
 

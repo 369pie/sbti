@@ -76,6 +76,8 @@ export interface CreateMystiOrderInput {
   redirectPath?: string;
   referralCode?: string;
   deviceId?: string;
+  /** Logged-in user — writes mysti_orders.user_id for her_profiles sync */
+  userId?: string;
   attachJson?: MystiOrderAttach;
 }
 
@@ -299,6 +301,7 @@ export async function createPendingMystiOrder(
       ...(candidate.includeDeviceId && input.deviceId
         ? { device_id: input.deviceId }
         : {}),
+      ...(input.userId ? { user_id: input.userId } : {}),
     };
 
     const { data, error } = await admin()
