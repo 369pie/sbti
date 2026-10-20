@@ -67,6 +67,23 @@ const nextConfig: NextConfig = {
       { source: '/wtfti/daily/:path*', destination: '/today/', permanent: true },
       { source: '/wtfti/moon/:path*', destination: '/today/', permanent: true },
       ...['hogti', 'xpti/whitepaper'].map((r) => ({ source: `/${r}/:path*`, destination: '/start/', permanent: true })),
+      // Audit 2026-10-20 decision 4: ONE ¥19/月 membership → /member/.
+      // 暮光通行证 page + per-universe pricing pages fold into it (single reports stay on result pages).
+      ...['mysti/subscribe', 'xpti/pricing', 'cpti/pricing'].map((r) => ({
+        source: `/${r}/:path*`, destination: '/member/', permanent: true,
+      })),
+      // Audit decision 3: XPTI couple + CPTI = 「我和他」 (entry /xpti/couple/).
+      // CPTI leftovers with ~no traffic (30d: squad 0, stealth 0, gallery 4, leaderboard 4 devices).
+      ...['cpti/squad', 'cpti/stealth', 'cpti/gallery', 'cpti/leaderboard'].map((r) => ({
+        source: `/${r}/:path*`, destination: '/xpti/couple/', permanent: true,
+      })),
+      // Solo CPTI quiz → 我和他. Pair-code invites (/cpti/join → /cpti/test?pairCodeId=) keep working.
+      {
+        source: '/cpti/test',
+        missing: [{ type: 'query', key: 'pairCodeId' }],
+        destination: '/xpti/couple/',
+        permanent: true,
+      },
     ];
   },
   env: {

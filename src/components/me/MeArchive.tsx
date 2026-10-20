@@ -18,6 +18,7 @@ const TEST_LABEL: Record<string, string> = {
   first_look: '90 秒首测',
   soulti: 'SoulTI',
   xpti: '亲密偏好',
+  wohe: '我和他',
   xpti_couple: '我和他',
   cpti: 'CP 角色',
   cpti_peer: '我们的关系',

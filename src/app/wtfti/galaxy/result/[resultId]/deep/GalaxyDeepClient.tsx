@@ -461,9 +461,9 @@ export default function GalaxyDeepClient({ resultId }: { resultId: string }) {
                     desc="8 维雷达 · 30 条共修建议"
                   />
                   <CrossLink
-                    href={`${basePath}/mysti/subscribe/?from=wtfti-deep-pantheon`}
+                    href={`${basePath}/member/?from=wtfti-deep-pantheon`}
                     eyebrow="MYSTI · ¥19/月"
-                    title="月度通行证 · 全档 7 折"
+                    title="会员 ¥19/月 · 本档免费"
                     desc="本档免费 · 后续全模块自动 7 折"
                   />
                 </div>

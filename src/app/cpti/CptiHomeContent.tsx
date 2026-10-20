@@ -21,8 +21,7 @@ const MODES = [
 ];
 
 const EXPLORE = [
-  { href: '/cpti/gallery/', label: '我的关系图鉴', desc: '25 种 CP 关系图鉴，每多测一个人就多解锁一格。' },
-  { href: '/cpti/leaderboard/', label: '关系排行榜', desc: '看看谁是当周收集最多关系类型的玩家。' },
+  { href: '/xpti/couple/', label: '我和他', desc: '你先测，再邀请他，拿到你们俩的关系报告。' },
   { href: '/cpti/join/', label: '输入配对码', desc: '用 ta 发来的六位码加入配对，解锁新的关系。' },
   { href: '/cpti/theory/', label: '维度白皮书', desc: '5 个维度怎么算出 25 种关系？看一眼就懂。' },
   { href: '/cpti/scenarios/lover/', label: '情侣 CP 测试', desc: '你和对象是灵魂伴侣还是相爱相杀？' },
@@ -78,7 +77,7 @@ export default function CptiHomeContent() {
             </div>
 
             <div className="mt-10 sm:mt-14 flex flex-wrap items-center gap-3 sm:gap-4">
-              <Link href="/cpti/test/" prefetch={false} className="btn btn-rose">
+              <Link href="/xpti/couple/" prefetch={false} className="btn btn-rose">
                 开始测试 <ArrowIcon />
               </Link>
               <Link href="/cpti/join/" prefetch={false} className="btn btn-ghost">
@@ -327,7 +326,7 @@ export default function CptiHomeContent() {
             一份关于关系的图鉴，<br className="sm:hidden" />送给在意身边任何一段关系的你。
           </p>
           <hr className="editorial-rule w-16 mx-auto mb-10" />
-          <Link href="/cpti/test/" prefetch={false} className="btn btn-rose">
+          <Link href="/xpti/couple/" prefetch={false} className="btn btn-rose">
             测测你和身边人是什么关系 <ArrowIcon />
           </Link>
         </div>

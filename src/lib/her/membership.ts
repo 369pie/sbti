@@ -8,11 +8,10 @@
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { SUBSCRIPTION_DURATION_DAYS, type SubscriptionSku } from '@/lib/mysti/unlock';
 
-/** Reuse live Mysti monthly-pass SKU (already wired to xunhupay). */
-export const HER_MEMBERSHIP_MONTHLY_SKU = 'monthly-pass' as const;
+export { HER_MEMBERSHIP_MONTHLY_SKU } from './membership-benefits';
 
-/** Member static try-on free uses / Asia/Shanghai month (plan §4 「N 次」). */
-export const MEMBER_TRY_ON_CAP = 10;
+import { MEMBER_TRY_ON_CAP } from './membership-benefits';
+export { MEMBER_TRY_ON_CAP };
 
 /** Deep-report member discount: 8折 → take off 0.2. */
 export const DEEP_REPORT_MEMBER_DISCOUNT = 0.2;
@@ -76,6 +75,36 @@ export function statusFromRow(row: HerMembershipRow | null | undefined): HerMemb
       : '开通后 30 天权益 · 到期不自动续费',
   };
 }
+
+/**
+ * Single membership resolver (audit decision 4). A user is a member when
+ * her_profiles says so, OR — legacy 「暮光通行证」 — the device still holds an
+ * active mysti_subscriptions row (honored until it expires).
+ */
+export async function resolveMembership(opts: {
+  userId?: string | null;
+  deviceId?: string | null;
+}): Promise<HerMembershipStatus & { source: 'her_profiles' | 'legacy_pass' | null }> {
+  if (opts.userId) {
+    const st = await loadHerMembership(opts.userId);
+    if (st.isMember) return { ...st, source: 'her_profiles' };
+  }
+  if (opts.deviceId) {
+    try {
+      const { findActiveSubscriptionByDevice } = await import('@/lib/mysti/payment-store');
+      const sub = await findActiveSubscriptionByDevice(opts.deviceId);
+      if (sub && isMembershipSku(sub.sku)) {
+        const st = statusFromRow({ is_member: true, member_expires_at: new Date(sub.expiresAt).toISOString() });
+        if (st.isMember) return { ...st, source: 'legacy_pass' };
+      }
+    } catch {
+      /* soft: fall through to non-member */
+    }
+  }
+  return { ...statusFromRow(null), source: null };
+}
+
+export { MEMBERSHIP_BENEFITS } from './membership-benefits';
 
 export async function loadHerMembership(userId: string): Promise<HerMembershipStatus> {
   const admin = createAdminSupabaseClient();

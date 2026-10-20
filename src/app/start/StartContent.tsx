@@ -35,8 +35,7 @@ const GROUPS: Array<{ eyebrow: string; title: string; items: HallItem[] }> = [
     eyebrow: 'Me & him',
     title: '我和他',
     items: [
-      { id: 'xpti_couple', href: '/xpti/couple/', title: '我和他 · 合不合', desc: '你先测，再邀请他测，拿到你们俩的关系报告', meta: ['双人', '约 5 分钟'] },
-      { id: 'cpti', href: '/cpti/test/', title: '我在关系里是什么角色', desc: '20 道恋爱场景题，看你是哪一种 CP 角色', meta: ['约 4 分钟', '16 种角色'] },
+      { id: 'wohe', href: '/xpti/couple/', title: '我和他 · 合不合', desc: '你先测，再邀请他测，拿到你们俩的关系报告', meta: ['双人', '约 5 分钟'] },
       { id: 'xpti', href: '/xpti/test/', title: '我的亲密偏好', desc: '你在亲密关系里真正需要什么', meta: ['约 5 分钟', '12 种原型'] },
     ],
   },

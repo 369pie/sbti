@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 
 import Link from 'next/link';
+import { WoheFunnelCard } from '@/components/wohe/WoheFunnelCard';
 import NextImage from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -30,7 +31,6 @@ import { ClaimAssetCard } from '@/components/ClaimAssetCard';
 import { UniversePreviewCards } from '@/components/UniversePreviewCards';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';
 import { useDeferredShareGenerate } from '@/lib/perf/use-deferred-share-generate';
-import { CptiPairEntryPanel } from '@/components/cpti/CptiPairEntryPanel';
 import { CptiCompatibilityPredictor } from '@/components/cpti/CptiCompatibilityPredictor';
 import { isRelationshipResultIntent, parseCptiPricingIntent } from '@/lib/cpti/pricing-intents';
 
@@ -300,17 +300,8 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
         </section>
       )}
 
-      {/* ★ Pair entry panel — promoted to second screen (Sprint 1, 2026-04-19) */}
-      <section className="max-w-2xl mx-auto px-6 pb-12">
-        <motion.div
-          id="cpti-pair-entry-panel"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.5 }}
-        >
-          <CptiPairEntryPanel personality={personality} />
-        </motion.div>
-      </section>
+      {/* 「我和他」 — single entry + paywall (audit decision 3) */}
+      <WoheFunnelCard source={`cpti_result_${personality.slug}`} />
 
       {/* ★ Compatibility prediction widget (Sprint 2 polish, 2026-04-19) */}
       <section className="max-w-2xl mx-auto px-6 pb-12">
@@ -324,27 +315,6 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
             dimensionScores={dimensionScores}
           />
         </motion.div>
-      </section>
-
-      {/* Gallery entry card — promoted from leaderboard footer */}
-      <section className="max-w-2xl mx-auto px-6 pb-12">
-        <Link
-          href="/cpti/gallery/"
-          className="group block rounded-2xl border border-border-subtle bg-bg-elevated hover:border-accent/40 transition-all p-6 sm:p-7"
-        >
-          <div className="flex items-center gap-4">
-            <div className="text-3xl">📖</div>
-            <div className="flex-1 min-w-0">
-              <div className="text-base sm:text-lg font-semibold text-text-primary mb-1">
-                我的关系图鉴
-              </div>
-              <div className="text-xs sm:text-sm text-text-muted">
-                25 格可收集 · 看看你已点亮哪几格 · 还缺哪些
-              </div>
-            </div>
-            <span className="text-rose-text group-hover:translate-x-1 transition-transform">→</span>
-          </div>
-        </Link>
       </section>
 
       {/* Dimension Bars */}
@@ -465,7 +435,7 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
                 快速分享
               </button>
               <Link
-                href="/cpti/test"
+                href="/xpti/couple/"
                 className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all text-center"
               >
                 重新测试
@@ -474,45 +444,6 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
           </div>
         </motion.div>
       </section>
-
-      {/* Stealth (偊测) — demoted to tertiary entry (Sprint 1) */}
-      <section className="max-w-2xl mx-auto px-6 pb-16">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7, duration: 0.5 }}
-        >
-          <Link
-            href="/cpti/stealth"
-            className="block rounded-2xl border border-violet-text/20 bg-violet-text/5 p-5 sm:p-6 text-center hover:bg-violet-text/10 transition-all group"
-          >
-            <div className="flex items-center justify-center gap-3">
-              <span className="text-2xl">🔮</span>
-              <div className="text-left">
-                <div className="text-base font-medium text-violet-text group-hover:text-violet-text transition-colors">
-                  偊偊测一下
-                </div>
-                <div className="text-xs text-text-muted mt-0.5">
-                  不用发链接，根据你对 ta 的了解来测你们的默契
-                </div>
-              </div>
-              <svg className="w-5 h-5 text-text-muted group-hover:text-violet-text transition-colors ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-          </Link>
-        </motion.div>
-      </section>
-
-      {/* Leaderboard link */}
-      <div className="max-w-2xl mx-auto px-6 pb-10 text-center">
-        <Link
-          href="/cpti/leaderboard"
-          className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-accent transition-colors"
-        >
-          🏆 查看关系图鉴排行榜 →
-        </Link>
-      </div>
 
       {/* Other types */}
       <section className="max-w-3xl mx-auto px-6 pb-24">

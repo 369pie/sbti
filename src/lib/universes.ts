@@ -252,7 +252,7 @@ export const UNIVERSES: Universe[] = [
     emoji: '💕',
     status: 'live',
     accent: '#e11d48',
-    testPath: '/cpti/test/',
+    testPath: '/xpti/couple/',
     landingPath: '/cpti/',
     resultPrefix: '/cpti',
     galleryTabId: 'cpti',

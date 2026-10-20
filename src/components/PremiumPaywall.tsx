@@ -464,8 +464,8 @@ export function PremiumPaywall({
                   style={{ color: theme.accent }}
                 >
                   {passCovers
-                    ? '¥ 19 开通月度通行证 · 本 SKU 免费 + 以后全 7 折'
-                    : '¥ 19 开通月度通行证 · 以后全 7 折'}
+                    ? '¥19 开通会员 · 本报告免费 + 深度报告 8 折'
+                    : '¥19 开通会员 · 深度报告 8 折'}
                 </Link>
               )}
 

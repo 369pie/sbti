@@ -3,7 +3,7 @@
 /**
  * PriceAnchor — three-tier price line shown above paywalls / module entries.
  *
- * Renders: 「免费体验 · 单次解锁 ¥X.X · 月度通行证 ¥19/月（7折）」
+ * Renders: 「免费体验 · 单次解锁 ¥X.X · 月度会员 ¥19/月（7折）」
  *
  * Used by module home cards and the paywall preview to anchor expectations
  * before the user hits the gate.
@@ -37,7 +37,7 @@ export function PriceAnchor({
   const passCovers = passCoversSingleSku(sku);
   const passDiscount = passDiscountForSku(sku);
   const discounted = +(meta.price * (1 - passDiscount)).toFixed(2);
-  const passHref = `/mysti/subscribe/${from ? `?from=${encodeURIComponent(from)}` : ''}`;
+  const passHref = `/member/${from ? `?from=${encodeURIComponent(from)}` : ''}`;
 
   return (
     <div
@@ -55,10 +55,10 @@ export function PriceAnchor({
       {disablePassLink ? (
         <span style={{ color: 'var(--color-gold)' }}>
           {passCovers
-            ? `通行证 ¥19/月 · 本档免费`
+            ? `会员 ¥19/月 · 本档免费`
             : passDiscount > 0
-              ? `通行证 ¥19/月 · 此档 ¥${discounted.toFixed(1)}`
-              : `通行证 ¥19/月`}
+              ? `会员 ¥19/月 · 此档 ¥${discounted.toFixed(1)}`
+              : `会员 ¥19/月`}
         </span>
       ) : (
         <Link
@@ -67,10 +67,10 @@ export function PriceAnchor({
           style={{ color: 'var(--color-gold)' }}
         >
           {passCovers
-            ? `通行证 ¥19/月 · 本档免费`
+            ? `会员 ¥19/月 · 本档免费`
             : passDiscount > 0
-              ? `通行证 ¥19/月 · 此档 ¥${discounted.toFixed(1)}`
-              : `通行证 ¥19/月`}
+              ? `会员 ¥19/月 · 此档 ¥${discounted.toFixed(1)}`
+              : `会员 ¥19/月`}
         </Link>
       )}
     </div>
