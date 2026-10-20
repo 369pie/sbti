@@ -7,6 +7,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { finalizeClaimedSession, stageAnonymousSourceForMerge } from '@/lib/auth/claimed-session';
 import { getApiPath } from '@/lib/api';
 import { enqueueProductEvent } from '@/lib/analytics/product-events';
+import { hasDeviceArchive, markDeviceArchive } from '@/lib/her/device-archive';
 import { getSupabaseBrowserConfigHelpMessage, isSupabaseConfigError } from '@/lib/supabase/env';
 
 export function RegisterForm() {
@@ -85,11 +86,20 @@ export function RegisterForm() {
       }
 
       enqueueProductEvent('auth', 'register_complete', { props: { next: redirectTo } });
-      // P0 funnel step 3: 建档 (explicit; register_complete alone is not enough for the gate query).
-      enqueueProductEvent('auth', 'archive_created', {
-        step: 'archive',
-        props: { next: redirectTo, birth_year: Number(birthYear) },
-      });
+      // P0 funnel step 3: 建档. Skip if this device already created an anonymous
+      // archive (one-tap on /start) — that one already fired archive_created.
+      if (!hasDeviceArchive()) {
+        enqueueProductEvent('auth', 'archive_created', {
+          step: 'archive',
+          props: { next: redirectTo, birth_year: Number(birthYear), mode: 'register' },
+        });
+        markDeviceArchive();
+      } else {
+        enqueueProductEvent('auth', 'archive_bound', {
+          step: 'bind',
+          props: { next: redirectTo, carried: !!data.archiveCarried },
+        });
+      }
 
       if (data.autoSignedIn) {
         // Server signed us in — refresh client auth state and go

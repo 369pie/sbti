@@ -4,13 +4,14 @@
  * /start/ — 新生 90 秒引导测（W3 · E3.1）
  *
  * 三题 → 推荐"起点支柱"。
- * 不写库；只有 funnel 事件 + 端上短暂状态。
+ * 结果页一键建档（可匿名），之后可绑定账号。
  */
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
 import { enqueueProductEvent } from '@/lib/analytics/product-events';
+import { ArchiveSaveCard } from '@/components/ArchiveSaveCard';
 
 type Pillar = 'I' | 'II' | 'III';
 
@@ -353,33 +354,8 @@ function RecommendedPillar({ pillar, onReset }: { pillar: Pillar; onReset: () =>
         {meta.italic}
       </p>
 
-      {/* P1: single next step — 今日卡 (refocus §5.1 / §7) */}
-      <div className="flex flex-col gap-3 mb-6">
-        <Link
-          href="/today/"
-          className="inline-flex items-center justify-center gap-3 px-7 py-3.5 text-sm transition-transform hover:translate-x-0.5"
-          style={{
-            background: meta.accent,
-            color: 'var(--color-bg-elevated)',
-            fontFamily: 'var(--font-display)',
-          }}
-        >
-          明天来看你的第一张今日卡
-          <span aria-hidden>→</span>
-        </Link>
-        <Link
-          href="/today/#remind"
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs"
-          style={{
-            color: meta.accent,
-            fontFamily: 'var(--font-display)',
-            textDecoration: 'underline',
-            textUnderlineOffset: 3,
-          }}
-        >
-          开启提醒，明天叫我一声
-        </Link>
-      </div>
+      {/* Single next step: one-tap archive (no forced registration) → 今日卡 */}
+      <ArchiveSaveCard accent={meta.accent} source={`start_pillar_${pillar}`} />
       <p className="mb-8 text-[13px]" style={{ color: 'var(--color-text-muted)' }}>
         想先逛逛也行：
         <Link href={meta.href} style={{ color: meta.accent, marginLeft: 6 }}>{meta.cta}</Link>
