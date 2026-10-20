@@ -24,7 +24,6 @@ export type TestId =
   | 'classic'
   | 'wtfti'
   | 'mysti'
-  | 'mysti_daily'
   | 'mysti_reading';
 
 export interface LocalTestRecord {

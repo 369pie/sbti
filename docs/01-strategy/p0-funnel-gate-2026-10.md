@@ -9,7 +9,7 @@
 | 步骤 | event | module | 触发点 |
 |---|---|---|---|
 | 1 访问 | `home_view` | `home` | `/` `HomeTracker`（首页「90 秒测」直达 `/test/`；点击另发 `home_cta_click`） |
-| 2 开测 | `test_start` | `test` | 任一测试的第 1 题出现：首测 `/test/`、SoulTI、XPTI 单人、XPTI 情侣（受邀方）、CPTI、经典 SBTI、WTFTI、塔罗（Quiz mysti 模式 / `/mysti/` 洗牌）、`/mysti/daily/` |
+| 2 开测 | `test_start` | `test` | 任一测试的第 1 题出现：首测 `/test/`、SoulTI、XPTI 单人、XPTI 情侣（受邀方）、CPTI、经典 SBTI、WTFTI、塔罗（Quiz mysti 模式 / `/mysti/` 洗牌）。注意：`/mysti/daily/` 每日一牌不是测试，不发 test_start/test_finish（仅保留其自有 mysti_daily_* 事件） |
 | 3 测完 | `test_finish` | `test` | 结果算出、跳结果页前。`props.test_id`、`props.result_key`（同时写入 `slug`），`value`=耗时 ms（首测） |
 | 4 建档 | `archive_created` | `home` | 结果页一键建档（可匿名，`props.mode`=anonymous/claimed，`props.test_id`/`result_key`=存进档案的测试）或未建档设备注册成功 |
 | 5 开提醒 | `push_enabled` | `home` | `DailyReminderToggle` 订阅成功 |

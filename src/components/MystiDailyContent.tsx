@@ -15,7 +15,6 @@ const MystiDailyShareImageGenerator = dynamic(
   { ssr: false },
 );
 import { trackMystiEvent } from '@/lib/mysti/analytics';
-import { trackTestFinish, trackTestStart } from '@/lib/analytics/test-events';
 import { isSubscriber } from '@/lib/mysti/subscription';
 
 
@@ -44,8 +43,6 @@ export function MystiDailyContent() {
   useEffect(() => {
     queueMicrotask(() => {
       const card = getDailyCard();
-      trackTestStart('mysti_daily');
-      trackTestFinish('mysti_daily', card.arcanaName);
       setDailyCard(card);
       setMounted(true);
     });
