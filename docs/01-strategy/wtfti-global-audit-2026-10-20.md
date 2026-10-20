@@ -6,6 +6,17 @@
 
 ---
 
+## 执行状态（更新于 2026-10-21 01:10 北京时间）
+
+| 阶段 | 状态 | PR | 内容 |
+|---|---|---|---|
+| 阶段 1 · 修正门 | ✅ 已上线 | #15、#16 | 首测 v3（`/test`）+ 结果页一键建档；`/start` 改测试大厅；底栏「测试 · 今日 · 我和他 · 美我 · 我」；匿名「我」可见；统一 `test_start/test_finish`；/wtfti、HOGTI 等 308；修复一次存档建 2 个匿名用户、匿名档案顶栏显示「我的档案」 |
+| 阶段 2 · 合并 | ✅ 已上线 | #17、#18 | 决策 3：XPTI couple + CPTI =「我和他」（入口 `/xpti/couple/`，`test_id: wohe` + `mode`，单一双人报告付费点，CPTI SEO URL 保留并换 v3 外观，squad/stealth/gallery/leaderboard 与单人 `/cpti/test` 308）；决策 4：唯一 ¥19/月会员 `/member/`（暮光通行证并入，`/mysti/subscribe`、`/xpti/pricing`、`/cpti/pricing` 308；¥9.9 首月 / 季卡 / 年卡下线）；生产补建 `device_user_bindings` + `mysti_orders.user_id`，会员回填迁移已执行（0 行） |
+| 阶段 3 · UI 统一 | ⏳ 下一步 | — | 按流量顺序换 v3：`/cpti/result/*`、`/cpti/scenarios/*`、`/cpti/relationship/*` 正式重写（目前为 token 桥接）→ `/xpti` 单人结果 → `/soulti` → `/mysti`（灵鉴命名与旧风格）→ 法务/页脚；长落地页压到 ≤3 屏 |
+| 「我和他」收尾 | ⏳ 下一步 | — | CPTI 配对（`/cpti/join`、`/cpti/invite`、`pairCodeId`）与偷偷测并入「我和他」统一流程 |
+
+---
+
 ## 0. 一页结论（TL;DR）
 
 1. **「测试是正门」这件事在产品里其实没做到。** 首页两个主 CTA「90 秒，先测测你是谁」都指向 `/start/`，但 `/start/` **不是人格测试**，是 3 道「天气 / 一个人 / 认识·陪着·认领」的意图分流题（旧版「认识她 / 陪着她 / 写下她」三支柱文案）。做完给的不是人格结果，而是一个 pillar 标签 + 建档卡 + 跳去别的模块。
