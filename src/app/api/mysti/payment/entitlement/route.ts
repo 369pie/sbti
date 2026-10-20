@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { memberUnlocksSku } from '@/lib/member-access';
 import { ALL_SKUS, isSubscriptionSku, type MystiSku } from '@/lib/mysti/unlock';
 import {
   findLatestMystiOrderForEntitlement,
@@ -55,6 +56,20 @@ export async function POST(req: NextRequest) {
         headers: { 'Retry-After': String(Math.ceil(rl.resetMs / 1000)) },
       },
     );
+  }
+
+  // 全站会员：会员覆盖的 SKU 直接放行（服务端按 session / 绑定设备判定）。
+  const member = await memberUnlocksSku(sku, { deviceId });
+  if (member.unlocked && member.access) {
+    return NextResponse.json({
+      unlocked: true,
+      pending: false,
+      via: 'member',
+      sku,
+      resourceId,
+      memberExpiresAt: member.access.expiresAt,
+      token: `member_${member.access.source}`,
+    });
   }
 
   try {

@@ -263,7 +263,12 @@ export function PremiumPaywall({
         stub?: boolean;
         error?: string;
         message?: string;
+        memberCovered?: boolean;
       }>(res);
+      if (data.memberCovered) {
+        setUnlocked(true);
+        return;
+      }
       if (!res.ok || !data.url || !data.orderId) {
         throw new Error(data.message || data.error || 'create_failed');
       }
