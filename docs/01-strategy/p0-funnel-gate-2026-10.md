@@ -9,7 +9,7 @@
 |---|---|---|---|
 | 1 访问 | `home_view` | `home` | `/` `HomeTracker` |
 | 2 测完 | `first_look_finish` | `home` | `/start` 三题完成（同时仍发 `onboarding_complete`） |
-| 3 建档 | `archive_created` | `auth` | 注册成功（同时仍发 `register_complete`）；服务端 upsert `her_profiles` |
+| 3 建档 | `archive_created` | `home` / `auth` | /start 结果页一键建档（可匿名，`props.mode`=anonymous/claimed）或未建档设备注册成功；服务端 upsert `her_profiles`。`register_complete` 独立；已建档设备注册发 `archive_bound` |
 | 4 开提醒 | `push_enabled` | `home` | `DailyReminderToggle` 订阅成功 |
 
 CTA 点击另有 `home_cta_click`（`data-track`），不计入闸门四步，但可用于诊断首页流失。
