@@ -133,7 +133,8 @@
 
 /* Keep page content clear of the mobile tab bar (HerNav). */
 @media (max-width: 767px) {
-  body:has(.her-tabbar) > main { padding-bottom: 72px; }
+  /* Pad the whole body (main + footer) so nothing sits under the fixed bar. */
+  body:has(.her-tabbar) { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
 }
 
 /* Auth forms inside the journal skin. */

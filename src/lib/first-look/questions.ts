@@ -233,19 +233,19 @@ export const FIRST_LOOK_QUESTIONS: FirstLookQuestion[] = [
       {
         key: 'A',
         label: '一个敢说真话的朋友',
-        sublabel: '→ 毒舌',
+        sublabel: '直说，但站在你这边',
         delta: d(3, 1, 0),
       },
       {
         key: 'B',
         label: '一个写给你自己的深夜树洞',
-        sublabel: '→ 灵魂镜像',
+        sublabel: '安安静静听你说完',
         delta: d(0, 3, 1),
       },
       {
         key: 'C',
         label: '一个会洗牌的神秘学姐',
-        sublabel: '→ 塔罗灵鉴',
+        sublabel: '陪你翻一张牌，聊聊心事',
         delta: d(0, 1, 3),
       },
     ],

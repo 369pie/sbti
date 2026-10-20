@@ -37,7 +37,7 @@ export function IdentifyViralCTA({ personalityName, variant = 'default' }: Props
             </p>
           </div>
           <Link
-            href="/identify/"
+            href="/start/"
             className={`flex-shrink-0 px-4 py-2 rounded-full text-bg-primary text-xs font-medium transition-colors ${
               isXpti ? 'bg-accent hover:bg-rose-deep' : 'bg-accent hover:bg-accent/85'
             }`}

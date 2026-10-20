@@ -389,7 +389,7 @@ export default function DailyPickOverlay({
         )}
 
         <Link
-          href="/types/"
+          href="/start/"
           prefetch={false}
           className="text-center text-[11px] text-text-muted underline-offset-4 hover:underline mt-1"
           onClick={onClose}

@@ -1,0 +1,23 @@
+.page { min-height: 100vh; padding-bottom: 24px; }
+.inner { max-width: 560px; margin: 0 auto; padding: 22px 22px 0; }
+.h1 { font-size: 32px; line-height: 1.3; margin: 10px 0 8px; }
+.sub { font-size: 14px; line-height: 1.7; color: var(--s-ink-2); }
+
+.hero { display: block; margin-top: 26px; padding: 24px 20px 20px; transform: rotate(-0.5deg); }
+.heroTop { display: flex; justify-content: space-between; align-items: baseline; }
+.badge { font-size: 11px; letter-spacing: 0.16em; color: var(--s-on-cta); background: var(--s-accent-text); border-radius: 10px; padding: 3px 9px; }
+.heroTitle { font-size: 26px; line-height: 1.35; margin: 12px 0 6px; }
+.heroDesc { font-size: 14px; line-height: 1.7; color: var(--s-ink-2); margin-bottom: 16px; }
+
+.group { margin-top: 30px; }
+.groupTitle { font-size: 20px; margin: 8px 0 12px; }
+.list { display: grid; gap: 12px; }
+.item { display: flex; gap: 14px; align-items: center; padding: 15px 16px; }
+.num { font-family: var(--s-hand); font-size: 22px; color: var(--s-accent-text); width: 26px; flex-shrink: 0; text-align: center; }
+.body { flex: 1; min-width: 0; }
+.title { font-size: 17px; line-height: 1.4; }
+.desc { margin-top: 2px; font-size: 12.5px; line-height: 1.6; color: var(--s-ink-2); }
+.meta { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+.meta span { font-size: 11px; color: var(--s-ink-2); background: var(--s-bg-2); border-radius: 10px; padding: 3px 8px; }
+.arrow { color: var(--s-mute); font-size: 18px; }
+.fine { margin-top: 26px; text-align: center; font-size: 11.5px; color: var(--s-mute); }

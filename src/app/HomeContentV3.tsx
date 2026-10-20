@@ -6,7 +6,7 @@ import { HomeTracker } from './HomeTracker';
 // One primary CTA (90s test); everything else explains what she gets afterwards.
 
 const PILLARS = [
-  { href: '/start/', title: '测我', desc: '我是什么样的人，他到底怎么想', tags: ['人格测试', '我和他', '掌纹', '塔罗'], num: 'i', tape: '' },
+  { href: '/start/', title: '测我', desc: '我是什么样的人，他到底怎么想', tags: ['90 秒首测', '我和他', 'SoulTI', '塔罗'], num: 'i', tape: '' },
   { href: '/mirror/', title: '美我', desc: '适合我的颜色、妆和风格', tags: ['色彩季型', '脸型妆容', 'AI 换一身'], num: 'ii', tape: 's-tape--peach' },
   { href: '/bottle/', title: '懂我', desc: '说出来就好受一点，有人会抱抱你', tags: ['树洞', '心情日记'], num: 'iii', tape: 's-tape--sage' },
 ];
@@ -51,7 +51,7 @@ export default function HomeContentV3() {
           懂你的<br /><em>女生私人顾问</em>
         </h1>
         <p className={styles.sub}>看清自己 · 变好看 · 有地方说心里话</p>
-        <Link href="/start/" prefetch={false} className="s-btn" data-track="hero">90 秒，先测测你是谁</Link>
+        <Link href="/test/" prefetch={false} className="s-btn" data-track="hero">90 秒，先测测你是谁</Link>
         <p className={styles.proof}>已经有 7 万+ 人来过这里</p>
       </section>
 
@@ -108,7 +108,7 @@ export default function HomeContentV3() {
 
       <section className={styles.close}>
         <p className="s-hand">先认识自己，再说别的。</p>
-        <Link href="/start/" prefetch={false} className="s-btn" data-track="close">开始 90 秒测试</Link>
+        <Link href="/test/" prefetch={false} className="s-btn" data-track="close">开始 90 秒测试</Link>
         <p className={styles.fine}>免费 · 不用注册 · 结果仅供娱乐与自我探索</p>
       </section>
     </div>

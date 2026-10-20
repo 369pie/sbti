@@ -89,7 +89,7 @@ export default function MuseumProgress({ totalCards, totalSeries }: MuseumProgre
           </p>
         </div>
         <Link
-          href="/card/"
+          href="/me/"
           prefetch={false}
           className="text-xs sm:text-sm font-medium px-3.5 py-2 rounded-lg border border-rule-soft hover:border-ink transition-colors shrink-0"
           style={{ borderColor: 'var(--color-rule-soft)' }}

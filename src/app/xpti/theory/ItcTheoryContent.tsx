@@ -354,19 +354,8 @@ https://wtfti.com/xpti/theory/`}
           严肃心理评估请咨询持证心理咨询师。
         </p>
         <p style={{ ...pStyle, marginTop: 14, fontSize: 13 }}>
-          <a
-            href="/xpti/whitepaper/"
-            style={{
-              color: PALETTE.wine,
-              fontFamily: mono,
-              fontSize: 11,
-              letterSpacing: '0.32em',
-              textTransform: 'uppercase',
-              textDecoration: 'underline',
-              textUnderlineOffset: 4,
-            }}
-          >
-            ↓ 下载完整白皮书 (打印 / 另存为 PDF)
+          <a href="/xpti/test/" style={{ color: PALETTE.wine, textDecoration: 'underline', textUnderlineOffset: 4 }}>
+            → 去做 XPTI 亲密偏好测试
           </a>
         </p>
       </section>

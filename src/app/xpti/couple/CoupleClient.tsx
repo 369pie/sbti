@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { basePath } from '@/lib/site';
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
+import { trackTestFinish, trackTestStart } from '@/lib/analytics/test-events';
 import { ITC_AXES } from '@/lib/xpti/itc';
 import { type CoupleMergeResult } from '@/lib/xpti/couple';
 import { loadXptiResult } from '@/lib/xpti/storage';
@@ -89,6 +90,10 @@ export function CoupleClient({
     if (!mounted) return false;
     return loadIsMine(shareToken);
   }, [mounted, shareToken, legacyInviteMode]);
+
+  useEffect(() => {
+    if (legacyInviteMode || shareToken) trackTestStart('xpti_couple');
+  }, [legacyInviteMode, shareToken]);
 
   // Mark legacy partner mode in localStorage so refresh keeps quiz visible.
   useEffect(() => {
@@ -272,6 +277,7 @@ export function CoupleClient({
         });
         setCouple(updated);
         trackFunnelEvent('couple_completed', { module: 'xpti', slug: couple.inviter.slug });
+        trackTestFinish('xpti_couple', couple.inviter.slug, { href: '/xpti/couple/' });
       } catch (err) {
         console.error('[xpti/couple] completeCouple failed', err);
         setPartnerError('提交失败，请检查网络后重试。');

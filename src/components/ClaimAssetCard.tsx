@@ -170,7 +170,7 @@ export function ClaimAssetCard({
     if (claimState === 'claimed') {
       // Navigate to WTF CARD or continue exploring
       if (variant === 'result') {
-        window.location.href = withBasePath('/card');
+        window.location.href = withBasePath('/me/');
       } else {
         // Continue exploring relationships
         window.location.href = withBasePath('/cpti');

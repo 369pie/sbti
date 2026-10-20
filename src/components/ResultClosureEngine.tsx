@@ -232,7 +232,7 @@ export function ResultClosureEngine({
                   </button>
                 ) : (
                   <Link
-                    href="/card/"
+                    href="/me/"
                     className="px-4 py-2 rounded-xl text-xs font-medium text-text-secondary border border-border-subtle hover:text-text-primary hover:border-border transition-all"
                   >
                     查看档案 →
@@ -281,7 +281,7 @@ export function ResultClosureEngine({
               </p>
             </Link>
             <Link
-              href="/identify/"
+              href="/start/"
               className="group rounded-2xl border border-border-subtle bg-bg-elevated p-4 text-center shadow-sm transition-all hover:-translate-y-px hover:shadow-md"
               style={{ backgroundImage: 'linear-gradient(180deg, rgba(201,166,118,0.12), transparent 70%)' }}
             >

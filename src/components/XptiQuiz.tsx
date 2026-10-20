@@ -1,5 +1,6 @@
 'use client';
 
+import { trackTestFinish, trackTestStart } from '@/lib/analytics/test-events';
 import { useState, useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 import { XPTI_QUESTIONS, XPTI_DEFAULT_OPTIONS, shuffleXptiQuestions } from '@/lib/xpti/questions';
 import type { XptiAnswerOption } from '@/lib/xpti/questions';
@@ -55,12 +56,17 @@ export function XptiQuiz() {
     };
   }, []);
 
+  useEffect(() => {
+    trackTestStart('xpti');
+  }, []);
+
   const finishTest = useCallback((finalAnswers: Map<number, Answer>) => {
     if (isFinishingRef.current) return;
     isFinishingRef.current = true;
     setIsFinishing(true);
 
     const result = calculateXptiResult(finalAnswers, questions);
+    trackTestFinish('xpti', result.personality.slug, { href: `/xpti/result/${result.personality.slug}/` });
 
     // Persist user's actual dimension scores so couple/archive features can
     // read them without forcing a re-test (Sprint 2-3 of v3.0).

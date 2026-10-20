@@ -1,5 +1,6 @@
 'use client';
 
+import { trackTestFinish, trackTestStart } from '@/lib/analytics/test-events';
 import { useState, useCallback, useMemo, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -59,10 +60,12 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
 
   // Track mysti test start
   useEffect(() => {
+    const testId = isMysti ? 'mysti' : resultPrefix === '/wtfti' ? 'wtfti' : resultPrefix === '' ? 'classic' : null;
+    if (testId) trackTestStart(testId);
     if (isMysti) {
       trackMystiEvent('mysti_test_start');
     }
-  }, [isMysti]);
+  }, [isMysti, resultPrefix]);
   const [skinMode, setSkinMode] = useState<'standard' | 'xiuxian'>(() =>
     (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('skin') : null) === 'xiuxian' ? 'xiuxian' : 'standard'
   );
@@ -129,6 +132,8 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
     setIsFinishing(true);
 
     const result = calculateResult(finalAnswers, QUESTIONS);
+    const finishTestId = isMysti ? 'mysti' : resultPrefix === '/wtfti' ? 'wtfti' : resultPrefix === '' ? 'classic' : null;
+    if (finishTestId) trackTestFinish(finishTestId, result.personality.slug);
     const resultNamespace = isMysti ? 'mysti' : (resultPrefix === '/wtfti' ? 'wtfti' : 'sbti');
 
     // Track mysti test completion
@@ -165,7 +170,8 @@ export function Quiz({ resultPrefix = '', showSkinToggle = true, variant = 'stan
       } else if (isMysti) {
         window.location.href = `${basePath}/mysti/result/${encodeURIComponent(result.personality.slug)}${skinParam}`;
       } else if (resultPrefix === '/wtfti') {
-        window.location.href = `${basePath}/wtfti/galaxy/preview/?seed=${encodeURIComponent(result.personality.slug)}`;
+        // galaxy/* is 308'd to /start — land on the WTFTI result page instead.
+        window.location.href = `${basePath}/wtfti/result/${encodeURIComponent(result.personality.slug)}/`;
       } else {
         window.location.href = `${basePath}${resultPrefix}/result/${encodeURIComponent(result.personality.slug)}${skinParam}`;
       }

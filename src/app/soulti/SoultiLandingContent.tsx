@@ -649,7 +649,7 @@ export default function SoultiLandingContent() {
               恋爱XP
             </Link>
             <span>·</span>
-            <Link href="/wtfti/" className="hover:text-text-muted transition-colors" style={{ fontFamily: serifFont }}>
+            <Link href="/start/" className="hover:text-text-muted transition-colors" style={{ fontFamily: serifFont }}>
               WTF 毒舌版
             </Link>
           </div>

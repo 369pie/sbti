@@ -10,6 +10,7 @@ import { trackMystiEvent } from '@/lib/mysti/analytics';
 import { useMystiTheme } from '@/components/MystiThemeProvider';
 import { captureCreatorReferral } from '@/lib/mysti/creator-referral';
 import { PremiumFoilStyles } from '@/components/premium/PremiumFoil';
+import { trackTestFinish, trackTestStart } from '@/lib/analytics/test-events';
 
 type FlowStep = 'invite' | 'shuffle' | 'choose';
 
@@ -58,9 +59,12 @@ function MystiLandingContent() {
       if (idx2 >= idx1) idx2 += 1;
       const p1 = WTFTI_PERSONALITIES[idx1];
       const p2 = WTFTI_PERSONALITIES[idx2];
+      trackTestStart('mysti_reading');
+      trackTestFinish('mysti_reading', p1.slug);
       router.push(`/mysti/result/${p1.slug}?partner=${p2.slug}&ritual=1`);
       return;
     }
+    trackTestStart('mysti_reading');
     setStep('shuffle');
     window.setTimeout(() => setStep('choose'), 2500);
   };
@@ -68,6 +72,7 @@ function MystiLandingContent() {
   const handleCardPick = (idx: number) => {
     setPickedCardIdx(idx);
     const slug = pickPool[idx % pickPool.length];
+    trackTestFinish('mysti_reading', slug);
     window.setTimeout(() => {
       const url = partnerSlug
         ? `/mysti/result/${slug}?partner=${partnerSlug}&ritual=1`
@@ -740,7 +745,7 @@ function MystiLandingContent() {
             ))}
           </div>
           <Link
-            href="/lingjian/"
+            href="/mirror/"
             className="mt-4 pt-4 text-center text-xs italic border-t flex items-center justify-center gap-2 hover:opacity-80 transition-opacity"
             style={{
               color: theme.textMuted,
@@ -807,7 +812,7 @@ function MystiLandingContent() {
               命书馆
             </Link>
             <Link
-              href="/lingjian/"
+              href="/mirror/"
               className="py-3 rounded-xl text-xs font-medium text-center transition-all hover:bg-white/5"
               style={{
                 borderWidth: 1,

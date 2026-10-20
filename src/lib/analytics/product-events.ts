@@ -24,6 +24,7 @@ const DID_KEY = 'wtfti.perf.did';
 
 export type ProductEventModule =
   | 'first_look'
+  | 'test'
   | 'mysti'
   | 'cpti'
   | 'soulti'

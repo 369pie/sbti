@@ -58,7 +58,7 @@ export function UniverseProgressBar({ currentUniverseId }: Props) {
       className="max-w-2xl mx-auto px-6 pb-8"
     >
       <Link
-        href="/card/"
+        href="/me/"
         className="group block rounded-2xl border border-border-subtle bg-bg-secondary/40 hover:bg-accent-dim hover:border-accent/20 transition-all p-4"
       >
         {/* Header row */}

@@ -55,7 +55,7 @@ export default async function MystiResultPage({ params }: PageProps) {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/wtfti/') },
+              { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
               { '@type': 'ListItem', position: 2, name: '灵鉴', item: getSiteUrl('/mysti/') },
               { '@type': 'ListItem', position: 3, name: wtftiPersonality.wtftiName, item: getSiteUrl(`/mysti/result/${type}/`) },
             ],

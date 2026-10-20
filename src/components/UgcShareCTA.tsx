@@ -11,7 +11,7 @@ export function UgcShareCTA({ variant = 'default' }: Props) {
   return (
     <section className="mt-8 text-center">
       <Link
-        href="/share-templates/"
+        href="/start/"
         className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
           isXpti
             ? 'bg-text-primary border border-accent/20 text-text-secondary hover:text-bg-primary hover:border-accent/35'

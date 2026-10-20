@@ -183,7 +183,7 @@ export default function XptiHomeContent() {
               >
                 开始测试 <ArrowIcon />
               </Link>
-              <Link href="/types/" prefetch={false} className="btn btn-ghost">
+              <Link href="/start/" prefetch={false} className="btn btn-ghost">
                 先翻翻 12 种原型
               </Link>
               <Link
@@ -570,7 +570,7 @@ export default function XptiHomeContent() {
               SoulTI 觉察版
             </Link>
             <span>·</span>
-            <Link href="/wtfti/" className="hover:text-text-primary transition-colors">
+            <Link href="/start/" className="hover:text-text-primary transition-colors">
               WTF 毒舌版
             </Link>
           </div>
