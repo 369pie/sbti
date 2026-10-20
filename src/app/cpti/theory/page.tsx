@@ -211,7 +211,7 @@ export default function CptiTheoryPage() {
         {/* CTA */}
         <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
           <Link
-            href="/cpti/test/"
+            href="/xpti/couple/"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent text-bg-primary font-semibold hover:bg-accent/85 transition-colors"
           >
             开始测试 <span>→</span>

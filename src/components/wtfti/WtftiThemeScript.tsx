@@ -6,7 +6,8 @@ const DEFAULT_COLOR_SCHEME = 'light';
  * Runs before hydration to apply the saved WTFTI visual mode.
  * Keep this as a server component so React does not warn about client-rendered scripts.
  *
- * 2026-08-17：合并宇宙暗色页判断（首页 / /today / /bottle / /wtfti/letters）。
+ * 2026-08-17：合并宇宙暗色页判断。2026-10-20：/today、/bottle 已是 v3 奶油日记，移出暗色名单
+ *（否则 body + 页脚被染成丝绒夜深紫），只剩 /wtfti/letters。
  * 宇宙页首帧前直接置暗 + 上 cosmicLock（防全局 provider hydrate 覆盖），
  * 页内 CosmicThemeBinder 稍后接管并负责离场恢复。后缀正则兼容 basePath。
  */
@@ -15,7 +16,7 @@ export function WtftiThemeNoFlashScript() {
     try {
       var b = document.body;
       var p = location.pathname;
-      var cosmic = /(^|\\/)today\\/?$/.test(p) || /(^|\\/)bottle\\/?$/.test(p) || /(^|\\/)wtfti\\/letters\\/?$/.test(p);
+      var cosmic = /(^|\\/)wtfti\\/letters\\/?$/.test(p);
       if (cosmic) {
         b.dataset._cosmicPrev = b.dataset.theme || '';
         b.dataset.theme = 'wtfti-dark';

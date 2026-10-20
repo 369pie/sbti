@@ -126,14 +126,14 @@ export default function SharedMuseumPage({ allTabs, snapshot }: SharedMuseumPage
       {/* CTA */}
       <div className="flex flex-wrap gap-2.5 justify-center">
         <Link
-          href="/types/today/"
+          href="/today/"
           onClick={() => trackMuseum('snapshot_visit_museum', { source: 'today' })}
           className="text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl border border-accent text-accent hover:bg-accent hover:text-bg-primary transition-colors"
         >
           翻今天的牌 →
         </Link>
         <Link
-          href="/types/"
+          href="/start/"
           onClick={() => trackMuseum('snapshot_visit_museum', { source: 'gallery' })}
           className="text-xs sm:text-sm px-4 py-2.5 rounded-xl border text-text-muted hover:text-text-secondary"
           style={{ borderColor: 'var(--color-border-subtle)' }}

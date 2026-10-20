@@ -18,11 +18,10 @@ import { passDiscountForSku } from '@/lib/mysti/subscription';
 import {
   createPendingMystiOrder,
   findActiveSubscriptionByDevice,
-  hasPaidMystiSubscriptionOrderForDevice,
   updateMystiOrderStatus,
   type MystiOrderAttach,
 } from '@/lib/mysti/payment-store';
-import { ALL_SKUS, SKU_PRICES, isSubscriptionSku, type MystiSku } from '@/lib/mysti/unlock';
+import { SKU_PRICES, isPurchasableSku, isSubscriptionSku, type MystiSku } from '@/lib/mysti/unlock';
 import { GIFT_CARD_OPTIONS, type GiftCardGiftSku } from '@/lib/mysti/gift-card';
 import { maybeCleanup, rateLimit, resolveRateLimitKey } from '@/lib/perf/rate-limit';
 
@@ -45,7 +44,6 @@ interface CreateBody {
   };
 }
 
-const VALID_SKUS = new Set<MystiSku>(ALL_SKUS);
 
 function isPaymentChannel(value: unknown): value is XunhupayPaymentChannel {
   return value === 'wechat' || value === 'alipay';
@@ -166,28 +164,11 @@ export async function POST(req: NextRequest) {
   const metadata = sanitizeGiftMetadata(body.metadata);
   const allowStub = isMystiPaymentStubMode();
 
-  if (!sku || !VALID_SKUS.has(sku) || !resourceId) {
+  if (!sku || !isPurchasableSku(sku) || !resourceId) {
     return NextResponse.json({ error: 'invalid_params' }, { status: 400 });
   }
 
-  // 首月 intro 资格：服务端 fail-closed（UI 只是展示层）。
-  // stub 模式（本地/开发）跳过校验，方便联调。
-  if (sku === 'monthly-pass-intro' && !allowStub) {
-    if (!deviceId) {
-      return NextResponse.json({ error: 'intro_requires_device' }, { status: 400 });
-    }
-    try {
-      const everPaid = await hasPaidMystiSubscriptionOrderForDevice(deviceId);
-      if (everPaid) {
-        return NextResponse.json(
-          { error: 'intro_ineligible', message: '首月价仅限首次开通通行证。' },
-          { status: 403 },
-        );
-      }
-    } catch {
-      return NextResponse.json({ error: 'intro_check_failed' }, { status: 503 });
-    }
-  }
+  // ¥9.9 首月 / 季卡 / 年卡 retired 2026-10-21 — rejected above by isPurchasableSku.
 
   const cfg = readXunhupayConfig(paymentType);
   const meta = SKU_PRICES[sku];

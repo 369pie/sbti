@@ -63,7 +63,7 @@ export function DailyCheckInCTA({ variant = 'default' }: Props) {
             )}
           </div>
           <Link
-            href={`/daily/result/${todaySlug}/`}
+            href="/today/"
             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               isXpti
                 ? 'text-text-secondary bg-accent/20 hover:bg-accent/30'
@@ -80,7 +80,7 @@ export function DailyCheckInCTA({ variant = 'default' }: Props) {
   return (
     <section className="max-w-2xl mx-auto px-6 pb-6">
       <Link
-        href="/daily/test"
+        href="/today/"
         className={`group flex items-center gap-3 rounded-2xl border p-4 transition-all ${
           isXpti
             ? 'border-accent/20 bg-gradient-to-r from-accent/12 to-rose-deep/12 hover:border-accent/35'

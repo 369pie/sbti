@@ -33,6 +33,8 @@ interface IngestBody {
 // Whitelist of known modules. Add new ones here as they are wired in.
 const ALLOWED_MODULES = new Set([
   'first_look',
+  // Unified test_start / test_finish (audit 2026-10-20 Phase 1).
+  'test',
   'mysti',
   'cpti',
   'soulti',
@@ -87,6 +89,22 @@ function clampProps(v: unknown): Record<string, unknown> | null {
   return Object.keys(result).length > 0 ? result : null;
 }
 
+// Bot hint: clients send a coarse ua family; if missing, fall back to the request
+// header so 1-event "devices" (prefetchers / crawlers) can be filtered later.
+const BOT_RE = /bot|crawl|spider|slurp|preview|headless|lighthouse|prerender|facebookexternalhit|bytespider|python|curl|wget|httpclient/i;
+
+function uaFamilyFromHeader(header: string): string {
+  if (!header) return 'empty';
+  if (BOT_RE.test(header)) return 'bot';
+  const ua = header.toLowerCase();
+  if (ua.includes('micromessenger')) return 'wechat';
+  if (ua.includes('edg/')) return 'edge';
+  if (ua.includes('chrome/')) return 'chrome';
+  if (ua.includes('safari/')) return 'safari';
+  if (ua.includes('firefox/')) return 'firefox';
+  return 'other';
+}
+
 function clampTs(v: unknown): string | null {
   if (typeof v !== 'number' || !Number.isFinite(v)) return null;
   // Ignore timestamps far outside a reasonable window (yesterday → tomorrow).
@@ -114,6 +132,10 @@ export async function POST(req: NextRequest) {
 
   const raw = Array.isArray(body.events) ? (body.events as EventInput[]) : [];
   if (raw.length === 0) return NextResponse.json({ ok: true, accepted: 0 });
+
+  const headerUa = req.headers.get('user-agent') ?? '';
+  const headerFamily = uaFamilyFromHeader(headerUa);
+  const likelyBot = headerFamily === 'bot' || headerFamily === 'empty';
 
   const country =
     req.headers.get('x-vercel-ip-country') || req.headers.get('cf-ipcountry') || null;
@@ -143,8 +165,8 @@ export async function POST(req: NextRequest) {
         utm_medium: clampString(e.utm_medium, 64),
         utm_campaign: clampString(e.utm_campaign, 64),
         country,
-        ua: clampString(e.ua, 32),
-        props: clampProps(e.props),
+        ua: likelyBot ? headerFamily : (clampString(e.ua, 32) ?? headerFamily),
+        props: likelyBot ? { ...(clampProps(e.props) ?? {}), likely_bot: true } : clampProps(e.props),
       };
     })
     .filter((r): r is NonNullable<typeof r> => r !== null);

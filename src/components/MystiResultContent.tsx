@@ -120,7 +120,7 @@ export function MystiResultContent({ wtftiPersonality }: Props) {
     <div className="min-h-screen" style={gradientBgStyle}>
       {/* Top bar */}
       <div className="max-w-3xl mx-auto px-6 pt-6 pb-4 flex items-center justify-between">
-        <Link href="/wtfti/" className="text-sm font-medium tracking-wide opacity-80 hover:opacity-100 transition-opacity" style={{ color: theme.textMuted }}>
+        <Link href="/start/" className="text-sm font-medium tracking-wide opacity-80 hover:opacity-100 transition-opacity" style={{ color: theme.textMuted }}>
           WTFTI · 灵鉴
         </Link>
         
@@ -1162,7 +1162,7 @@ function AuroraInvitationCard({
         {prompt}
       </p>
       <Link
-        href={withBasePath('/her-voice/#hv-compose')}
+        href={withBasePath('/bottle/')}
         onClick={onClick}
         className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.28em] pb-1 transition-opacity hover:opacity-80"
         style={{

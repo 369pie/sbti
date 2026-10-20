@@ -10,7 +10,7 @@ import { useCallback, useState } from 'react';
 
 import { readApiJson } from '@/lib/api';
 import { getOrCreateDeviceId } from '@/lib/mysti/device';
-import { HER_MEMBERSHIP_MONTHLY_SKU, MEMBER_TRY_ON_CAP } from '@/lib/her/membership';
+import { HER_MEMBERSHIP_MONTHLY_SKU, MEMBERSHIP_BENEFITS } from '@/lib/her/membership-benefits';
 import { getPaymentAvailabilityStatus } from '@/lib/payment/availability';
 
 type Props = {
@@ -100,9 +100,9 @@ export function MembershipSubscribeCard({
           。到期后需手动续费，我们不会自动扣款。
         </p>
         <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: 'var(--s-ink-2)', lineHeight: 1.7 }}>
-          <li>完整今日已解锁</li>
-          <li>美我换装本月最多 {MEMBER_TRY_ON_CAP} 次免费</li>
-          <li>「我和他」等深度报告会员价 8 折</li>
+          {MEMBERSHIP_BENEFITS.map((b) => (
+            <li key={b}>{b}</li>
+          ))}
         </ul>
       </section>
     );
@@ -115,9 +115,9 @@ export function MembershipSubscribeCard({
         {variant === 'inline' ? '开通会员 · ¥19/月' : '懂你多一点 · ¥19/月'}
       </h2>
       <ul style={{ margin: '0 0 12px', paddingLeft: 18, fontSize: 13, color: 'var(--s-ink-2)', lineHeight: 1.7 }}>
-        <li>完整今日（穿搭示意 + 更细建议）</li>
-        <li>美我换装每月 {MEMBER_TRY_ON_CAP} 次额度</li>
-        <li>深度报告（含「我和他」）8 折</li>
+        {MEMBERSHIP_BENEFITS.map((b) => (
+          <li key={b}>{b}</li>
+        ))}
       </ul>
       <p style={{ fontSize: 12, color: 'var(--s-mute)', margin: '0 0 12px' }}>
         一次开通 30 天 · <strong style={{ color: 'var(--s-ink-2)', fontWeight: 500 }}>到期不自动续费</strong>

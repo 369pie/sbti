@@ -10,6 +10,7 @@ import { trackMystiEvent } from '@/lib/mysti/analytics';
 import { useMystiTheme } from '@/components/MystiThemeProvider';
 import { captureCreatorReferral } from '@/lib/mysti/creator-referral';
 import { PremiumFoilStyles } from '@/components/premium/PremiumFoil';
+import { trackTestFinish, trackTestStart } from '@/lib/analytics/test-events';
 
 type FlowStep = 'invite' | 'shuffle' | 'choose';
 
@@ -58,9 +59,12 @@ function MystiLandingContent() {
       if (idx2 >= idx1) idx2 += 1;
       const p1 = WTFTI_PERSONALITIES[idx1];
       const p2 = WTFTI_PERSONALITIES[idx2];
+      trackTestStart('mysti_reading');
+      trackTestFinish('mysti_reading', p1.slug);
       router.push(`/mysti/result/${p1.slug}?partner=${p2.slug}&ritual=1`);
       return;
     }
+    trackTestStart('mysti_reading');
     setStep('shuffle');
     window.setTimeout(() => setStep('choose'), 2500);
   };
@@ -68,6 +72,7 @@ function MystiLandingContent() {
   const handleCardPick = (idx: number) => {
     setPickedCardIdx(idx);
     const slug = pickPool[idx % pickPool.length];
+    trackTestFinish('mysti_reading', slug);
     window.setTimeout(() => {
       const url = partnerSlug
         ? `/mysti/result/${slug}?partner=${partnerSlug}&ritual=1`
@@ -301,7 +306,7 @@ function MystiLandingContent() {
           </motion.div>
         </div>
 
-        {/* --- PREMIUM SUBSCRIPTION BANNER (终身席位) --- */}
+        {/* --- ONE membership (audit decision 4: 暮光通行证 folded into ¥19/月 会员) --- */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -309,7 +314,7 @@ function MystiLandingContent() {
           className="mb-9"
         >
           <Link
-            href="/mysti/subscribe/"
+            href="/member/"
             className="group relative block rounded-2xl p-[1px] overflow-hidden transition-all hover:scale-[1.01] active:scale-[0.99] shadow-lg"
           >
             <div
@@ -329,23 +334,23 @@ function MystiLandingContent() {
                   className="text-[10px] tracking-[0.25em] font-bold uppercase"
                   style={{ color: theme.accentGold, fontFamily: 'var(--font-mono)' }}
                 >
-                  ✦ Twilight Pass · 终身席位
+                  会员 · ¥19/月
                 </span>
                 <span className="premium-foil text-[11px] font-semibold tracking-widest uppercase">
-                  申请会籍 →
+                  了解会员 →
                 </span>
               </div>
               <p
                 className="text-[20px] italic mb-1.5 tracking-wide leading-snug"
                 style={{ color: theme.text, fontFamily: 'var(--font-display)' }}
               >
-                把神谕室的钥匙，留给自己。
+                一个会员，塔罗也包含在内
               </p>
               <p
                 className="text-[11px] leading-relaxed"
                 style={{ color: theme.textMuted, fontFamily: 'var(--font-serif)' }}
               >
-                无限暮光抽牌 · 合盘长文 · 历年命书 · 节气暗信 · 年度灵魂纪章
+                每日一牌加抽 · 每月小报告 · Plus 分享卡 · 今日卡 / 美我 / 深度报告同享 · 到期不自动续费
               </p>
             </div>
           </Link>
@@ -740,7 +745,7 @@ function MystiLandingContent() {
             ))}
           </div>
           <Link
-            href="/lingjian/"
+            href="/mirror/"
             className="mt-4 pt-4 text-center text-xs italic border-t flex items-center justify-center gap-2 hover:opacity-80 transition-opacity"
             style={{
               color: theme.textMuted,
@@ -807,7 +812,7 @@ function MystiLandingContent() {
               命书馆
             </Link>
             <Link
-              href="/lingjian/"
+              href="/mirror/"
               className="py-3 rounded-xl text-xs font-medium text-center transition-all hover:bg-white/5"
               style={{
                 borderWidth: 1,

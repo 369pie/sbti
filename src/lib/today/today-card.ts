@@ -181,7 +181,7 @@ export function computeArchiveGaps(profile: {
   completeness_pct?: number | null;
 }): { pct: number; gaps: ArchiveGap[] } {
   const gaps: ArchiveGap[] = [];
-  if (!profile.has_persona) gaps.push({ key: 'persona', label: '人格类型', href: '/start/' });
+  if (!profile.has_persona) gaps.push({ key: 'persona', label: '人格类型', href: '/test/' });
   if (!profile.has_color_season) gaps.push({ key: 'color_season', label: '色彩季型', href: '/mirror/color/' });
   if (!profile.has_palm) gaps.push({ key: 'palm', label: '掌纹', href: '/mirror/palm/' });
   if (!profile.has_face) gaps.push({ key: 'face', label: '脸型妆容', href: '/mirror/face/' });

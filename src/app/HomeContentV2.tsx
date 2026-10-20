@@ -52,7 +52,7 @@ const INDEX: Array<{ num: string; title: string; desc: string; href: string; acc
     num: '03',
     title: '抽象文学部',
     desc: '发疯文学、牛马语录、发圈文案——生成一段，抄走就发。',
-    href: '/share-templates/',
+    href: '/start/',
     accent: '#D4B889',
   },
   {
@@ -289,7 +289,7 @@ function IndexSection() {
 
         <p className="mt-8 text-[12.5px]" style={{ color: 'var(--color-text-muted)' }}>
           还有 17 个风格宇宙塞在{' '}
-          <Link href="/types/" prefetch={false} className="underline underline-offset-4" style={{ color: 'var(--color-gold-text)' }}>
+          <Link href="/start/" prefetch={false} className="underline underline-offset-4" style={{ color: 'var(--color-gold-text)' }}>
             人设图鉴
           </Link>{' '}
           里，闲了去逛。
@@ -318,7 +318,7 @@ function EchoSection() {
           树洞里，一位匿名用户 · 本周
         </figcaption>
         <Link
-          href="/her-voice/"
+          href="/bottle/"
           prefetch={false}
           className="mt-6 inline-block text-[13px] italic underline underline-offset-8"
           style={{ fontFamily: 'var(--font-display)', color: 'var(--color-violet-text)' }}
@@ -380,7 +380,7 @@ async function renderAuthedRibbonIfSession() {
     { title: '最近的我', cta: '回看结果 →', href: '/me/', accent: 'var(--color-rose-text)' },
     { title: '今日', cta: '打开 →', href: '/today', accent: 'var(--color-sage-text)' },
     { title: '待拆的信', cta: '去信箱 →', href: '/wtfti/letters/', accent: 'var(--color-gold-text)' },
-    { title: '树洞', cta: '去听听 →', href: '/her-voice/', accent: 'var(--color-violet-text)' },
+    { title: '树洞', cta: '去听听 →', href: '/bottle/', accent: 'var(--color-violet-text)' },
   ] as const;
 
   return (

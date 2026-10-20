@@ -133,7 +133,8 @@
 
 /* Keep page content clear of the mobile tab bar (HerNav). */
 @media (max-width: 767px) {
-  body:has(.her-tabbar) > main { padding-bottom: 72px; }
+  /* Pad the whole body (main + footer) so nothing sits under the fixed bar. */
+  body:has(.her-tabbar) { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
 }
 
 /* Auth forms inside the journal skin. */
@@ -149,4 +150,51 @@
   color: var(--s-on-cta);
   border-radius: 30px;
   box-shadow: 0 4px 0 #2E2017;
+}
+
+/* ── 「我和他」 legacy bridge (audit 2026-10-20 decision 3) ──────────────
+   CPTI SEO pages + XPTI couple keep their markup/URLs, but render in v3 journal:
+   remap the legacy --color-* tokens the Tailwind classes read onto v3 tokens. */
+.skin-bridge {
+  --color-bg-primary: var(--s-bg);
+  --color-bg-secondary: var(--s-bg-2);
+  --color-bg-tertiary: var(--s-bg-2);
+  --color-bg-elevated: var(--s-card);
+  --color-paper: var(--s-bg);
+  --color-paper-deep: var(--s-bg-2);
+  --color-paper-warm: var(--s-bg-2);
+  --color-text-primary: var(--s-ink);
+  --color-text-secondary: var(--s-ink-2);
+  --color-text-muted: var(--s-mute);
+  --color-ink: var(--s-ink);
+  --color-ink-soft: var(--s-ink-2);
+  --color-ink-mute: var(--s-mute);
+  --color-stone: var(--s-mute);
+  --color-border: var(--s-line);
+  --color-border-subtle: var(--s-line);
+  --color-rule: var(--s-line);
+  --color-rule-soft: var(--s-line);
+  --color-accent: var(--s-accent);
+  --color-accent-light: var(--s-accent-soft);
+  --color-accent-dim: var(--s-accent-soft);
+  --color-rose: var(--s-accent);
+  --color-rose-dust: var(--s-accent-soft);
+  --color-rose-deep: var(--s-accent-text);
+  --color-rose-text: var(--s-accent-text);
+  --color-violet-text: var(--s-accent-text);
+  --color-cta-from: var(--s-cta);
+  --color-cta-to: var(--s-cta);
+  --color-text-on-accent: var(--s-on-cta);
+  min-height: 100vh;
+}
+.skin-bridge h1,
+.skin-bridge h2,
+.skin-bridge h3 {
+  font-family: var(--s-h-font);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+.skin-bridge .rounded-2xl,
+.skin-bridge .rounded-xl {
+  border-radius: var(--s-radius);
 }

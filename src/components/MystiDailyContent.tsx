@@ -42,7 +42,8 @@ export function MystiDailyContent() {
 
   useEffect(() => {
     queueMicrotask(() => {
-      setDailyCard(getDailyCard());
+      const card = getDailyCard();
+      setDailyCard(card);
       setMounted(true);
     });
     trackMystiEvent('mysti_daily_view');
@@ -288,20 +289,20 @@ export function MystiDailyContent() {
                 className="px-5 py-2.5 rounded-full text-sm font-medium transition-all hover:brightness-110 disabled:opacity-50"
                 style={{ background: `linear-gradient(90deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`, color: 'var(--color-bg-primary)' }}
               >
-                {bonusUsedToday ? '今日已加抽过' : '🎴 通行证特权 · 再翻一张'}
+                {bonusUsedToday ? '今日已加抽过' : '会员特权 · 再翻一张'}
               </button>
             )
           ) : (
             <div>
               <p className="text-xs" style={{ color: theme.textMuted }}>
-                通行证会员每天可额外翻一张牌
+                会员每天可额外翻一张牌
               </p>
               <Link
-                href="/mysti/subscribe/?from=daily_bonus"
+                href="/member/?from=daily_bonus"
                 className="inline-flex mt-3 px-4 py-2 rounded-full text-xs border transition-all hover:opacity-80"
                 style={{ borderColor: theme.cardBorder, color: theme.accent }}
               >
-                了解通行证 →
+                了解会员 →
               </Link>
             </div>
           )}

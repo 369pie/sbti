@@ -21,13 +21,13 @@ const META: Record<
   Pillar,
   { eyebrow: string; chinese: string; accent: string; href: string }
 > = {
-  I: { eyebrow: 'KNOW HER', chinese: '认识她', accent: 'var(--color-rose)', href: '/types/' },
+  I: { eyebrow: 'KNOW HER', chinese: '认识她', accent: 'var(--color-rose)', href: '/start/' },
   II: { eyebrow: 'WALK WITH HER', chinese: '陪着她', accent: 'var(--color-gem)', href: '/mysti/' },
   III: {
     eyebrow: 'WRITE WITH HER',
     chinese: '一起写下她',
     accent: 'var(--color-gold-leaf)',
-    href: '/her-voice/',
+    href: '/bottle/',
   },
 };
 

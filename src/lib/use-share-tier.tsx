@@ -19,7 +19,7 @@ import {
   SHARE_CARD_TIER_LABEL,
   type ShareCardTier,
 } from '@/lib/share-card-tiers';
-import { isUnlocked, SKU_PRICES, type MystiSku } from '@/lib/mysti/unlock';
+import { isUnlocked, skuMeta, type MystiSku } from '@/lib/mysti/unlock';
 import { readApiJson } from '@/lib/api';
 import { getPaymentAvailabilityStatus } from '@/lib/payment/availability';
 import { getOrCreateDeviceId } from '@/lib/mysti/device';
@@ -273,7 +273,7 @@ export function ShareTierPicker({
         const unlocked = tierUnlocked(t);
         const label = SHARE_CARD_TIER_LABEL[t];
         const sku = t === 'free' ? null : TIER_TO_SKU[t];
-        const price = sku ? SKU_PRICES[sku].price : 0;
+        const price = sku ? skuMeta(sku).price : 0;
         const baseClass = isDark
           ? active
             ? 'border-white/60 bg-white/15 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.45)]'

@@ -10,6 +10,7 @@ import type {
 } from '@/lib/cpti/claim';
 import { getApiPath } from '@/lib/api';
 import { withBasePath } from '@/lib/site';
+import { ensureAnonymousSession } from '@/lib/supabase/auth';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 
 type ClaimState = 'idle' | 'claiming' | 'claimed' | 'error';
@@ -106,16 +107,11 @@ export function ClaimAssetCard({
       const supabase = createBrowserSupabaseClient();
 
       // Check if already has session
-      const { data: { session } } = await supabase.auth.getSession();
-
-      // If no session, sign in anonymously
-      if (!session) {
-        const { error: authError } = await supabase.auth.signInAnonymously();
-        if (authError) {
-          console.error('Anonymous sign-in failed:', authError);
-          setClaimState('error');
-          return;
-        }
+      const anon = await ensureAnonymousSession(supabase);
+      if (!anon.success) {
+        console.error('Anonymous sign-in failed:', anon.error);
+        setClaimState('error');
+        return;
       }
 
       await fetch(getApiPath('/cpti/users/bootstrap'), {
@@ -170,7 +166,7 @@ export function ClaimAssetCard({
     if (claimState === 'claimed') {
       // Navigate to WTF CARD or continue exploring
       if (variant === 'result') {
-        window.location.href = withBasePath('/card');
+        window.location.href = withBasePath('/me/');
       } else {
         // Continue exploring relationships
         window.location.href = withBasePath('/cpti');

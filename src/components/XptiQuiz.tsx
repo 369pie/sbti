@@ -1,5 +1,6 @@
 'use client';
 
+import { trackTestFinish, trackTestStart } from '@/lib/analytics/test-events';
 import { useState, useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 import { XPTI_QUESTIONS, XPTI_DEFAULT_OPTIONS, shuffleXptiQuestions } from '@/lib/xpti/questions';
 import type { XptiAnswerOption } from '@/lib/xpti/questions';
@@ -55,12 +56,25 @@ export function XptiQuiz() {
     };
   }, []);
 
+  // 「我和他」 step 1 (?flow=wohe): same quiz, unified test_id, back to the couple entry after.
+  const woheFlow = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('flow') === 'wohe';
+
+  useEffect(() => {
+    if (woheFlow) trackTestStart('wohe', { mode: 'self' });
+    else trackTestStart('xpti');
+  }, [woheFlow]);
+
   const finishTest = useCallback((finalAnswers: Map<number, Answer>) => {
     if (isFinishingRef.current) return;
     isFinishingRef.current = true;
     setIsFinishing(true);
 
     const result = calculateXptiResult(finalAnswers, questions);
+    if (woheFlow) {
+      trackTestFinish('wohe', result.personality.slug, { href: '/xpti/couple/', mode: 'self' });
+    } else {
+      trackTestFinish('xpti', result.personality.slug, { href: `/xpti/result/${result.personality.slug}/` });
+    }
 
     // Persist user's actual dimension scores so couple/archive features can
     // read them without forcing a re-test (Sprint 2-3 of v3.0).
@@ -74,9 +88,11 @@ export function XptiQuiz() {
     }
 
     finishTimeoutRef.current = window.setTimeout(() => {
-      window.location.href = `${basePath}/xpti/result/${encodeURIComponent(result.personality.slug)}/`;
+      window.location.href = woheFlow
+        ? `${basePath}/xpti/couple/`
+        : `${basePath}/xpti/result/${encodeURIComponent(result.personality.slug)}/`;
     }, 800);
-  }, [questions]);
+  }, [questions, woheFlow]);
 
   const handleAnswer = useCallback((questionId: number, value: Answer) => {
     if (!currentQ) return;

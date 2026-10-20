@@ -448,7 +448,7 @@ export function HermosaInputCard({
               ↓ 保存长图
             </a>
             <Link
-              href={withBasePath('/her-voice/')}
+              href={withBasePath('/bottle/')}
               style={{
                 flex: 1,
                 display: 'inline-flex',
@@ -494,7 +494,7 @@ export function HermosaInputCard({
               写一个 AI 问题
             </FollowUpLink>
             <FollowUpLink
-              href={withBasePath('/her-voice/my/')}
+              href={withBasePath('/bottle/')}
               target="result_salon_followup"
             >
               → 点亮自己的第一束光

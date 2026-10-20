@@ -49,7 +49,7 @@ export function WtfCardCTA({ variant = 'default' }: Props) {
   return (
     <section className="max-w-2xl mx-auto px-6 pb-8">
       <Link
-        href="/card/"
+        href="/me/"
         className={`group block rounded-2xl border transition-all p-5 ${
           isXpti
             ? 'border-accent/20 hover:border-accent/35 bg-text-primary hover:bg-text-primary'

@@ -1082,7 +1082,7 @@ export default function MirrorClient() {
          ══════════════════════════════════════════════════════════════════════ */}
       <nav className="relative z-10">
         <div className="wtfti-wide-container flex items-center justify-between py-6">
-          <Link href="/wtfti/" className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+          <Link href="/mirror/" className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
             <span className="inline-block transition-transform duration-300 hover:-translate-x-1">←</span>
             <span style={{ fontFamily: 'var(--font-display)' }}>WTFTI</span>
           </Link>
@@ -1095,7 +1095,7 @@ export default function MirrorClient() {
             >
               档案历史
             </button>
-            <Link href="/lingjian/" className="text-xs tracking-wider transition-colors hover:text-[var(--color-gold)]" style={{ color: 'var(--color-text-secondary)' }}>
+            <Link href="/mirror/" className="text-xs tracking-wider transition-colors hover:text-[var(--color-gold)]" style={{ color: 'var(--color-text-secondary)' }}>
               灵笺
             </Link>
           </div>

@@ -103,7 +103,7 @@ export function readUnlock(
   }
 }
 
-export const SKU_PRICES: Record<MystiSku, { price: number; label: string; tagline?: string }> = {
+export const SKU_PRICES: Record<PurchasableSku, { price: number; label: string; tagline?: string }> = {
   // ── L1 单次内容 ─────────────────────────────────────────────
   'soul-letter': { price: 9.9, label: '灵魂信 · 深度版', tagline: '为你写的一封长信，5-8 屏深读' },
   'dual-report': { price: 12.9, label: '双人合盘报告', tagline: '关系的 8 个维度，看清你们之间' },
@@ -139,11 +139,26 @@ export const SKU_PRICES: Record<MystiSku, { price: number; label: string; taglin
 
   // ── L2 订阅 / 通行证 ──────────────────────────────────────
   'monthly-pass': { price: 19, label: '月度会员', tagline: '完整今日 + 美我月额度 + 深度报告 8 折 · 到期不自动续费' },
-  'monthly-pass-intro': { price: 9.9, label: '月度会员 · 首月', tagline: '首月体验价 · 30 天全权益，到期不自动续费' },
-  'quarterly-pass': { price: 99, label: '季度会员', tagline: '相当于 ¥33/月，最划算' },
-  'yearly-pass': { price: 299, label: '年度会员', tagline: '折合 ¥25/月，铁粉无脑选' },
   'creator-pass': { price: 39, label: '创作者 Plus 会员', tagline: '高级题库 + 分润 30%' },
 };
+
+/**
+ * Retired 2026-10-21 (audit decision 4): ONE ¥19/月 membership only.
+ * Kept in the MystiSku union + durations so historical orders / notify callbacks
+ * still resolve, but they have no price and create-order rejects them.
+ */
+export const RETIRED_SKUS = ['monthly-pass-intro', 'quarterly-pass', 'yearly-pass'] as const;
+export type RetiredSku = (typeof RETIRED_SKUS)[number];
+export type PurchasableSku = Exclude<MystiSku, RetiredSku>;
+type SkuMeta = { price: number; label: string; tagline?: string };
+const RETIRED_META: SkuMeta = { price: 0, label: '已下线' };
+/** Price meta for any SKU type; retired SKUs return a placeholder (never sold). */
+export function skuMeta(sku: MystiSku): SkuMeta {
+  return (SKU_PRICES as Partial<Record<MystiSku, SkuMeta>>)[sku] ?? RETIRED_META;
+}
+export function isPurchasableSku(sku: string | null | undefined): sku is PurchasableSku {
+  return !!sku && (ALL_SKUS as string[]).includes(sku) && !(RETIRED_SKUS as readonly string[]).includes(sku);
+}
 
 /** 订阅类 SKU 列表 */
 export const SUBSCRIPTION_SKUS: SubscriptionSku[] = [

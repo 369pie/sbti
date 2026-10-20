@@ -145,7 +145,7 @@ export function BundleCta({
         }}
       >
         <Link
-          href="/mysti/subscribe/?from=deep-bundle"
+          href="/member/?from=deep-bundle"
           style={{
             fontFamily: 'var(--font-mono)',
             fontSize: 10,

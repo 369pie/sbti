@@ -33,7 +33,7 @@ export function StardustSealing({
   dueDays = 30,
   onSealed,
   enableNotification = true,
-  nextHref = '/wtfti/',
+  nextHref = '/start/',
   nextLabel = '✦ 回到我的人格主页',
 }: Props) {
   const [text, setText] = useState('');

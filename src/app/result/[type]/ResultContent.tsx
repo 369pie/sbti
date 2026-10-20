@@ -536,7 +536,7 @@ export function ResultContent({ personality, dimensionScores }: Props) {
               transition={{ delay: 0.55, duration: 0.5 }}
             >
               <Link
-                href={`/combo?sbti=${personality.slug}`}
+                href="/start/"
                 className="block rounded-2xl border p-6 sm:p-8 text-center transition-all hover:shadow-md"
                 style={{ borderColor: 'color-mix(in oklab, var(--color-accent) 19%, transparent)', background: 'color-mix(in oklab, var(--color-accent) 6%, transparent)' }}
               >

@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/components/AuthProvider';
 import type { CreatorApplicationStatus } from '@/lib/creator/applications';
-import { CREATOR_APPLICATION_STATUS_META } from '@/lib/creator/applications';
 import { ASSET_SYNC_EVENT } from '@/lib/assets/asset-contract';
 import { signOut } from '@/lib/supabase/auth';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
@@ -15,6 +14,7 @@ import { getOrCreateCard, saveCard, type WtfCardData } from '@/lib/wtf-card';
 import GrowthTimeline from '@/components/GrowthTimeline';
 import { XptiSummaryCard } from '@/components/me/XptiSummaryCard';
 import { CollectionWall } from '@/components/CollectionWall';
+import { MeArchive } from '@/components/me/MeArchive';
 
 interface MeStats {
   wtfLit: number;
@@ -75,8 +75,6 @@ export function MeContent() {
   const [stats, setStats] = useState<MeStats | null>(null);
   const [xptiSummary, setXptiSummary] = useState<XptiSummaryStats | null>(null);
   const [profile, setProfile] = useState<{ nickname: string; headline: string; username: string } | null>(null);
-  const [creatorApplication, setCreatorApplication] = useState<CreatorApplicationSummary | null>(null);
-  const [hasCreatorAccess, setHasCreatorAccess] = useState(false);
   const [editingNickname, setEditingNickname] = useState(false);
   const [nicknameInput, setNicknameInput] = useState('');
   const [saving, setSaving] = useState(false);
@@ -84,12 +82,11 @@ export function MeContent() {
   const [pageLoading, setPageLoading] = useState(true);
 
   const loadSummary = useCallback(async () => {
-    const [summaryData, creatorApplicationData] = await Promise.all([
+    const [summaryData] = await Promise.all([
       fetch(getApiPath('/me/summary'), {
         credentials: 'include',
         headers: { Accept: 'application/json' },
       }).then((response) => (response.ok ? response.json() : null)).catch(() => null) as Promise<MeSummaryResponse | null>,
-      fetch(getApiPath('/creator-applications/me')).then(r => (r.ok ? r.json() : null)).catch(() => null) as Promise<CreatorApplicationMeResponse | null>,
     ]);
 
     const syncedCard = summaryData?.assets?.['wtf-card'] ?? null;
@@ -110,8 +107,6 @@ export function MeContent() {
       cptiCollected: summaryData?.stats?.cpti?.collected ?? 0,
       cptiTotal: summaryData?.stats?.cpti?.total ?? 0,
     });
-    setCreatorApplication(creatorApplicationData?.item ?? null);
-    setHasCreatorAccess(Boolean(creatorApplicationData?.creatorAccess?.hasCreator));
     setPageLoading(false);
 
     // XPTI summary (best-effort, fail silent so card just shows local data)
@@ -136,7 +131,8 @@ export function MeContent() {
   useEffect(() => {
     if (authLoading) return;
     if (!isAuthenticated) {
-      router.replace('/auth/login/?next=/me/');
+      // Anonymous / no session: show the device archive instead of a login wall.
+      setPageLoading(false);
       return;
     }
 
@@ -198,6 +194,8 @@ export function MeContent() {
     }
   }, [isLoggingOut, router]);
 
+  if (!authLoading && !isAuthenticated) return <MeArchive />;
+
   if (authLoading || pageLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -206,15 +204,14 @@ export function MeContent() {
     );
   }
 
-  if (!isAuthenticated) return null;
 
   const avatarChar = (profile?.nickname || displayName || '?').charAt(0);
   const wtfPct = stats ? Math.round((stats.wtfLit / stats.wtfTotal) * 100) : 0;
   const cptiPct = stats && stats.cptiTotal > 0 ? Math.round((stats.cptiCollected / stats.cptiTotal) * 100) : 0;
-  const creatorApplicationMeta = creatorApplication ? CREATOR_APPLICATION_STATUS_META[creatorApplication.status] : null;
 
   return (
     <div className="min-h-screen bg-bg-primary">
+      <MeArchive embedded />
       <div className="max-w-xl mx-auto px-6 py-10 sm:py-14">
         {/* Header */}
         <motion.div
@@ -320,36 +317,6 @@ export function MeContent() {
           <h2 className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase">快捷入口</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Link
-              href="/card/"
-              className="flex items-center gap-3 px-4 py-3 rounded-xl border border-border-subtle bg-bg-elevated hover:border-accent/30 hover:shadow-sm transition-all"
-            >
-              <span className="text-xl">🎨</span>
-              <div className="min-w-0">
-                <div className="text-sm font-medium text-text-primary">WTF Card</div>
-                <div className="text-xs text-text-muted">我的多宇宙人格卡</div>
-              </div>
-            </Link>
-            <Link
-              href="/cpti/gallery/"
-              className="flex items-center gap-3 px-4 py-3 rounded-xl border border-border-subtle bg-bg-elevated hover:border-accent/30 hover:shadow-sm transition-all"
-            >
-              <span className="text-xl">💕</span>
-              <div className="min-w-0">
-                <div className="text-sm font-medium text-text-primary">CP 图鉴</div>
-                <div className="text-xs text-text-muted">关系收藏与同步</div>
-              </div>
-            </Link>
-            <Link
-              href="/types/"
-              className="flex items-center gap-3 px-4 py-3 rounded-xl border border-border-subtle bg-bg-elevated hover:border-accent/30 hover:shadow-sm transition-all"
-            >
-              <span className="text-xl">📚</span>
-              <div className="min-w-0">
-                <div className="text-sm font-medium text-text-primary">人设图鉴</div>
-                <div className="text-xs text-text-muted">浏览全部29型</div>
-              </div>
-            </Link>
-            <Link
               href="/mysti/collection/"
               className="flex items-center gap-3 px-4 py-3 rounded-xl border border-border-subtle bg-bg-elevated hover:border-accent/30 hover:shadow-sm transition-all"
             >
@@ -369,95 +336,6 @@ export function MeContent() {
                 <div className="text-xs text-text-muted">XPTI / SoulTI / CPTI 付费内容</div>
               </div>
             </Link>
-            {hasCreatorAccess && (
-              <Link
-                href="/creator/studio/"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl border border-sage/45 bg-sage/15 hover:border-sage/70 hover:bg-sage/25 transition-all"
-              >
-                <span className="text-xl">🎨</span>
-                <div className="min-w-0">
-                  <div className="text-sm font-medium text-sage-text">创作工作台</div>
-                  <div className="text-xs text-sage-text/80">已开通，立即进入管理宇宙</div>
-                </div>
-              </Link>
-            )}
-          </div>
-        </motion.div>
-
-        {/* Growth timeline (E-12) */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.25 }}
-          className="mb-10"
-        >
-          <div className="rounded-2xl border border-border-subtle bg-bg-elevated p-5">
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div>
-                <h2 className="text-xs font-mono tracking-[0.2em] text-text-muted uppercase mb-2">创作者申请</h2>
-                <h3 className="text-lg font-semibold text-text-primary">
-                  {creatorApplication ? creatorApplicationMeta?.label : '还没有提交创作者申请'}
-                </h3>
-                <p className="text-sm text-text-secondary leading-7 mt-2">
-                  {creatorApplication
-                    ? creatorApplicationMeta?.description
-                    : '正式账号提交的创作者申请，会自动绑定到当前个人中心并持续展示审核状态。'}
-                </p>
-              </div>
-              <Link
-                href="/creator/apply/"
-                className="shrink-0 px-4 py-2 rounded-xl border border-border-subtle text-sm text-text-secondary hover:text-text-primary hover:border-border transition-colors"
-              >
-                {creatorApplication ? '更新申请资料' : '去申请'}
-              </Link>
-            </div>
-
-            {creatorApplication ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-text-secondary">
-                <div className="rounded-xl bg-bg-secondary px-4 py-3">
-                  <p className="text-xs text-text-muted mb-1">申请模式</p>
-                  <p>
-                    {creatorApplication.wantsFree ? '免费主题测试' : ''}
-                    {creatorApplication.wantsFree && creatorApplication.wantsPaid ? ' + ' : ''}
-                    {creatorApplication.wantsPaid ? '付费主题测试商城' : ''}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-bg-secondary px-4 py-3">
-                  <p className="text-xs text-text-muted mb-1">内容方向</p>
-                  <p>{creatorApplication.contentVertical ?? '暂未填写'}</p>
-                </div>
-                <div className="rounded-xl bg-bg-secondary px-4 py-3">
-                  <p className="text-xs text-text-muted mb-1">提交时间</p>
-                  <p>{new Date(creatorApplication.createdAt).toLocaleString('zh-CN')}</p>
-                </div>
-                <div className="rounded-xl bg-bg-secondary px-4 py-3">
-                  <p className="text-xs text-text-muted mb-1">最近更新</p>
-                  <p>{new Date(creatorApplication.updatedAt).toLocaleString('zh-CN')}</p>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-xl bg-bg-secondary px-4 py-3 text-sm text-text-muted">
-                提交申请后，这里会持续同步你的创作者审核进度。
-              </div>
-            )}
-
-            {creatorApplication?.status === 'approved' && !hasCreatorAccess && (
-              <div className="mt-3 rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-gold-text">
-                你的申请已通过，创作工作台正在开通中，请稍后刷新本页查看入口。
-              </div>
-            )}
-
-            {creatorApplication?.status === 'approved' && hasCreatorAccess && (
-              <div className="mt-3 rounded-xl border border-sage/45 bg-sage/15 px-4 py-3 text-sm text-sage-text flex items-center justify-between gap-3">
-                <span>创作者身份已开通，可直接进入创作工作台。</span>
-                <Link
-                  href="/creator/studio/"
-                  className="shrink-0 px-3 py-1.5 rounded-lg bg-sage text-bg-primary text-xs font-medium hover:bg-sage/90 transition-colors"
-                >
-                  进入工作台
-                </Link>
-              </div>
-            )}
           </div>
         </motion.div>
 

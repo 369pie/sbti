@@ -15,6 +15,7 @@
 
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { WoheFunnelCard } from '@/components/wohe/WoheFunnelCard';
 import type { Metadata } from 'next';
 import {
   getRelationshipBySlug,
@@ -84,7 +85,7 @@ export default async function CptiRelationshipTypePage({ params }: PageProps) {
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
           { '@type': 'ListItem', position: 2, name: 'CPTI 关系测试', item: getSiteUrl('/cpti/') },
-          { '@type': 'ListItem', position: 3, name: '关系图鉴', item: getSiteUrl('/cpti/gallery/') },
+          { '@type': 'ListItem', position: 3, name: '我和他', item: getSiteUrl('/xpti/couple/') },
           { '@type': 'ListItem', position: 4, name: relationship.name, item: getSiteUrl(`/cpti/relationship/${relationship.slug}/`) },
         ],
       },
@@ -177,29 +178,10 @@ export default async function CptiRelationshipTypePage({ params }: PageProps) {
         </section>
 
         {/* Primary CTA */}
-        <section className="max-w-2xl mx-auto px-6 pb-12">
-          <div
-            className="rounded-2xl p-6 sm:p-8 text-center"
-            style={{
-              background: `linear-gradient(135deg, ${relationship.color}15, ${relationship.color}05)`,
-              border: `1px solid ${relationship.color}30`,
-            }}
-          >
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">
-              想知道你和 ta 是不是「{relationship.name}」？
-            </h3>
-            <p className="text-sm text-text-muted mb-6 leading-relaxed">
-              3 分钟测出你的 CP 角色，邀请 ta 配对解锁你们的关系类型
-            </p>
-            <Link
-              href="/cpti/test/"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-bg-primary font-semibold hover:scale-105 transition-transform"
-              style={{ background: relationship.color }}
-            >
-              开始测试 <span>→</span>
-            </Link>
-          </div>
-        </section>
+        <WoheFunnelCard
+          source={`cpti_relationship_${relationship.slug}`}
+          title={`你和他是不是「${relationship.name}」？`}
+        />
 
         {/* Cross-links */}
         <section className="max-w-2xl mx-auto px-6 pb-12">
@@ -223,15 +205,7 @@ export default async function CptiRelationshipTypePage({ params }: PageProps) {
 
         {/* Theory + Gallery */}
         <section className="max-w-2xl mx-auto px-6 pb-16">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Link
-              href="/cpti/gallery/"
-              className="rounded-xl border border-border-subtle bg-bg-elevated p-5 hover:border-accent/40 transition-all"
-            >
-              <div className="text-xs font-mono tracking-wider text-text-muted uppercase mb-1">25 / 25</div>
-              <div className="text-base font-semibold mb-1">查看关系图鉴 →</div>
-              <div className="text-xs text-text-muted">25 种关系全收录，看看你已点亮哪几格</div>
-            </Link>
+          <div className="grid grid-cols-1 gap-3">
             <Link
               href="/cpti/theory/"
               className="rounded-xl border border-border-subtle bg-bg-elevated p-5 hover:border-accent/40 transition-all"
