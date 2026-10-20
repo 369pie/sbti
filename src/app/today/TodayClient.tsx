@@ -88,6 +88,8 @@ export function TodayClient() {
 
   useEffect(() => {
     trackFunnelEvent('module_landing_view', { module: 'wtfti', source: '/today' });
+    // Data fetch on mount: state is only set after the awaited response.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
   }, [load]);
 

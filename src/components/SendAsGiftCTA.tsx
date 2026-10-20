@@ -1,5 +1,6 @@
 'use client';
 
+import { isSkuOnSale } from '@/lib/payments/on-sale';
 import Link from 'next/link';
 import { useMystiTheme } from '@/components/MystiThemeProvider';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
@@ -25,10 +26,12 @@ export function SendAsGiftCTA({
   description = '附自定义贺卡 · 微信 / 支付宝 · 朋友圈不撞款',
 }: Props) {
   const { theme } = useMystiTheme();
+  const offSale = !isSkuOnSale('gift-card');
   const href = giftSku
     ? `/mysti/gift/?preset=${encodeURIComponent(giftSku)}&from=${encodeURIComponent(source)}`
     : `/mysti/gift/?from=${encodeURIComponent(source)}`;
 
+  if (offSale) return null;
   return (
     <Link
       href={href}

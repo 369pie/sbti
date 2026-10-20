@@ -1,5 +1,6 @@
 'use client';
 
+import { isSkuOnSale } from '@/lib/payments/on-sale';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { toQrDataUrl } from '@/lib/qr-code';
@@ -1037,7 +1038,7 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
 
     return (
       <div>
-        {allowTierSwitch && (
+        {allowTierSwitch && (isSkuOnSale('share-plus') || tierUnlocked('plus') || tierUnlocked('atelier')) && (
           <div className="mb-3 grid grid-cols-3 gap-2">
             {(['free', 'plus', 'atelier'] as const).map(t => {
               const active = tier === t;

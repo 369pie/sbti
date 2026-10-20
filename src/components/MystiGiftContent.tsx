@@ -1,5 +1,6 @@
 'use client';
 
+import { isSkuOnSale } from '@/lib/payments/on-sale';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -25,6 +26,9 @@ import { readApiJson } from '@/lib/api';
 
 type Tab = 'buy' | 'mine' | 'redeem';
 
+// Paid convergence: gift cards are off sale; 我购买的 / 兑换码 keep working for existing buyers.
+const GIFT_ON_SALE = isSkuOnSale('gift-card');
+
 export function MystiGiftContent() {
   const { theme } = useMystiTheme();
   const router = useRouter();
@@ -32,7 +36,7 @@ export function MystiGiftContent() {
   const initialCode = searchParams.get('code') ?? '';
   const issuedCode = searchParams.get('issued') ?? '';
   const presetGiftSku = searchParams.get('preset') ?? '';
-  const [tab, setTab] = useState<Tab>(issuedCode ? 'mine' : initialCode ? 'redeem' : 'buy');
+  const [tab, setTab] = useState<Tab>(issuedCode ? 'mine' : initialCode ? 'redeem' : GIFT_ON_SALE ? 'buy' : 'redeem');
   const [hydrated, setHydrated] = useState(false);
   const [cards, setCards] = useState<GiftCard[]>([]);
   const [issuedCard, setIssuedCard] = useState<GiftCard | null>(null);
@@ -151,7 +155,7 @@ export function MystiGiftContent() {
               ['mine', '我购买的'],
               ['redeem', '使用兑换码'],
             ] as Array<[Tab, string]>
-          ).map(([id, label]) => {
+          ).filter(([id]) => GIFT_ON_SALE || id !== 'buy').map(([id, label]) => {
             const active = tab === id;
             return (
               <button
@@ -178,7 +182,7 @@ export function MystiGiftContent() {
           </div>
         )}
 
-        {hydrated && tab === 'buy' && <BuyTab presetGiftSku={presetGiftSku} onPurchased={card => {
+        {hydrated && GIFT_ON_SALE && tab === 'buy' && <BuyTab presetGiftSku={presetGiftSku} onPurchased={card => {
           setCards(getGiftCards());
           setIssuedCard(card);
         }} />}

@@ -11,6 +11,7 @@
  * the live mysti v2 theme, so behavior for existing mysti pages is unchanged.
  */
 
+import { isSkuOnSale } from '@/lib/payments/on-sale';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -325,6 +326,11 @@ export function PremiumPaywall({
 
   if (unlocked) {
     return <div data-paywall="unlocked">{children}</div>;
+  }
+
+  // Off-sale SKU (paid convergence): keep the preview, drop the purchase entry.
+  if (!isSkuOnSale(sku)) {
+    return <div data-paywall="off-sale">{preview}</div>;
   }
 
   const applyMemberPrice = passDiscount > 0 && (hasPass || herMemberDiscount);
