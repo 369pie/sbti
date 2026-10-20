@@ -35,21 +35,27 @@ export function DailyReminderToggle() {
 
   async function enable() {
     setState('working');
+    enqueueProductEvent('home', 'push_enable_click');
+    let stage = 'permission';
     try {
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
         setState(permission === 'denied' ? 'denied' : 'idle');
+        enqueueProductEvent('home', 'push_enable_failed', { step: 'permission', props: { reason: permission } });
         return;
       }
+      stage = 'sw_register';
       const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
       await navigator.serviceWorker.ready;
       const sub =
         (await reg.pushManager.getSubscription()) ??
         (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) }));
 
+      stage = 'session';
       const supabase = tryCreateBrowserSupabaseClient();
       if (supabase) await getOrCreateAnonymousSession(supabase);
 
+      stage = 'api';
       const res = await fetch(getApiPath('/push/subscribe/'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -58,7 +64,11 @@ export function DailyReminderToggle() {
       if (!res.ok) throw new Error(`subscribe ${res.status}`);
       enqueueProductEvent('home', 'push_enabled');
       setState('on');
-    } catch {
+    } catch (e) {
+      enqueueProductEvent('home', 'push_enable_failed', {
+        step: stage,
+        props: { reason: e instanceof Error ? e.message.slice(0, 120) : 'unknown' },
+      });
       setState('error');
     }
   }

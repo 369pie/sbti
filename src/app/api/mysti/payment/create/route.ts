@@ -221,8 +221,9 @@ export async function POST(req: NextRequest) {
   const origin = req.nextUrl.origin;
   const siteName = req.nextUrl.hostname;
   const userAgent = req.headers.get('user-agent') ?? undefined;
-  const notifyUrl = `${origin}/api/mysti/payment/notify?channel=${paymentType}&sku=${encodeURIComponent(sku)}`;
-  const returnUrl = `${origin}/mysti/payment/return?orderId=${encodeURIComponent(tradeOrderId)}`;
+  // trailingSlash: true → 无斜杠的 URL 会被 308；虎皮椒异步通知不跟随重定向，订单会永远停在 pending。
+  const notifyUrl = `${origin}/api/mysti/payment/notify/?channel=${paymentType}&sku=${encodeURIComponent(sku)}`;
+  const returnUrl = `${origin}/mysti/payment/return/?orderId=${encodeURIComponent(tradeOrderId)}`;
   const callbackUrl = fitXunhupayUrl(`${origin}${redirect}`);
 
   // Stub 模式仅用于本地/开发；生产环境缺配置时必须 fail closed。
@@ -245,7 +246,7 @@ export async function POST(req: NextRequest) {
       listPrice: meta.price,
       label: meta.label,
       // 前端会识别 stub 标志直接走"假装支付成功"路径
-      url: `/mysti/payment/return?stub=1&channel=${paymentType}&orderId=${tradeOrderId}&sku=${sku}&resourceId=${encodeURIComponent(resourceId)}&redirect=${encodeURIComponent(redirect)}`,
+      url: `/mysti/payment/return/?stub=1&channel=${paymentType}&orderId=${tradeOrderId}&sku=${sku}&resourceId=${encodeURIComponent(resourceId)}&redirect=${encodeURIComponent(redirect)}`,
     });
   }
 
