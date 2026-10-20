@@ -14,6 +14,9 @@ import { MembershipSubscribeCard } from '@/components/MembershipSubscribeCard';
 import { MemberEntryLink } from '@/components/member/MemberEntry';
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
 import { getApiPath } from '@/lib/api';
+import { getOrCreateDeviceId } from '@/lib/mysti/device';
+import { formatShanghaiDateCN, greetingForHour, shanghaiDateISO, shanghaiHour } from '@/lib/today/date';
+import { generateTodayCard } from '@/lib/today/today-card';
 import type { ArchiveGap } from '@/lib/today/today-card';
 
 import styles from './today.module.css';
@@ -88,6 +91,8 @@ export function TodayClient() {
 
   useEffect(() => {
     trackFunnelEvent('module_landing_view', { module: 'wtfti', source: '/today' });
+    // Data fetch on mount: state is only set after the awaited response.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
   }, [load]);
 
@@ -100,38 +105,7 @@ export function TodayClient() {
   }
 
   if (state.status === 'guest') {
-    return (
-      <main className={`skin-journal ${styles.page}`}>
-        <div className={styles.inner}>
-          <section className={styles.guest}>
-            <p className="s-eyebrow">Today · 今日</p>
-            <h1 className={`s-title ${styles.guestTitle}`}>
-              登录后，每天一张<br />
-              只写给你的今日卡
-            </h1>
-            <p className={styles.guestSub}>
-              运势、幸运色、妆容一句，都会跟着你的档案走。先花 90 秒测测自己，一键就能存下档案。
-            </p>
-            <div className={styles.guestActions}>
-              <Link href="/test/" prefetch={false} className="s-btn">
-                90 秒测一测 · 免注册建档
-              </Link>
-              <Link href="/auth/login/?next=%2Ftoday%2F" prefetch={false} className={styles.secondary}>
-                已有账号，登录
-              </Link>
-            </div>
-          </section>
-          {/* 提醒不依赖登录：/api/push/subscribe 接受匿名会话。之前只在登录态渲染，导致绝大多数访客根本看不到开关。 */}
-          <div className={styles.reminders} id="remind">
-            <DailyReminderToggle />
-          </div>
-          <p className={styles.guestSub} style={{ marginTop: 18, textAlign: 'center' }}>
-            有心事想说？<Link href="/bottle/" prefetch={false} className={styles.moodLink}>去树洞写两句</Link>
-          </p>
-          <p className={styles.fine}>仅供娱乐与自我探索</p>
-        </div>
-      </main>
-    );
+    return <GuestToday />;
   }
 
   if (state.status === 'error') {
@@ -281,6 +255,86 @@ export function TodayClient() {
           <DailyEmailToggle />
         </div>
 
+        <p className={styles.fine}>仅供娱乐与自我探索 · 同一天打开，内容不变</p>
+      </div>
+    </main>
+  );
+}
+
+/**
+ * B01: visitors without an archive still get today's card (no login wall).
+ * Deterministic per device + Shanghai date, computed client-side (no writes).
+ * Saving an archive makes it personal (persona / color season) + unlocks reminders.
+ */
+function GuestToday() {
+  const [card, setCard] = useState<ReturnType<typeof generateTodayCard> | null>(null);
+  const [meta, setMeta] = useState<{ dateLabel: string; greeting: string } | null>(null);
+  useEffect(() => {
+    const dateISO = shanghaiDateISO();
+    const id = getOrCreateDeviceId() || 'guest';
+    // Client-only values (device id, clock) — computed once after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCard(generateTodayCard({ userId: id, dateISO, birthYear: null, colorSeason: null, hasPersona: false }));
+    setMeta({ dateLabel: formatShanghaiDateCN(dateISO), greeting: greetingForHour(shanghaiHour()) });
+    trackFunnelEvent('module_landing_view', { module: 'wtfti', source: '/today:guest_card' });
+  }, []);
+
+  return (
+    <main className={`skin-journal ${styles.page}`}>
+      <div className={styles.inner}>
+        <header className={styles.greeting}>
+          <p className="s-eyebrow">{meta?.dateLabel ?? 'Today · 今日'}</p>
+          <h1 className={`s-title ${styles.hi}`}>
+            {meta?.greeting ?? '你好'}，<em>今天的你</em>
+          </h1>
+        </header>
+
+        <article className={`s-card s-card--lined ${styles.card}`} data-today-card="guest">
+          <div className="s-tape" />
+          <div className={styles.cardHead}>
+            <span className={`s-en ${styles.date}`}>TODAY · 今日卡</span>
+            <span className={`s-en ${styles.tag}`}>通用版</span>
+          </div>
+          {card ? (
+            <>
+              <p className={`s-title ${styles.fortune}`}>{card.fortune}</p>
+              <div className={styles.row}>
+                <span className={styles.k}>幸运色</span>
+                <i className={styles.sw} style={{ background: card.luckyColor.hex }} aria-hidden="true" />
+                <span className={styles.v}>
+                  {card.luckyColor.name}
+                  <small>{card.luckyColor.tip}</small>
+                </span>
+              </div>
+              <div className={styles.row}>
+                <span className={styles.k}>妆容</span>
+                <i className={styles.sw} style={{ background: '#B07A7A' }} aria-hidden="true" />
+                <span className={styles.v}>
+                  今日一句
+                  <small>{card.makeup}</small>
+                </span>
+              </div>
+            </>
+          ) : (
+            <p className={styles.loading}>今日卡准备中…</p>
+          )}
+          <p className={styles.memberHint}>这是通用版 · 测完存下档案，明天起每张都按你的人格和颜色来写</p>
+        </article>
+
+        <section className={styles.guest}>
+          <div className={styles.guestActions}>
+            <Link href="/test/?from=today" prefetch={false} className="s-btn">
+              90 秒测一测 · 让今日卡只写给你
+            </Link>
+            <Link href="/auth/login/?next=%2Ftoday%2F" prefetch={false} className={styles.secondary}>
+              已有账号，登录
+            </Link>
+          </div>
+        </section>
+
+        <p className={styles.guestSub} style={{ marginTop: 18, textAlign: 'center' }}>
+          有心事想说？<Link href="/bottle/" prefetch={false} className={styles.moodLink}>去树洞写两句</Link>
+        </p>
         <p className={styles.fine}>仅供娱乐与自我探索 · 同一天打开，内容不变</p>
       </div>
     </main>
