@@ -2,7 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
+import { hasDeviceArchive } from '@/lib/her/device-archive';
 
 // Audit 2026-10-20 Phase 1: 测试 · 今日 · 我和他 · 美我 · 我 (树洞 is reached from 今日).
 const TABS = [
@@ -24,7 +26,14 @@ function isActive(pathname: string, tab: (typeof TABS)[number]) {
 
 export function HerNav() {
   const pathname = usePathname() ?? '/';
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
+  // Anonymous archive owners aren't "logged in", but they DO have an archive —
+  // don't greet them with 「登录」. Read the device marker after mount (SSR-safe).
+  const [deviceArchive, setDeviceArchive] = useState(false);
+  useEffect(() => {
+    queueMicrotask(() => setDeviceArchive(hasDeviceArchive()));
+  }, [pathname, user?.id]);
+  const hasAnonArchive = !isAuthenticated && (deviceArchive || !!user?.is_anonymous);
   const showTabBar = TAB_BAR_PATHS.has(pathname.endsWith('/') ? pathname : `${pathname}/`);
 
   return (
@@ -47,7 +56,12 @@ export function HerNav() {
               </Link>
             ))}
           </nav>
-          {!loading && !isAuthenticated && (
+          {!loading && hasAnonArchive && (
+            <Link href="/me/" prefetch={false} className="text-[13px]" style={{ color: 'var(--s-ink-2)' }}>
+              我的档案
+            </Link>
+          )}
+          {!loading && !isAuthenticated && !hasAnonArchive && (
             <Link href="/auth/login/" prefetch={false} className="text-[13px]" style={{ color: 'var(--s-ink-2)' }}>
               登录
             </Link>

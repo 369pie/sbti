@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { enqueueProductEvent } from '@/lib/analytics/product-events';
 import { getApiPath } from '@/lib/api';
 import { markDeviceArchive } from '@/lib/her/device-archive';
+import { ensureAnonymousSession } from '@/lib/supabase/auth';
 import { tryCreateBrowserSupabaseClient } from '@/lib/supabase/client';
 
 import styles from '@/app/test/test-v3.module.css';
@@ -43,11 +44,8 @@ export function ArchiveSaveCard({ source, result }: { source: string; result?: A
     try {
       const supabase = tryCreateBrowserSupabaseClient();
       if (!supabase) throw new Error('no_supabase');
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        const { error } = await supabase.auth.signInAnonymously();
-        if (error) throw error;
-      }
+      const session = await ensureAnonymousSession(supabase);
+      if (!session.success) throw new Error(session.error || 'anon_signin_failed');
       const res = await fetch(getApiPath('/her/archive/'), {
         method: 'POST',
         credentials: 'include',

@@ -6,6 +6,7 @@
  * partner_user_id when possible.
  */
 
+import { ensureAnonymousSession } from '@/lib/supabase/auth';
 import { getApiPath } from '@/lib/api';
 import { tryCreateBrowserSupabaseClient } from '@/lib/supabase/client';
 import type { CoupleMergeResult } from '@/lib/xpti/couple';
@@ -19,15 +20,10 @@ async function ensureSession(): Promise<boolean> {
     const supabase = tryCreateBrowserSupabaseClient();
     if (!supabase) return false;
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) {
-        const { error } = await supabase.auth.signInAnonymously();
-        if (error) {
-          console.warn('[xpti-couple-api] signInAnonymously failed:', error.message);
-          return false;
-        }
+      const anon = await ensureAnonymousSession(supabase);
+      if (!anon.success) {
+        console.warn('[xpti-couple-api] signInAnonymously failed:', anon.error);
+        return false;
       }
       return true;
     } catch (err) {
