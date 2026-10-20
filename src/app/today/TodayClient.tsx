@@ -19,6 +19,7 @@ import styles from './today.module.css';
 
 interface TodayPayload {
   ok: true;
+  isAnonymous?: boolean;
   greeting: string;
   nickname: string;
   dateLabel: string;
@@ -108,14 +109,14 @@ export function TodayClient() {
               只写给你的今日卡
             </h1>
             <p className={styles.guestSub}>
-              运势、幸运色、妆容一句，都会跟着你的档案走。还没有账号的话，先花 90 秒测测自己。
+              运势、幸运色、妆容一句，都会跟着你的档案走。先花 90 秒测测自己，一键就能存下档案。
             </p>
             <div className={styles.guestActions}>
-              <Link href="/auth/login/?next=%2Ftoday%2F" prefetch={false} className="s-btn">
-                登录看今日卡
+              <Link href="/start/" prefetch={false} className="s-btn">
+                90 秒测一测 · 免注册建档
               </Link>
-              <Link href="/start/" prefetch={false} className={styles.secondary}>
-                先测测我是谁
+              <Link href="/auth/login/?next=%2Ftoday%2F" prefetch={false} className={styles.secondary}>
+                已有账号，登录
               </Link>
             </div>
           </section>
@@ -200,6 +201,14 @@ export function TodayClient() {
           )}
         </article>
 
+        {data.isAnonymous ? (
+          <p className={styles.memberHint}>
+            档案目前只存在这台设备上 ·{' '}
+            <Link href="/auth/register/?next=%2Ftoday%2F" prefetch={false} className={styles.moodLink}>
+              绑定账号，换手机也不丢
+            </Link>
+          </p>
+        ) : (
         <MembershipSubscribeCard
           redirectPath="/today/"
           skin="journal"
@@ -208,6 +217,7 @@ export function TodayClient() {
           expiresAt={data.membership?.expiresAt ?? null}
           className={styles.memberCard}
         />
+        )}
 
         <section className={`s-card ${styles.mood}`}>
           <div className="s-tape s-tape--peach" />

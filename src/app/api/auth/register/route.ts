@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { computeCompletenessPct } from '@/lib/her/profile-flags';
 
 export async function POST(request: NextRequest) {
   try {
@@ -55,6 +56,30 @@ export async function POST(request: NextRequest) {
     const authEmail = trimmedEmail || `${trimmedUsername}@wtfti.local`;
     const admin = createAdminSupabaseClient();
 
+    // Anonymous archive (one-tap from /start) — carry it into the new account.
+    let anonArchive: {
+      has_persona?: boolean;
+      has_color_season?: boolean;
+      has_palm?: boolean;
+      has_face?: boolean;
+      color_season?: string | null;
+      palm_summary?: Record<string, unknown> | null;
+    } | null = null;
+    try {
+      const preSession = await createServerSupabaseClient();
+      const { data: pre } = await preSession.auth.getUser();
+      if (pre.user?.is_anonymous) {
+        const { data: row } = await admin
+          .from('her_profiles')
+          .select('has_persona, has_color_season, has_palm, has_face, color_season, palm_summary')
+          .eq('user_id', pre.user.id)
+          .maybeSingle();
+        anonArchive = (row as typeof anonArchive) ?? null;
+      }
+    } catch {
+      anonArchive = null;
+    }
+
     const { data, error } = await admin.auth.admin.createUser({
       email: authEmail,
       password,
@@ -85,7 +110,8 @@ export async function POST(request: NextRequest) {
         user_id: data.user.id,
         birth_year: birthYear,
         nickname: trimmedNickname || trimmedUsername,
-        completeness_pct: 10,
+        ...(anonArchive ?? {}),
+        completeness_pct: computeCompletenessPct({ birth_year: birthYear, ...(anonArchive ?? {}) }),
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'user_id' },
@@ -107,6 +133,7 @@ export async function POST(request: NextRequest) {
         userId: data.user.id,
         autoSignedIn: false,
         archiveCreated: !profileError,
+      archiveCarried: !!anonArchive,
       });
     }
 
@@ -115,6 +142,7 @@ export async function POST(request: NextRequest) {
       userId: data.user.id,
       autoSignedIn: true,
       archiveCreated: !profileError,
+      archiveCarried: !!anonArchive,
     });
   } catch (err) {
     console.error('[api/auth/register] unexpected error:', err);

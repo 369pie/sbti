@@ -1,12 +1,12 @@
 /**
  * GET /api/today — personalized Today Card + streak bump (P1 slice A).
- * Claimed (non-anonymous) session required.
+ * Any session (anonymous archive OK); payload flags isAnonymous so UI can offer binding.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import type { User } from '@supabase/supabase-js';
 
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
-import { withClaimedAuth } from '@/lib/supabase/with-auth';
+import { withAuth } from '@/lib/supabase/with-auth';
 import { getUserDisplayName } from '@/lib/supabase/auth';
 import {
   formatShanghaiDateCN,
@@ -47,7 +47,7 @@ function json(body: unknown, init?: ResponseInit) {
   });
 }
 
-export const GET = withClaimedAuth(async (_req: NextRequest, _ctx, user: User) => {
+export const GET = withAuth(async (_req: NextRequest, _ctx, user: User) => {
   const admin = createAdminSupabaseClient();
   const todayISO = shanghaiDateISO();
   const yesterdayISO = shanghaiYesterdayISO();
@@ -63,6 +63,11 @@ export const GET = withClaimedAuth(async (_req: NextRequest, _ctx, user: User) =
   if (selectError && selectError.code !== 'PGRST116') {
     console.error('[api/today] select failed', selectError.message);
     return json({ error: 'profile_load_failed' }, { status: 500 });
+  }
+
+  // Anonymous sessions only get a card once they've saved an archive (/start one-tap).
+  if (user.is_anonymous && !existing) {
+    return json({ error: 'no_archive', needsArchive: true }, { status: 401 });
   }
 
   const metaBirth =
@@ -152,6 +157,7 @@ export const GET = withClaimedAuth(async (_req: NextRequest, _ctx, user: User) =
 
   return json({
     ok: true,
+    isAnonymous: !!user.is_anonymous,
     greeting: greetingForHour(hour),
     nickname,
     dateLabel: formatShanghaiDateCN(todayISO),
