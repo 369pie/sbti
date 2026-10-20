@@ -85,7 +85,9 @@ export function MeArchive({ embedded = false }: { embedded?: boolean }) {
             ? data?.isAnonymous
               ? '存在这台设备上，不用注册。想换手机也不丢，可以绑定账号。'
               : '你测过的每一个结果，都会写进这里。'
-            : '做完任意一个测试，一键就能存下来，不用注册。'}
+            : rows.length
+              ? '你在这台设备上测过的结果都在这里，一键存进档案就能每天收到今日卡。'
+              : '做完任意一个测试，一键就能存下来，不用注册。'}
         </p>
 
         <section className={`s-card s-card--lined ${styles.card}`}>
@@ -134,6 +136,8 @@ export function MeArchive({ embedded = false }: { embedded?: boolean }) {
         <div className={styles.cta}>
           {hasArchive ? (
             <Link href="/today/" prefetch={false} className="s-btn">打开我的今日卡</Link>
+          ) : persona && resultHref(persona) ? (
+            <Link href={resultHref(persona)!} prefetch={false} className="s-btn">把这个结果存进档案</Link>
           ) : (
             <Link href="/test/" prefetch={false} className="s-btn">90 秒首测 · 开始建档</Link>
           )}
