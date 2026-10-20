@@ -62,7 +62,7 @@ export function MemberEntryCard({ source, showUsage = false }: { source: string;
         </ul>
       )}
       <Link href={memberHref(source)} prefetch={false} onClick={() => trackMemberEntry(source)} className="s-btn"
-        style={{ marginTop: 12, display: 'inline-block' }}>
+        style={{ marginTop: 12, display: 'block', textAlign: 'center' }}>
         {isMember ? '查看会员权益' : `¥${MEMBER_PRICE_CNY} 开通会员`}
       </Link>
     </div>

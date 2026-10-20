@@ -408,7 +408,7 @@ export function PremiumPaywall({
                           }
                         }}
                       >
-                        会员 8 折 · ¥{discountedPrice.toFixed(1)}
+                        {passCovers ? "会员免费" : `会员 8 折 · ¥${discountedPrice.toFixed(1)}`}
                       </Link>
                     </>
                   )}
