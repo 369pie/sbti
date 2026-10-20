@@ -7,20 +7,12 @@
  */
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { MembershipSubscribeCard } from '@/components/MembershipSubscribeCard';
-import { readApiJson } from '@/lib/api';
+import { FEATURES, capFor } from '@/lib/entitlements';
 import { MEMBERSHIP_PRICE_LABEL } from '@/lib/her/membership-benefits';
-import { getOrCreateDeviceId } from '@/lib/mysti/device';
-
-interface MembershipResp {
-  ok?: boolean;
-  claimed?: boolean;
-  isMember?: boolean;
-  expiresAt?: string | null;
-  source?: 'her_profiles' | 'legacy_pass' | null;
-}
+import { trackMemberEvent, useEntitlements } from '@/lib/member-client';
 
 const SINGLES: Array<{ name: string; desc: string; href: string }> = [
   { name: '我和他 · 双人关系报告', desc: '你们俩都测完后解锁，可 AA 各付一半', href: '/xpti/couple/' },
@@ -28,15 +20,16 @@ const SINGLES: Array<{ name: string; desc: string; href: string }> = [
 ];
 
 export function MemberContent() {
-  const [state, setState] = useState<MembershipResp | null>(null);
+  const state = useEntitlements();
 
   useEffect(() => {
-    const deviceId = getOrCreateDeviceId() || '';
-    fetch(`/api/her/membership/?deviceId=${encodeURIComponent(deviceId)}`, { credentials: 'include' })
-      .then((r) => readApiJson<MembershipResp>(r))
-      .then(setState)
-      .catch(() => setState({ ok: false }));
+    const from = new URLSearchParams(window.location.search).get('from') ?? 'direct';
+    trackMemberEvent('member_page_view', { from });
   }, []);
+
+  const usageByKey = new Map((state?.usage ?? []).map((u) => [u.key, u]));
+  const content = FEATURES.filter((f) => f.kind === 'content');
+  const ai = FEATURES.filter((f) => f.kind === 'ai');
 
   return (
     <main className="skin-journal" style={{ minHeight: '100vh' }}>
@@ -63,6 +56,41 @@ export function MemberContent() {
           expiresAt={state?.expiresAt ?? null}
         />
 
+        <section style={{ marginTop: 24 }} data-section="benefits">
+          <p className="s-eyebrow">Benefits · 会员权益</p>
+          <h2 className="s-title" style={{ fontSize: 22, margin: '8px 0 12px' }}>全站付费内容，会员都免费</h2>
+          <ul className="s-card" style={{ listStyle: 'none', margin: 0, padding: '6px 16px' }}>
+            {content.map((f) => (
+              <li key={f.key} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '10px 0', borderBottom: '1px dashed var(--s-line, rgba(0,0,0,0.08))', fontSize: 14 }}>
+                <span style={{ color: 'var(--s-ink)' }}>{f.label}</span>
+                <span style={{ color: 'var(--s-accent-text)', whiteSpace: 'nowrap' }}>会员免费</span>
+              </li>
+            ))}
+          </ul>
+          <h3 className="s-title" style={{ fontSize: 18, margin: '18px 0 10px' }}>AI 功能 · 每月次数</h3>
+          <div className="s-card" style={{ padding: '6px 16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 64px 64px', fontSize: 12, color: 'var(--s-mute)', padding: '8px 0' }}>
+              <span>功能</span><span style={{ textAlign: 'right' }}>非会员</span><span style={{ textAlign: 'right' }}>会员</span>
+            </div>
+            {ai.map((f) => {
+              const u = usageByKey.get(f.key);
+              return (
+                <div key={f.key} style={{ display: 'grid', gridTemplateColumns: '1fr 64px 64px', fontSize: 14, padding: '9px 0', borderTop: '1px dashed var(--s-line, rgba(0,0,0,0.08))' }}>
+                  <span style={{ color: 'var(--s-ink)' }}>
+                    {f.label}
+                    {u && u.remaining != null ? (
+                      <span style={{ display: 'block', fontSize: 11, color: 'var(--s-mute)' }}>本月剩 {u.remaining}/{u.cap}</span>
+                    ) : null}
+                  </span>
+                  <span style={{ textAlign: 'right', color: 'var(--s-mute)' }}>{f.freeQuota ?? 0} 次</span>
+                  <span style={{ textAlign: 'right', color: 'var(--s-accent-text)', fontWeight: 500 }}>{capFor(f.key, true) ?? '不限'} 次</span>
+                </div>
+              );
+            })}
+          </div>
+          <p style={{ fontSize: 12, color: 'var(--s-mute)', margin: '8px 2px 0' }}>次数每月 1 日（北京时间）重置。</p>
+        </section>
+
         {state && !state.claimed && !state.isMember ? (
           <p style={{ fontSize: 12, color: 'var(--s-mute)', margin: '12px 2px 0', lineHeight: 1.6 }}>
             建议先
@@ -80,7 +108,7 @@ export function MemberContent() {
             {SINGLES.map((s) => (
               <Link key={s.name} href={s.href} prefetch={false} className="s-card" style={{ padding: '14px 16px', display: 'block' }}>
                 <span style={{ display: 'block', fontSize: 15, color: 'var(--s-ink)', fontWeight: 500 }}>{s.name}</span>
-                <span style={{ display: 'block', fontSize: 13, color: 'var(--s-mute)', marginTop: 4 }}>{s.desc} · 会员 8 折</span>
+                <span style={{ display: 'block', fontSize: 13, color: 'var(--s-mute)', marginTop: 4 }}>{s.desc} · 会员免费</span>
               </Link>
             ))}
           </div>

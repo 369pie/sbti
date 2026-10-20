@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { memberUnlocksSku } from '@/lib/member-access';
 import {
   createXunhupayOrder,
   maskXunhupayAppId,
@@ -156,6 +157,15 @@ export async function POST(req: NextRequest) {
   const paymentType = body.paymentType ?? 'wechat';
   const ref = (body.ref ?? '').slice(0, 32);
   const deviceId = (body.deviceId ?? '').slice(0, 64) || undefined;
+
+  // 全站会员：会员覆盖的内容 SKU 无需下单（服务端按 session 判定）。
+  const memberAccess = sku && isPurchasableSku(sku) ? await memberUnlocksSku(sku, { deviceId }) : null;
+  if (memberAccess?.unlocked) {
+    return NextResponse.json(
+      { error: 'member_covered', memberCovered: true, unlocked: true, sku, resourceId },
+      { status: 409 },
+    );
+  }
   // Bind claimed session so monthly-pass can write her_profiles.is_member
   const auth = await getAuthUser();
   const userId =

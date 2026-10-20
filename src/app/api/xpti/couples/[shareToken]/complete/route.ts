@@ -9,6 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { coupleUnlockState } from '@/lib/member-access';
 import { completeCouplePartner } from '@/lib/xpti/couple-server';
 import { getAuthUser } from '@/lib/supabase/middleware';
 
@@ -69,6 +70,7 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
     if (!couple) {
       return NextResponse.json({ error: 'not_found' }, { status: 404 });
     }
+    const unlock = await coupleUnlockState(couple, { deviceId: req.nextUrl.searchParams.get('deviceId') });
     return NextResponse.json({
       couple: {
         shareToken: couple.share_token,
@@ -85,7 +87,8 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
           nickname: couple.partner_nickname,
         },
         merged: couple.merged_payload,
-        unlocked: couple.unlocked_at != null,
+        unlocked: unlock.unlocked,
+        unlockedVia: unlock.via,
         unlockedSku: couple.unlocked_sku,
         unlockedAt: couple.unlocked_at,
         completedAt: couple.completed_at,

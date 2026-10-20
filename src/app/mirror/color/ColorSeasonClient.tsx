@@ -5,6 +5,7 @@
  * 问卷 ± 可选自拍 → has_color_season；照片不落库。
  */
 
+import { quotaMessage, trackQuotaExhausted } from '@/lib/member-client';
 import Link from 'next/link';
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react';
 
@@ -102,7 +103,7 @@ export function ColorSeasonClient() {
         profile?: { completeness_pct?: number } | null;
       };
       if (!res.ok || !data.ok || !data.result) {
-        setError(data.error === 'rate_limited' ? '太频繁了，稍后再试' : '这次没诊断出来，再试一次');
+        if (data.error === 'quota_exhausted') { trackQuotaExhausted(data); setError(quotaMessage(data)); } else setError(data.error === 'rate_limited' ? '太频繁了，稍后再试' : '这次没诊断出来，再试一次');
         setBusy(false);
         return;
       }

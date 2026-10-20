@@ -12,6 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { memberUnlocksSku } from '@/lib/member-access';
 
 async function recordUnlock(opts: {
   orderId: string;
@@ -61,6 +62,16 @@ export async function GET(req: NextRequest) {
   const slug = req.nextUrl.searchParams.get('slug') ?? '';
   const sku = req.nextUrl.searchParams.get('sku') ?? '';
   const isLive = process.env.SOULTI_PAYMENT_PROVIDER === 'live';
+
+  // 全站会员：SoulTI 深度报告（full-report ≙ soulti-deep-mirror）对会员放行。
+  if (sku === 'full-report' || sku === 'soulti-deep-mirror') {
+    const member = await memberUnlocksSku('soulti-deep-mirror', {
+      deviceId: req.nextUrl.searchParams.get('deviceId'),
+    });
+    if (member.unlocked) {
+      return NextResponse.json({ orderId: orderId || null, status: 'paid', provider: 'member', unlocked: true });
+    }
+  }
 
   if (!orderId) {
     return NextResponse.json({ error: 'missing_orderId' }, { status: 400 });

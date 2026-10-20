@@ -162,24 +162,9 @@ export function daysUntilExpiry(now: number = Date.now()): number {
   return Math.max(0, Math.ceil(ms / (24 * 60 * 60 * 1000)));
 }
 
-/** 通行证 C 端是否覆盖某个 SKU 的"内容解锁" */
+/** 会员（含旧通行证）是否覆盖某个 SKU 的内容解锁 — 全站会员：所有付费内容（lib/entitlements.ts）。 */
 export function passCoversSingleSku(sku: string): boolean {
-  // creator-pass 不解锁 C 端内容
-  switch (sku) {
-    case 'monthly-report':
-    case 'share-plus':
-    case 'wtfti-deep-pantheon':
-    case 'soulti-deep-mirror':
-    case 'cpti-deep-relationship':
-    case 'cpti-codex-pass-yearly':
-    case 'cpti-cosign-edition':
-    case 'cpti-squad-pack':
-    case 'cpti-seasonal-pack':
-    case 'xpti-deep-xp':
-      return true;
-    default:
-      return false;
-  }
+  return memberCoversSku(sku);
 }
 
 /** 通行证 C 端权益是否覆盖某个 SKU（含 7 折） */
@@ -212,6 +197,7 @@ export { isSubscriptionSku };
 // ───────────────────────── Server sync ─────────────────────────
 
 import { getOrCreateDeviceId } from './device';
+import { memberCoversSku } from '@/lib/entitlements';
 
 const LAST_SYNC_KEY = 'mysti-subscription-last-sync';
 const SYNC_INTERVAL_MS = 60 * 60 * 1000; // 1h

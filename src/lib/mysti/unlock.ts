@@ -10,6 +10,8 @@
  * 独立的 `subscription.ts` 管理过期时间与权益。
  */
 
+import { memberCoversSku } from '@/lib/entitlements';
+
 const STORAGE_PREFIX = 'mysti-unlock-';
 
 /** 单次解锁类 */
@@ -71,7 +73,20 @@ function key(sku: MystiSku, resourceId: string): string {
 export function isUnlocked(sku: MystiSku, resourceId: string): boolean {
   if (typeof window === 'undefined') return false;
   try {
-    return window.localStorage.getItem(key(sku, resourceId)) !== null;
+    if (window.localStorage.getItem(key(sku, resourceId)) !== null) return true;
+    return memberCoversSku(sku) && hasLocalMembership();
+  } catch {
+    return false;
+  }
+}
+
+/** 全站会员（本地镜像）：服务端 /api/entitlements 写 wtfti-member-until，旧通行证写 mysti-subscription-v1 */
+function hasLocalMembership(now: number = Date.now()): boolean {
+  const until = Number(window.localStorage.getItem('wtfti-member-until') ?? 0);
+  if (until > now) return true;
+  try {
+    const env = JSON.parse(window.localStorage.getItem('mysti-subscription-v1') ?? 'null') as { active?: { expiresAt?: number } } | null;
+    return !!(env?.active?.expiresAt && env.active.expiresAt > now);
   } catch {
     return false;
   }

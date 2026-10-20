@@ -6,6 +6,7 @@
  * wall. Login / bind account are secondary. Read-only: GET /api/her/archive/.
  */
 
+import { MemberEntryCard } from '@/components/member/MemberEntry';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -90,6 +91,9 @@ export function MeArchive({ embedded = false }: { embedded?: boolean }) {
               ? '你在这台设备上测过的结果都在这里，一键存进档案就能每天收到今日卡。'
               : '做完任意一个测试，一键就能存下来，不用注册。'}
         </p>
+        <div style={{ margin: '16px 0 4px' }}>
+          <MemberEntryCard source="me" showUsage />
+        </div>
 
         <section className={`s-card s-card--lined ${styles.card}`}>
           <div className="s-tape" />

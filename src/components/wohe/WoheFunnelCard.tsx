@@ -36,7 +36,7 @@ export function WoheFunnelCard({
         <span className="s-title" style={{ display: 'block', fontSize: 21, margin: '8px 0 6px' }}>{title}</span>
         <span style={{ display: 'block', fontSize: 14, lineHeight: 1.7, color: 'var(--s-ink-2)', marginBottom: 14 }}>{desc}</span>
         <span className="s-btn">{cta}</span>
-        <span style={{ display: 'block', fontSize: 12, color: 'var(--s-mute)', marginTop: 10 }}>约 5 分钟 · 免费测 · 双人报告可单买，会员 8 折</span>
+        <span style={{ display: 'block', fontSize: 12, color: 'var(--s-mute)', marginTop: 10 }}>约 5 分钟 · 免费测 · 双人报告可单买，会员免费</span>
       </Link>
     </section>
   );

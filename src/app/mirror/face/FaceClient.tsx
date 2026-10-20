@@ -5,6 +5,7 @@
  * 自述三题 ± 可选自拍 → vision/规则库 → has_face。无 MediaPipe 重依赖。
  */
 
+import { quotaMessage, trackQuotaExhausted } from '@/lib/member-client';
 import Link from 'next/link';
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react';
 
@@ -91,7 +92,7 @@ export function FaceClient() {
         profile?: { completeness_pct?: number } | null;
       };
       if (!res.ok || !data.ok || !data.result) {
-        setError(data.error === 'rate_limited' ? '太频繁了，稍后再试' : '这次没看出来，再试一次');
+        if (data.error === 'quota_exhausted') { trackQuotaExhausted(data); setError(quotaMessage(data)); } else setError(data.error === 'rate_limited' ? '太频繁了，稍后再试' : '这次没看出来，再试一次');
         setBusy(false);
         return;
       }

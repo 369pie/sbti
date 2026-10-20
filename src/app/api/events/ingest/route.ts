@@ -35,6 +35,8 @@ const ALLOWED_MODULES = new Set([
   'first_look',
   // Unified test_start / test_finish (audit 2026-10-20 Phase 1).
   'test',
+  // 全站会员 funnel (2026-10-21).
+  'member',
   'mysti',
   'cpti',
   'soulti',
