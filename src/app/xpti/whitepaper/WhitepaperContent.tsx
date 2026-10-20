@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
 import { ITC_AXES } from '@/lib/xpti/itc';
-import { ITC_PAIRINGS_CATALOG } from '@/lib/xpti/itc-pairing';
 import { XPTI_PERSONALITY_TYPES, getXptiTensionSignature } from '@/lib/xpti/personalities';
 
 const display = '"Cormorant Garamond", "Noto Serif SC", serif';
@@ -29,7 +28,9 @@ const PALETTE = {
  *
  * 我们不再单独维护一份 PDF 二进制，源真理是这一页 + itc-theory.md。
  */
-export function WhitepaperContent() {
+export type PublicPairing = { id: string; label: string; english: string; oneLine: string };
+
+export function WhitepaperContent({ pairings }: { pairings: PublicPairing[] }) {
   useEffect(() => {
     trackFunnelEvent('theory_view', { module: 'xpti', source: 'whitepaper' });
   }, []);
@@ -208,7 +209,7 @@ export function WhitepaperContent() {
         <section style={{ marginTop: 36 }}>
           <SectionTitle eyebrow="§4" title="6 类张力配对模型" />
           <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
-            {ITC_PAIRINGS_CATALOG.map((pair) => (
+            {pairings.map((pair) => (
               <div
                 key={pair.id}
                 style={{ borderLeft: `3px solid ${PALETTE.wine}`, padding: '8px 14px', background: PALETTE.paperDeep, borderRadius: 4 }}

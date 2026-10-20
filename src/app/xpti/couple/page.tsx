@@ -4,9 +4,9 @@ import { decodeCoupleInvite } from '@/lib/xpti/couple';
 import {
   createCouple,
   getCoupleByShareToken,
-  type XptiCoupleRow,
 } from '@/lib/xpti/couple-server';
-import { CoupleClient, type InitialCoupleProps } from './CoupleClient';
+import { buildCoupleView } from '@/lib/xpti/couple-view';
+import { CoupleClient } from './CoupleClient';
 
 export const metadata: Metadata = {
   title: '我和他 · 合不合 — 你先测，再邀请他 | WTFTI',
@@ -31,32 +31,6 @@ function pickFirst(value: string | string[] | undefined): string | undefined {
   return value;
 }
 
-function toView(couple: XptiCoupleRow): NonNullable<InitialCoupleProps['initialCouple']> {
-  return {
-    shareToken: couple.share_token,
-    pairCode: couple.pair_code,
-    status: couple.status,
-    inviter: {
-      slug: couple.inviter_slug,
-      dims: couple.inviter_dims,
-      nickname: couple.inviter_nickname,
-    },
-    partner: couple.partner_slug
-      ? {
-          slug: couple.partner_slug,
-          dims: couple.partner_dims!,
-          nickname: couple.partner_nickname,
-        }
-      : null,
-    merged: couple.merged_payload,
-    unlocked: couple.unlocked_at != null,
-    unlockedSku: couple.unlocked_sku,
-    unlockedAt: couple.unlocked_at,
-    completedAt: couple.completed_at,
-    expiresAt: couple.expires_at,
-    history: (couple.history ?? []) as NonNullable<InitialCoupleProps['initialCouple']>['history'],
-  };
-}
 
 export default async function XptiCouplePage({ searchParams }: XptiCouplePageProps) {
   const params = (await searchParams) ?? {};
@@ -68,7 +42,7 @@ export default async function XptiCouplePage({ searchParams }: XptiCouplePagePro
     if (couple) {
       return (
         <CoupleClient
-          initialCouple={toView(couple)}
+          initialCouple={await buildCoupleView(couple)}
           initialShareToken={token}
           legacyInviteMode={false}
         />
@@ -93,7 +67,7 @@ export default async function XptiCouplePage({ searchParams }: XptiCouplePagePro
       if (upgradedCouple) {
         return (
           <CoupleClient
-            initialCouple={toView(upgradedCouple)}
+            initialCouple={await buildCoupleView(upgradedCouple)}
             initialShareToken={upgradedCouple.share_token}
             legacyInviteMode={true}
           />

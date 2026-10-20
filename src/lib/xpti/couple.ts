@@ -13,7 +13,7 @@
 import { XPTI_PERSONALITY_TYPES, type XptiPersonalityType } from './personalities';
 import type { XptiDimensionScore } from './scoring';
 import { computeItcAxes, type ItcAxisScore } from './itc';
-import { matchTensionPairing, type TensionPairing } from './itc-pairing';
+import type { TensionPairing } from './itc-pairing';
 import type { ItcSignature } from './itc';
 
 const SCHEMA_VERSION = 'v1';
@@ -92,18 +92,9 @@ export interface CoupleMergeResult {
   pairing: TensionPairing;
 }
 
-/** Build the full merged report from two sides' raw dimension scores + slugs. */
-export function buildCoupleMerge(
-  inviter: { slug: string; dims: number[] },
-  partner: { slug: string; dims: number[] }
-): CoupleMergeResult {
-  const a = enrichSide(inviter);
-  const b = enrichSide(partner);
-  const pairing = matchTensionPairing(a.signature, b.signature);
-  return { inviter: a, partner: b, pairing };
-}
-
-function enrichSide(side: { slug: string; dims: number[] }) {
+/** Per-side enrichment (free data). buildCoupleMerge lives in ./couple-merge
+ *  (server-only) so the paid pairing notes never enter client bundles. */
+export function enrichCoupleSide(side: { slug: string; dims: number[] }) {
   const archetype =
     XPTI_PERSONALITY_TYPES.find((p) => p.slug === side.slug) ?? XPTI_PERSONALITY_TYPES[0];
   const sig = dimsToSignature(side.dims);

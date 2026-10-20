@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getSiteUrl } from '@/lib/site';
-import { getCoupleByShareToken, type XptiCoupleRow } from '@/lib/xpti/couple-server';
-import { CoupleClient, type InitialCoupleProps } from '../../CoupleClient';
+import { getCoupleByShareToken } from '@/lib/xpti/couple-server';
+import { buildCoupleView } from '@/lib/xpti/couple-view';
+import { CoupleClient } from '../../CoupleClient';
 
 interface ResultPageProps {
   params: Promise<{ shareToken: string }>;
@@ -33,32 +34,6 @@ export async function generateMetadata({ params }: ResultPageProps): Promise<Met
   };
 }
 
-function toView(couple: XptiCoupleRow): NonNullable<InitialCoupleProps['initialCouple']> {
-  return {
-    shareToken: couple.share_token,
-    pairCode: couple.pair_code,
-    status: couple.status,
-    inviter: {
-      slug: couple.inviter_slug,
-      dims: couple.inviter_dims,
-      nickname: couple.inviter_nickname,
-    },
-    partner: couple.partner_slug
-      ? {
-          slug: couple.partner_slug,
-          dims: couple.partner_dims!,
-          nickname: couple.partner_nickname,
-        }
-      : null,
-    merged: couple.merged_payload,
-    unlocked: couple.unlocked_at != null,
-    unlockedSku: couple.unlocked_sku,
-    unlockedAt: couple.unlocked_at,
-    completedAt: couple.completed_at,
-    expiresAt: couple.expires_at,
-    history: (couple.history ?? []) as NonNullable<InitialCoupleProps['initialCouple']>['history'],
-  };
-}
 
 export default async function XptiCoupleResultPage({ params }: ResultPageProps) {
   const { shareToken } = await params;
@@ -66,7 +41,7 @@ export default async function XptiCoupleResultPage({ params }: ResultPageProps) 
   if (!couple) notFound();
   return (
     <CoupleClient
-      initialCouple={toView(couple)}
+      initialCouple={await buildCoupleView(couple)}
       initialShareToken={shareToken}
       legacyInviteMode={false}
     />

@@ -56,6 +56,10 @@ interface Props {
   theme?: PaywallTheme;
   /** Optional teaser bullets shown below the price (max ~3). */
   teaserBullets?: string[];
+  /** Server already says this resource is unlocked (e.g. couple order / member). */
+  serverUnlocked?: boolean;
+  /** Fired once whenever the paywall enters the unlocked state (payment, restore, member). */
+  onUnlocked?: () => void;
 }
 
 export function PremiumPaywall({
@@ -67,6 +71,8 @@ export function PremiumPaywall({
   children,
   theme: themeProp,
   teaserBullets,
+  serverUnlocked = false,
+  onUnlocked,
 }: Props) {
   const theme: PaywallTheme = themeProp
     ?? (brand === 'mysti'
@@ -75,7 +81,15 @@ export function PremiumPaywall({
       ? BRAND_THEMES.wtfti
       : BRAND_THEMES[brand]);
 
-  const [unlocked, setUnlocked] = useState<boolean>(() => isUnlocked(sku, resourceId));
+  const [unlocked, setUnlocked] = useState<boolean>(() => serverUnlocked || isUnlocked(sku, resourceId));
+  useEffect(() => {
+    if (serverUnlocked) setUnlocked(true);
+  }, [serverUnlocked]);
+  const onUnlockedRef = useRef(onUnlocked);
+  onUnlockedRef.current = onUnlocked;
+  useEffect(() => {
+    if (unlocked) onUnlockedRef.current?.();
+  }, [unlocked]);
   const [hasPass, setHasPass] = useState(false);
   /** P3 her_profiles membership — discount only (does not free-unlock passCovers). */
   const [herMemberDiscount, setHerMemberDiscount] = useState(false);

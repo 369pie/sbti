@@ -6,6 +6,8 @@
  * partner_user_id when possible.
  */
 
+import type { DialogueScript } from '@/lib/xpti/dialogue-scripts';
+import type { ConflictRehearsal, DailyPractice, LoveLetter } from '@/lib/xpti/paid-content';
 import { ensureAnonymousSession } from '@/lib/supabase/auth';
 import { getApiPath } from '@/lib/api';
 import { tryCreateBrowserSupabaseClient } from '@/lib/supabase/client';
@@ -35,14 +37,25 @@ async function ensureSession(): Promise<boolean> {
   return _signInPromise;
 }
 
+/** Paid deep content — only present when the requester is unlocked (order or member). */
+export interface CoupleDeepPayload {
+  dialogues: DialogueScript[];
+  practice: DailyPractice[];
+  conflicts: ConflictRehearsal[];
+  letter: LoveLetter;
+}
+
 export interface PublicCoupleView {
   shareToken: string;
   pairCode: string;
   status: 'active' | 'completed' | 'expired';
   inviter: { slug: string; dims: number[]; nickname: string | null };
   partner: { slug: string; dims: number[]; nickname: string | null } | null;
+  /** Locked: pairing.longDescription / pairing.notes are stripped server-side. */
   merged: CoupleMergeResult | null;
+  deep?: CoupleDeepPayload | null;
   unlocked: boolean;
+  unlockedVia?: 'order' | 'member' | null;
   unlockedSku: string | null;
   unlockedAt: string | null;
   completedAt: string | null;

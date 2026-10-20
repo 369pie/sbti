@@ -123,6 +123,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid_json' }, { status: 400 });
   }
 
+  // 全站会员：会员覆盖的内容 SKU 无需下单（服务端按 session 判定）。放在支付时段/限流之前：会员不付款。
+  {
+    const memberSku = typeof body.sku === 'string' && isPurchasableSku(body.sku) ? body.sku : null;
+    const memberDevice = (body.deviceId ?? '').slice(0, 64) || undefined;
+    const memberAccess = memberSku ? await memberUnlocksSku(memberSku, { deviceId: memberDevice }) : null;
+    if (memberAccess?.unlocked) {
+      return NextResponse.json(
+        { error: 'member_covered', memberCovered: true, unlocked: true, sku: memberSku, resourceId: (body.resourceId ?? '').slice(0, 64) },
+        { status: 409 },
+      );
+    }
+  }
+
   const paymentAvailability = getPaymentAvailabilityStatus();
   if (paymentAvailability.blocked) {
     return NextResponse.json(getPaymentBlockedPayload(), { status: 403 });
@@ -157,15 +170,6 @@ export async function POST(req: NextRequest) {
   const paymentType = body.paymentType ?? 'wechat';
   const ref = (body.ref ?? '').slice(0, 32);
   const deviceId = (body.deviceId ?? '').slice(0, 64) || undefined;
-
-  // 全站会员：会员覆盖的内容 SKU 无需下单（服务端按 session 判定）。
-  const memberAccess = sku && isPurchasableSku(sku) ? await memberUnlocksSku(sku, { deviceId }) : null;
-  if (memberAccess?.unlocked) {
-    return NextResponse.json(
-      { error: 'member_covered', memberCovered: true, unlocked: true, sku, resourceId },
-      { status: 409 },
-    );
-  }
   // Bind claimed session so monthly-pass can write her_profiles.is_member
   const auth = await getAuthUser();
   const userId =

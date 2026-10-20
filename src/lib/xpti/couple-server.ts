@@ -14,7 +14,8 @@
 import { randomBytes } from 'node:crypto';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { generatePairCode } from '@/lib/cpti/pair-code';
-import { buildCoupleMerge, type CoupleMergeResult } from '@/lib/xpti/couple';
+import type { CoupleMergeResult } from '@/lib/xpti/couple';
+import { buildCoupleMerge } from '@/lib/xpti/couple-merge';
 
 export type XptiCoupleStatus = 'active' | 'completed' | 'expired';
 

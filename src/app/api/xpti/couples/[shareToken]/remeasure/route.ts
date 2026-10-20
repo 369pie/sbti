@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { recordRemeasure } from '@/lib/xpti/couple-server';
+import { buildCoupleView } from '@/lib/xpti/couple-view';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,9 +34,12 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   if (!updated) {
     return NextResponse.json({ error: 'Couple not found or update failed' }, { status: 404 });
   }
+  const view = await buildCoupleView(updated, { deviceId: req.nextUrl.searchParams.get('deviceId') });
   return NextResponse.json({
     ok: true,
     history: updated.history,
-    merged: updated.merged_payload,
+    merged: view.merged,
+    deep: view.deep,
+    unlocked: view.unlocked,
   });
 }
