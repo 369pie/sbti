@@ -317,7 +317,7 @@ export function CoupleClient({
         </h1>
         {mode !== 'merged' ? (
           <p style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--s-ink-2)', margin: 0 }}>
-            ① 你做完自己的测试 → ② 把链接发给他，他答 12 题 → ③ 看你们俩合不合。双人深度报告 ¥ 单买或 AA，会员 8 折。
+            ① 你做完自己的测试 → ② 把链接发给他，他答 12 题 → ③ 看你们俩合不合。双人深度报告 ¥12.9 单买，或两人 AA 各 ¥6.9；会员 8 折。
           </p>
         ) : null}
       </header>
