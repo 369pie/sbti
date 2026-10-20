@@ -3,7 +3,7 @@ import { getSiteUrl } from '@/lib/site';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: '关于 WTFTI',
+  title: { absolute: '关于 WTFTI' },
   description:
     '了解 WTFTI 多宇宙人格测试平台、经典 SBTI 测试结构，以及它和 MBTI 的区别。',
   keywords: ['WTFTI', 'SBTI', '人格测试', '关于WTFTI', 'SBTI介绍', 'MBTI区别'],

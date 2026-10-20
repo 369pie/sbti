@@ -5,7 +5,7 @@ import { ResetPasswordForm } from './ResetPasswordForm';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: '重置密码 — WTFTI',
+  title: '重置密码',
   description: '设置你的新密码。',
   robots: { index: false, follow: false },
 };

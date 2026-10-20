@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const a = getArchetypeBySlug(slug);
   if (!a) return {};
   return {
-    title: `「${a.name}」· 我的 90 秒首测结果 — WTFTI`,
+    title: `「${a.name}」· 我的 90 秒首测结果`,
     description: `${a.tagline} 大约 ${a.holdRate}% 的女生和你一样。90 秒首测，免费免注册。`,
     alternates: { canonical: `/test/result/${slug}/` },
     openGraph: {

@@ -14,7 +14,7 @@ const ALL_TABS = [
 ];
 
 export const metadata: Metadata = {
-  title: `WTFTI 全人格图鉴馆 — ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡`,
+  title: { absolute: `WTFTI 全人格图鉴馆 — ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡` },
   description:
     `浏览 WTFTI 全部 ${TYPES_GALLERY_DATA.totalCount} 张抽象人设卡：经典 SBTI、修仙版、WTFTI、班TI、王者TI、三角TI、恋爱、职场、XPTI、花TI、今日状态、酒后人设，${TYPES_GALLERY_DATA.seriesCount} 个系列一次刷完。`,
   keywords: ['WTFTI人格图鉴', 'SBTI人格图鉴', '人格类型大全', '人格图鉴馆', '抽象人设卡', '人格测试类型'],

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { ProfileClient } from './ProfileClient';
 
 export const metadata: Metadata = {
-  title: 'WTFTI · 五感档案 — 你的灵魂频率',
+  title: { absolute: 'WTFTI · 五感档案 — 你的灵魂频率' },
   description:
     'WTFTI · 五感档案：把听觉/视觉/嗅觉/触觉/直觉合成一张你的灵魂频率雷达，附带「灵魂香水」与「灵魂质地」描述。',
   alternates: { canonical: '/wtfti/profile/' },

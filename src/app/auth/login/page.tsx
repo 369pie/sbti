@@ -5,7 +5,7 @@ import { LoginForm } from './LoginForm';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: '登录 — WTFTI',
+  title: '登录',
   description: '登录你的 WTFTI 账号，同步你的人格衣橱和关系图鉴。',
   robots: { index: false, follow: false },
 };

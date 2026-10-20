@@ -4,7 +4,7 @@ import { FR_REALMS, getFrCharacter } from '@/lib/fanrenti/characters';
 import { FANRENTI_PERSONALITIES } from '@/lib/fanrenti/personalities';
 
 export const metadata: Metadata = {
-  title: '凡人TI · 修仙图鉴 | WTFTI',
+  title: '凡人TI · 修仙图鉴',
   description: '29 种人格对应凡人修仙传正典角色，按境界分类浏览。道友请留步——你是哪位散修？',
 };
 

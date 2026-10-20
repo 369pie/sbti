@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: '她财富 · WTFTI',
+  title: '她财富',
   description: '她财富不是理财课，而是「用女生听得懂的语言，建立投资意识」。AI 量化交易引擎提供市场情绪信号，但决策权在你。',
 };
 

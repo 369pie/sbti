@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { GUIDE_ARTICLES } from '@/lib/guides';
 
 export const metadata: Metadata = {
-  title: 'WTFTI 指南：SBTI 经典测试说明与结果解读',
+  title: { absolute: 'WTFTI 指南：SBTI 经典测试说明与结果解读' },
   description: '查看 WTFTI 经典 SBTI 测试说明、结果怎么看、SBTI 和 MBTI 的区别，以及图鉴阅读入口。',
   alternates: { canonical: '/guide/' },
 };

@@ -8,7 +8,7 @@ import {
 import { DecisionDeckUpgradeBanner } from '@/components/mysti/DecisionDeckUpgradeBanner';
 
 export const metadata: Metadata = {
-  title: '今日决策 · 灵鉴 90 秒决策快卡 — WTFTI',
+  title: '今日决策 · 灵鉴 90 秒决策快卡',
   description:
     '今夜赴约？此刻交锋？出门远行？选一个场景，让暮光替你抽 3 张牌，得到一句可截屏的诗意答案。灵鉴所述仅为暮光时分的隐喻 · 决定权永远在你手里。',
   keywords: ['决策快卡', '塔罗决策', '今日决策', 'WTFTI', '灵鉴', '约会塔罗', '面试塔罗'],

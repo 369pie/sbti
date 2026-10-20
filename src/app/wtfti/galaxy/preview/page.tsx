@@ -14,7 +14,7 @@ import { mapPersonalityToHomePlanet } from '@/lib/wtfi/galaxy-mapping';
  * seed 走语义映射（mapPersonalityToHomePlanet），而不是随机哈希。
  */
 export const metadata: Metadata = {
-  title: 'WTFTI 人格神域 · 内部预览',
+  title: { absolute: 'WTFTI 人格神域 · 内部预览' },
   description: 'WTFTI 人格神域结果页 mock 预览（非真实测试结果）',
   robots: { index: false, follow: false },
 };

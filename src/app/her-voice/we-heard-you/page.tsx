@@ -25,7 +25,7 @@ import {
 } from '../_editorial-styles';
 
 export const metadata: Metadata = {
-  title: '她说我们听见了 · HERMOSA · WTFTI',
+  title: '她说我们听见了 · HERMOSA',
   description: 'HERMOSA 用户共建公开看板：「想要」「体验吐槽」标签下的留言，及产品方的处理状态。',
 };
 

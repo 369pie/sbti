@@ -5,7 +5,7 @@ import { HOGTI_PERSONALITIES } from '@/lib/hogti/personalities';
 import { withBasePath } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: '霍格沃茨TI · 人格图鉴 | WTFTI',
+  title: '霍格沃茨TI · 人格图鉴',
   description: '29 种人格对应霍格沃茨正典角色，按学院分类浏览。分院帽已就绪，你是哪一位？',
 };
 

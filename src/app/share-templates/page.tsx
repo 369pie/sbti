@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import ShareTemplatesContent from './ShareTemplatesContent';
 
 export const metadata: Metadata = {
-  title: '分享文案模板 — 一键复制发小红书/微信/抖音 | WTFTI',
+  title: '分享文案模板 — 一键复制发小红书/微信/抖音',
   description:
     '基于你的多宇宙人格测试结果，自动生成小红书、微信、抖音平台分享文案，一键复制即发。',
   openGraph: {

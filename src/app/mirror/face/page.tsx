@@ -5,7 +5,7 @@ import { FaceClient } from './FaceClient';
 const DESC = '三道自述 + 可选自拍，得到脸型妆容建议，写进你的档案。';
 
 export const metadata: Metadata = {
-  title: '脸型妆容 · 美我 · WTFTI',
+  title: '脸型妆容 · 美我',
   description: DESC,
   alternates: { canonical: '/mirror/face/' },
   openGraph: {
