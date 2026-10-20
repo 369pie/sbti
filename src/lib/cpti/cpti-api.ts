@@ -1,3 +1,4 @@
+import { ensureAnonymousSession } from '@/lib/supabase/auth';
 import type { CptiClaimSource } from './claim';
 import type { CodexRecord, CodexScenarioBucket } from './codex-archive';
 import { getApiPath } from '@/lib/api';
@@ -22,14 +23,11 @@ async function ensureSession(): Promise<boolean> {
     }
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        const { error } = await supabase.auth.signInAnonymously();
-        if (error) {
-          console.error('[cpti-api] signInAnonymously failed:', error.message);
+      const anon = await ensureAnonymousSession(supabase);
+        if (!anon.success) {
+          console.error('[cpti-api] signInAnonymously failed:', anon.error);
           return false;
         }
-      }
 
       return true;
     } catch (err) {

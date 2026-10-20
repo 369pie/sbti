@@ -1,5 +1,4 @@
 import { hasBrowserSupabaseSession, tryCreateBrowserSupabaseClient } from '@/lib/supabase/client';
-import { getOrCreateAnonymousSession } from '@/lib/supabase/auth';
 import { getApiPath, readApiJson } from '@/lib/api';
 import {
   ASSET_KEYS,
@@ -143,11 +142,11 @@ async function ensureSyncSession(): Promise<boolean> {
       return false;
     }
 
+    // Background sync only piggybacks on an existing session (archive / login /
+    // explicit save). Minting an anonymous user here created one orphan
+    // auth.users row per quiz result and raced the one-tap archive button.
     const { data: { session } } = await supabase.auth.getSession();
-    if (session) return true;
-
-    const result = await getOrCreateAnonymousSession(supabase);
-    return result.success;
+    return Boolean(session);
   })();
 
   try {

@@ -57,16 +57,9 @@ async function ensureSession() {
     try {
       const { createBrowserSupabaseClient } = await import('@/lib/supabase/client');
       const supabase = createBrowserSupabaseClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        const { error } = await supabase.auth.signInAnonymously();
-        if (error) {
-          throw error;
-        }
-      }
+      const { ensureAnonymousSession } = await import('@/lib/supabase/auth');
+      const anon = await ensureAnonymousSession(supabase);
+      if (!anon.success) throw new Error(anon.error || 'anon_signin_failed');
     } finally {
       setTimeout(() => {
         ensureSessionPromise = null;

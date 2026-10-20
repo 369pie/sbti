@@ -12,7 +12,43 @@ export type AnonymousSignInResult = AuthResult;
 
 // ─── Anonymous Auth ──────────────────────────────────────────────────────────
 
-export async function signInAnonymously(
+// Single-flight across the whole page (also across dynamic-import chunks via
+// globalThis): concurrent callers share ONE signInAnonymously request, and a
+// caller arriving after a session exists reuses it. Before this, the result
+// page's asset sync and the one-tap archive button raced and created 2 anon
+// auth.users per archive click.
+const ANON_FLIGHT_KEY = '__wtftiAnonSignInFlight';
+type FlightHolder = { [ANON_FLIGHT_KEY]?: Promise<AnonymousSignInResult> | null };
+
+/**
+ * Reuse the current session if there is one, otherwise create exactly one
+ * anonymous session. Use this instead of calling supabase.auth.signInAnonymously().
+ */
+export function ensureAnonymousSession(supabase: SupabaseClient): Promise<AnonymousSignInResult> {
+  const holder = globalThis as FlightHolder;
+  const inflight = holder[ANON_FLIGHT_KEY];
+  if (inflight) return inflight;
+  const flight = (async (): Promise<AnonymousSignInResult> => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) return { success: true, userId: session.user.id };
+    } catch {
+      /* fall through to sign-in */
+    }
+    return rawSignInAnonymously(supabase);
+  })().finally(() => {
+    holder[ANON_FLIGHT_KEY] = null;
+  });
+  holder[ANON_FLIGHT_KEY] = flight;
+  return flight;
+}
+
+/** Back-compat name: now session-reusing + single-flight. */
+export function signInAnonymously(supabase: SupabaseClient): Promise<AnonymousSignInResult> {
+  return ensureAnonymousSession(supabase);
+}
+
+async function rawSignInAnonymously(
   supabase: SupabaseClient
 ): Promise<AnonymousSignInResult> {
   try {
@@ -56,16 +92,7 @@ export async function isAnonymousUser(supabase: SupabaseClient): Promise<boolean
 export async function getOrCreateAnonymousSession(
   supabase: SupabaseClient
 ): Promise<AnonymousSignInResult> {
-  const user = await getCurrentUser(supabase);
-
-  if (user) {
-    return {
-      success: true,
-      userId: user.id,
-    };
-  }
-
-  return signInAnonymously(supabase);
+  return ensureAnonymousSession(supabase);
 }
 
 // ─── Email/Password Auth ─────────────────────────────────────────────────────
