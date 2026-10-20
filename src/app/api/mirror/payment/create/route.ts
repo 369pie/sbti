@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
   const origin = req.nextUrl.origin;
   const userAgent = req.headers.get('user-agent') ?? undefined;
   const siteName = req.nextUrl.hostname;
-  const notifyUrl = `${origin}/api/mirror/payment/notify?channel=${paymentType}`;
+  const notifyUrl = `${origin}/api/mirror/payment/notify/?channel=${paymentType}`;
   const returnUrl = `${origin}/mirror/?paid=1&orderId=${encodeURIComponent(tradeOrderId)}`;
   const callbackUrl = `${origin}/mirror/`;
 

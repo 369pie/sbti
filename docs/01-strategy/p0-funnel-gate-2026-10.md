@@ -18,10 +18,10 @@ CTA 点击另有 `home_cta_click`（`data-track`），不计入闸门四步，�
 
 ```sql
 -- 近 7 日四步漏斗（按独立 session_id）
-with window as (
+with w as (  -- 注意：window 是 Postgres 保留字，不能做 CTE 名
   select *
   from product_events
-  where created_at >= now() - interval '7 days'
+  where ts >= now() - interval '7 days'  -- product_events 的时间列是 ts（没有 created_at）
     and event in ('home_view', 'first_look_finish', 'archive_created', 'push_enabled')
 )
 select
@@ -29,7 +29,7 @@ select
   count(distinct session_id) filter (where event = 'first_look_finish') as finish_test,
   count(distinct session_id) filter (where event = 'archive_created') as archive,
   count(distinct session_id) filter (where event = 'push_enabled') as reminder
-from window;
+from w;
 ```
 
 ## 运维前置

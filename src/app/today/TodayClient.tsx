@@ -120,6 +120,10 @@ export function TodayClient() {
               </Link>
             </div>
           </section>
+          {/* 提醒不依赖登录：/api/push/subscribe 接受匿名会话。之前只在登录态渲染，导致绝大多数访客根本看不到开关。 */}
+          <div className={styles.reminders} id="remind">
+            <DailyReminderToggle />
+          </div>
           <p className={styles.fine}>仅供娱乐与自我探索</p>
         </div>
       </main>

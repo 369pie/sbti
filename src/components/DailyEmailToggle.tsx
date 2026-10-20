@@ -29,7 +29,10 @@ export function DailyEmailToggle() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ on: next }),
     }).catch(() => null);
-    if (!r?.ok) return setState('error');
+    if (!r?.ok) {
+      enqueueProductEvent('home', 'email_daily_enable_failed', { props: { status: r?.status ?? 0, on: next } });
+      return setState('error');
+    }
     if (next) enqueueProductEvent('home', 'email_daily_enabled');
     setState(next ? 'on' : 'off');
   }
