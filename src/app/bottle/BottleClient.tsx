@@ -124,6 +124,7 @@ export function BottleClient() {
         return;
       }
       setError(null);
+      enqueueProductEvent('home', 'treehole_publish_request', { step: 'publish' });
       setLastPost((p) => (p && p.id === id ? { ...p, visibility: 'public_pending' } : p));
       void load();
     },
