@@ -24,7 +24,7 @@ import {
   SHARE_CARD_TIER_LABEL,
   type ShareCardTier,
 } from '@/lib/share-card-tiers';
-import { isUnlocked, SKU_PRICES, type MystiSku } from '@/lib/mysti/unlock';
+import { isUnlocked, skuMeta, type MystiSku } from '@/lib/mysti/unlock';
 
 const CARD_WIDTH = 540;
 const MAX_H = 4000;
@@ -1044,7 +1044,7 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
               const unlocked = tierUnlocked(t);
               const label = SHARE_CARD_TIER_LABEL[t];
               const sku = t === 'free' ? null : TIER_TO_SKU[t];
-              const price = sku ? SKU_PRICES[sku].price : 0;
+              const price = sku ? skuMeta(sku).price : 0;
               const nameColor = active ? theme.text : hexToRgba(theme.text, 0.92);
               const taglineColor = active ? theme.textMuted : hexToRgba(theme.textMuted, 0.9);
               const statusColor = unlocked
@@ -1095,7 +1095,7 @@ export const MystiShareImageGenerator = forwardRef<MystiShareImageGeneratorHandl
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
-              {SHARE_CARD_TIER_LABEL[tier].cta} · ¥{SKU_PRICES[TIER_TO_SKU[tier as 'plus' | 'atelier']].price.toFixed(1)}
+              {SHARE_CARD_TIER_LABEL[tier].cta} · ¥{skuMeta(TIER_TO_SKU[tier as 'plus' | 'atelier']).price.toFixed(1)}
             </>
           ) : (
             <>

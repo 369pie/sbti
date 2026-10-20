@@ -17,7 +17,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   isUnlocked,
   recordUnlock,
-  SKU_PRICES,
+  skuMeta,
   type MystiSku,
 } from '@/lib/mysti/unlock';
 import { getPaymentAvailabilityStatus } from '@/lib/payment/availability';
@@ -82,7 +82,7 @@ export function PremiumPaywall({
   const [error, setError] = useState<string | null>(null);
   const [paymentType, setPaymentType] = useState<'wechat' | 'alipay'>('wechat');
 
-  const meta = SKU_PRICES[sku];
+  const meta = skuMeta(sku);
   const passCovers = passCoversSingleSku(sku);
   const passDiscount = passDiscountForSku(sku);
   const discountedPrice = +(meta.price * (1 - passDiscount)).toFixed(2);

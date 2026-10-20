@@ -10,7 +10,7 @@
  */
 
 import Link from 'next/link';
-import { SKU_PRICES, type MystiSku } from '@/lib/mysti/unlock';
+import { skuMeta, type MystiSku } from '@/lib/mysti/unlock';
 import { passCoversSingleSku, passDiscountForSku } from '@/lib/mysti/subscription';
 
 interface Props {
@@ -31,7 +31,7 @@ export function PriceAnchor({
   disablePassLink = false,
   className,
 }: Props) {
-  const meta = SKU_PRICES[sku];
+  const meta = skuMeta(sku);
   if (!meta) return null;
 
   const passCovers = passCoversSingleSku(sku);
