@@ -5,6 +5,9 @@ import { getDailyCard, formatDateCN } from '@/lib/mysti/daily-card';
 import { PillarBreadcrumb } from '@/components/PillarBreadcrumb';
 import { MystiDailyContent } from '@/components/MystiDailyContent';
 
+// Date-dependent title/description: re-render at least every 10 min (otherwise frozen at build time).
+export const revalidate = 600;
+
 export async function generateMetadata(): Promise<Metadata> {
   const card = getDailyCard();
   const dateStr = formatDateCN(new Date());

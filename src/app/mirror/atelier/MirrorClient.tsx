@@ -2,6 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- APIMart returns temporary external URLs and uploads use browser data URLs. */
 
+import { pausedNote, usePaymentPause } from '@/lib/payment/use-payment-pause';
 import { useRef, useState, useEffect, useCallback, type ChangeEvent, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -516,6 +517,7 @@ export default function MirrorClient() {
   const [showTopUp, setShowTopUp] = useState(false);
   const [paymentChannel, setPaymentChannel] = useState<'wechat' | 'alipay'>('wechat');
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const paused = usePaymentPause();
   const [paymentPolling, setPaymentPolling] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [history, setHistory] = useState<MirrorHistoryRecord[]>([]);
@@ -1836,12 +1838,15 @@ export default function MirrorClient() {
               </div>
             </div>
 
+            {paused ? (
+              <p className="mb-3 text-xs leading-relaxed" style={{ color: 'var(--color-text-muted)' }} data-payment-paused="1">{pausedNote(paused)}</p>
+            ) : null}
             <div className="mb-4 space-y-3">
               {getTopUpOptions().map(option => (
                 <button
                   key={option.pack}
                   type="button"
-                  disabled={paymentLoading || paymentPolling}
+                  disabled={paymentLoading || paymentPolling || !!paused}
                   onClick={() => handleTopUp(option.pack)}
                   className="mirror-atelier-tier w-full text-left transition-opacity hover:opacity-90 disabled:opacity-40"
                 >
