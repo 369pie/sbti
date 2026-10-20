@@ -1,9 +1,10 @@
 'use client';
 
 /**
- * One-tap「她的档案」— no forced registration.
- * Before save: locked preview of today's card (value first).
- * After save: real today card + completeness, single CTA → /today/, bind account later.
+ * One-tap anonymous archive (PR #12) — v3 journal skin.
+ * Pre-save: blurred today-card preview. Save → anon Supabase session →
+ * POST /api/her/archive/ with the test result, so the archive holds「我是谁」.
+ * After save: real today card + a single next step into /today/.
  */
 
 import Link from 'next/link';
@@ -14,22 +15,31 @@ import { getApiPath } from '@/lib/api';
 import { markDeviceArchive } from '@/lib/her/device-archive';
 import { tryCreateBrowserSupabaseClient } from '@/lib/supabase/client';
 
+import styles from '@/app/test/test-v3.module.css';
+
 interface SavedArchive {
   isAnonymous: boolean;
   card: { fortune: string; luckyColor: { name: string; hex: string; tip: string }; makeup: string };
   archive: { completenessPct: number };
 }
 
-const mono = 'ui-monospace, "SF Mono", monospace';
+export interface ArchiveTestResult {
+  test_id: string;
+  result_key: string;
+  result_name?: string;
+}
 
-export function ArchiveSaveCard({ accent, source }: { accent: string; source: string }) {
+export function ArchiveSaveCard({ source, result }: { source: string; result?: ArchiveTestResult; accent?: string }) {
   const [phase, setPhase] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [saved, setSaved] = useState<SavedArchive | null>(null);
 
   async function save() {
     if (phase === 'saving') return;
     setPhase('saving');
-    enqueueProductEvent('home', 'archive_save_click', { step: 'archive_click', props: { source } });
+    enqueueProductEvent('home', 'archive_save_click', {
+      step: 'archive_click',
+      props: { source, test_id: result?.test_id, result_key: result?.result_key },
+    });
     try {
       const supabase = tryCreateBrowserSupabaseClient();
       if (!supabase) throw new Error('no_supabase');
@@ -38,13 +48,23 @@ export function ArchiveSaveCard({ accent, source }: { accent: string; source: st
         const { error } = await supabase.auth.signInAnonymously();
         if (error) throw error;
       }
-      const res = await fetch(getApiPath('/her/archive/'), { method: 'POST', credentials: 'include' });
+      const res = await fetch(getApiPath('/her/archive/'), {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(result ? { test: result } : {}),
+      });
       const data = await res.json();
       if (!res.ok || !data?.ok) throw new Error(data?.error || 'save_failed');
       if (data.created) {
         enqueueProductEvent('home', 'archive_created', {
           step: 'archive',
-          props: { mode: data.isAnonymous ? 'anonymous' : 'claimed', source },
+          props: {
+            mode: data.isAnonymous ? 'anonymous' : 'claimed',
+            source,
+            test_id: result?.test_id,
+            result_key: result?.result_key,
+          },
         });
       }
       markDeviceArchive();
@@ -63,38 +83,25 @@ export function ArchiveSaveCard({ accent, source }: { accent: string; source: st
   ];
 
   return (
-    <div className="mb-6">
-      <div
-        className="p-5 mb-4"
-        style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-rule-soft)' }}
-      >
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-[10px] tracking-[0.32em] uppercase" style={{ fontFamily: mono, color: accent }}>
-            你的今日卡 · 预览
-          </span>
-          <span className="text-[11px]" style={{ fontFamily: mono, color: 'var(--color-text-muted)' }}>
-            {saved ? `档案 ${saved.archive.completenessPct}% 完整` : '保存档案后解锁'}
-          </span>
-        </div>
-        <ul className="flex flex-col gap-2.5" aria-live="polite">
-          {rows.map(([k, v, hex]) => (
-            <li key={k} className="flex items-baseline gap-3 text-[14px]">
-              <span className="shrink-0 w-16 text-[12px]" style={{ color: 'var(--color-text-muted)' }}>{k}</span>
-              {hex ? <i aria-hidden style={{ width: 10, height: 10, borderRadius: 99, background: hex, display: 'inline-block' }} /> : null}
-              <span
-                style={{
-                  color: 'var(--color-text-primary)',
-                  filter: saved ? 'none' : 'blur(4px)',
-                  userSelect: saved ? 'auto' : 'none',
-                  transition: 'filter 500ms ease',
-                }}
-              >
-                {v}
-              </span>
-            </li>
-          ))}
-        </ul>
+    <div className={`s-card s-card--lined ${styles.archive}`}>
+      <div className="s-tape s-tape--sage" />
+      <div className={styles.archiveHead}>
+        <span className="s-eyebrow">你的今日卡 · 预览</span>
+        <span className={styles.archiveMeta}>
+          {saved ? `档案 ${saved.archive.completenessPct}% 完整` : '存下档案就能看'}
+        </span>
       </div>
+      <ul className={styles.archiveList} aria-live="polite">
+        {rows.map(([k, v, hex]) => (
+          <li key={k}>
+            <span className={styles.archiveK}>{k}</span>
+            <span className={saved ? undefined : styles.blur}>
+              {hex ? <i aria-hidden className={styles.sw} style={{ background: hex }} /> : null}
+              {v}
+            </span>
+          </li>
+        ))}
+      </ul>
 
       {phase !== 'saved' ? (
         <>
@@ -102,32 +109,23 @@ export function ArchiveSaveCard({ accent, source }: { accent: string; source: st
             type="button"
             onClick={() => void save()}
             disabled={phase === 'saving'}
-            className="w-full inline-flex items-center justify-center gap-3 px-7 py-3.5 text-sm"
-            style={{ background: accent, color: 'var(--color-bg-elevated)', fontFamily: 'var(--font-display)', border: 'none', cursor: 'pointer', opacity: phase === 'saving' ? 0.7 : 1 }}
+            className="s-btn"
+            style={{ opacity: phase === 'saving' ? 0.7 : 1, border: 0, cursor: 'pointer' }}
           >
-            {phase === 'saving' ? '正在为你建档…' : '一键保存我的档案，看今日卡'}
-            <span aria-hidden>→</span>
+            {phase === 'saving' ? '正在为你建档…' : '一键存进我的档案'}
           </button>
-          <p className="mt-2 text-center text-[12px]" style={{ color: 'var(--color-text-muted)' }}>
-            {phase === 'error' ? '刚才没存上，再点一次试试' : '免注册 · 存在这台设备上，之后可随时绑定账号'}
+          <p className={styles.sub}>
+            {phase === 'error' ? '刚才没存上，再点一次试试' : '免注册 · 存在这台设备上，之后可以随时绑定账号'}
           </p>
         </>
       ) : (
         <>
-          <Link
-            href="/today/"
-            className="w-full inline-flex items-center justify-center gap-3 px-7 py-3.5 text-sm"
-            style={{ background: accent, color: 'var(--color-bg-elevated)', fontFamily: 'var(--font-display)' }}
-          >
-            档案已保存 · 打开我的今日卡
-            <span aria-hidden>→</span>
+          <Link href="/today/" prefetch={false} className="s-btn">
+            打开我的今日卡 →
           </Link>
           {saved?.isAnonymous ? (
-            <p className="mt-2 text-center text-[12px]" style={{ color: 'var(--color-text-muted)' }}>
-              换手机也不想丢？
-              <Link href="/auth/register/?next=%2Ftoday%2F" style={{ color: accent, marginLeft: 4, textDecoration: 'underline', textUnderlineOffset: 3 }}>
-                绑定账号
-              </Link>
+            <p className={styles.sub}>
+              换手机也不想丢？<Link href="/auth/register/?next=%2Fme%2F" prefetch={false}>绑定账号</Link>
             </p>
           ) : null}
         </>

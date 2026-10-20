@@ -130,7 +130,7 @@ export function CrossUniverseCTA({ slug, currentUniverseId, theme }: CrossUniver
           transition={{ duration: 0.4, delay: 0.6 }}
         >
           <Link
-            href="/types/"
+            href="/start/"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all hover:brightness-110"
             style={{ 
               background: `linear-gradient(90deg, ${t.accent}, ${t.accent}cc)`,

@@ -69,7 +69,7 @@ export function TheoryAnchorCard({
       )}
       {!hideLink && !compact && (
         <Link
-          href="/theory/"
+          href="/start/"
           className={`mt-2 inline-block text-[11px] underline-offset-2 hover:underline ${
             isDark ? 'text-bg-primary/55' : 'text-text-muted'
           }`}

@@ -207,18 +207,18 @@ export default function RootLayout({
           <WtftiThemeProvider>
             <HerNav />
             <main className="flex-1">{children}</main>
-          <footer className="border-t border-border-subtle py-8 px-6 text-center text-text-muted text-sm">
+          <footer className="skin-journal border-t py-8 px-6 text-center text-[13px]" style={{ borderColor: 'var(--s-line)', color: 'var(--s-mute)' }}>
             <div className="max-w-5xl mx-auto">
-              <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4 text-sm">
-                <Link href="/about/" prefetch={false} className="hover:text-text-primary transition-colors">关于</Link>
-                <Link href="/contact/" prefetch={false} className="hover:text-text-primary transition-colors">联系我们</Link>
-                <Link href="/privacy/" prefetch={false} className="hover:text-text-primary transition-colors">隐私说明</Link>
-                <Link href="/terms/" prefetch={false} className="hover:text-text-primary transition-colors">使用条款</Link>
+              <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-4" style={{ color: 'var(--s-ink-2)' }}>
+                <Link href="/about/" prefetch={false}>关于</Link>
+                <Link href="/contact/" prefetch={false}>联系我们</Link>
+                <Link href="/privacy/" prefetch={false}>隐私说明</Link>
+                <Link href="/terms/" prefetch={false}>使用条款</Link>
               </div>
               <FollowMeInline />
               <p>测试与玄学内容仅供娱乐与自我探索，不能替代专业的心理或医疗建议。</p>
-              <p className="mt-2 opacity-60">What&apos;s The F* Type Inside</p>
-              <p className="mt-2 opacity-50">SBTI 主题原创作者：B站 @Q肉儿串儿、如有侵权请联系</p>
+              <p className="mt-2">WTFTI · 懂你的女生私人顾问</p>
+              <p className="mt-1 opacity-80">如有内容侵权，请通过「联系我们」告诉我们</p>
             </div>
           </footer>
           </WtftiThemeProvider>

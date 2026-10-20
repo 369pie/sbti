@@ -1,5 +1,6 @@
 'use client';
 
+import { trackTestFinish, trackTestStart } from '@/lib/analytics/test-events';
 import { useState, useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 import { QuizShell, QuestionTitle, QuizOptions, QuizOption } from './QuizShell';
 import { SOULTI_QUESTIONS, SOULTI_ACT_NAMES, shuffleSoultiQuestions } from '@/lib/soulti/questions';
@@ -52,12 +53,17 @@ export function SoultiQuiz() {
     };
   }, []);
 
+  useEffect(() => {
+    trackTestStart('soulti');
+  }, []);
+
   const finishTest = useCallback((finalAnswers: Map<number, Answer>) => {
     if (isFinishingRef.current) return;
     isFinishingRef.current = true;
     setIsFinishing(true);
 
     const result = calculateSoultiResult(finalAnswers, questions);
+    trackTestFinish('soulti', result.personality.slug, { href: `/soulti/result/${result.personality.slug}/` });
 
     // Calculate and persist layered (three-mirror) result
     try {

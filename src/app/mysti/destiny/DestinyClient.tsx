@@ -584,7 +584,7 @@ function ReportView({
           重新缮写
         </button>
         <Link
-          href="/lingjian/"
+          href="/mirror/"
           style={{
             ...pillStyle,
             padding: '10px 24px',

@@ -41,7 +41,7 @@ export function WtfCardBanner() {
     <section className="px-6 pb-4 pt-2">
       <div className="max-w-4xl mx-auto">
         <Link
-          href="/card/"
+          href="/me/"
           className="group block rounded-2xl border border-border-subtle bg-bg-elevated hover:shadow-lg transition-all duration-300 overflow-hidden"
         >
           <div className="p-5 sm:p-6">

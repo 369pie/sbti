@@ -207,7 +207,7 @@ export function WeeklySoulContent() {
         className="text-center mt-6"
       >
         <Link
-          href="/card/"
+          href="/me/"
           className="text-sm text-text-muted hover:text-accent transition-colors"
         >
           ← 返回 WTF Card

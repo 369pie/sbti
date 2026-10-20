@@ -105,7 +105,7 @@ async function renderSymptomsCard(
   const WHITE = '#f5f0f8';
   const ACCENT = p.color;
 
-  const shareUrl = SHARE_SITE_URL + `wtfti/symptoms/${p.slug}/`;
+  const shareUrl = SHARE_SITE_URL + `wtfti/result/${p.slug}/`;
 
   const [qrImg, charImg] = await Promise.all([
     toQrDataUrl(shareUrl, {

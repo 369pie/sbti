@@ -36,7 +36,7 @@ function buildEvents(card: WtfCardData | null, gacha: GachaResult[], streakDays:
         title: `解锁 ${universeId} 宇宙`,
         detail: `类型：${res.slug}`,
         emoji: '✨',
-        href: `/card/`,
+        href: `/me/`,
       });
     }
     for (const r of card.relationships ?? []) {
@@ -58,7 +58,7 @@ function buildEvents(card: WtfCardData | null, gacha: GachaResult[], streakDays:
       title: `抽到 ${g.universeName} · ${g.slug}`,
       detail: `稀有度 ${g.rarity}`,
       emoji: g.universeEmoji || '🎴',
-      href: `/gacha/`,
+      href: `/start/`,
     });
   }
 
@@ -69,7 +69,7 @@ function buildEvents(card: WtfCardData | null, gacha: GachaResult[], streakDays:
       title: `连续签到 ${streakDays} 天`,
       detail: '今日已打卡',
       emoji: '🌙',
-      href: `/daily/`,
+      href: `/today/`,
     });
   }
 

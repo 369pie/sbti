@@ -55,6 +55,18 @@ const nextConfig: NextConfig = {
       { source: '/wtfti/delta/:path*', destination: '/start/', permanent: true },
       { source: '/wtfti/feng/:path*', destination: '/start/', permanent: true },
       { source: '/wtfti/galaxy/:path*', destination: '/start/', permanent: true },
+      // Audit 2026-10-20 Phase 1: 神域 landing + orphan pages → 测试大厅.
+      // Kept live: /wtfti/test, /wtfti/result (long-tail test), /wtfti/letters (cron emails),
+      // /wtfti/work (universe registry). CPTI / SoulTI sub-pages are still linked from their
+      // result pages — pruning those belongs to Phase 2 (couple merge).
+      { source: '/wtfti', destination: '/start/', permanent: true },
+      ...['symptoms', 'shrine', 'duet', 'profile'].map((r) => ({
+        source: `/wtfti/${r}/:path*`, destination: '/start/', permanent: true,
+      })),
+      // Duplicate "daily" surfaces merge into 今日.
+      { source: '/wtfti/daily/:path*', destination: '/today/', permanent: true },
+      { source: '/wtfti/moon/:path*', destination: '/today/', permanent: true },
+      ...['hogti', 'xpti/whitepaper'].map((r) => ({ source: `/${r}/:path*`, destination: '/start/', permanent: true })),
     ];
   },
   env: {

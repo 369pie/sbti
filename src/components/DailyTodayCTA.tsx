@@ -36,7 +36,7 @@ export function DailyTodayCTA() {
     return (
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
         <Link
-          href="/daily/test"
+          href="/today/"
           className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-sage text-bg-primary font-medium text-base hover:bg-sage/85 transition-all duration-200"
         >
           测一测今天开了什么模式
@@ -53,7 +53,7 @@ export function DailyTodayCTA() {
     return (
       <div className="flex flex-col items-center gap-4">
         <Link
-          href={`/daily/result/${todaySlug}/`}
+          href="/today/"
           className="inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-sage text-bg-primary font-medium text-base hover:bg-sage/85 transition-all duration-200"
         >
           {status?.emoji} 查看今日结果：{status?.name ?? todaySlug}
@@ -80,7 +80,7 @@ export function DailyTodayCTA() {
   return (
     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
       <Link
-        href="/daily/test"
+        href="/today/"
         className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-sage text-bg-primary font-medium text-base hover:bg-sage/85 transition-all duration-200"
       >
         测一测今天开了什么模式

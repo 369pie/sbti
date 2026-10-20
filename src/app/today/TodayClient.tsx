@@ -112,7 +112,7 @@ export function TodayClient() {
               运势、幸运色、妆容一句，都会跟着你的档案走。先花 90 秒测测自己，一键就能存下档案。
             </p>
             <div className={styles.guestActions}>
-              <Link href="/start/" prefetch={false} className="s-btn">
+              <Link href="/test/" prefetch={false} className="s-btn">
                 90 秒测一测 · 免注册建档
               </Link>
               <Link href="/auth/login/?next=%2Ftoday%2F" prefetch={false} className={styles.secondary}>
@@ -124,6 +124,9 @@ export function TodayClient() {
           <div className={styles.reminders} id="remind">
             <DailyReminderToggle />
           </div>
+          <p className={styles.guestSub} style={{ marginTop: 18, textAlign: 'center' }}>
+            有心事想说？<Link href="/bottle/" prefetch={false} className={styles.moodLink}>去树洞写两句</Link>
+          </p>
           <p className={styles.fine}>仅供娱乐与自我探索</p>
         </div>
       </main>

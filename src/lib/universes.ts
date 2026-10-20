@@ -108,7 +108,7 @@ export const UNIVERSES: Universe[] = [
     status: 'live',
     accent: '#ef4444',
     testPath: '/wtfti/test/',
-    landingPath: '/wtfti/',
+    landingPath: '/wtfti/test/',
     resultPrefix: '/wtfti',
     galleryTabId: 'wtfti',
     activeClass: 'bg-rose-100 text-rose-700 shadow-sm font-medium',

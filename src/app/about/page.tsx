@@ -74,13 +74,13 @@ export default function AboutPage() {
           开始经典测试
         </Link>
         <Link
-          href="/types/"
+          href="/start/"
           className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all"
         >
           查看全站图鉴
         </Link>
         <Link
-          href="/guide/"
+          href="/start/"
           className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-border text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all"
         >
           进入说明栏目

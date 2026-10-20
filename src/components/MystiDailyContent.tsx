@@ -42,7 +42,8 @@ export function MystiDailyContent() {
 
   useEffect(() => {
     queueMicrotask(() => {
-      setDailyCard(getDailyCard());
+      const card = getDailyCard();
+      setDailyCard(card);
       setMounted(true);
     });
     trackMystiEvent('mysti_daily_view');

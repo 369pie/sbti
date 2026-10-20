@@ -4,20 +4,20 @@ import { getSiteUrl } from '@/lib/site';
 import { StartContent } from './StartContent';
 
 export const metadata: Metadata = {
-  title: '90 秒看见我自己 · WTFTI',
+  title: '测试大厅 · WTFTI',
   description:
-    '三个问题，找到为「她」量身的入口——认识她 / 陪着她 / 一起写下她。WTFTI 新生引导，仅供娱乐与自我观察。',
+    '从 90 秒首测开始，再看看 SoulTI、我和他、塔罗等女生向测试。每个结果都进你的档案，免费免注册，仅供娱乐与自我探索。',
   alternates: { canonical: '/start/' },
   openGraph: {
-    title: '90 秒看见我自己 · WTFTI',
-    description: '三个问题，找到属于你的支柱入口。',
+    title: '测试大厅 · WTFTI',
+    description: '90 秒首测、SoulTI、我和他、塔罗——今天想测点什么？',
     url: getSiteUrl('/start/'),
     images: [{ url: getSiteUrl('/images/og-default.png'), width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: '90 秒看见我自己 · WTFTI',
-    description: '三个问题，找到属于你的支柱入口。',
+    title: '测试大厅 · WTFTI',
+    description: '90 秒首测、SoulTI、我和他、塔罗——今天想测点什么？',
   },
 };
 

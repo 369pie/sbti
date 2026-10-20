@@ -17,18 +17,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const a = getArchetypeBySlug(slug);
   if (!a) return {};
   return {
-    title: `#${a.code}「${a.name}」— WTFti · 初见`,
-    description: `${a.tagline} — 你的 First Look 初见牌，仅 ${a.holdRate}% 的人是这张。`,
+    title: `「${a.name}」· 我的 90 秒首测结果 — WTFTI`,
+    description: `${a.tagline} 大约 ${a.holdRate}% 的女生和你一样。90 秒首测，免费免注册。`,
     alternates: { canonical: `/test/result/${slug}/` },
     openGraph: {
-      title: `我的初见牌是「${a.name}」#${a.code}`,
+      title: `我测出来是「${a.name}」`,
       description: a.tagline,
       url: getSiteUrl(`/test/result/${slug}/`),
       images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: a.name }],
     },
     twitter: {
       card: 'summary',
-      title: `我的初见牌是「${a.name}」#${a.code}`,
+      title: `我测出来是「${a.name}」`,
       description: a.tagline,
     },
   };
@@ -49,7 +49,7 @@ export default async function FirstLookResultPage({ params }: PageProps) {
             '@type': 'BreadcrumbList',
             itemListElement: [
               { '@type': 'ListItem', position: 1, name: 'WTFti', item: getSiteUrl('/') },
-              { '@type': 'ListItem', position: 2, name: '初见', item: getSiteUrl('/test/') },
+              { '@type': 'ListItem', position: 2, name: '首测', item: getSiteUrl('/test/') },
               { '@type': 'ListItem', position: 3, name: archetype.name },
             ],
           }),

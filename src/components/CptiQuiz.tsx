@@ -1,5 +1,6 @@
 'use client';
 
+import { trackTestFinish, trackTestStart } from '@/lib/analytics/test-events';
 import { useState, useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 import { CPTI_QUESTIONS, CPTI_DEFAULT_OPTIONS, shuffleCptiQuestions } from '@/lib/cpti/questions';
 import type { CptiAnswerOption } from '@/lib/cpti/questions';
@@ -113,6 +114,10 @@ export function CptiQuiz({
     }
   }, []);
 
+  useEffect(() => {
+    trackTestStart('cpti');
+  }, []);
+
   // ── Finish: self-assessment done ──
   const finishSelfTest = useCallback(async (finalAnswers: Map<number, Answer>) => {
     if (isFinishingRef.current) return;
@@ -121,6 +126,7 @@ export function CptiQuiz({
     setIsFinishing(true);
 
     const result = calculateCptiResult(finalAnswers, CPTI_QUESTIONS);
+    trackTestFinish('cpti', result.personality.slug, { href: `/cpti/result/${result.personality.slug}/` });
 
     // Save profile to localStorage for future invite/stealth use
     saveCptiProfile(result.personality.slug, result.dimensions);
@@ -216,6 +222,7 @@ export function CptiQuiz({
     const dimsB = peerResult.dimensions;
 
     const relResult = matchRelationship(dimsA, dimsB);
+    trackTestFinish('cpti_peer', relResult.relationship.slug, { href: '/cpti/relationship/' });
 
     if (finishTimeoutRef.current !== null) {
       window.clearTimeout(finishTimeoutRef.current);
@@ -271,6 +278,7 @@ export function CptiQuiz({
     const dimsA = myProfile.dimensions;
     const dimsB = crushResult.dimensions;
     const relResult = matchRelationship(dimsA, dimsB);
+    trackTestFinish('cpti_stealth', relResult.relationship.slug, { href: '/cpti/relationship/' });
 
     // Write to WTF Card relationship collection
     recordRelationship({

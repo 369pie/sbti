@@ -65,6 +65,8 @@ export async function POST(request: NextRequest) {
       color_season?: string | null;
       palm_summary?: Record<string, unknown> | null;
     } | null = null;
+    // Test results saved on the anonymous archive (POST /api/her/archive) travel with it.
+    let anonTests: { wtfti_tests?: unknown; wtfti_persona?: unknown } = {};
     try {
       const preSession = await createServerSupabaseClient();
       const { data: pre } = await preSession.auth.getUser();
@@ -75,6 +77,8 @@ export async function POST(request: NextRequest) {
           .eq('user_id', pre.user.id)
           .maybeSingle();
         anonArchive = (row as typeof anonArchive) ?? null;
+        const meta = pre.user.user_metadata ?? {};
+        if (meta.wtfti_tests) anonTests = { wtfti_tests: meta.wtfti_tests, wtfti_persona: meta.wtfti_persona };
       }
     } catch {
       anonArchive = null;
@@ -90,6 +94,7 @@ export async function POST(request: NextRequest) {
         display_name: trimmedNickname || trimmedUsername,
         has_real_email: !!trimmedEmail,
         birth_year: birthYear,
+        ...anonTests,
       },
     });
 
