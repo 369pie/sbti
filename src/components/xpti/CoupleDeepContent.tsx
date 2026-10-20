@@ -5,12 +5,9 @@ import Link from 'next/link';
 import type { CoupleMergeResult } from '@/lib/xpti/couple';
 import { loadXptiResult } from '@/lib/xpti/storage';
 import { getApiPath } from '@/lib/api';
-import {
-  getDialogueScriptsForPairing,
-  PRACTICE_30DAYS,
-  CONFLICT_SCRIPTS,
-  composeLoveLetter,
-} from '@/lib/xpti/paid-content';
+import type { DialogueScript } from '@/lib/xpti/dialogue-scripts';
+import type { ConflictRehearsal, LoveLetter } from '@/lib/xpti/paid-content';
+import type { CoupleDeepPayload } from '@/lib/xpti/couple-client-api';
 import { togglePractice } from '@/lib/xpti/couple-client-api';
 
 const display = '"Cormorant Garamond", "Noto Serif SC", serif';
@@ -35,6 +32,7 @@ export interface RemeasureHistoryEntry {
 
 export function CoupleDeepContent({
   merge,
+  deep,
   shareToken,
   history = [],
   mySide,
@@ -43,30 +41,16 @@ export function CoupleDeepContent({
   onRemeasured,
 }: {
   merge: CoupleMergeResult;
+  /** Paid content, delivered by the API only when unlocked (order or member). */
+  deep: CoupleDeepPayload;
   shareToken: string;
   history?: RemeasureHistoryEntry[];
   mySide?: 'inviter' | 'partner';
   practiceChecklist?: Record<string, { inviter?: boolean; partner?: boolean; updatedAt: string }>;
   onPracticeUpdate?: (checklist: Record<string, { inviter?: boolean; partner?: boolean; updatedAt: string }>) => void;
-  onRemeasured?: (patch: { merged?: CoupleMergeResult; history?: RemeasureHistoryEntry[] }) => void;
+  onRemeasured?: (patch: { merged?: CoupleMergeResult; deep?: CoupleDeepPayload | null; history?: RemeasureHistoryEntry[] }) => void;
 }) {
-  const { pairing, inviter, partner } = merge;
-  const pairingId = pairing.id;
-
-  const dialogues = useMemo(() => getDialogueScriptsForPairing(pairingId), [pairingId]);
-  const practice = PRACTICE_30DAYS[pairingId] ?? [];
-  const conflicts = CONFLICT_SCRIPTS[pairingId] ?? [];
-  const letter = useMemo(
-    () =>
-      composeLoveLetter({
-        pairingId,
-        fromNickname: null,
-        toNickname: null,
-        signatureFrom: inviter.signature.label,
-        signatureTo: partner.signature.label,
-      }),
-    [pairingId, inviter.signature.label, partner.signature.label],
-  );
+  const { dialogues, practice, conflicts, letter } = deep;
 
   return (
     <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 40 }}>
@@ -90,7 +74,7 @@ export function CoupleDeepContent({
 // Dialogue scripts
 // ─────────────────────────────────────────────
 
-function DialogueSection({ scripts }: { scripts: ReturnType<typeof getDialogueScriptsForPairing> }) {
+function DialogueSection({ scripts }: { scripts: DialogueScript[] }) {
   if (!scripts.length) return null;
   return (
     <section>
@@ -390,7 +374,7 @@ function PracticeSection({
 // Conflict rehearsals
 // ─────────────────────────────────────────────
 
-function ConflictSection({ items }: { items: typeof CONFLICT_SCRIPTS[keyof typeof CONFLICT_SCRIPTS] }) {
+function ConflictSection({ items }: { items: ConflictRehearsal[] }) {
   const [openId, setOpenId] = useState<string | null>(items[0]?.id ?? null);
   if (!items.length) return null;
   return (
@@ -473,7 +457,7 @@ function ConflictSection({ items }: { items: typeof CONFLICT_SCRIPTS[keyof typeo
 // Love letter
 // ─────────────────────────────────────────────
 
-function LoveLetterSection({ letter }: { letter: ReturnType<typeof composeLoveLetter> }) {
+function LoveLetterSection({ letter }: { letter: LoveLetter }) {
   return (
     <section>
       <SectionHeader eyebrow="Letter · 致 ta 的一封信" title="把你们的张力写成一句话" />
@@ -554,7 +538,7 @@ function RemeasureSection({
   history: RemeasureHistoryEntry[];
   mySide?: 'inviter' | 'partner';
   merge: CoupleMergeResult;
-  onRemeasured?: (patch: { merged?: CoupleMergeResult; history?: RemeasureHistoryEntry[] }) => void;
+  onRemeasured?: (patch: { merged?: CoupleMergeResult; deep?: CoupleDeepPayload | null; history?: RemeasureHistoryEntry[] }) => void;
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -607,8 +591,9 @@ function RemeasureSection({
       const json = (await res.json()) as {
         history?: RemeasureHistoryEntry[];
         merged?: CoupleMergeResult;
+        deep?: CoupleDeepPayload | null;
       };
-      onRemeasured?.({ merged: json.merged, history: json.history });
+      onRemeasured?.({ merged: json.merged, deep: json.deep, history: json.history });
       setHint('已记录这次重测，下方对比已更新。');
     } catch (err) {
       setError(err instanceof Error ? err.message : '提交失败');

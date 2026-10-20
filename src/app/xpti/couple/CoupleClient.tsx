@@ -9,6 +9,7 @@ import { trackFunnelEvent } from '@/lib/analytics/funnel';
 import { trackTestFinish, trackTestStart } from '@/lib/analytics/test-events';
 import { ITC_AXES } from '@/lib/xpti/itc';
 import { type CoupleMergeResult } from '@/lib/xpti/couple';
+import type { CoupleDeepPayload } from '@/lib/xpti/couple-client-api';
 import { loadXptiResult } from '@/lib/xpti/storage';
 import { getPartnerQuestions } from '@/lib/xpti/questions-partner';
 import type { Answer } from '@/lib/xpti/scoring';
@@ -181,6 +182,29 @@ export function CoupleClient({
       setCreating(false);
     }
   }, [myResult, creating, router]);
+
+  // After payment / member unlock: re-fetch so the server returns the paid part
+  // (it is stripped from locked responses). Retries while the notify lands.
+  const refreshCouple = useCallback(async () => {
+    if (!shareToken) return;
+    const deviceId = getOrCreateDeviceId() || '';
+    for (let attempt = 0; attempt < 6; attempt++) {
+      try {
+        const res = await fetch(
+          `${basePath}/api/xpti/couples/${encodeURIComponent(shareToken)}?deviceId=${encodeURIComponent(deviceId)}`,
+          { credentials: 'include', cache: 'no-store' },
+        );
+        if (res.ok) {
+          const json = (await res.json()) as { couple: PublicCoupleView };
+          setCouple(json.couple);
+          if (json.couple.unlocked && json.couple.deep) return;
+        }
+      } catch {
+        /* retry */
+      }
+      await new Promise((r) => setTimeout(r, 2500));
+    }
+  }, [shareToken]);
 
   // Build link for sharing once we have a token.
   const inviteLink = useMemo(() => {
@@ -365,6 +389,8 @@ export function CoupleClient({
           setPayMode={setPayMode}
           shareToken={shareToken}
           alreadyUnlocked={couple.unlocked}
+          deep={couple.deep ?? null}
+          onRefresh={refreshCouple}
           history={couple.history ?? []}
           practiceChecklist={couple.practiceChecklist ?? {}}
           mySide={isMine ? 'inviter' : 'partner'}
@@ -679,12 +705,16 @@ function MergedView({
   setPayMode,
   shareToken,
   alreadyUnlocked,
+  deep,
+  onRefresh,
   history,
   practiceChecklist,
   mySide,
   onRemeasured,
   onPracticeUpdate,
 }: {
+  deep: CoupleDeepPayload | null;
+  onRefresh: () => Promise<void>;
   merge: CoupleMergeResult;
   payMode: PayMode;
   setPayMode: (m: PayMode) => void;
@@ -830,6 +860,10 @@ function MergedView({
           sku={activeSku}
           brand="xpti"
           resourceId={coupleResource}
+          serverUnlocked={alreadyUnlocked}
+          onUnlocked={() => {
+            if (!deep) void onRefresh();
+          }}
           lockedTitle={`解锁 ${pairing.label} · 关系笔记 · ${activePrice}`}
           teaserBullets={[
             '最常发生的甜 / 痛 / 能不能长走',
@@ -843,6 +877,14 @@ function MergedView({
             </div>
           }
         >
+          {!deep || !pairing.notes ? (
+            <div style={{ marginTop: 14, padding: 22, border: `1px solid ${PALETTE.rule}`, borderRadius: 8 }}>
+              <p style={{ ...pStyle, marginTop: 0 }}>正在加载完整报告…</p>
+              <button type="button" onClick={() => void onRefresh()} style={{ ...ctaSecondary, cursor: 'pointer', background: 'transparent' }}>
+                没出来？点这里刷新
+              </button>
+            </div>
+          ) : (
           <div style={{ marginTop: 14, padding: 22, background: 'var(--color-bg-elevated)', border: `1px solid ${PALETTE.rule}`, borderRadius: 8 }}>
             <p style={{ ...pStyle, marginTop: 0 }}>
               <strong style={{ color: PALETTE.wine }}>最常发生的甜：</strong>
@@ -861,6 +903,7 @@ function MergedView({
             </p>
             <CoupleDeepContent
               merge={merge}
+              deep={deep}
               shareToken={shareToken}
               history={history}
               mySide={mySide}
@@ -872,6 +915,7 @@ function MergedView({
               本报告内容已在你的设备解锁；如需 ta 那边也能直接看，让 ta 在自己设备里付一次（同一价位即可）。
             </p>
           </div>
+          )}
         </PremiumPaywall>
       </div>
 

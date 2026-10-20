@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { WhitepaperContent } from './WhitepaperContent';
+import { ITC_PAIRINGS_CATALOG } from '@/lib/xpti/itc-pairing';
 import { getSiteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -18,5 +19,7 @@ export const metadata: Metadata = {
 };
 
 export default function WhitepaperPage() {
-  return <WhitepaperContent />;
+  // Only public fields cross to the client (pairing notes are paid content).
+  const pairings = ITC_PAIRINGS_CATALOG.map(({ id, label, english, oneLine }) => ({ id, label, english, oneLine }));
+  return <WhitepaperContent pairings={pairings} />;
 }

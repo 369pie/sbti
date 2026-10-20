@@ -105,6 +105,57 @@ async function main() {
     }
   });
 
+  // 5. 「我和他」 report gating (src/lib/xpti/couple-view.ts)
+  const { buildCoupleMerge } = await import('@/lib/xpti/couple-merge');
+  const { buildCoupleView, PAID_PAIRING_KEYS } = await import('@/lib/xpti/couple-view');
+  const merged = buildCoupleMerge({ slug: 'architect', dims: [3, 3, 3, 1, 1, 1, 3, 3, 3] }, { slug: 'architect', dims: [1, 1, 1, 3, 3, 3, 1, 1, 1] });
+  const row = (unlocked_at: string | null) => ({
+    id: 'c1', pair_code: 'P', share_token: 'tok', status: 'completed' as const,
+    inviter_user_id: null, inviter_device_id: null, inviter_slug: 'architect', inviter_dims: merged.inviter.dims, inviter_nickname: null,
+    partner_user_id: null, partner_device_id: null, partner_slug: 'architect', partner_dims: merged.partner.dims, partner_nickname: null,
+    merged_payload: merged, unlocked_sku: unlocked_at ? 'xpti-couple-report' : null, unlocked_at,
+    unlocked_by_user_id: null, unlocked_by_device_id: null, completed_at: PAST, expires_at: FUTURE,
+    created_at: PAST, updated_at: PAST, practice_checklist: {}, history: [],
+  });
+  const PAID_TEXT = [merged.pairing.longDescription, merged.pairing.notes.fit, merged.pairing.notes.risk, merged.pairing.notes.longTerm];
+  const assertNoPaid = (view: unknown) => {
+    const json = JSON.stringify(view);
+    for (const t of PAID_TEXT) assert.ok(!json.includes(t), `locked view leaked: ${t.slice(0, 20)}`);
+    const v = view as { merged: { pairing: Record<string, unknown> }; deep: unknown };
+    for (const k of PAID_PAIRING_KEYS) assert.ok(!(k in v.merged.pairing), `locked pairing has ${k}`);
+    assert.equal(v.deep, null);
+  };
+  const assertFull = (view: { unlocked: boolean; merged: { pairing: { notes?: unknown; longDescription?: unknown } } | null; deep?: { dialogues: unknown[]; practice: unknown[]; conflicts: unknown[]; letter: unknown } | null }) => {
+    assert.equal(view.unlocked, true);
+    assert.ok(view.merged?.pairing.notes && view.merged.pairing.longDescription);
+    assert.ok(view.deep && view.deep.dialogues.length > 0 && view.deep.practice.length > 0 && view.deep.letter);
+  };
+
+  __setMemberAccessDepsForTests(ANON_NONMEMBER);
+  await t('couple view: non-member, unpaid → locked, no paid fields', async () => {
+    const v = await buildCoupleView(row(null) as never);
+    assert.equal(v.unlocked, false);
+    assertNoPaid(v);
+    // free preview fields still present
+    assert.ok(v.merged?.pairing.label && v.merged.pairing.oneLine && v.merged.inviter.axes.length && v.merged.partner.signature.label);
+  });
+  __setMemberAccessDepsForTests(NO_SESSION);
+  await t('couple view: no session → locked', async () => assertNoPaid(await buildCoupleView(row(null) as never)));
+  __setMemberAccessDepsForTests(EXPIRED);
+  await t('couple view: expired member → locked', async () => assertNoPaid(await buildCoupleView(row(null) as never)));
+  __setMemberAccessDepsForTests(MEMBER);
+  await t('couple view: member → full (no order)', async () => {
+    const v = await buildCoupleView(row(null) as never);
+    assertFull(v);
+    assert.equal(v.unlockedVia, 'member');
+  });
+  __setMemberAccessDepsForTests(ANON_NONMEMBER);
+  await t('couple view: paid order → full', async () => {
+    const v = await buildCoupleView(row(PAST) as never);
+    assertFull(v);
+    assert.equal(v.unlockedVia, 'order');
+  });
+
   __setMemberAccessDepsForTests(null);
   console.log(`\n${pass} passed`);
 }

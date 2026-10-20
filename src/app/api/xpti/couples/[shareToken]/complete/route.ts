@@ -9,7 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { coupleUnlockState } from '@/lib/member-access';
+import { buildCoupleView } from '@/lib/xpti/couple-view';
 import { completeCouplePartner } from '@/lib/xpti/couple-server';
 import { getAuthUser } from '@/lib/supabase/middleware';
 
@@ -70,31 +70,8 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
     if (!couple) {
       return NextResponse.json({ error: 'not_found' }, { status: 404 });
     }
-    const unlock = await coupleUnlockState(couple, { deviceId: req.nextUrl.searchParams.get('deviceId') });
-    return NextResponse.json({
-      couple: {
-        shareToken: couple.share_token,
-        pairCode: couple.pair_code,
-        status: couple.status,
-        inviter: {
-          slug: couple.inviter_slug,
-          dims: couple.inviter_dims,
-          nickname: couple.inviter_nickname,
-        },
-        partner: {
-          slug: couple.partner_slug!,
-          dims: couple.partner_dims!,
-          nickname: couple.partner_nickname,
-        },
-        merged: couple.merged_payload,
-        unlocked: unlock.unlocked,
-        unlockedVia: unlock.via,
-        unlockedSku: couple.unlocked_sku,
-        unlockedAt: couple.unlocked_at,
-        completedAt: couple.completed_at,
-        expiresAt: couple.expires_at,
-      },
-    });
+    const view = await buildCoupleView(couple, { deviceId });
+    return NextResponse.json({ couple: view });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'unknown';
     console.error('[POST /api/xpti/couples/[shareToken]/complete]', message);
