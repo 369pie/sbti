@@ -121,7 +121,7 @@ export function MirrorHubClient() {
             色彩、脸型妆容、换装、掌纹——写进档案，让「今日」更像为你写的。
             {isMember
               ? ` 会员本月换装额度 ${MEMBER_TRY_ON_CAP} 次。`
-              : ' 会员可提升换装额度，深度报告 8 折。'}
+              : ' 会员可提升换装额度，全站深度报告免费。'}
           </p>
         </header>
 
@@ -160,7 +160,7 @@ export function MirrorHubClient() {
               <section className={`s-card ${styles.guestMember}`}>
                 <p className="s-eyebrow">会员 · ¥19/月</p>
                 <p className={styles.guestMemberText}>
-                  登录后可开通会员：美我月额度提升到 {MEMBER_TRY_ON_CAP} 次，深度报告 8 折，完整今日解锁。
+                  登录后可开通会员：美我月额度提升到 {MEMBER_TRY_ON_CAP} 次，全站深度报告免费，完整今日解锁。
                   到期不自动续费。
                 </p>
                 <Link href="/auth/login/?next=%2Fmirror%2F" prefetch={false} className="s-btn">

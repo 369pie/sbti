@@ -13,6 +13,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { memberHref, trackMemberEntry } from '@/lib/member-client';
 import {
   recordUnlock,
   SKU_PRICES,
@@ -320,6 +321,18 @@ export function DecisionPackPaywall({
         ))}
       </div>
 
+      <a
+        href={memberHref('paywall_decision')}
+        onClick={() => trackMemberEntry('paywall_decision')}
+        data-member-entry="paywall"
+        style={{
+          display: 'block', textAlign: 'center', padding: '12px 18px', borderRadius: 999,
+          border: '1px solid rgba(201,166,118,0.78)', color: '#E8C99A', fontSize: 13,
+          letterSpacing: '0.12em', textDecoration: 'none',
+        }}
+      >
+        开会员全站解锁 · ¥19 / 30 天
+      </a>
       <button
         type="button"
         onClick={handlePurchase}

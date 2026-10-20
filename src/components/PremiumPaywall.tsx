@@ -31,6 +31,7 @@ import { getActiveReferralCode } from '@/lib/mysti/creator-referral';
 import { getOrCreateDeviceId } from '@/lib/mysti/device';
 import { trackMystiEvent } from '@/lib/mysti/analytics';
 import { readApiJson } from '@/lib/api';
+import { fetchEntitlements, memberHref, trackMemberEntry } from '@/lib/member-client';
 import { restoreMystiEntitlement } from '@/lib/mysti/entitlement-restore';
 import {
   BRAND_THEMES,
@@ -119,12 +120,18 @@ export function PremiumPaywall({
       .catch(() => {});
 
     // P3: her_profiles membership → deep-report 8折 (cross-device)
-    fetch('/api/her/membership/', { credentials: 'include', cache: 'no-store' })
-      .then(async (res) => {
-        if (!res.ok) return;
-        const data = (await res.json()) as { isMember?: boolean; deepDiscount?: number };
-        if (data.isMember && (data.deepDiscount ?? 0) > 0) {
-          setHerMemberDiscount(true);
+    // 全站会员: a member (her_profiles or legacy pass) unlocks every content SKU.
+    fetchEntitlements()
+      .then((data) => {
+        if (!data.isMember) return;
+        setHerMemberDiscount(true);
+        if (passCoversSingleSku(sku) && !unlockedRef.current) {
+          setUnlocked(true);
+          try {
+            trackMystiEvent('mysti_paywall_pass_unlocked', { sku, resourceId, brand, source: 'member' });
+          } catch {
+            /* noop */
+          }
         }
       })
       .catch(() => {});
@@ -446,27 +453,21 @@ export function PremiumPaywall({
                 {loading ? '正在创建订单…' : `✦ 解锁 · ¥${finalPrice.toFixed(1)}`}
               </button>
 
-              {!(hasPass || herMemberDiscount) && (passCovers || passDiscount > 0) && (
+              {!(hasPass || herMemberDiscount) && (
                 <Link
-                  href={`/today/?from=${encodeURIComponent(sku)}`}
-                  onClick={() => {
-                    try {
-                      trackMystiEvent('mysti_subscribe_view', {
-                        source: 'paywall_upsell',
-                        sku,
-                        brand,
-                      });
-                    } catch {
-                      /* noop */
-                    }
-                  }}
-                  className="mt-3 text-[11px] underline opacity-80 hover:opacity-100"
-                  style={{ color: theme.accent }}
+                  href={memberHref(`paywall_${brand}`)}
+                  onClick={() => trackMemberEntry(`paywall_${brand}:${sku}`)}
+                  className="mt-3 block w-full rounded-full py-3 text-center text-sm font-medium"
+                  style={{ border: `1px solid ${theme.accent}`, color: theme.accent }}
+                  data-member-entry="paywall"
                 >
-                  {passCovers
-                    ? '¥19 开通会员 · 本报告免费 + 深度报告 8 折'
-                    : '¥19 开通会员 · 深度报告 8 折'}
+                  开会员全站解锁 · ¥19 / 30 天
                 </Link>
+              )}
+              {!(hasPass || herMemberDiscount) && (
+                <p className="mt-2 text-[11px]" style={{ color: theme.textSubtle }}>
+                  {passCovers ? '会员期内本报告和全站付费内容都免费 · 到期不自动续费' : '会员享深度内容免费 · 到期不自动续费'}
+                </p>
               )}
 
               <AnimatePresence>

@@ -11,6 +11,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { DailyEmailToggle } from '@/components/DailyEmailToggle';
 import { DailyReminderToggle } from '@/components/DailyReminderToggle';
 import { MembershipSubscribeCard } from '@/components/MembershipSubscribeCard';
+import { MemberEntryLink } from '@/components/member/MemberEntry';
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
 import { getApiPath } from '@/lib/api';
 import type { ArchiveGap } from '@/lib/today/today-card';
@@ -210,6 +211,8 @@ export function TodayClient() {
             <Link href="/auth/register/?next=%2Ftoday%2F" prefetch={false} className={styles.moodLink}>
               绑定账号，换手机也不丢
             </Link>
+            {' · '}
+            <MemberEntryLink source="today" className={styles.moodLink}>开会员全站解锁</MemberEntryLink>
           </p>
         ) : (
         <MembershipSubscribeCard

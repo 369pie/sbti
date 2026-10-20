@@ -6,6 +6,7 @@
  * Explicit: 到期不自动续费（no dark-pattern auto-renew）.
  */
 
+import { trackMemberEvent } from '@/lib/member-client';
 import { useCallback, useState } from 'react';
 
 import { readApiJson } from '@/lib/api';
@@ -46,6 +47,7 @@ export function MembershipSubscribeCard({
     }
     setLoading(true);
     setError(null);
+    trackMemberEvent('member_checkout_start', { sku: HER_MEMBERSHIP_MONTHLY_SKU, paymentType, redirect: redirectPath });
     try {
       const deviceId = getOrCreateDeviceId() || undefined;
       const res = await fetch('/api/mysti/payment/create', {

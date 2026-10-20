@@ -2,6 +2,7 @@
  * POST /api/mirror/color-season — lite season diagnosis + has_color_season on her_profiles.
  * Optional selfie processed in-memory only.
  */
+import { consumeFeatureQuota } from '@/lib/entitlements-server';
 import { NextRequest, NextResponse } from 'next/server';
 import type { User } from '@supabase/supabase-js';
 
@@ -83,6 +84,12 @@ export const POST = withClaimedAuth(async (req: NextRequest, _ctx, user: User) =
   }
 
   const imageDataUrl = optionalImage(record.imageDataUrl);
+  if (imageDataUrl) {
+    const quota = await consumeFeatureQuota(user.id, 'color_season');
+    if (!quota.allowed) {
+      return json({ error: 'quota_exhausted', feature: 'color_season', cap: quota.cap, used: quota.used, isMember: quota.isMember }, { status: 429 });
+    }
+  }
   const result = await diagnoseColorSeason({ veinTone, contrast, metal, imageDataUrl });
 
   const metaBirth =

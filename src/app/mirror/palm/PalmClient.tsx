@@ -5,6 +5,7 @@
  * photo → API → structured lines overlay；写 has_palm；照片不落库。
  */
 
+import { quotaMessage, trackQuotaExhausted } from '@/lib/member-client';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
 
@@ -112,7 +113,9 @@ export function PalmClient() {
       };
       if (!res.ok || !data.ok || !data.reading) {
         setError(
-          data.error === 'rate_limited'
+          data.error === 'quota_exhausted'
+            ? (trackQuotaExhausted(data), quotaMessage(data))
+            : data.error === 'rate_limited'
             ? '太频繁了，稍等一分钟再试'
             : data.error === 'consent_required'
               ? '请先勾选同意说明'

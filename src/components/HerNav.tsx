@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { MemberEntryLink } from '@/components/member/MemberEntry';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
@@ -56,6 +57,9 @@ export function HerNav() {
               </Link>
             ))}
           </nav>
+          <MemberEntryLink source="nav" className="text-[13px]" style={{ color: 'var(--s-accent-text)', fontWeight: 500 }}>
+            会员
+          </MemberEntryLink>
           {!loading && hasAnonArchive && (
             <Link href="/me/" prefetch={false} className="text-[13px]" style={{ color: 'var(--s-ink-2)' }}>
               我的档案

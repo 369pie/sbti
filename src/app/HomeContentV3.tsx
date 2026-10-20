@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import styles from './home-v3.module.css';
 import { HomeTracker } from './HomeTracker';
+import { MemberEntryCard } from '@/components/member/MemberEntry';
 
 // Homepage per docs/01-strategy/wtfti-her-refocus-2026-10.md §5.1, skin: journal.
 // One primary CTA (90s test); everything else explains what she gets afterwards.
@@ -53,6 +54,10 @@ export default function HomeContentV3() {
         <p className={styles.sub}>看清自己 · 变好看 · 有地方说心里话</p>
         <Link href="/test/" prefetch={false} className="s-btn" data-track="hero">90 秒，先测测你是谁</Link>
         <p className={styles.proof}>已经有 7 万+ 人来过这里</p>
+      </section>
+
+      <section className={styles.sec} data-section="member">
+        <MemberEntryCard source="home" />
       </section>
 
       <section className={styles.sec}>

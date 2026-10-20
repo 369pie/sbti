@@ -1,5 +1,6 @@
 'use client';
 
+import { trackMemberEntry } from '@/lib/member-client';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -317,7 +318,7 @@ export function CoupleClient({
         </h1>
         {mode !== 'merged' ? (
           <p style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--s-ink-2)', margin: 0 }}>
-            ① 你做完自己的测试 → ② 把链接发给他，他答 12 题 → ③ 看你们俩合不合。双人深度报告 ¥12.9 单买，或两人 AA 各 ¥6.9；会员 8 折。
+            ① 你做完自己的测试 → ② 把链接发给他，他答 12 题 → ③ 看你们俩合不合。双人深度报告 ¥12.9 单买，或两人 AA 各 ¥6.9；会员免费。
           </p>
         ) : null}
       </header>
@@ -818,10 +819,9 @@ function MergedView({
           )}
         </p>
         <p style={{ fontSize: 12, color: PALETTE.wine, margin: '0 0 12px', lineHeight: 1.6 }}>
-          会员可享「我和他」深度报告 <strong>8 折</strong>
-          （服务端按会员价下单）·{' '}
-          <Link href="/today/" style={{ color: PALETTE.gold, textDecoration: 'underline' }}>
-            去今日开通 ¥19/月
+          会员「我和他」报告<strong>免费</strong>·{' '}
+          <Link href="/member/?from=paywall_couple" onClick={() => trackMemberEntry('paywall_couple')} data-member-entry="paywall" style={{ color: PALETTE.gold, textDecoration: 'underline' }}>
+            开会员全站解锁 ¥19/30 天
           </Link>
           ，到期不自动续费。
         </p>

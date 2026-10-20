@@ -3,6 +3,7 @@
  * Same image fingerprint + hand ⇒ same result (replay from palm_summary when match).
  * Image never stored.
  */
+import { consumeFeatureQuota } from '@/lib/entitlements-server';
 import { NextRequest, NextResponse } from 'next/server';
 import type { User } from '@supabase/supabase-js';
 
@@ -71,6 +72,10 @@ export const POST = withClaimedAuth(async (req: NextRequest, _ctx, user: User) =
   let reading = stored ? readingFromStoredSummary(stored, hand, fingerprint) : null;
   let replayed = false;
   if (!reading) {
+    const quota = await consumeFeatureQuota(user.id, 'palm');
+    if (!quota.allowed) {
+      return json({ error: 'quota_exhausted', feature: 'palm', cap: quota.cap, used: quota.used, isMember: quota.isMember }, { status: 429 });
+    }
     reading = await analyzePalmFromImage({ imageDataUrl, hand });
   } else {
     replayed = true;

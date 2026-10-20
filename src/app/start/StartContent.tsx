@@ -7,6 +7,7 @@
  */
 
 import Link from 'next/link';
+import { MemberEntryLink } from '@/components/member/MemberEntry';
 import { useEffect } from 'react';
 
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
@@ -66,6 +67,11 @@ export function StartContent() {
         <p className="s-eyebrow">Tests · 测试大厅</p>
         <h1 className={`s-title ${styles.h1}`}>今天想测点什么？</h1>
         <p className={styles.sub}>每个测试的结果都会进你的档案，测得越多，今日卡越懂你。</p>
+        <p className={styles.sub} style={{ marginTop: 4 }}>
+          <MemberEntryLink source="test_hall" style={{ color: 'var(--s-accent-text)', fontWeight: 500 }}>
+            会员 ¥19/30 天：所有深度报告 + 合盘免费 →
+          </MemberEntryLink>
+        </p>
 
         <Link href="/test/" prefetch={false} className={`s-card s-card--lined ${styles.hero}`} onClick={() => trackPick('first_look')}>
           <div className="s-tape" />

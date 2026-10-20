@@ -1,6 +1,7 @@
 /**
  * POST /api/mirror/face — face shape + makeup advice; sets has_face on her_profiles.
  */
+import { consumeFeatureQuota } from '@/lib/entitlements-server';
 import { NextRequest, NextResponse } from 'next/server';
 import type { User } from '@supabase/supabase-js';
 
@@ -68,6 +69,12 @@ export const POST = withClaimedAuth(async (req: NextRequest, _ctx, user: User) =
   if (!hint) return json({ error: 'invalid_answers' }, { status: 400 });
 
   const imageDataUrl = optionalImage(record.imageDataUrl);
+  if (imageDataUrl) {
+    const quota = await consumeFeatureQuota(user.id, 'face');
+    if (!quota.allowed) {
+      return json({ error: 'quota_exhausted', feature: 'face', cap: quota.cap, used: quota.used, isMember: quota.isMember }, { status: 429 });
+    }
+  }
   const result = await diagnoseFaceMakeup({ hint, imageDataUrl });
 
   const metaBirth =

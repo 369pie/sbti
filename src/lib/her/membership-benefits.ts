@@ -7,15 +7,16 @@
 export const HER_MEMBERSHIP_MONTHLY_SKU = 'monthly-pass' as const;
 
 /** Member static try-on free uses / Asia/Shanghai month (plan §4 「N 次」). */
-export const MEMBER_TRY_ON_CAP = 10;
+export const MEMBER_TRY_ON_CAP = 10; // keep in sync with FEATURES.try_on.member
 
 export const MEMBERSHIP_PRICE_LABEL = '¥19/月';
 
-/** Everything the one membership includes — /member/, /today, /mirror, Mysti. */
+import { FEATURES } from '@/lib/entitlements';
+
+/** Generated from lib/entitlements.ts — content unlocks + AI monthly caps. */
 export const MEMBERSHIP_BENEFITS: string[] = [
-  '完整今日卡（穿搭示意 + 更细建议）',
-  `美我换装每月 ${MEMBER_TRY_ON_CAP} 次免费额度`,
-  '「我和他」双人报告会员价 8 折',
-  'SoulTI 深夜长信 · XPTI / WTFTI 深度档 会员期内免费解锁',
-  '塔罗：每日一牌额外加抽 + 每月小报告 + 全部 Plus 分享卡（原暮光通行证权益）',
+  ...FEATURES.filter((f) => f.kind === 'content').map((f) => `${f.label} · 会员免费`),
+  ...FEATURES.filter((f) => f.kind === 'ai').map((f) =>
+    `${f.label} · 每月 ${f.member === 'unlimited' ? '不限' : `${f.member} 次`}（非会员 ${f.freeQuota ?? 0} 次）`,
+  ),
 ];
