@@ -215,7 +215,7 @@ export function CptiCodexClient() {
               </p>
             </div>
             <Link
-              href="/cpti/pricing/?intent=codex-pass"
+              href="/member/"
               onClick={() => trackCptiEvent('cpti_codex_pass_clicked', { value: records.length })}
               className="mt-3 inline-flex items-center justify-center rounded-lg bg-text-primary px-4 py-2 text-[12.5px] font-medium text-bg-primary sm:mt-0 sm:shrink-0"
             >
@@ -312,7 +312,7 @@ function EmptyState({ tab }: { tab: Tab }) {
     <div className="rounded-2xl border border-dashed border-gold/50 bg-bg-elevated/70 px-6 py-12 text-center">
       <p className="text-[14px] text-text-secondary">你的{label}图鉴还是空白。</p>
       <Link
-        href="/cpti/test/"
+        href="/xpti/couple/"
         className="mt-4 inline-flex items-center gap-2 rounded-xl bg-text-primary px-4 py-2.5 text-[13px] font-medium text-bg-primary"
       >
         先去测一段 →

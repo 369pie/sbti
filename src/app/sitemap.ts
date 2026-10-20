@@ -40,6 +40,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     page('/test/classic/', 'monthly', 0.7),
     page('/xpti/', 'weekly', 0.85),
     page('/xpti/couple/', 'weekly', 0.85),
+    page('/member/', 'monthly', 0.6),
     page('/soulti/', 'weekly', 0.85),
     page('/cpti/', 'weekly', 0.85),
     page('/cpti/theory/', 'monthly', 0.6),

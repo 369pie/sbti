@@ -15,6 +15,8 @@ import {
 import { isMystiPaymentStubMode } from '@/lib/mysti/payment-mode';
 import { hasAnyXunhupayConfig } from '@/lib/payment/xunhupay';
 import { reconcileMystiOrderFromProvider } from '@/lib/mysti/payment-reconcile';
+import { loadHerMembership } from '@/lib/her/membership';
+import { getAuthUser } from '@/lib/supabase/middleware';
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -38,6 +40,25 @@ export async function GET(req: NextRequest) {
         startsAt: sub.startsAt,
         expiresAt: sub.expiresAt,
       });
+    }
+
+    // One membership: a her_profiles member gets the Mysti pass benefits too.
+    try {
+      const { user } = await getAuthUser();
+      if (user && !user.is_anonymous) {
+        const mem = await loadHerMembership(user.id);
+        if (mem.isMember && mem.expiresAtMs) {
+          return NextResponse.json({
+            active: true,
+            sku: 'monthly-pass',
+            startsAt: Date.now(),
+            expiresAt: mem.expiresAtMs,
+            source: 'membership',
+          });
+        }
+      }
+    } catch {
+      /* soft */
     }
 
     const latestOrder = await findLatestMystiSubscriptionOrderForDevice(deviceId);

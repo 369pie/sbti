@@ -70,11 +70,11 @@ export function MystiSubscriptionExpiryBanner() {
       aria-live="polite"
     >
       <span className="opacity-90">
-        通行证还剩 <b>{days}</b> 天到期
+        会员还剩 <b>{days}</b> 天到期
         {sku ? ` · ${labelFor(sku)}` : ''} ·{' '}
       </span>
       <Link
-        href="/mysti/subscribe/?from=expiry"
+        href="/member/?from=expiry"
         className="underline font-medium"
         onClick={() => {
           try {
@@ -105,13 +105,13 @@ export function MystiSubscriptionExpiryBanner() {
 function labelFor(sku: string): string {
   switch (sku) {
     case 'monthly-pass':
-      return '月度通行证';
+      return '会员';
     case 'quarterly-pass':
-      return '季度通行证';
+      return '会员';
     case 'yearly-pass':
-      return '年度通行证';
+      return '会员';
     case 'creator-pass':
-      return '创作者通行证';
+      return '创作者会员';
     default:
       return sku;
   }

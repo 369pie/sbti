@@ -118,7 +118,7 @@ export function CptiHisPovClient({ relationship }: Props) {
         {/* CTAs */}
         <div className="mt-12 space-y-3">
           <Link
-            href="/cpti/test/"
+            href="/xpti/couple/"
             onClick={() => trackCptiEvent('cpti_his_pov_cta_clicked', { target: 'cpti-self', relationship: relationship.slug })}
             className="block w-full rounded-xl bg-text-primary py-4 text-center text-[15px] font-medium text-bg-primary transition active:scale-[0.98]"
           >

@@ -17,6 +17,10 @@ export type TestId =
   | 'first_look'
   | 'soulti'
   | 'xpti'
+  // 「我和他」 (audit decision 3): ONE test_id for XPTI couple + CPTI; `mode` prop says which
+  // (self | partner | cpti | cpti_peer | cpti_stealth).
+  | 'wohe'
+  // Legacy ids — no longer emitted, kept so older local history still renders.
   | 'xpti_couple'
   | 'cpti'
   | 'cpti_peer'
@@ -47,13 +51,13 @@ export function trackTestStart(testId: TestId, props?: Record<string, string | n
 export function trackTestFinish(
   testId: TestId,
   resultKey: string,
-  extra?: { name?: string; href?: string; elapsedMs?: number },
+  extra?: { name?: string; href?: string; elapsedMs?: number; mode?: string },
 ): void {
   enqueueProductEvent('test', 'test_finish', {
     slug: resultKey.slice(0, 64),
     step: 'finish',
     value: extra?.elapsedMs,
-    props: { test_id: testId, result_key: resultKey },
+    props: { test_id: testId, result_key: resultKey, ...(extra?.mode ? { mode: extra.mode } : {}) },
   });
   started.delete(testId);
   rememberTestResult({ test_id: testId, result_key: resultKey, result_name: extra?.name, href: extra?.href, at: Date.now() });

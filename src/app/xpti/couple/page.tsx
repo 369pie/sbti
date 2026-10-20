@@ -9,17 +9,17 @@ import {
 import { CoupleClient, type InitialCoupleProps } from './CoupleClient';
 
 export const metadata: Metadata = {
-  title: 'XPTI · 关系合并报告 / 亲密张力配对',
+  title: '我和他 · 合不合 — 你先测，再邀请他 | WTFTI',
   description:
-    '用 12 道精简题完成另一半的 XPTI 测试，与你的张力签名合并，生成关系雷达 + 6 类配对模型 + 24 句对话脚本。',
+    '「我和他」：你先测，再把链接发给他（12 题）。两个人都测完，看你们的关系雷达、相处模式和对话脚本。',
   alternates: { canonical: '/xpti/couple/' },
   openGraph: {
-    title: 'XPTI · 关系合并报告',
-    description: '12 道精简题 → 双人张力雷达 + 配对模型 + 对话脚本。',
+    title: '我和他 · 合不合',
+    description: '你先测，再邀请他 → 两个人的关系报告。',
     url: getSiteUrl('/xpti/couple/'),
     type: 'website',
   },
-  robots: { index: false, follow: false },
+  robots: { index: true, follow: true },
 };
 
 interface XptiCouplePageProps {

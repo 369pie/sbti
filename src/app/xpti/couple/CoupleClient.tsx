@@ -23,16 +23,17 @@ import {
 } from '@/lib/xpti/couple-client-api';
 import { getOrCreateDeviceId } from '@/lib/mysti/device';
 
-const display = '"Cormorant Garamond", "Noto Serif SC", serif';
+// v3 journal (audit 2026-10-20 decision 3: 「我和他」 = XPTI couple + CPTI).
+const display = 'var(--s-h-font)';
 const mono = '"SF Mono", ui-monospace, "Menlo", monospace';
 const PALETTE = {
-  paper: 'var(--color-bg-primary)',
-  ink: 'var(--color-text-primary)',
-  inkMute: 'var(--color-text-muted)',
-  rule: 'var(--color-border)',
-  rose: '#A85A6E',
-  wine: '#6A2A3E',
-  gold: '#C9A676',
+  paper: 'var(--s-bg)',
+  ink: 'var(--s-ink)',
+  inkMute: 'var(--s-mute)',
+  rule: 'var(--s-line)',
+  rose: 'var(--s-accent-text)',
+  wine: 'var(--s-ink)',
+  gold: 'var(--s-accent-text)',
 };
 
 type Mode = 'gate' | 'inviter-create' | 'inviter-waiting' | 'partner-quiz' | 'merged';
@@ -92,7 +93,7 @@ export function CoupleClient({
   }, [mounted, shareToken, legacyInviteMode]);
 
   useEffect(() => {
-    if (legacyInviteMode || shareToken) trackTestStart('xpti_couple');
+    if (legacyInviteMode || shareToken) trackTestStart('wohe', { mode: 'partner' });
   }, [legacyInviteMode, shareToken]);
 
   // Mark legacy partner mode in localStorage so refresh keeps quiz visible.
@@ -277,7 +278,7 @@ export function CoupleClient({
         });
         setCouple(updated);
         trackFunnelEvent('couple_completed', { module: 'xpti', slug: couple.inviter.slug });
-        trackTestFinish('xpti_couple', couple.inviter.slug, { href: '/xpti/couple/' });
+        trackTestFinish('wohe', couple.inviter.slug, { href: '/xpti/couple/', mode: 'partner' });
       } catch (err) {
         console.error('[xpti/couple] completeCouple failed', err);
         setPartnerError('提交失败，请检查网络后重试。');
@@ -308,17 +309,17 @@ export function CoupleClient({
 
   // ───────── Render ─────────
   return (
-    <main style={{ background: PALETTE.paper, color: PALETTE.ink, minHeight: '100vh' }}>
-      <header style={{ maxWidth: 720, margin: '0 auto', padding: '64px 24px 24px' }}>
-        <div style={{ fontFamily: mono, fontSize: 11, letterSpacing: '0.42em', color: PALETTE.rose, textTransform: 'uppercase' }}>
-          XPTI · Couple Report
-        </div>
-        <h1 style={{ fontFamily: display, fontWeight: 500, fontSize: 'clamp(34px, 5vw, 54px)', lineHeight: 1.1, margin: '14px 0 8px', letterSpacing: '-0.01em' }}>
-          关系合并报告
-          <span style={{ display: 'block', fontStyle: 'italic', color: PALETTE.wine, fontSize: '0.5em', marginTop: 6 }}>
-            Intimacy Tension Pairing
-          </span>
+    <main className="skin-journal skin-bridge" style={{ minHeight: '100vh', paddingBottom: 96 }}>
+      <header style={{ maxWidth: 720, margin: '0 auto', padding: '36px 24px 12px' }}>
+        <p className="s-eyebrow">我和他 · 双人</p>
+        <h1 className="s-title" style={{ fontSize: 34, lineHeight: 1.2, margin: '10px 0 8px' }}>
+          {mode === 'merged' ? '你们俩的关系报告' : '先测你，再邀请他'}
         </h1>
+        {mode !== 'merged' ? (
+          <p style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--s-ink-2)', margin: 0 }}>
+            ① 你做完自己的测试 → ② 把链接发给他，他答 12 题 → ③ 看你们俩合不合。双人深度报告 ¥12.9 单买，或两人 AA 各 ¥6.9；会员 8 折。
+          </p>
+        ) : null}
       </header>
 
       {mode === 'gate' && <GateView />}
@@ -403,9 +404,9 @@ function InviterCreateView({
     return (
       <section style={cardWrap}>
         <p style={pStyle}>
-          要邀请伴侣合并报告，你需要先完成一次 XPTI 测试。
+          第一步：先做你自己的那份（约 3 分钟），测完就能生成邀请链接。
         </p>
-        <Link href={`${basePath}/xpti/test/`} style={ctaPrimary}>开始 XPTI 测试 →</Link>
+        <Link href={`${basePath}/xpti/test/?flow=wohe`} className="s-btn">开始测我 →</Link>
       </section>
     );
   }

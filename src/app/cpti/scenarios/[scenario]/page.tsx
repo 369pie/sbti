@@ -13,11 +13,12 @@
  *   - Static (force-static, generateStaticParams).
  *   - Has full Metadata + FAQPage JSON-LD.
  *   - Cross-links to 5–8 most-relevant /cpti/relationship/[slug]/ pages.
- *   - Primary CTA → /cpti/test/.
+ *   - Primary CTA → 「我和他」 /xpti/couple/ (audit 2026-10-20 decision 3).
  */
 
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { WoheFunnelCard } from '@/components/wohe/WoheFunnelCard';
 import NextImage from 'next/image';
 import type { Metadata } from 'next';
 import {
@@ -74,7 +75,7 @@ export default async function CptiScenarioPage({ params }: PageProps) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'CPTI', item: `${siteUrl}/cpti/` },
+      { '@type': 'ListItem', position: 1, name: '我和他', item: `${siteUrl}/xpti/couple/` },
       { '@type': 'ListItem', position: 2, name: '场景', item: `${siteUrl}/cpti/scenarios/` },
       { '@type': 'ListItem', position: 3, name: config.name, item: `${siteUrl}/cpti/scenarios/${scenario}/` },
     ],
@@ -150,13 +151,13 @@ export default async function CptiScenarioPage({ params }: PageProps) {
         </h1>
         <p className="text-sm text-text-secondary italic mb-6">{config.heroSub}</p>
         <Link
-          href="/cpti/test/"
+          href="/xpti/couple/"
           className="inline-block px-7 py-3 rounded-full text-bg-primary font-semibold shadow-lg hover:shadow-xl transition-shadow"
           style={{ background: config.color }}
         >
           {config.cta}
         </Link>
-        <p className="text-xs text-text-muted mt-3">3 分钟一对 · 25 种关系类型</p>
+        <p className="text-xs text-text-muted mt-3">「我和他」· 你先测，再邀请 ta</p>
       </section>
 
       {/* Intro */}
@@ -218,37 +219,9 @@ export default async function CptiScenarioPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* Theory + gallery cross-links */}
-      <section className="max-w-2xl mx-auto px-6 pb-12">
-        <div className="grid grid-cols-2 gap-3">
-          <Link
-            href="/cpti/gallery/"
-            className="rounded-2xl bg-bg-secondary border border-border-subtle p-4 text-center hover:border-border transition-colors"
-          >
-            <div className="text-2xl mb-1">🗂</div>
-            <div className="text-sm font-semibold text-text-primary">25 种关系图鉴</div>
-            <div className="text-xs text-text-muted mt-1">看完全部</div>
-          </Link>
-          <Link
-            href="/cpti/theory/"
-            className="rounded-2xl bg-bg-secondary border border-border-subtle p-4 text-center hover:border-border transition-colors"
-          >
-            <div className="text-2xl mb-1">📖</div>
-            <div className="text-sm font-semibold text-text-primary">CPTI 理论</div>
-            <div className="text-xs text-text-muted mt-1">5 个维度怎么测</div>
-          </Link>
-        </div>
-      </section>
-
-      {/* Bottom CTA */}
+      <WoheFunnelCard source={`cpti_scenario_${scenario}`} />
       <section className="max-w-2xl mx-auto px-6 pb-16 text-center">
-        <Link
-          href="/cpti/test/"
-          className="inline-block px-8 py-3.5 rounded-full text-bg-primary font-semibold shadow-lg hover:shadow-xl transition-shadow"
-          style={{ background: config.color }}
-        >
-          {config.cta}
-        </Link>
+        <Link href="/cpti/theory/" className="text-sm text-text-muted">5 个维度怎么测 →</Link>
       </section>
     </div>
   );

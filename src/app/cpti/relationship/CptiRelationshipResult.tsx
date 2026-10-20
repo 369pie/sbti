@@ -1148,7 +1148,7 @@ export function CptiRelationshipResult() {
               </label>
             ) : (
               <Link
-                href={`/cpti/pricing/?intent=cosign&rel=${relationship.slug}`}
+                href={`/member/`}
                 onClick={() => {
                   import('@/lib/cpti/analytics').then(({ trackCptiEvent }) => {
                     trackCptiEvent('cpti_cosign_invited', { relationship: relationship.slug });
@@ -1257,7 +1257,7 @@ export function CptiRelationshipResult() {
                 {copied ? '已复制 ✓' : '复制链接'}
               </button>
               <Link
-                href="/cpti/test"
+                href="/xpti/couple/"
                 className="flex-1 py-3 rounded-xl border border-border text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary/50 transition-all text-center"
               >
                 重新测试
