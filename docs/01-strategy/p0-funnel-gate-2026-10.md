@@ -56,3 +56,55 @@ group by 1 order by finishes desc;
    - `db/migrations/2026-10-17_her_profiles.sql`
 2. Vercel / `.env` 设置 `NEXT_PUBLIC_VAPID_PUBLIC_KEY`、`VAPID_PRIVATE_KEY`、`VAPID_SUBJECT`。
 3. Cron：`GET /api/push/dispatch`（`vercel.json`，每日一次）。
+
+## 次日留存 SQL（2026-10-21 新增，B12）
+
+口径：`product_events`，按 Asia/Shanghai 自然日计算，排除 `ua='bot'`，用 `device_id` 去重。D0 = 设备首次出现的日期。
+
+```sql
+-- 按首访日 cohort 统计 D1（次日）和 D7（第 7 天）回访率
+with first_seen as (
+  select device_id, min((ts at time zone 'Asia/Shanghai')::date) as d0
+  from product_events
+  where ua <> 'bot' and device_id is not null
+  group by 1
+),
+active as (
+  select distinct device_id, (ts at time zone 'Asia/Shanghai')::date as d
+  from product_events
+  where ua <> 'bot' and device_id is not null
+)
+select f.d0,
+       count(*) as cohort,
+       count(*) filter (where exists (select 1 from active a where a.device_id = f.device_id and a.d = f.d0 + 1)) as d1,
+       round(100.0 * count(*) filter (where exists (select 1 from active a where a.device_id = f.device_id and a.d = f.d0 + 1)) / nullif(count(*), 0), 1) as d1_pct,
+       count(*) filter (where exists (select 1 from active a where a.device_id = f.device_id and a.d = f.d0 + 7)) as d7
+from first_seen f
+where f.d0 >= current_date - 30 and f.d0 < current_date - 1
+group by 1
+order by 1;
+
+-- 建档用户的次日留存（今日卡钩子是否生效）：首个 archive_created 的设备，次日是否有 today_view
+with arch as (
+  select device_id, min((ts at time zone 'Asia/Shanghai')::date) as d0
+  from product_events where event = 'archive_created' and device_id is not null group by 1
+)
+select count(*) as archived,
+       count(*) filter (where exists (
+         select 1 from product_events e
+         where e.device_id = arch.device_id and e.module = 'today' and e.event = 'today_view'
+           and (e.ts at time zone 'Asia/Shanghai')::date = arch.d0 + 1)) as d1_today_view
+from arch where d0 >= current_date - 30;
+```
+
+新增事件（B12）：
+| module | event | 触发时机 | props |
+|---|---|---|---|
+| today | today_view | 打开 /today | has_archive |
+| mirror | mirror_view | 打开美我首页 / 掌纹 / 色彩 / 面部 / 换装页 | feature |
+| mirror | mirror_analyze_submit | 提交掌纹 / 色彩 / 面部分析 | feature |
+| mirror | mirror_tryon_submit | 提交换装生成 | feature=try_on |
+| mirror | mirror_pack_checkout_start | 发起换装包支付 | — |
+| treehole | treehole_view | 打开 /bottle | — |
+| treehole | treehole_write_submit | 写树洞并提交 | — |
+| home | archive_hero_click | 点击结果页首屏的存档按钮 | source, result_key |

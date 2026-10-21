@@ -37,6 +37,10 @@ const ALLOWED_MODULES = new Set([
   'test',
   // 全站会员 funnel (2026-10-21).
   'member',
+  // B12 (2026-10-21): 今日卡 / 美我 / 树洞 usage.
+  'today',
+  'mirror',
+  'treehole',
   'mysti',
   'cpti',
   'soulti',
