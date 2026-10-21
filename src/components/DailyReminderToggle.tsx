@@ -15,6 +15,45 @@ function urlBase64ToUint8Array(base64: string) {
   return Uint8Array.from(atob(padded), (c) => c.charCodeAt(0));
 }
 
+type Platform = 'ios-browser' | 'ios-app' | 'wechat' | 'android' | 'desktop';
+
+function detectPlatform(): Platform {
+  if (typeof navigator === 'undefined') return 'desktop';
+  const ua = navigator.userAgent;
+  if (/MicroMessenger|QQ\/|Weibo|xhsdiscover|aweme|Douyin/i.test(ua)) return 'wechat';
+  const ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (ios) {
+    const standalone = (navigator as Navigator & { standalone?: boolean }).standalone === true
+      || window.matchMedia?.('(display-mode: standalone)').matches;
+    return standalone ? 'ios-app' : 'ios-browser';
+  }
+  if (/Android/i.test(ua)) return 'android';
+  return 'desktop';
+}
+
+/** B02: per-platform guidance instead of a dead 「通知被关掉了」 button. */
+export function pushGuidance(state: 'unsupported' | 'denied', platform: Platform = detectPlatform()) {
+  if (platform === 'wechat') {
+    return { platform, title: '在 App 里打开收不到每日提醒', steps: ['点右上角「···」', '选「在浏览器打开」（iPhone 用 Safari）', '回到这一页再开启提醒'] };
+  }
+  if (platform === 'ios-browser') {
+    return { platform, title: 'iPhone 需要先把 WTFTI 加到主屏幕', steps: ['在 Safari 底部点「分享」', '选「添加到主屏幕」', '从主屏幕图标打开，再点「每天早上提醒我」'] };
+  }
+  if (platform === 'ios-app') {
+    return state === 'denied'
+      ? { platform, title: '通知被关掉了，这样重新打开', steps: ['打开 iPhone「设置」→「通知」', '找到 WTFTI，打开「允许通知」', '回来刷新这一页'] }
+      : { platform, title: '当前系统版本暂不支持提醒', steps: ['升级到 iOS 16.4 或更高版本后再试'] };
+  }
+  if (platform === 'android') {
+    return state === 'denied'
+      ? { platform, title: '通知被关掉了，这样重新打开', steps: ['点地址栏左侧的锁形图标 / 「网站设置」', '把「通知」改为「允许」', '回来刷新这一页'] }
+      : { platform, title: '这个浏览器不支持提醒', steps: ['换用 Chrome 或系统浏览器打开本页'] };
+  }
+  return state === 'denied'
+    ? { platform, title: '通知被关掉了，这样重新打开', steps: ['点地址栏左侧的图标 → 网站设置', '把「通知」改为「允许」', '刷新这一页'] }
+    : { platform, title: '这个浏览器不支持提醒', steps: ['换用 Chrome / Edge / Safari 最新版打开'] };
+}
+
 // Daily "今日卡" reminder (refocus §6.1). iOS only supports this after "添加到主屏幕".
 export function DailyReminderToggle() {
   const [state, setState] = useState<State>('idle');
@@ -73,19 +112,26 @@ export function DailyReminderToggle() {
     }
   }
 
-  if (state === 'unsupported') {
+  if (state === 'unsupported' || state === 'denied') {
+    const g = pushGuidance(state);
     return (
-      <p className="text-[12px]" style={{ color: 'var(--s-mute)' }}>
-        想每天收到提醒？用 Safari 打开，点「分享 → 添加到主屏幕」后再来开启。
-      </p>
+      <div
+        className="w-full rounded-2xl border px-4 py-3 text-[13px] leading-relaxed"
+        style={{ borderColor: 'var(--s-line)', background: 'var(--s-card)', color: 'var(--s-ink-2)' }}
+        data-push-guidance={g.platform}
+      >
+        <p className="font-medium" style={{ color: 'var(--s-ink)', margin: 0 }}>{g.title}</p>
+        <ol style={{ margin: '6px 0 0', paddingLeft: 18 }}>
+          {g.steps.map((t) => <li key={t}>{t}</li>)}
+        </ol>
+      </div>
     );
   }
 
-  const label: Record<Exclude<State, 'unsupported'>, string> = {
+  const label: Record<Exclude<State, 'unsupported' | 'denied'>, string> = {
     idle: '每天早上提醒我看今日卡',
     working: '开启中…',
     on: '已开启每日提醒',
-    denied: '通知被关掉了，可以在浏览器设置里重新打开',
     error: '没开成功，再试一次',
   };
 
@@ -93,7 +139,7 @@ export function DailyReminderToggle() {
     <button
       type="button"
       onClick={enable}
-      disabled={state === 'working' || state === 'on' || state === 'denied'}
+      disabled={state === 'working' || state === 'on'}
       className="w-full rounded-full border px-4 py-3 text-[14px] transition-colors disabled:cursor-default"
       style={{ borderColor: 'var(--s-line)', background: state === 'on' ? 'var(--s-accent-soft)' : 'var(--s-card)', color: 'var(--s-ink)' }}
     >

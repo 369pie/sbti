@@ -2,6 +2,8 @@
 
 /* eslint-disable @next/next/no-img-element -- APIMart returns temporary external URLs and uploads use browser data URLs. */
 
+import { pausedNote, usePaymentPause } from '@/lib/payment/use-payment-pause';
+import { enqueueProductEvent } from '@/lib/analytics/product-events';
 import { useRef, useState, useEffect, useCallback, type ChangeEvent, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -470,6 +472,10 @@ export default function MirrorClient() {
   const [mode, setMode] = useState<MirrorMode>('beauty');
   const searchParams = useSearchParams();
   useEffect(() => {
+    enqueueProductEvent('mirror', 'mirror_view', { step: 'view', props: { feature: 'try_on' } });
+  }, []);
+
+  useEffect(() => {
     const m = searchParams.get('mode');
     if (m === 'beauty' || m === 'color' || m === 'compare' || m === 'fortune') {
       setMode(m);
@@ -516,6 +522,7 @@ export default function MirrorClient() {
   const [showTopUp, setShowTopUp] = useState(false);
   const [paymentChannel, setPaymentChannel] = useState<'wechat' | 'alipay'>('wechat');
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const paused = usePaymentPause();
   const [paymentPolling, setPaymentPolling] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [history, setHistory] = useState<MirrorHistoryRecord[]>([]);
@@ -671,6 +678,7 @@ export default function MirrorClient() {
     setPaymentLoading(true);
     setPaymentError(null);
     try {
+      enqueueProductEvent('mirror', 'mirror_pack_checkout_start', { step: 'checkout' });
       const res = await fetch('/api/mirror/payment/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -909,6 +917,7 @@ export default function MirrorClient() {
         body.compareStyles = compareStyles.join(',');
       }
 
+      enqueueProductEvent('mirror', 'mirror_tryon_submit', { step: 'submit', props: { feature: 'try_on' } });
       const response = await fetch('/api/mirror/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1836,12 +1845,15 @@ export default function MirrorClient() {
               </div>
             </div>
 
+            {paused ? (
+              <p className="mb-3 text-xs leading-relaxed" style={{ color: 'var(--color-text-muted)' }} data-payment-paused="1">{pausedNote(paused)}</p>
+            ) : null}
             <div className="mb-4 space-y-3">
               {getTopUpOptions().map(option => (
                 <button
                   key={option.pack}
                   type="button"
-                  disabled={paymentLoading || paymentPolling}
+                  disabled={paymentLoading || paymentPolling || !!paused}
                   onClick={() => handleTopUp(option.pack)}
                   className="mirror-atelier-tier w-full text-left transition-opacity hover:opacity-90 disabled:opacity-40"
                 >

@@ -77,3 +77,24 @@
 
 .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 18px; margin-top: 22px; font-size: 13px; }
 .actions button, .actions a { color: var(--s-ink-2); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+/* B04: archive CTA above the fold on the result page */
+.archiveHero {
+  margin-top: 14px;
+  padding: 16px 18px 18px;
+  border: 1px solid var(--s-accent, #c07a8e);
+}
+.archiveHeroTitle {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--s-ink);
+}
+.archiveHeroList {
+  margin: 0 0 12px;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--s-ink-2);
+}

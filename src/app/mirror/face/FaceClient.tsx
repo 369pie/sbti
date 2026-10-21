@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react';
 
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
+import { enqueueProductEvent } from '@/lib/analytics/product-events';
 import { getApiPath } from '@/lib/api';
 import type { FaceMakeupResult, FaceSelfHint } from '@/lib/mirror/face-shape';
 
@@ -54,6 +55,7 @@ export function FaceClient() {
 
   useEffect(() => {
     trackFunnelEvent('module_landing_view', { module: 'wtfti', source: '/mirror/face' });
+    enqueueProductEvent('mirror', 'mirror_view', { step: 'view', props: { feature: 'face' } });
   }, []);
 
   const onFile = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
@@ -74,6 +76,7 @@ export function FaceClient() {
     setBusy(true);
     setError(null);
     try {
+      enqueueProductEvent('mirror', 'mirror_analyze_submit', { step: 'submit', props: { feature: 'face' } });
       const res = await fetch(getApiPath('/mirror/face/'), {
         method: 'POST',
         credentials: 'include',

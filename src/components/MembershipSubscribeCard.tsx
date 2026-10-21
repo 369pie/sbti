@@ -6,6 +6,7 @@
  * Explicit: 到期不自动续费（no dark-pattern auto-renew）.
  */
 
+import { pausedButtonLabel, pausedNote, usePaymentPause } from '@/lib/payment/use-payment-pause';
 import { trackMemberEvent } from '@/lib/member-client';
 import { useCallback, useState } from 'react';
 
@@ -36,6 +37,7 @@ export function MembershipSubscribeCard({
   className = '',
 }: Props) {
   const [loading, setLoading] = useState(false);
+  const paused = usePaymentPause();
   const [error, setError] = useState<string | null>(null);
   const [paymentType, setPaymentType] = useState<'wechat' | 'alipay'>('wechat');
 
@@ -156,11 +158,15 @@ export function MembershipSubscribeCard({
         type="button"
         className="s-btn"
         style={{ width: '100%', maxWidth: 'none' }}
-        disabled={loading}
+        disabled={loading || !!paused}
+        data-payment-paused={paused ? '1' : undefined}
         onClick={() => void startPay()}
       >
-        {loading ? '正在打开支付…' : `确认开通 · ¥19（${paymentType === 'wechat' ? '微信' : '支付宝'}）`}
+        {paused ? pausedButtonLabel(paused) : loading ? '正在打开支付…' : `确认开通 · ¥19（${paymentType === 'wechat' ? '微信' : '支付宝'}）`}
       </button>
+      {paused ? (
+        <p style={{ marginTop: 8, fontSize: 12, color: 'var(--s-mute, #8a7d76)', lineHeight: 1.6 }}>{pausedNote(paused)}</p>
+      ) : null}
       {error ? (
         <p style={{ marginTop: 10, fontSize: 12, color: '#a14a4a' }} role="alert">
           {error}

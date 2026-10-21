@@ -8,7 +8,7 @@
  */
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { enqueueProductEvent } from '@/lib/analytics/product-events';
 import { getApiPath } from '@/lib/api';
@@ -35,7 +35,7 @@ export function ArchiveSaveCard({ source, result }: { source: string; result?: A
   const [saved, setSaved] = useState<SavedArchive | null>(null);
 
   async function save() {
-    if (phase === 'saving') return;
+    if (phase === 'saving' || phase === 'saved') return;
     setPhase('saving');
     enqueueProductEvent('home', 'archive_save_click', {
       step: 'archive_click',
@@ -66,12 +66,22 @@ export function ArchiveSaveCard({ source, result }: { source: string; result?: A
         });
       }
       markDeviceArchive();
+      window.dispatchEvent(new CustomEvent('wtfti:archive-saved'));
       setSaved(data as SavedArchive);
       setPhase('saved');
     } catch {
       setPhase('error');
     }
   }
+
+  // Hero CTA above the fold (B04) triggers the same save.
+  const saveRef = useRef(save);
+  saveRef.current = save;
+  useEffect(() => {
+    const h = () => void saveRef.current();
+    window.addEventListener('wtfti:archive-save', h);
+    return () => window.removeEventListener('wtfti:archive-save', h);
+  }, []);
 
   const card = saved?.card;
   const rows: Array<[string, string, string | undefined]> = [
