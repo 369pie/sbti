@@ -3,9 +3,11 @@
  * 灵镜充值 — 创建虎皮椒支付订单
  */
 
+import { wechatGuideUrl } from '@/lib/payment/wechat-guide';
 import { NextRequest, NextResponse } from 'next/server';
 import {
   createXunhupayOrder,
+  detectPaymentClientKind,
   maskXunhupayAppId,
   readXunhupayConfig,
   type XunhupayPaymentChannel,
@@ -152,8 +154,9 @@ export async function POST(req: NextRequest) {
       price: meta.price,
       label: meta.label,
       serverWalletEligible: Boolean(userId),
-      url: order.url,
+      url: wechatGuideUrl({ kind: 'mirror', orderId: tradeOrderId, userAgent, qrcode: order.qrcode, cashier: order.url, paymentType, back: '/mirror/' }) ?? order.url,
       qrcode: order.qrcode,
+      wechatInApp: detectPaymentClientKind(userAgent) === 'wechat-inapp',
     });
   } catch (err) {
     console.error('[mirror-payment-create] create failed', {

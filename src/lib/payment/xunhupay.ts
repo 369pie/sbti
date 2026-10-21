@@ -262,6 +262,45 @@ export function hasAnyXunhupayConfig(): boolean {
 const DEFAULT_XUNHUPAY_API_BASE = 'https://api.dpweixin.com';
 const SECONDARY_XUNHUPAY_API_BASE = 'https://api.xunhupay.com';
 
+export type PaymentClientKind =
+  | 'wechat-inapp'
+  | 'alipay-inapp'
+  | 'qq-inapp'
+  | 'other-inapp'
+  | 'ios'
+  | 'android'
+  | 'desktop'
+  | 'unknown';
+
+/** Coarse client classification, stored on new orders for funnel attribution (no raw UA kept). */
+export function detectPaymentClientKind(userAgent?: string | null): PaymentClientKind {
+  if (!userAgent) return 'unknown';
+  const ua = userAgent;
+  if (/MicroMessenger/i.test(ua)) return 'wechat-inapp';
+  if (/AlipayClient/i.test(ua)) return 'alipay-inapp';
+  if (/\bQQ\/|MQQBrowser.*QQ/i.test(ua)) return 'qq-inapp';
+  if (/Weibo|DingTalk|aweme|BytedanceWebview|Xiaohongshu|discover\//i.test(ua)) return 'other-inapp';
+  if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+  if (/Android/i.test(ua)) return 'android';
+  return 'desktop';
+}
+
+/** WeChat's in-app browser forbids WeChat H5 (WAP) pay and blocks Alipay links. */
+export function isWechatInAppBrowser(userAgent?: string | null): boolean {
+  return !!userAgent && /MicroMessenger/i.test(userAgent);
+}
+
+/** Only allow Xunhupay-hosted QR / cashier URLs to be echoed into our guide page. */
+export function isTrustedXunhupayUrl(url?: string | null): boolean {
+  if (!url) return false;
+  try {
+    const u = new URL(url);
+    return u.protocol === 'https:' && /(^|\.)(xunhupay\.com|dpweixin\.com)$/i.test(u.hostname);
+  } catch {
+    return false;
+  }
+}
+
 function isLikelyMobileBrowser(userAgent?: string): boolean {
   if (!userAgent) return false;
   return /android.+mobile|iphone|ipod|ipad|iemobile|mobile|phone|windows ce|wap/i.test(
@@ -304,7 +343,8 @@ export async function createXunhupayOrder(
   if (params.attach) payload.attach = params.attach.slice(0, 256);
   if (params.callbackUrl) payload.callback_url = params.callbackUrl;
 
-  if (channel === 'wechat' && isLikelyMobileBrowser(params.userAgent)) {
+  // WeChat in-app: H5 pay is rejected by WeChat → use PC mode (cashier + url_qrcode) instead.
+  if (channel === 'wechat' && isLikelyMobileBrowser(params.userAgent) && !isWechatInAppBrowser(params.userAgent)) {
     payload.type = 'WAP';
     try {
       const origin = new URL(params.returnUrl).origin;
