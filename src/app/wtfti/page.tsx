@@ -9,7 +9,7 @@ const WTFTI_DESCRIPTION =
   '不是测试，是一座可以被装饰、被分享、随月相成长的女性精神生活神域。8 主神 × 灵魂印记 × 五感探针 × 月相日课 — 一次召唤，长期归属。';
 
 export const metadata: Metadata = {
-  title: 'WTFTI · 人格神域 — 90 秒召唤你的主神',
+  title: { absolute: 'WTFTI · 人格神域 — 90 秒召唤你的主神' },
   description: WTFTI_DESCRIPTION,
   keywords: [
     'WTFTI',

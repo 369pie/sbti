@@ -12,7 +12,7 @@ import {
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
-  title: 'WTFTI 经营总看板',
+  title: { absolute: 'WTFTI 经营总看板' },
   robots: { index: false, follow: false },
 };
 

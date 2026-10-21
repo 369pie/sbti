@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!wp) return {};
 
   return {
-    title: `WTF ${wp.number}（${wp.wtftiName}）— WTFTI 人格图鉴`,
+    title: { absolute: `WTF ${wp.number}（${wp.wtftiName}）— WTFTI 人格图鉴` },
     description: `${wp.tagline} — WTFTI 人格图鉴卡：${wp.wtftiName}，你的隐藏人格翻译。`,
     keywords: [`${wp.wtftiName}`, `${wp.code}`, `WTFTI ${wp.wtftiName}`, 'WTFTI 人格测试', 'WTF人格'],
     alternates: { canonical: `/wtfti/result/${type}/` },

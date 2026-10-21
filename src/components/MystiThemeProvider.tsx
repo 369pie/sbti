@@ -29,7 +29,10 @@ export function MystiThemeProvider({
   const { theme: rootTheme, toggle, setTheme: setRootTheme } = useWtftiTheme();
   
   // 映射全局 WtftiTheme 到 MystiTheme
-  const themeId: MystiThemeV2Id = rootTheme === 'dark' ? 'twilight' : 'aurora';
+  // B09 (2026-10-21): old /mysti pages align with the homepage skin-journal look —
+  // always render the light journal palette, regardless of the global dark toggle.
+  void rootTheme;
+  const themeId: MystiThemeV2Id = 'aurora';
   const theme = MYSTI_THEMES_V2[themeId];
 
   // 抹平旧的控制接口，将它们映射到全局 toggle

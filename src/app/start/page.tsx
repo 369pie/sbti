@@ -4,7 +4,7 @@ import { getSiteUrl } from '@/lib/site';
 import { StartContent } from './StartContent';
 
 export const metadata: Metadata = {
-  title: '测试大厅 · WTFTI',
+  title: '测试大厅',
   description:
     '从 90 秒首测开始，再看看 SoulTI、我和他、塔罗等女生向测试。每个结果都进你的档案，免费免注册，仅供娱乐与自我探索。',
   alternates: { canonical: '/start/' },

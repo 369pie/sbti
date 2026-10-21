@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { ShardDetailContent } from './ShardDetailContent';
 
 export const metadata: Metadata = {
-  title: '人格碎片详情 — WTFTI',
+  title: '人格碎片详情',
   description: '你的人格碎片今天说了什么？看看这枚碎片的语气、节拍、心绪和共鸣。',
   alternates: { canonical: '/card/shard/' },
   robots: { index: false, follow: false },

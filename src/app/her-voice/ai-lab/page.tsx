@@ -31,7 +31,7 @@ import {
 } from '../_editorial-styles';
 
 export const metadata: Metadata = {
-  title: 'AI 互助实验室 · Her Voice · WTFTI',
+  title: 'AI 互助实验室 · Her Voice',
   description: 'Her Voice Commons 里的女性 AI 学习问题池：把困惑变成共同实验。',
 };
 

@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const arcanaName = mysti?.majorArcana.name ?? '未知卡牌';
 
   return {
-    title: `${wp.wtftiName} · ${arcanaName} — WTFTI 灵鉴`,
+    title: { absolute: `${wp.wtftiName} · ${arcanaName} — WTFTI 灵鉴` },
     description: `${mysti?.tagline ?? wp.tagline} — WTFTI 灵鉴：${wp.wtftiName} 的灵魂卡牌是 ${arcanaName}。`,
     keywords: [`${wp.wtftiName}`, `${wp.code}`, `WTFTI ${wp.wtftiName}`, 'WTFTI 灵鉴', '灵魂卡牌', '大阿卡纳'],
     alternates: { canonical: `/mysti/result/${type}/` },

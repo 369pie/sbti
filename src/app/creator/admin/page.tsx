@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import CreatorAdminContent from './CreatorAdminContent';
 
 export const metadata: Metadata = {
-  title: '管理员 · UGC 宇宙审核 · WTFTI',
+  title: '管理员 · UGC 宇宙审核',
   robots: { index: false, follow: false },
 };
 

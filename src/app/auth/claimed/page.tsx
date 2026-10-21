@@ -6,7 +6,7 @@ import { ClaimedContent } from './ClaimedContent';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: '认领账号 — WTFTI',
+  title: '认领账号',
   description: '把你已保存的 CPTI 资产认领成正式账号，换设备也不会丢。',
   robots: { index: false, follow: false },
 };

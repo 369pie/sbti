@@ -41,7 +41,7 @@ const homepageFaqSchema = {
 };
 
 export const metadata: Metadata = {
-  title: 'WTFTI — 懂你的女生私人顾问',
+  title: { absolute: 'WTFTI — 懂你的女生私人顾问' },
   description: '看清自己、变好看、有地方说心里话。90 秒人格测试，每天一张为你写的今日卡：运势、穿搭色、妆容建议，还有一个敢说话的树洞。',
   alternates: { canonical: '/' },
 };

@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const dateStr = formatDateCN(new Date());
 
   return {
-    title: `${dateStr} · ${card.arcanaNameCN} — WTFTI 每日一牌`,
+    title: { absolute: `${dateStr} · ${card.arcanaNameCN} — WTFTI 每日一牌` },
     description: `${card.dailyReading} — 今日幸运色：${card.luckyColor}，幸运数：${card.luckyNumber}。`,
     keywords: ['每日塔罗', '塔罗牌', '每日一牌', 'WTFTI', '灵鉴', card.arcanaNameCN, card.arcanaName],
     alternates: { canonical: '/mysti/daily/' },

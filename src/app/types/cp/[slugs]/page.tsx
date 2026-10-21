@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slugs } = await params;
   const key = decodePairSlug(slugs);
   const fallback: Metadata = {
-    title: 'CP 配对 · WTFTI 图鉴馆',
+    title: { absolute: 'CP 配对 · WTFTI 图鉴馆' },
     description: '把任意两张人设卡配在一起，自动生成 CP 名 + 三句锐评 + 拼图截图。',
     alternates: { canonical: `/types/cp/${slugs}/` },
   };
