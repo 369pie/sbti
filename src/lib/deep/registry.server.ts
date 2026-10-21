@@ -9,7 +9,8 @@ import { buildCptiDeepPayload } from '@/lib/deep/cpti-deep.server';
 import { buildSoultiDeepPayload } from '@/lib/deep/soulti-deep.server';
 import { buildMystiLetterPayload } from '@/lib/deep/mysti-deep.server';
 
-export type DeepTarget = { sku: string; resourceId: string; build: () => unknown | Promise<unknown> };
+/** `sku` is the primary SKU; `alsoSkus` are equivalent purchases (legacy / unified paywall). */
+export type DeepTarget = { sku: string; alsoSkus?: string[]; resourceId: string; build: () => unknown | Promise<unknown> };
 export type DeepKind = { resolve: (str: (k: string) => string | null) => DeepTarget | null };
 
 export const DEEP_KINDS: Record<string, DeepKind> = {
@@ -28,7 +29,8 @@ export const DEEP_KINDS: Record<string, DeepKind> = {
     resolve: (str) => {
       const slug = str('slug');
       if (!slug) return null;
-      return { sku: 'cpti-deep-relationship', resourceId: buildResourceId('cpti', slug), build: () => buildCptiDeepPayload(slug) };
+      // 我和他 unified paywall (xpti-couple-report) also unlocks; legacy cpti-deep-relationship buyers keep access.
+      return { sku: 'cpti-deep-relationship', alsoSkus: ['xpti-couple-report'], resourceId: buildResourceId('cpti', slug), build: () => buildCptiDeepPayload(slug) };
     },
   },
   soulti: {

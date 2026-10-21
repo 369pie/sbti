@@ -218,6 +218,14 @@ async function main() {
   await t('deep cpti: xpti purchase does not unlock cpti', async () => {
     assert.equal((await deepPost('cpti', { slug: cSlug, deviceId: 'dev-buyer' })).status, 403);
   });
+  __setDeepEntitlementDepsForTests({ memberUnlocks: async () => false, paidOrder: async (sku: string, rid: string, dev: string) => sku === 'xpti-couple-report' && rid === buildResourceIdT('cpti', cSlug) && dev === 'dev-c' });
+  await t('deep cpti: unified 我和他 sku (xpti-couple-report) on same resource unlocks', async () => {
+    assert.equal((await deepPost('cpti', { slug: cSlug, deviceId: 'dev-c' })).status, 200);
+  });
+  __setDeepEntitlementDepsForTests({ memberUnlocks: async () => false, paidOrder: async (sku: string, rid: string, dev: string) => sku === 'cpti-deep-relationship' && rid === buildResourceIdT('cpti', cSlug) && dev === 'dev-legacy' });
+  await t('deep cpti: legacy cpti-deep-relationship buyer still unlocks', async () => {
+    assert.equal((await deepPost('cpti', { slug: cSlug, deviceId: 'dev-legacy' })).status, 200);
+  });
   await t('deep: unknown kind → 404', async () => assert.equal((await deepPost('nope', { slug: 'x' })).status, 404));
   // real member-access wiring: member deps flow through checkDeepEntitlement defaults
   __setDeepEntitlementDepsForTests(null);

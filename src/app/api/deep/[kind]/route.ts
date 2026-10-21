@@ -33,7 +33,11 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ kind: stri
   const target = def.resolve(str);
   if (!target) return NextResponse.json({ error: 'invalid_params' }, { status: 400 });
 
-  const ent = await checkDeepEntitlement({ sku: target.sku, resourceId: target.resourceId, deviceId });
+  let ent = await checkDeepEntitlement({ sku: target.sku, resourceId: target.resourceId, deviceId });
+  for (const alt of target.alsoSkus ?? []) {
+    if (ent.unlocked) break;
+    ent = await checkDeepEntitlement({ sku: alt, resourceId: target.resourceId, deviceId });
+  }
   if (!ent.unlocked) {
     return NextResponse.json({ error: 'not_entitled', sku: target.sku }, { status: 403, headers: { 'Cache-Control': 'no-store' } });
   }
