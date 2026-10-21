@@ -1,5 +1,5 @@
 /**
- * /cpti/relationship/[type]/his/page.tsx
+ * /xpti/couple/cp/[type]/his/page.tsx
  * ─────────────────────────────────────────────────────────────
  * v2.0 W2 — 男性反向报告（"在她眼里你是谁"）
  *
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `在她眼里你是谁 · ${r.name} — CPTI`,
     description: `她邀请你测了「${r.name}」。这是给你的反向报告：她为什么这样看你、这段关系正在向哪里走、想稳住你可以先做这件事。`,
-    alternates: { canonical: `/cpti/relationship/${type}/his/` },
+    alternates: { canonical: `/xpti/couple/cp/${type}/his/` },
     robots: { index: false, follow: true },
   };
 }

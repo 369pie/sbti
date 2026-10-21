@@ -38,7 +38,7 @@ export const FEATURES: FeatureConfig[] = [
   { key: 'xpti_deep', label: 'XPTI 亲密偏好深析', kind: 'content', where: '/xpti/result/*/deep/', freeQuota: null, member: 'unlimited', skus: ['xpti-deep-xp'] },
   { key: 'xpti_archive', label: 'XPTI 年度档案', kind: 'content', where: '/xpti/archive/', freeQuota: null, member: 'unlimited', skus: ['xpti-archive-yearly'] },
   { key: 'wtfti_deep', label: 'WTFTI 深度主神档案', kind: 'content', where: '/wtfti/result/', freeQuota: null, member: 'unlimited', skus: ['wtfti-deep-pantheon'] },
-  { key: 'cpti_deep', label: 'CPTI 关系深档 / 图鉴 / 双签卡 / 季节皮肤', kind: 'content', where: '/cpti/relationship/*/deep/', freeQuota: null, member: 'unlimited', skus: ['cpti-deep-relationship', 'cpti-codex-pass-yearly', 'cpti-cosign-edition', 'cpti-squad-pack', 'cpti-seasonal-pack', 'cpti-seasonal-qixi-2026', 'cpti-seasonal-valentines-2026', 'cpti-seasonal-lunar-newyear-2026'] },
+  { key: 'cpti_deep', label: 'CPTI 关系深档 / 图鉴 / 双签卡 / 季节皮肤', kind: 'content', where: '/xpti/couple/cp/*/deep/', freeQuota: null, member: 'unlimited', skus: ['cpti-deep-relationship', 'cpti-codex-pass-yearly', 'cpti-cosign-edition', 'cpti-squad-pack', 'cpti-seasonal-pack', 'cpti-seasonal-qixi-2026', 'cpti-seasonal-valentines-2026', 'cpti-seasonal-lunar-newyear-2026'] },
   { key: 'tarot_letter', label: '塔罗灵魂信 · 合盘 · 月报', kind: 'content', where: '/mysti/', freeQuota: null, member: 'unlimited', skus: ['soul-letter', 'dual-report', 'monthly-report'] },
   { key: 'tarot_decision', label: '塔罗决策快卡 · 全场景', kind: 'content', where: '/mysti/decision/', freeQuota: null, member: 'unlimited', skus: ['decision-pack'] },
   { key: 'sigil', label: 'Sigil 年度纪章册', kind: 'content', where: '/mysti/sigil/', freeQuota: null, member: 'unlimited', skus: ['sigil-yearly'] },

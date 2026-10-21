@@ -187,7 +187,7 @@ export function CptiRelationshipResult() {
     };
   }, [mounted, searchParams]);
 
-  const shareUrl = getSiteUrl('/cpti/');
+  const shareUrl = getSiteUrl('/xpti/couple/');
 
   // ── Ceremony reveal state machine ──
   // Phases: 'translating' → 'dimensions' → 'reveal' → 'done'
@@ -340,7 +340,7 @@ export function CptiRelationshipResult() {
 
   const getReturnBaseLink = useCallback(() => {
     if (!data) return '';
-    return getSiteUrl(`/cpti/relationship/?r=${encodeRelationshipLink({
+    return getSiteUrl(`/xpti/couple/cp/?r=${encodeRelationshipLink({
       relationshipSlug: data.relationship.slug,
       compatibility: data.compatibility,
       personalitySlugA: data.personalitySlugA,
@@ -489,7 +489,7 @@ export function CptiRelationshipResult() {
           <h1 className="text-2xl font-semibold mb-2">没有找到关系数据</h1>
           <p className="text-text-muted text-sm mb-6">请先完成CPTI配对测试。</p>
           <Link
-            href="/cpti/"
+            href="/xpti/couple/"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-accent/85 transition-all"
           >
             开始测试
@@ -1271,7 +1271,7 @@ export function CptiRelationshipResult() {
       <section className="max-w-2xl mx-auto px-6 pb-24">
         <div className="text-center">
           <Link
-            href="/cpti/"
+            href="/xpti/couple/"
             className="text-sm text-text-muted hover:text-text-secondary transition-colors"
           >
             ← 返回CPTI首页

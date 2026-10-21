@@ -12,7 +12,7 @@
  * Each page:
  *   - Static (force-static, generateStaticParams).
  *   - Has full Metadata + FAQPage JSON-LD.
- *   - Cross-links to 5–8 most-relevant /cpti/relationship/[slug]/ pages.
+ *   - Cross-links to 5–8 most-relevant /xpti/couple/cp/[slug]/ pages.
  *   - Primary CTA → 「我和他」 /xpti/couple/ (audit 2026-10-20 decision 3).
  */
 
@@ -133,7 +133,7 @@ export default async function CptiScenarioPage({ params }: PageProps) {
       {/* Header */}
       <div className="max-w-2xl mx-auto px-6 pt-8 pb-4">
         <Link
-          href="/cpti/"
+          href="/xpti/couple/"
           className="text-xs text-text-muted hover:text-text-secondary transition-colors mb-4 inline-block"
         >
           ← 返回 CPTI
@@ -178,7 +178,7 @@ export default async function CptiScenarioPage({ params }: PageProps) {
             return (
               <Link
                 key={r.slug}
-                href={`/cpti/relationship/${r.slug}/`}
+                href={`/xpti/couple/cp/${r.slug}/`}
                 className="group rounded-2xl bg-bg-secondary border border-border-subtle overflow-hidden hover:border-border transition-colors"
               >
                 <div className="aspect-square relative bg-bg-primary">
@@ -221,7 +221,7 @@ export default async function CptiScenarioPage({ params }: PageProps) {
 
       <WoheFunnelCard source={`cpti_scenario_${scenario}`} />
       <section className="max-w-2xl mx-auto px-6 pb-16 text-center">
-        <Link href="/cpti/theory/" className="text-sm text-text-muted">5 个维度怎么测 →</Link>
+        <Link href="/xpti/couple/" className="text-sm text-text-muted">5 个维度怎么测 →</Link>
       </section>
     </div>
   );

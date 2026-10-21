@@ -313,7 +313,7 @@ function buildThemeTabs(): GalleryTab[] {
       color: personality.color,
       emoji: personality.emoji,
       image: getCptiTypeThumbnailImage(personality.slug),
-      href: `/cpti/result/${personality.slug}`,
+      href: `/xpti/couple/cp/me/${personality.slug}`,
       rarity: { label: rarity.label, color: rarity.color, bgColor: rarity.bgColor },
     };
   });
@@ -329,7 +329,7 @@ function buildThemeTabs(): GalleryTab[] {
       color: relationship.color,
       emoji: relationship.emoji,
       image: getCptiRelationshipTypeThumbnailImage(relationship.slug),
-      href: `/cpti/relationship/?type=${relationship.slug}`,
+      href: `/xpti/couple/cp/?type=${relationship.slug}`,
       rarity: { label: tierInfo.label, color: tierInfo.color, bgColor: tierInfo.bgColor },
     };
   });
@@ -430,7 +430,7 @@ function buildThemeTabs(): GalleryTab[] {
       label: 'CPTI关系',
       emoji: '💕',
       accent: '#db2777',
-      testHref: '/cpti/relationship/',
+      testHref: '/xpti/couple/cp/',
       description: `CPTI 关系图鉴：${cptiRelationshipItems.length} 种关系类型，覆盖梗王级到稀有级。`,
       items: cptiRelationshipItems,
     },

@@ -132,7 +132,7 @@ export function CptiHisPovClient({ relationship }: Props) {
             测你想要的亲密关系是什么样 → XPTI
           </Link>
           <Link
-            href={`/cpti/relationship/${relationship.slug}/`}
+            href={`/xpti/couple/cp/${relationship.slug}/`}
             className="block py-3 text-center text-[12px] font-mono uppercase tracking-[0.24em] text-gold hover:text-text-primary"
           >
             查看「{relationship.name}」完整描述

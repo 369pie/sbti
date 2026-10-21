@@ -126,7 +126,7 @@ export function CptiQuiz({
     setIsFinishing(true);
 
     const result = calculateCptiResult(finalAnswers, CPTI_QUESTIONS);
-    trackTestFinish('wohe', result.personality.slug, { href: `/cpti/result/${result.personality.slug}/`, mode: 'cpti' });
+    trackTestFinish('wohe', result.personality.slug, { href: `/xpti/couple/cp/me/${result.personality.slug}/`, mode: 'cpti' });
 
     // Save profile to localStorage for future invite/stealth use
     saveCptiProfile(result.personality.slug, result.dimensions);
@@ -186,7 +186,7 @@ export function CptiQuiz({
         });
 
         finishTimeoutRef.current = window.setTimeout(() => {
-          window.location.href = `${basePath}/cpti/relationship/`;
+          window.location.href = `${basePath}/xpti/couple/cp/`;
         }, 800);
         return;
       }
@@ -198,7 +198,7 @@ export function CptiQuiz({
       const params = new URLSearchParams();
       if (pricingIntent) params.set('intent', pricingIntent);
       const query = params.toString();
-      window.location.href = `${basePath}/cpti/result/${encodeURIComponent(result.personality.slug)}/${query ? `?${query}` : ''}`;
+      window.location.href = `${basePath}/xpti/couple/cp/me/${encodeURIComponent(result.personality.slug)}/${query ? `?${query}` : ''}`;
     }, 800);
   }, [pairCodeId, pairPartnerNickname, pricingIntent, storeRelationshipResult]);
 
@@ -222,7 +222,7 @@ export function CptiQuiz({
     const dimsB = peerResult.dimensions;
 
     const relResult = matchRelationship(dimsA, dimsB);
-    trackTestFinish('wohe', relResult.relationship.slug, { href: '/cpti/relationship/', mode: 'cpti_peer' });
+    trackTestFinish('wohe', relResult.relationship.slug, { href: '/xpti/couple/cp/', mode: 'cpti_peer' });
 
     if (finishTimeoutRef.current !== null) {
       window.clearTimeout(finishTimeoutRef.current);
@@ -253,7 +253,7 @@ export function CptiQuiz({
     });
 
     finishTimeoutRef.current = window.setTimeout(() => {
-      window.location.href = `${basePath}/cpti/relationship/`;
+      window.location.href = `${basePath}/xpti/couple/cp/`;
     }, 800);
   }, [inviteData, storeRelationshipResult]);
 
@@ -278,7 +278,7 @@ export function CptiQuiz({
     const dimsA = myProfile.dimensions;
     const dimsB = crushResult.dimensions;
     const relResult = matchRelationship(dimsA, dimsB);
-    trackTestFinish('wohe', relResult.relationship.slug, { href: '/cpti/relationship/', mode: 'cpti_stealth' });
+    trackTestFinish('wohe', relResult.relationship.slug, { href: '/xpti/couple/cp/', mode: 'cpti_stealth' });
 
     // Write to WTF Card relationship collection
     recordRelationship({
@@ -306,7 +306,7 @@ export function CptiQuiz({
     }
 
     finishTimeoutRef.current = window.setTimeout(() => {
-      window.location.href = `${basePath}/cpti/relationship/`;
+      window.location.href = `${basePath}/xpti/couple/cp/`;
     }, 800);
   }, [storeRelationshipResult, targetNickname]);
 

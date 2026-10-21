@@ -8,7 +8,7 @@ import { getRelationshipBySlug, type CptiRelationshipType } from '@/lib/cpti/rel
 import { PremiumPaywall } from '@/components/PremiumPaywall';
 import { buildResourceId } from '@/lib/payments/skus';
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
-import { hashString, pickN, pickLevel, levelToScore } from '@/lib/payments/deep-content';
+import { pickLevel, levelToScore } from '@/lib/payments/deep-content';
 import {
   PremiumFoilStyles,
   PremiumEditionStamp,
@@ -16,12 +16,9 @@ import {
   formatIssuedDate,
 } from '@/components/premium/PremiumFoil';
 import { BundleCta } from '@/components/premium/BundleCta';
-import {
-  RELATIONSHIP_STAGES,
-  type RelationshipStage,
-  getPracticesForStage,
-  LANDMINE_POOL_V2,
-} from '@/lib/cpti/deep-pools';
+import { RELATIONSHIP_STAGES, type RelationshipStage } from '@/lib/cpti/deep-stages';
+import { useDeepPayload, deepStatusText } from '@/lib/deep/use-deep-payload';
+import type { CptiDeepPayload } from '@/lib/deep/cpti-deep.server';
 
 const display = '"Cormorant Garamond", "Noto Serif SC", serif';
 const mono = '"SF Mono", ui-monospace, "Menlo", monospace';
@@ -37,23 +34,6 @@ const AXES = [
   { id: 'safety',    label: '安全感存量' },
   { id: 'growth',    label: '共修弹性' },
 ] as const;
-
-const LANDMINE_POOL = LANDMINE_POOL_V2;
-
-const MONTH_THEMES = [
-  '一月 · 仪式重启',
-  '二月 · 重提爱意',
-  '三月 · 共修一项新技能',
-  '四月 · 互写感谢清单',
-  '五月 · 旅行 / 短途出走',
-  '六月 · 边界对齐',
-  '七月 · 共同财务 check-in',
-  '八月 · 各自独处一天',
-  '九月 · 复盘上半年',
-  '十月 · 朋友圈共建',
-  '十一月 · 健康 / 体能合修',
-  '十二月 · 写下一年关系清单',
-];
 
 interface Props {
   relationship: CptiRelationshipType;
@@ -90,22 +70,6 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
   const partnerRadarPoints = partner
     ? AXES.map((a) => levelToScore(pickLevel(partner.slug, a.id)) / 3)
     : null;
-
-  // Stage-aware practice pool — re-seeded per (slug × stage) for variety.
-  const practicePool = useMemo(() => getPracticesForStage(stage), [stage]);
-  const practices = useMemo(
-    () => pickN(practicePool, `${slug}::${stage}`, 24, 'practice-v2'),
-    [practicePool, slug, stage],
-  );
-
-  // Expanded landmines — pull 12 (was 8) from the v2 pool of 60+.
-  const landmines = useMemo(
-    () => pickN(LANDMINE_POOL, slug, 12, 'landmine-v2'),
-    [slug],
-  );
-
-  const monthOffset = hashString(slug) % 12;
-  const themes = MONTH_THEMES.map((_, i) => MONTH_THEMES[(i + monthOffset) % 12]);
 
   const accent = relationship.color || '#B85A78';
   const partnerAccent = '#9C7CFF'; // amethyst — visually distinct from the user's rose.
@@ -237,7 +201,8 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
       {/* ── Paywalled deep content ── */}
       <section style={{ maxWidth: 720, margin: '48px auto 0', padding: '0 24px' }}>
         <PremiumPaywall
-          sku="cpti-deep-relationship"
+          sku="xpti-couple-report"
+          legacySkus={['cpti-deep-relationship']}
           brand="cpti"
           resourceId={resourceId}
           lockedTitle={`解锁 ${relationship.name} · 8 维关系深档`}
@@ -280,6 +245,66 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
             </div>
           }
         >
+          <CptiDeepPaid
+            slug={slug}
+            relationship={relationship}
+            partner={partner ?? null}
+            stage={stage}
+            setStage={setStage}
+            radarLevels={radarLevels}
+            radarPoints={radarPoints}
+            partnerRadarPoints={partnerRadarPoints}
+            accent={accent}
+            partnerAccent={partnerAccent}
+            editionNo={editionNo}
+            issuedDate={issuedDate}
+          />
+        </PremiumPaywall>
+      </section>
+    </main>
+  );
+}
+
+// ─── helpers ────────────────────────────────────────────────────────────────
+
+function CptiDeepPaid({
+  slug,
+  relationship,
+  partner,
+  stage,
+  setStage,
+  radarLevels,
+  radarPoints,
+  partnerRadarPoints,
+  accent,
+  partnerAccent,
+  editionNo,
+  issuedDate,
+}: {
+  slug: string;
+  relationship: CptiRelationshipType;
+  partner: CptiRelationshipType | null;
+  stage: RelationshipStage;
+  setStage: (s: RelationshipStage) => void;
+  radarLevels: ReturnType<typeof pickLevel>[];
+  radarPoints: number[];
+  partnerRadarPoints: number[] | null;
+  accent: string;
+  partnerAccent: string;
+  editionNo: string;
+  issuedDate: string;
+}) {
+  const state = useDeepPayload<CptiDeepPayload>('cpti', { slug });
+  if (state.status !== 'ok') {
+    return (
+      <p data-deep-status={state.status} style={{ textAlign: 'center', padding: '48px 0', color: 'rgba(245,240,232,0.7)', fontSize: 14 }}>
+        {deepStatusText(state)}
+      </p>
+    );
+  }
+  const { landmines, themes } = state.data;
+  const practices = state.data.practicesByStage[stage] ?? [];
+  return (
           <div style={{ display: 'grid', gap: 56, paddingBlock: 24 }}>
 
             <PremiumEditionStamp editionNo={editionNo} issuedDate={issuedDate} />
@@ -507,13 +532,8 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
               </div>
             </DeepSection>
           </div>
-        </PremiumPaywall>
-      </section>
-    </main>
   );
 }
-
-// ─── helpers ────────────────────────────────────────────────────────────────
 
 function DeepSection({
   eyebrow,

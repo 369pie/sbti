@@ -22,8 +22,8 @@ const MODES = [
 
 const EXPLORE = [
   { href: '/xpti/couple/', label: '我和他', desc: '你先测，再邀请他，拿到你们俩的关系报告。' },
-  { href: '/cpti/join/', label: '输入配对码', desc: '用 ta 发来的六位码加入配对，解锁新的关系。' },
-  { href: '/cpti/theory/', label: '维度白皮书', desc: '5 个维度怎么算出 25 种关系？看一眼就懂。' },
+  { href: '/xpti/couple/cp/join/', label: '输入配对码', desc: '用 ta 发来的六位码加入配对，解锁新的关系。' },
+  { href: '/xpti/couple/', label: '维度白皮书', desc: '5 个维度怎么算出 25 种关系？看一眼就懂。' },
   { href: '/cpti/scenarios/lover/', label: '情侣 CP 测试', desc: '你和对象是灵魂伴侣还是相爱相杀？' },
   { href: '/cpti/scenarios/bestie/', label: '闺蜜浓度测试', desc: '塑料姐妹 / 双子星 / 怪咖联盟，你们是哪一种？' },
   { href: '/cpti/scenarios/family/', label: '家人关系测试', desc: '和妈、和爸、和兄弟姐妹，到底是哪一种关系？' },
@@ -80,7 +80,7 @@ export default function CptiHomeContent() {
               <Link href="/xpti/couple/" prefetch={false} className="btn btn-rose">
                 开始测试 <ArrowIcon />
               </Link>
-              <Link href="/cpti/join/" prefetch={false} className="btn btn-ghost">
+              <Link href="/xpti/couple/cp/join/" prefetch={false} className="btn btn-ghost">
                 输入配对码
               </Link>
               <Link href="/" prefetch={false} className="eyebrow ml-1 hover:text-text-primary transition-colors">
@@ -268,7 +268,7 @@ export default function CptiHomeContent() {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-px" style={{ background: 'var(--color-rule-soft)', border: '1px solid var(--color-rule-soft)' }}>
             {FEATURED.map((p, i) => (
-              <Link key={p.slug} href={`/cpti/result/${p.slug}/`} prefetch={false} className="group block p-5 sm:p-7 transition-colors duration-500 animate-fade-up" style={{ background: 'var(--color-bg-elevated)', animationDelay: `${i * 40}ms` }}>
+              <Link key={p.slug} href={`/xpti/couple/cp/me/${p.slug}/`} prefetch={false} className="group block p-5 sm:p-7 transition-colors duration-500 animate-fade-up" style={{ background: 'var(--color-bg-elevated)', animationDelay: `${i * 40}ms` }}>
                 <div className="flex items-start justify-between mb-6">
                   <span className="serial-number text-[10px]">N°{String(i + 1).padStart(2, '0')}</span>
                   <span className="text-xs font-mono tracking-wider" style={{ color: p.color }}>{p.code}</span>

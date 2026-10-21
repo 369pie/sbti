@@ -373,7 +373,7 @@ function RecordCard({ record, editing, onEditStart, onEditEnd, onUpdate, onDelet
         </div>
         <div className="flex shrink-0 gap-1">
           <Link
-            href={`/cpti/relationship/${rel.slug}/`}
+            href={`/xpti/couple/cp/${rel.slug}/`}
             className="rounded-md border border-gold/40 px-2 py-1 text-[11px] text-text-secondary hover:bg-gold/10"
           >
             查看

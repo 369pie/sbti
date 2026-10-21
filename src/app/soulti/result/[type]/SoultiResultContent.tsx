@@ -29,7 +29,7 @@ import { HermosaInputCard } from '@/components/hermosa/HermosaInputCard';
 import { SoultiShareCardSwitcher } from '@/components/SoultiShareCardSwitcher';
 import { DailyCheckInCTA } from '@/components/DailyCheckInCTA';
 import { ResultClosureEngine } from '@/components/ResultClosureEngine';
-import { getCurrentWeeklyPrompt } from '@/lib/soulti/deep-report';
+import { getCurrentWeeklyPrompt } from '@/lib/soulti/weekly-prompts';
 import { useAuth } from '@/components/AuthProvider';
 import { getSoultiExtendedSections, generateSoulLetter } from '@/lib/soulti/extended-sections';
 import { WtfiTheoryWiring } from '@/components/WtfiTheoryWiring';

@@ -156,6 +156,86 @@ async function main() {
     assert.equal(v.unlockedVia, 'order');
   });
 
+
+  // 6. Server-gated deep reports (/api/deep/<kind>/, src/lib/deep/entitlement.ts)
+  const { POST: deep } = await import('@/app/api/deep/[kind]/route');
+  const { __setDeepEntitlementDepsForTests, checkDeepEntitlement } = await import('@/lib/deep/entitlement');
+  const { DIALOGUE_SCRIPTS } = await import('@/lib/xpti/dialogue-scripts');
+  const { LANDMINE_POOL_V2 } = await import('@/lib/cpti/deep-pools');
+  const { getSoulLetter } = await import('@/lib/mysti/soul-letters');
+  const { getAllSoultiSlugs } = await import('@/lib/soulti/personalities');
+  const { getAllXptiSlugs } = await import('@/lib/xpti/personalities');
+  const { getAllRelationshipSlugs } = await import('@/lib/cpti/relationships');
+  const { listSoulLetterSlugs } = await import('@/lib/mysti/soul-letters');
+  const { buildResourceId: buildResourceIdT } = await import('@/lib/payments/skus');
+  const xSlug = getAllXptiSlugs()[0];
+  const cSlug = getAllRelationshipSlugs()[0];
+  const sSlug = getAllSoultiSlugs()[0];
+  const mSlug = listSoulLetterSlugs()[0];
+  const deepPost = (kind: string, body: unknown) => deep(post(`http://x/api/deep/${kind}/`, body), { params: Promise.resolve({ kind }) });
+  const NONE = { memberUnlocks: async () => false, paidOrder: async () => false };
+  const AS_MEMBER = { memberUnlocks: async () => true, paidOrder: async () => false };
+  const AS_BUYER = { memberUnlocks: async () => false, paidOrder: async (sku: string, rid: string, dev: string) => sku === 'xpti-deep-xp' && rid === buildResourceIdT("xpti", xSlug) && dev === 'dev-buyer' };
+  const paidSamples: Record<string, string[]> = {
+    xpti: DIALOGUE_SCRIPTS.slice(0, 40).map((d) => d.goal),
+    cpti: LANDMINE_POOL_V2.slice(0, 60) as string[],
+    'mysti-letter': [getSoulLetter(mSlug)!.neuro.slice(0, 30)],
+  };
+
+  __setDeepEntitlementDepsForTests(NONE);
+  for (const [kind, slug] of [['xpti', xSlug], ['cpti', cSlug], ['soulti', sSlug], ['mysti-letter', mSlug]] as const) {
+    await t(`deep ${kind}: unentitled → 403, no paid text`, async () => {
+      const r = await deepPost(kind, { slug, deviceId: 'dev-x' });
+      assert.equal(r.status, 403);
+      const txt = await r.text();
+      for (const p of paidSamples[kind] ?? []) assert.ok(!txt.includes(p));
+    });
+  }
+  __setDeepEntitlementDepsForTests(AS_MEMBER);
+  for (const [kind, slug] of [['xpti', xSlug], ['cpti', cSlug], ['soulti', sSlug], ['mysti-letter', mSlug]] as const) {
+    await t(`deep ${kind}: member → 200 with payload`, async () => {
+      const r = await deepPost(kind, { slug, deviceId: 'dev-x' });
+      assert.equal(r.status, 200);
+      const j = await r.json();
+      assert.ok(j.data);
+      assert.equal(j.via, 'member');
+    });
+  }
+  await t('deep xpti: member payload contains paid dialogues', async () => {
+    const j = await (await deepPost('xpti', { slug: xSlug })).json();
+    assert.equal(j.data.dialogues.length, 6);
+    assert.equal(j.data.landmines.length, 8);
+  });
+  __setDeepEntitlementDepsForTests(AS_BUYER);
+  await t('deep xpti: paid order on same device → 200 via order', async () => {
+    const r = await deepPost('xpti', { slug: xSlug, deviceId: 'dev-buyer' });
+    assert.equal(r.status, 200);
+    assert.equal((await r.json()).via, 'order');
+  });
+  await t('deep xpti: same buyer, other device → 403', async () => {
+    assert.equal((await deepPost('xpti', { slug: xSlug, deviceId: 'dev-other' })).status, 403);
+  });
+  await t('deep cpti: xpti purchase does not unlock cpti', async () => {
+    assert.equal((await deepPost('cpti', { slug: cSlug, deviceId: 'dev-buyer' })).status, 403);
+  });
+  __setDeepEntitlementDepsForTests({ memberUnlocks: async () => false, paidOrder: async (sku: string, rid: string, dev: string) => sku === 'xpti-couple-report' && rid === buildResourceIdT('cpti', cSlug) && dev === 'dev-c' });
+  await t('deep cpti: unified 我和他 sku (xpti-couple-report) on same resource unlocks', async () => {
+    assert.equal((await deepPost('cpti', { slug: cSlug, deviceId: 'dev-c' })).status, 200);
+  });
+  __setDeepEntitlementDepsForTests({ memberUnlocks: async () => false, paidOrder: async (sku: string, rid: string, dev: string) => sku === 'cpti-deep-relationship' && rid === buildResourceIdT('cpti', cSlug) && dev === 'dev-legacy' });
+  await t('deep cpti: legacy cpti-deep-relationship buyer still unlocks', async () => {
+    assert.equal((await deepPost('cpti', { slug: cSlug, deviceId: 'dev-legacy' })).status, 200);
+  });
+  await t('deep: unknown kind → 404', async () => assert.equal((await deepPost('nope', { slug: 'x' })).status, 404));
+  // real member-access wiring: member deps flow through checkDeepEntitlement defaults
+  __setDeepEntitlementDepsForTests(null);
+  __setMemberAccessDepsForTests(MEMBER);
+  await t('deep entitlement: member-access member unlocks xpti-deep-xp (default deps)', async () =>
+    assert.deepEqual(await checkDeepEntitlement({ sku: 'xpti-deep-xp', resourceId: 'r', deviceId: null }), { unlocked: true, via: 'member' }));
+  __setMemberAccessDepsForTests(ANON_NONMEMBER);
+  await t('deep entitlement: non-member, no device → locked (no DB call)', async () =>
+    assert.deepEqual(await checkDeepEntitlement({ sku: 'xpti-deep-xp', resourceId: 'r', deviceId: null }), { unlocked: false, via: null }));
+
   __setMemberAccessDepsForTests(null);
   console.log(`\n${pass} passed`);
 }

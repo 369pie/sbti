@@ -72,7 +72,7 @@ export function CptiCompatibilityPredictor({ personality, dimensionScores }: Pro
           return (
             <li key={partner.slug}>
               <Link
-                href={`/cpti/relationship/${rel.slug}/`}
+                href={`/xpti/couple/cp/${rel.slug}/`}
                 onClick={() =>
                   trackCptiEvent('cpti_prediction_clicked', {
                     mySlug: personality.slug,
