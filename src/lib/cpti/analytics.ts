@@ -27,7 +27,7 @@ type CptiEvent =
   | 'cpti_prediction_viewed'
   | 'cpti_prediction_clicked'
   // ── v2.0 (2026-04-21) — Codex / His POV / Cosign / Subtle / Pricing ──
-  | 'cpti_codex_viewed'              // /cpti/me/codex/ 档案夹打开
+  | 'cpti_codex_viewed'              // /xpti/couple/cp/my/codex/ 档案夹打开
   | 'cpti_codex_record_added'        // 一段关系归档（result page mount）
   | 'cpti_codex_record_renamed'      // 用户给关系起昵称/备注
   | 'cpti_codex_record_deleted'      // 删除一段

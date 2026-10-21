@@ -62,6 +62,8 @@ interface Props {
   serverUnlocked?: boolean;
   /** Fired once whenever the paywall enters the unlocked state (payment, restore, member). */
   onUnlocked?: () => void;
+  /** Older SKUs that also unlock this resource (e.g. cpti-deep-relationship → 我和他 report). */
+  legacySkus?: MystiSku[];
 }
 
 export function PremiumPaywall({
@@ -75,6 +77,7 @@ export function PremiumPaywall({
   teaserBullets,
   serverUnlocked = false,
   onUnlocked,
+  legacySkus,
 }: Props) {
   const theme: PaywallTheme = themeProp
     ?? (brand === 'mysti'
@@ -83,7 +86,9 @@ export function PremiumPaywall({
       ? BRAND_THEMES.wtfti
       : BRAND_THEMES[brand]);
 
-  const [unlocked, setUnlocked] = useState<boolean>(() => serverUnlocked || isUnlocked(sku, resourceId));
+  const [unlocked, setUnlocked] = useState<boolean>(
+    () => serverUnlocked || isUnlocked(sku, resourceId) || (legacySkus ?? []).some((l) => isUnlocked(l, resourceId)),
+  );
   const paused = usePaymentPause();
   useEffect(() => {
     if (serverUnlocked) setUnlocked(true);
@@ -166,7 +171,11 @@ export function PremiumPaywall({
 
     const restore = async () => {
       try {
-        const restored = await restoreMystiEntitlement({ sku, resourceId, deviceId });
+        let restored = await restoreMystiEntitlement({ sku, resourceId, deviceId });
+        for (const legacy of legacySkus ?? []) {
+          if (restored.restored || cancelled) break;
+          restored = await restoreMystiEntitlement({ sku: legacy, resourceId, deviceId });
+        }
         if (cancelled || !restored.restored) return;
         setUnlocked(true);
         try {
@@ -190,6 +199,7 @@ export function PremiumPaywall({
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- legacySkus is a static per-call-site list
   }, [unlocked, sku, resourceId, brand]);
 
   // First view tracking

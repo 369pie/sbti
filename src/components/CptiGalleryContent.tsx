@@ -150,7 +150,7 @@ export function CptiGalleryContent() {
       {/* Header */}
       <div className="max-w-2xl mx-auto px-6 pt-8 pb-4">
         <Link
-          href="/cpti/"
+          href="/xpti/couple/"
           className="text-xs text-text-muted hover:text-text-secondary transition-colors mb-4 inline-block"
         >
           ← 返回 CPTI
@@ -423,7 +423,7 @@ function RelationshipDetail({
             测一个新的人 · 有机会点亮这一格
           </Link>
           <Link
-            href={`/cpti/relationship/${type.slug}/`}
+            href={`/xpti/couple/cp/${type.slug}/`}
             className="block w-full text-center px-6 py-2.5 rounded-xl border border-border-subtle text-text-secondary text-sm hover:bg-bg-secondary/50 transition-colors"
           >
             先了解一下「{type.name}」是什么 →

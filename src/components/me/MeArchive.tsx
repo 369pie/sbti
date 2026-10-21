@@ -47,7 +47,7 @@ function resultHref(r: Row): string | undefined {
   if (r.test_id === 'first_look') return `/test/result/${r.result_key}/`;
   if (r.test_id === 'soulti') return `/soulti/result/${r.result_key}/`;
   if (r.test_id === 'xpti') return `/xpti/result/${r.result_key}/`;
-  if (r.test_id === 'cpti') return `/cpti/result/${r.result_key}/`;
+  if (r.test_id === 'cpti') return `/xpti/couple/cp/me/${r.result_key}/`;
   return undefined;
 }
 

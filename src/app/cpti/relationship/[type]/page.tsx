@@ -1,5 +1,5 @@
 /**
- * /cpti/relationship/[type]/page.tsx
+ * /xpti/couple/cp/[type]/page.tsx
  * ─────────────────────────────────────────────────────────────
  * Sprint 1 (2026-04-19) — 25 SEO landing pages, one per relationship type.
  *
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${r.name}（${r.code}）— CPTI 25 种关系类型`,
     description: `${r.tagline} ${r.description.slice(0, 80)}… 测一测你和身边谁是「${r.name}」。`,
-    alternates: { canonical: `/cpti/relationship/${type}/` },
+    alternates: { canonical: `/xpti/couple/cp/${type}/` },
     openGraph: {
       title: `${r.name} · CPTI 25 种关系图鉴`,
       description: r.tagline,
@@ -84,9 +84,9 @@ export default async function CptiRelationshipTypePage({ params }: PageProps) {
         '@type': 'BreadcrumbList',
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
-          { '@type': 'ListItem', position: 2, name: 'CPTI 关系测试', item: getSiteUrl('/cpti/') },
+          { '@type': 'ListItem', position: 2, name: 'CPTI 关系测试', item: getSiteUrl('/xpti/couple/') },
           { '@type': 'ListItem', position: 3, name: '我和他', item: getSiteUrl('/xpti/couple/') },
-          { '@type': 'ListItem', position: 4, name: relationship.name, item: getSiteUrl(`/cpti/relationship/${relationship.slug}/`) },
+          { '@type': 'ListItem', position: 4, name: relationship.name, item: getSiteUrl(`/xpti/couple/cp/${relationship.slug}/`) },
         ],
       },
       {
@@ -129,7 +129,7 @@ export default async function CptiRelationshipTypePage({ params }: PageProps) {
       <main className="min-h-screen bg-bg-primary text-text-primary">
         {/* Hero */}
         <section className="max-w-2xl mx-auto px-6 pt-16 pb-12 text-center">
-          <Link href="/cpti/" className="text-xs font-mono tracking-wider text-text-muted uppercase hover:text-text-primary transition-colors">
+          <Link href="/xpti/couple/" className="text-xs font-mono tracking-wider text-text-muted uppercase hover:text-text-primary transition-colors">
             ← CPTI 关系测试
           </Link>
 
@@ -192,7 +192,7 @@ export default async function CptiRelationshipTypePage({ params }: PageProps) {
             {otherTiers.map((r) => (
               <Link
                 key={r.slug}
-                href={`/cpti/relationship/${r.slug}/`}
+                href={`/xpti/couple/cp/${r.slug}/`}
                 className="group rounded-xl border border-border-subtle bg-bg-elevated p-4 text-center hover:border-accent/40 transition-all"
               >
                 <div className="text-3xl mb-2">{r.emoji}</div>
@@ -207,7 +207,7 @@ export default async function CptiRelationshipTypePage({ params }: PageProps) {
         <section className="max-w-2xl mx-auto px-6 pb-16">
           <div className="grid grid-cols-1 gap-3">
             <Link
-              href="/cpti/theory/"
+              href="/xpti/couple/"
               className="rounded-xl border border-border-subtle bg-bg-elevated p-5 hover:border-accent/40 transition-all"
             >
               <div className="text-xs font-mono tracking-wider text-text-muted uppercase mb-1">5 维度</div>

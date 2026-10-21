@@ -73,7 +73,7 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
   const shareRef = useRef<CptiShareImageGeneratorHandle>(null);
   const { mounted: shareMounted, ensureMounted: ensureShareMounted, triggerGenerate: triggerShareGenerate } = useDeferredShareGenerate(shareRef, CptiShareImageGenerator);
 
-  const shareUrl = getSiteUrl(`/cpti/result/${personality.slug}/`);
+  const shareUrl = getSiteUrl(`/xpti/couple/cp/me/${personality.slug}/`);
   const heroImageSrc = heroImageMode === 'full'
     ? getCptiTypeImage(personality.slug)
     : heroImageMode === 'thumb'
@@ -454,7 +454,7 @@ export function CptiResultContent({ personality, dimensionScores }: Props) {
           {others.map(p => (
             <Link
               key={p.slug}
-              href={`/cpti/result/${p.slug}`}
+              href={`/xpti/couple/cp/me/${p.slug}`}
               className="group rounded-xl border border-border-subtle hover:border-border bg-bg-secondary/30 hover:bg-bg-secondary/60 transition-all p-4"
             >
               {(otherImageModes[p.slug] ?? 'thumb') === 'emoji' ? (

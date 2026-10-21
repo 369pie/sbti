@@ -46,7 +46,7 @@ function buildEvents(card: WtfCardData | null, gacha: GachaResult[], streakDays:
         title: `鉴定关系：${r.slug}`,
         detail: `和 ${r.partnerNickname ?? 'TA'}`,
         emoji: '💕',
-        href: `/cpti/relationship/`,
+        href: `/xpti/couple/cp/`,
       });
     }
   }

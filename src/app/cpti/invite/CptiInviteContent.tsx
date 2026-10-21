@@ -108,7 +108,7 @@ function InviteInner() {
             <h1 className="text-2xl font-semibold mb-2">配对码无效</h1>
             <p className="text-text-muted text-sm mb-6">{pairError || '这个配对码无效或已过期。'}</p>
             <Link
-              href="/cpti/"
+              href="/xpti/couple/"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-rose-deep transition-all"
             >
               自己去做CPTI测试
@@ -258,7 +258,7 @@ function InviteInner() {
             transition={{ delay: 0.7 }}
           >
             <Link
-              href="/cpti/join/"
+              href="/xpti/couple/cp/join/"
               className="text-xs text-text-muted hover:text-text-secondary transition-colors"
             >
               有配对码？手动输入 →
@@ -278,7 +278,7 @@ function InviteInner() {
           <h1 className="text-2xl font-semibold mb-2">邀请链接无效</h1>
           <p className="text-text-muted text-sm mb-6">这个邀请链接缺少必要的参数，可能已失效。</p>
           <Link
-            href="/cpti/"
+            href="/xpti/couple/"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-rose-deep transition-all"
           >
             自己去做CPTI测试
@@ -298,7 +298,7 @@ function InviteInner() {
           <h1 className="text-2xl font-semibold mb-2">邀请链接已损坏</h1>
           <p className="text-text-muted text-sm mb-6">无法解析这个邀请链接的数据。</p>
           <Link
-            href="/cpti/"
+            href="/xpti/couple/"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-bg-primary font-medium hover:bg-rose-deep transition-all"
           >
             自己去做CPTI测试
@@ -454,7 +454,7 @@ function InviteLanding({ inviteData, personality }: InviteLandingProps) {
           transition={{ delay: 0.7 }}
         >
           <Link
-            href="/cpti/"
+            href="/xpti/couple/"
             className="text-xs text-text-muted hover:text-text-secondary transition-colors"
           >
             或者自己去做一份CPTI测试
