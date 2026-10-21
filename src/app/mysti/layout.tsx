@@ -31,7 +31,7 @@ export default function MystiLayout({ children }: { children: React.ReactNode })
     <MystiThemeProvider defaultTheme={getAutoTimeTheme()}>
       <MystiSubscriptionBoot />
       <MystiSubscriptionExpiryBanner />
-      <div className="skin-journal" style={{ minHeight: '100vh' }}>{children}</div>
+      <div className="skin-journal skin-bridge" style={{ minHeight: '100vh' }}>{children}</div>
     </MystiThemeProvider>
   );
 }

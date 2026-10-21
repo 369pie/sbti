@@ -18,7 +18,19 @@ const TABS = [
 
 // The bottom tab bar only shows on hub pages, never inside a quiz / result / couple flow,
 // so it can't cover the first answer option.
-const TAB_BAR_PATHS = new Set(['/', '/start/', '/today/', '/xpti/couple/', '/mirror/', '/me/', '/bottle/']);
+const TAB_BAR_PATHS = new Set(['/', '/start/', '/today/', '/xpti/couple/', '/mirror/', '/me/', '/bottle/', '/xpti/', '/soulti/', '/mysti/', '/member/']);
+// Phase 3: result / content pages (by traffic) also get the tab bar. Never quiz pages.
+const TAB_BAR_PREFIXES = [
+  '/test/result/', '/xpti/result/', '/soulti/result/', '/soulti/report/',
+  '/cpti/result/', '/cpti/relationship/', '/cpti/scenarios/', '/xpti/couple/cp/',
+  '/mysti/result/', '/mysti/daily/', '/mysti/collection/', '/mysti/archive/', '/wtfti/result/',
+];
+const TAB_BAR_EXCLUDE = ['/xpti/couple/cp/test/', '/xpti/couple/cp/join/'];
+function tabBarVisible(p: string): boolean {
+  if (TAB_BAR_PATHS.has(p)) return true;
+  if (TAB_BAR_EXCLUDE.some((x) => p.startsWith(x))) return false;
+  return TAB_BAR_PREFIXES.some((x) => p.startsWith(x));
+}
 
 function isActive(pathname: string, tab: (typeof TABS)[number]) {
   const p = pathname.endsWith('/') ? pathname : `${pathname}/`;
@@ -35,7 +47,7 @@ export function HerNav() {
     queueMicrotask(() => setDeviceArchive(hasDeviceArchive()));
   }, [pathname, user?.id]);
   const hasAnonArchive = !isAuthenticated && (deviceArchive || !!user?.is_anonymous);
-  const showTabBar = TAB_BAR_PATHS.has(pathname.endsWith('/') ? pathname : `${pathname}/`);
+  const showTabBar = tabBarVisible(pathname.endsWith('/') ? pathname : `${pathname}/`);
 
   return (
     <>

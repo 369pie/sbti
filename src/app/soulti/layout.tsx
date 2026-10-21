@@ -9,9 +9,9 @@ import { SoultiNightMode } from '@/components/SoultiNightMode';
  */
 export default function SoultiLayout({ children }: { children: ReactNode }) {
   return (
-    <>
+    <div className="skin-journal skin-bridge" style={{ minHeight: '100vh' }}>
       {children}
       <SoultiNightMode />
-    </>
+    </div>
   );
 }

@@ -48,7 +48,8 @@ export function WechatPayGuide() {
 
   return (
     <main className="skin-journal" data-wechat-pay-guide style={{ minHeight: '100vh', padding: '24px 20px 96px' }}>
-      <div aria-hidden style={{ position: 'fixed', top: 6, right: 14, fontSize: 30, lineHeight: 1, color: 'var(--s-accent-text)' }}>↗</div>
+      {/* Points at WeChat's own ··· menu (above the page). z-index above the sticky site header (z-40). */}
+      <div aria-hidden data-wechat-arrow style={{ position: 'fixed', top: 4, right: 12, zIndex: 60, fontSize: 30, lineHeight: 1, color: 'var(--s-accent-text)', background: 'color-mix(in oklab, var(--s-bg) 85%, transparent)', borderRadius: 999, padding: '2px 8px' }}>↗</div>
       <div style={{ maxWidth: 440, margin: '0 auto' }}>
         <p style={{ fontSize: 11, letterSpacing: '0.3em', color: 'var(--s-mute)', margin: '28px 0 8px' }}>支付 · 小提示</p>
         <h1 className="s-title" style={{ fontSize: 24, margin: '0 0 10px', fontFamily: 'var(--s-h-font)' }}>微信里没法直接付款</h1>
