@@ -198,3 +198,10 @@
 .skin-bridge .rounded-xl {
   border-radius: var(--s-radius);
 }
+
+/* Phase 3: keep content clear of the fixed mobile tab bar on every page that shows it. */
+@media (max-width: 767px) {
+  body:has(.her-tabbar) main.flex-1 {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+}
