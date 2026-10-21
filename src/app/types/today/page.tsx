@@ -11,7 +11,7 @@ const ALL_TABS = [
 ];
 
 export const metadata: Metadata = {
-  title: '今日封印 · WTFTI 每日一卡',
+  title: { absolute: '今日封印 · WTFTI 每日一卡' },
   description:
     '每天一张人格签卡：基于今天的节气、月相和你的解锁进度，给你一句仅属于今日的话。截图发小红书或邀请闺蜜也来翻一张。',
   alternates: { canonical: '/types/today/' },

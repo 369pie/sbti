@@ -20,12 +20,15 @@ export interface DailyCardInterpretation {
  * Same card for everyone on the same day (creates shared experience).
  * Formula: hash the date string (sum of char codes) % 22
  */
+/** Calendar parts in Asia/Shanghai (UTC+8, no DST) — server (UTC) and client agree. */
+function shanghaiParts(date?: Date): { y: number; m: number; d: number } {
+  const t = new Date((date ?? new Date()).getTime() + 8 * 3600_000);
+  return { y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate() };
+}
+
 export function getDailyCardIndex(date?: Date): number {
-  const d = date ?? new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  const dateStr = `${yyyy}-${mm}-${dd}`;
+  const { y, m, d } = shanghaiParts(date);
+  const dateStr = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 
   let hash = 0;
   for (let i = 0; i < dateStr.length; i++) {
@@ -38,8 +41,8 @@ export function getDailyCardIndex(date?: Date): number {
  * Format date in Chinese style: 2025年4月16日
  */
 export function formatDateCN(date?: Date): string {
-  const d = date ?? new Date();
-  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+  const { y, m, d } = shanghaiParts(date);
+  return `${y}年${m}月${d}日`;
 }
 
 /** 22 Major Arcana daily interpretations */

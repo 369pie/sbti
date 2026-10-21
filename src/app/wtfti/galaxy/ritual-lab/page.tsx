@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 import { RitualLabClient } from '@/components/galaxy/RitualLabClient';
 
 export const metadata: Metadata = {
-  title: 'Ritual Lab · 问答仪式实验台 · WTFTI',
+  title: 'Ritual Lab · 问答仪式实验台',
   description:
     'WTFTI 八种问答仪式语法 + 三个章节仪式的实验台 — 双行星 · 拍立得 · 镜面滑杆 · 塔罗 · 凌晨短信 · 唱片 · 滴墨 · 私语 · 神殿之门 · 印记勾勒 · 星尘封信。',
   openGraph: {

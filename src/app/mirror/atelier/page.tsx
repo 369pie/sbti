@@ -6,7 +6,7 @@ import MirrorClient from './MirrorClient';
 const DESC = '灵镜 Atelier：上传照片，AI 妆发 / 色彩 / 风格对比。按次灵币，照片不入库。';
 
 export const metadata: Metadata = {
-  title: '灵镜 Atelier · 美我 · WTFTI',
+  title: '灵镜 Atelier · 美我',
   description: DESC,
   alternates: { canonical: '/mirror/atelier/' },
   openGraph: {

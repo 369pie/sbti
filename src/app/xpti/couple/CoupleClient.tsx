@@ -367,6 +367,8 @@ export function CoupleClient({
         />
       )}
 
+      {/* Tab bar must not cover answer options while the partner is answering. */}
+      {mode === 'partner-quiz' && <style>{'.her-tabbar{display:none!important}'}</style>}
       {mode === 'partner-quiz' && couple && currentQ && (
         <PartnerQuizView
           inviterNick={couple.inviter.nickname ?? undefined}
@@ -731,7 +733,7 @@ function MergedView({
   const activePrice = payMode === 'split' ? '¥6.9' : '¥12.9';
   const coupleResource = buildCoupleResourceId(shareToken);
   return (
-    <section style={{ ...cardWrap, paddingBottom: 96 }}>
+    <section style={cardWrap}>
       <div style={{ fontFamily: mono, fontSize: 10, letterSpacing: '0.32em', color: PALETTE.gold, textTransform: 'uppercase' }}>
         Tension Pairing · Result
       </div>

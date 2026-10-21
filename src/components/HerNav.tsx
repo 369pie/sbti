@@ -18,7 +18,7 @@ const TABS = [
 
 // The bottom tab bar only shows on hub pages, never inside a quiz / result / couple flow,
 // so it can't cover the first answer option.
-const TAB_BAR_PATHS = new Set(['/', '/start/', '/today/', '/mirror/', '/me/', '/bottle/']);
+const TAB_BAR_PATHS = new Set(['/', '/start/', '/today/', '/xpti/couple/', '/mirror/', '/me/', '/bottle/']);
 
 function isActive(pathname: string, tab: (typeof TABS)[number]) {
   const p = pathname.endsWith('/') ? pathname : `${pathname}/`;

@@ -281,8 +281,21 @@ export function getUniverse(id: string): Universe | undefined {
   return UNIVERSES.find(u => u.id === id);
 }
 
+/**
+ * Landing paths that next.config.ts 308-redirects away (retired universes).
+ * Keep in sync with redirects() — linking them is a dead end (B07).
+ */
+export const RETIRED_LANDING_PREFIXES = [
+  '/bird/', '/flower/', '/fanrenti/', '/hogti/', '/ugc/',
+  '/wtfti/feng/', '/wtfti/kings/', '/wtfti/delta/', '/wtfti/galaxy/',
+];
+
+export function isRetiredLandingPath(path: string): boolean {
+  return RETIRED_LANDING_PREFIXES.some((p) => path.startsWith(p));
+}
+
 export function getLiveUniverses(): Universe[] {
-  return UNIVERSES.filter(u => u.status === 'live');
+  return UNIVERSES.filter(u => u.status === 'live' && !isRetiredLandingPath(u.landingPath));
 }
 
 const INACTIVE_CLASS = 'text-text-muted hover:text-text-secondary';

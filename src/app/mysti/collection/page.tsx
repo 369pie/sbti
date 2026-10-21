@@ -5,7 +5,7 @@ import { MystiCollectionContent } from '@/components/MystiCollectionContent';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: '我的图鉴 — WTFTI 灵鉴',
+    title: { absolute: '我的图鉴 — WTFTI 灵鉴' },
     description: '你的专属人格图鉴墙，收集所有宇宙的测试结果，看看你解锁了多少种隐藏人格。',
     keywords: ['图鉴墙', '人格收藏', 'WTFTI', '灵鉴', '人格测试结果'],
     alternates: { canonical: '/mysti/collection/' },

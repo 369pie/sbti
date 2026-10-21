@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { AdminFunnelContent } from './AdminFunnelContent';
 
 export const metadata: Metadata = {
-  title: '管理员 · 漏斗 · WTFTI',
+  title: '管理员 · 漏斗',
   robots: { index: false, follow: false },
 };
 

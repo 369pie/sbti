@@ -9,7 +9,7 @@ import { buildCoupleView } from '@/lib/xpti/couple-view';
 import { CoupleClient } from './CoupleClient';
 
 export const metadata: Metadata = {
-  title: '我和他 · 合不合 — 你先测，再邀请他 | WTFTI',
+  title: '我和他 · 合不合 — 你先测，再邀请他',
   description:
     '「我和他」：你先测，再把链接发给他（12 题）。两个人都测完，看你们的关系雷达、相处模式和对话脚本。',
   alternates: { canonical: '/xpti/couple/' },

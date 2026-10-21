@@ -5,7 +5,7 @@ import { ForgotPasswordForm } from './ForgotPasswordForm';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: '找回密码 — WTFTI',
+  title: '找回密码',
   description: '通过邮箱重置你的 WTFTI 密码。',
   robots: { index: false, follow: false },
 };

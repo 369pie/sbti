@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 
 import { MembershipSubscribeCard } from '@/components/MembershipSubscribeCard';
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
+import { enqueueProductEvent } from '@/lib/analytics/product-events';
 import { getApiPath } from '@/lib/api';
 import { MEMBER_TRY_ON_CAP } from '@/lib/her/membership';
 
@@ -73,6 +74,7 @@ export function MirrorHubClient() {
 
   useEffect(() => {
     trackFunnelEvent('module_landing_view', { module: 'wtfti', source: '/mirror' });
+    enqueueProductEvent('mirror', 'mirror_view', { step: 'view', props: { feature: 'hub' } });
     let cancelled = false;
     (async () => {
       try {

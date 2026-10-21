@@ -6,7 +6,7 @@ const DESC =
   '灵笺 · 人生档案：把你在 WTFTI 主神、灵镜形象档案、灵鉴命书、关系合盘的所有印记，缮写成同一本书。';
 
 export const metadata: Metadata = {
-  title: '灵笺 · 人生档案 · WTFTI',
+  title: '灵笺 · 人生档案',
   description: DESC,
   alternates: { canonical: '/lingjian/' },
   openGraph: {

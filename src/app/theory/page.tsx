@@ -5,7 +5,7 @@ import { DEFAULT_THEORY_FOR_UNIVERSE } from '@/lib/wtfi/scoring';
 import { CciPanel } from '@/components/CciPanel';
 
 export const metadata: Metadata = {
-  title: 'WTFTI 理论 · 你为什么"在不同场合像不同人" | WTFTI',
+  title: { absolute: 'WTFTI 理论 · 你为什么"在不同场合像不同人" | WTFTI' },
   description:
     'WTFTI 用 4 条情境维度 W-T-F-I（触发反应 · 情绪倾斜 · 应对弹性 · 印记锚点）解释你为什么在不同宇宙里像不同人。基于 Mischel & Shoda (1995) CAPS 框架的本土化。',
   alternates: { canonical: '/theory/' },

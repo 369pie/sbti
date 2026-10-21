@@ -8,6 +8,7 @@
  */
 
 import { isSkuOnSale } from '@/lib/payments/on-sale';
+import { pausedButtonLabel, pausedNote, usePaymentPause } from '@/lib/payment/use-payment-pause';
 import { useCallback, useEffect, useState } from 'react';
 import {
   recordUnlock,
@@ -31,6 +32,7 @@ export function SigilYearlyPaywall({ resourceId = 'yearly' }: Props) {
   const meta = SKU_PRICES[SKU];
   const [unlocked, setUnlocked] = useState<boolean>(() => isUnlocked(SKU, resourceId));
   const [loading, setLoading] = useState(false);
+  const paused = usePaymentPause();
   const [error, setError] = useState<string | null>(null);
   const [paymentType, setPaymentType] = useState<'wechat' | 'alipay'>('wechat');
 
@@ -283,7 +285,8 @@ export function SigilYearlyPaywall({ resourceId = 'yearly' }: Props) {
       <button
         type="button"
         onClick={handlePurchase}
-        disabled={loading}
+        disabled={loading || !!paused}
+        data-payment-paused={paused ? '1' : undefined}
         style={{
           marginTop: 4,
           padding: '14px 22px',
@@ -293,12 +296,12 @@ export function SigilYearlyPaywall({ resourceId = 'yearly' }: Props) {
           background: 'linear-gradient(135deg, #C9A676 0%, #C07A8E 100%)',
           border: 'none',
           borderRadius: 999,
-          cursor: loading ? 'wait' : 'pointer',
+          cursor: paused ? 'not-allowed' : loading ? 'wait' : 'pointer',
           fontWeight: 600,
-          opacity: loading ? 0.7 : 1,
+          opacity: loading || paused ? 0.6 : 1,
         }}
       >
-        {loading ? '正在创建订单…' : `✦ ¥${meta.price} 解锁年度纪章册`}
+        {paused ? pausedButtonLabel(paused) : loading ? '正在创建订单…' : `✦ ¥${meta.price} 解锁年度纪章册`}
       </button>
 
       {error && (

@@ -5,7 +5,7 @@ import { MystiGachaContent } from '@/components/MystiGachaContent';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: '每日抽卡 — WTFTI 灵鉴',
+    title: { absolute: '每日抽卡 — WTFTI 灵鉴' },
     description: '每天抽取一张来自不同宇宙的灵魂卡牌，收集稀有卡牌，分享你的收藏。普通、精良、稀有、传说四种稀有度等你来发现！',
     keywords: ['每日抽卡', '灵魂卡牌', 'WTFTI', '灵鉴', '抽卡', '卡牌收集', '稀有度'],
     alternates: { canonical: '/mysti/gacha/' },

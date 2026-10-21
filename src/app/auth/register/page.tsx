@@ -5,7 +5,7 @@ import { RegisterForm } from './RegisterForm';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: '注册 — WTFTI',
+  title: '注册',
   description: '创建 WTFTI 账号，开始收集你的多宇宙人格图鉴。',
   robots: { index: false, follow: false },
 };

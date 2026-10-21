@@ -7,7 +7,7 @@ import { LettersInbox } from '@/components/galaxy/LettersInbox';
 import { CosmicThemeBinder } from '@/components/wtfti/HomeCosmosThemeBinder';
 
 export const metadata: Metadata = {
-  title: '✦ 时间胶囊 · 收信箱 · WTFTI',
+  title: '✦ 时间胶囊 · 收信箱',
   description: '你写给 30 天后自己的星尘信件 — 到期即可拆封。',
 };
 

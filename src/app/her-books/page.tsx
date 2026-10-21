@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: '她读书 · WTFTI',
+  title: '她读书',
   description: '每周一本与女性成长、财富、心理相关的书摘。WTFTI 她成长内容 IP。',
 };
 

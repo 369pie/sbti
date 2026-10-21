@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { CPResultContent } from './CPResultContent';
 
 export const metadata: Metadata = {
-  title: 'CP 配对结果 — WTFTI',
+  title: 'CP 配对结果',
   description: '看看你们的 WTFTI 经典人格配对契合度！27 种人格 × 27 种人格 = 729 种配对组合。',
   robots: { index: false, follow: true },
 };

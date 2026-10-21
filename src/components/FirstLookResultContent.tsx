@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
 import { ArchiveSaveCard } from '@/components/ArchiveSaveCard';
+import { enqueueProductEvent } from '@/lib/analytics/product-events';
 import type { FirstLookShareImageGeneratorHandle } from '@/components/FirstLookShareImageGenerator';
 import { FIRST_LOOK_ARCHETYPES, getArchetypeBySlug } from '@/lib/first-look/archetypes';
 import { trackFirstLook } from '@/lib/first-look/analytics';
@@ -30,6 +31,12 @@ export function FirstLookResultContent({ slug }: { slug: string }) {
   const shareRef = useRef<FirstLookShareImageGeneratorHandle>(null);
   const [own, setOwn] = useState<boolean | null>(null);
   const [copied, setCopied] = useState(false);
+  const [heroSaved, setHeroSaved] = useState(false);
+  useEffect(() => {
+    const h = () => setHeroSaved(true);
+    window.addEventListener('wtfti:archive-saved', h);
+    return () => window.removeEventListener('wtfti:archive-saved', h);
+  }, []);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -82,6 +89,29 @@ export function FirstLookResultContent({ slug }: { slug: string }) {
           <p className={styles.rare}>大约 {archetype.holdRate}% 的女生和你一样</p>
         </article>
 
+        {own !== false && !heroSaved ? (
+          <div className={`s-card ${styles.archiveHero}`} data-archive-cta="hero">
+            <p className={styles.archiveHeroTitle}>存下这一页，明天起每天一张只写给你的今日卡</p>
+            <ul className={styles.archiveHeroList}>
+              <li>免注册，1 秒存好</li>
+              <li>运势 · 幸运色 · 妆容，按你的人格来写</li>
+              <li>以后测的结果都收在一起</li>
+            </ul>
+            <button
+              type="button"
+              className="s-btn"
+              style={{ border: 0, cursor: 'pointer' }}
+              onClick={() => {
+                enqueueProductEvent('home', 'archive_hero_click', { step: 'archive_click', props: { source: 'first_look_result_hero', result_key: slug } });
+                window.dispatchEvent(new CustomEvent('wtfti:archive-save'));
+                document.getElementById('archive-save')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }}
+            >
+              一键存进我的档案
+            </button>
+          </div>
+        ) : null}
+
         <section className={styles.sec}>
           <div className={`s-card s-card--lined ${styles.note}`}>
             <div className="s-tape s-tape--peach" />
@@ -111,7 +141,7 @@ export function FirstLookResultContent({ slug }: { slug: string }) {
           ) : (
             <>
               <p className="s-eyebrow">Next · 下一步</p>
-              <h2 className={`s-title ${styles.h2}`}>把这一页存进你的档案，<br />每天给你一张今日卡</h2>
+              <h2 id="archive-save" className={`s-title ${styles.h2}`}>把这一页存进你的档案，<br />每天给你一张今日卡</h2>
               <ArchiveSaveCard
                 source="first_look_result"
                 result={{ test_id: 'first_look', result_key: slug, result_name: archetype.name }}

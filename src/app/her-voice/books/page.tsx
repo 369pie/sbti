@@ -31,7 +31,7 @@ import {
 } from '../_editorial-styles';
 
 export const metadata: Metadata = {
-  title: '她的书架 · Her Voice · WTFTI',
+  title: '她的书架 · Her Voice',
   description: 'Her Voice Commons 里由女性共同推荐、共读、共建的书单。',
 };
 

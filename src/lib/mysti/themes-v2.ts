@@ -110,34 +110,34 @@ export const MYSTI_THEMES_V2: Record<MystiThemeV2Id, MystiThemeV2> = {
   aurora: {
     id: 'aurora',
     label: '晨光',
-    description: '清晨米色信纸 — 与主站 cream paper 完美一致，适合白天与小红书截图',
+    description: '2026-10 起对齐首页 skin-journal 令牌 · 清晨米色信纸 — 与主站 cream paper 完美一致，适合白天与小红书截图',
 
-    bg: '#FAF8F5',
-    bgGradient: ['#FAF8F5', '#F3EEE6'],
+    bg: '#FBF6EC',
+    bgGradient: ['#FBF6EC', '#F5ECDD'],
 
-    text: '#1F1A16',
-    textMuted: '#5B524B',
-    textSubtle: '#9A908A',
+    text: '#4A3628',
+    textMuted: '#6E5646',
+    textSubtle: '#8A7362',
 
-    accent: '#C07A8E',
-    accentSoft: 'rgba(192, 122, 142, 0.12)',
-    accentDeep: '#A85A6E',
+    accent: '#E8907A',
+    accentSoft: '#FADBD0',
+    accentDeep: '#B45C47',
 
     accentGold: '#B8905A',
     accentGoldSoft: 'rgba(184, 144, 90, 0.14)',
 
-    cardSurface: '#FFFDF9',
+    cardSurface: '#FFFDF8',
     cardSurfaceElevated: '#FFFFFF',
-    cardBorder: 'rgba(207, 198, 187, 0.60)',
-    cardBorderStrong: 'rgba(192, 122, 142, 0.40)',
-    cardGlow: 'rgba(192, 122, 142, 0.10)',
-    cardGradient: ['#FFFDF9', '#FAF8F5'],
+    cardBorder: '#E8DCC8',
+    cardBorderStrong: 'rgba(232, 144, 122, 0.45)',
+    cardGlow: 'rgba(232, 144, 122, 0.10)',
+    cardGradient: ['#FFFDF8', '#FBF6EC'],
 
-    divider: 'rgba(31, 26, 22, 0.08)',
-    dividerAccent: 'rgba(192, 122, 142, 0.25)',
+    divider: '#E8DCC8',
+    dividerAccent: 'rgba(232, 144, 122, 0.30)',
 
-    ctaGradientFrom: '#C07A8E',
-    ctaGradientTo: '#A85A6E',
+    ctaGradientFrom: '#4A3628',
+    ctaGradientTo: '#4A3628',
 
     tarotDir: 'v2/',
     isDark: false,

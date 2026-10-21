@@ -12,6 +12,7 @@
  */
 
 import { isSkuOnSale } from '@/lib/payments/on-sale';
+import { pausedButtonLabel, pausedNote, usePaymentPause } from '@/lib/payment/use-payment-pause';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -83,6 +84,7 @@ export function PremiumPaywall({
       : BRAND_THEMES[brand]);
 
   const [unlocked, setUnlocked] = useState<boolean>(() => serverUnlocked || isUnlocked(sku, resourceId));
+  const paused = usePaymentPause();
   useEffect(() => {
     if (serverUnlocked) setUnlocked(true);
   }, [serverUnlocked]);
@@ -466,8 +468,9 @@ export function PremiumPaywall({
 
               <button
                 onClick={handlePurchase}
-                disabled={loading}
-                className="w-full max-w-xs py-3.5 rounded-xl text-sm tracking-wider transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-wait"
+                disabled={loading || !!paused}
+                data-payment-paused={paused ? '1' : undefined}
+                className="w-full max-w-xs py-3.5 rounded-xl text-sm tracking-wider transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   background: `linear-gradient(135deg, ${theme.ctaGradientFrom}, ${theme.ctaGradientTo})`,
                   color: 'var(--color-bg-primary)',
@@ -475,8 +478,11 @@ export function PremiumPaywall({
                   boxShadow: `0 8px 24px ${theme.cardGlow}`,
                 }}
               >
-                {loading ? '正在创建订单…' : `✦ 解锁 · ¥${finalPrice.toFixed(1)}`}
+                {paused ? pausedButtonLabel(paused) : loading ? '正在创建订单…' : `✦ 解锁 · ¥${finalPrice.toFixed(1)}`}
               </button>
+              {paused ? (
+                <p className="mt-2 text-[11px] leading-relaxed" style={{ color: theme.textSubtle }}>{pausedNote(paused)}</p>
+              ) : null}
 
               {!(hasPass || herMemberDiscount) && (
                 <Link
