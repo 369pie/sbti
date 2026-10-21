@@ -3,7 +3,9 @@
 import { motion } from 'framer-motion';
 import { useMystiTheme } from '@/components/MystiThemeProvider';
 import { MystiPaywall } from '@/components/MystiPaywall';
-import { getSoulLetter, hasSoulLetter } from '@/lib/mysti/soul-letters';
+import { getSoulLetterTeaser } from '@/lib/mysti/soul-letter-teasers';
+import type { SoulLetter } from '@/lib/mysti/soul-letters';
+import { useDeepPayload, deepStatusText } from '@/lib/deep/use-deep-payload';
 
 interface Props {
   slug: string;
@@ -23,9 +25,9 @@ function personalize(text: string, name: string): string {
  */
 export function MystiSoulLetterSection({ slug, displayName }: Props) {
   const { theme } = useMystiTheme();
-  const letter = getSoulLetter(slug);
+  const teaser = getSoulLetterTeaser(slug);
 
-  if (!hasSoulLetter(slug) || !letter) {
+  if (!teaser) {
     return (
       <section
         className="rounded-2xl p-6 mt-10 text-center"
@@ -68,23 +70,48 @@ export function MystiSoulLetterSection({ slug, displayName }: Props) {
         className="text-2xl mb-4"
         style={{ fontFamily: 'var(--font-display)' }}
       >
-        {letter.title}
+        {teaser.title}
       </h2>
       <p
         className="text-base leading-relaxed mb-3 italic"
         style={{ fontFamily: 'var(--font-serif)' }}
       >
-        {letter.open}
+        {teaser.open}
       </p>
       <p
         className="text-base leading-relaxed"
         style={{ fontFamily: 'var(--font-serif)' }}
       >
-        {letter.shadow.slice(0, 60)}……
+        {teaser.shadowHead}……
       </p>
     </article>
   );
 
+  return (
+    <section className="mt-10">
+      <MystiPaywall
+        sku="soul-letter"
+        resourceId={slug}
+        lockedTitle={teaser.title}
+        preview={preview}
+      >
+        <SoulLetterFull slug={slug} displayName={displayName} />
+      </MystiPaywall>
+    </section>
+  );
+}
+
+function SoulLetterFull({ slug, displayName }: { slug: string; displayName: string }) {
+  const { theme } = useMystiTheme();
+  const state = useDeepPayload<SoulLetter>('mysti-letter', { slug });
+  if (state.status !== 'ok') {
+    return (
+      <p data-deep-status={state.status} className="text-center text-sm py-10" style={{ color: theme.textMuted }}>
+        {deepStatusText(state)}
+      </p>
+    );
+  }
+  const letter = state.data;
   const fullContent = (
     <motion.article
       initial={{ opacity: 0, y: 12 }}
@@ -256,16 +283,5 @@ export function MystiSoulLetterSection({ slug, displayName }: Props) {
     </motion.article>
   );
 
-  return (
-    <section className="mt-10">
-      <MystiPaywall
-        sku="soul-letter"
-        resourceId={slug}
-        lockedTitle={letter.title}
-        preview={preview}
-      >
-        {fullContent}
-      </MystiPaywall>
-    </section>
-  );
+  return fullContent;
 }

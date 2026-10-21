@@ -6,12 +6,9 @@ import { SOULTI_DIMENSIONS, SOULTI_MODEL_NAMES, SOULTI_MODEL_COLORS } from '@/li
 import type { SoultiPersonalityType } from '@/lib/soulti/personalities';
 import { getSoultiPersonalityBySlug, getSoultiResonance } from '@/lib/soulti/personalities';
 import type { SoultiDimensionScore, SoultiLayeredResult } from '@/lib/soulti/scoring';
-import {
-  getCrossReadingsForCode,
-  getRepairForCode,
-  getSoulLetterForCode,
-  getWeeklyPromptForPersonality,
-} from '@/lib/soulti/deep-report';
+import { getWeeklyPromptForPersonality } from '@/lib/soulti/weekly-prompts';
+import { useDeepPayload, deepStatusText } from '@/lib/deep/use-deep-payload';
+import type { SoultiDeepPayload } from '@/lib/deep/soulti-deep.server';
 import { useEffect, useState } from 'react';
 import { PremiumPaywall } from '@/components/PremiumPaywall';
 import { buildResourceId } from '@/lib/payments/skus';
@@ -55,9 +52,6 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
     });
   }, [personality.slug]);
 
-  const crossReadings = getCrossReadingsForCode(personality.code);
-  const repair = getRepairForCode(personality.code);
-  const soulLetter = getSoulLetterForCode(personality.code);
   const resonance = getSoultiResonance(personality.slug);
   const weeklyPrompt = getWeeklyPromptForPersonality({
     code: personality.code,
@@ -227,9 +221,9 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
         resourceId={buildResourceId('soulti', personality.slug)}
         lockedTitle="深度镜像 · 完整版"
         teaserBullets={[
-          `${crossReadings.length} 段 · 轴间交叉解读：看见你的关系模式`,
-          repair ? '修复处方 · 基于蜕变轴的私人练习' : '修复处方',
-          soulLetter ? '灵魂手信 · 写给你的私人长信' : '灵魂手信',
+          '轴间交叉解读：看见你的关系模式',
+          '修复处方 · 基于蜕变轴的私人练习',
+          '灵魂手信 · 写给你的私人长信',
         ]}
         preview={(
           <div className="py-2">
@@ -239,228 +233,15 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
             <p className="text-xs text-text-secondary mb-6" style={{ fontFamily: serifFont }}>
               单一维度只能看到轮廓，交叉才能看到你的模式
             </p>
-            {crossReadings[0] && (
-              <div className="rounded-2xl border p-6" style={{ borderColor: `${personality.color}18`, background: 'var(--color-bg-secondary)' }}>
-                <h3 className="text-base mb-2" style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}>
-                  {crossReadings[0].label} · {crossReadings[0].tagline}
-                </h3>
-                <p className="text-sm leading-[2] text-text-secondary" style={{ fontFamily: serifFont }}>
-                  {crossReadings[0].interpretation.slice(0, 140)}…
-                </p>
-              </div>
-            )}
+            <div className="rounded-2xl border p-6" style={{ borderColor: `${personality.color}18`, background: 'var(--color-bg-secondary)' }}>
+              <p className="text-sm leading-[2] text-text-secondary" style={{ fontFamily: serifFont }}>
+                解锁后显示你的轴间交叉解读、修复处方和一封写给你的灵魂手信。
+              </p>
+            </div>
           </div>
         )}
       >
-      <div className="max-w-2xl mx-auto px-6 pt-10">
-        <PremiumEditionStamp editionNo={editionNo} issuedDate={issuedDate} />
-      </div>
-      <motion.section
-        className="max-w-2xl mx-auto px-6 py-12"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25, duration: 0.6 }}
-      >
-        <h2
-          className="premium-foil text-[11px] tracking-[0.3em] font-medium uppercase mb-2"
-          style={{ fontFamily: serifFont }}
-        >
-          AXIS CROSS · 轴间交叉解读
-        </h2>
-        <p className="text-xs text-text-secondary mb-10 font-medium" style={{ fontFamily: serifFont }}>
-          单一维度只能看到轮廓，交叉才能看到你的模式
-        </p>
-
-        <div className="space-y-8">
-          {crossReadings.map((reading, i) => (
-            <motion.div
-              key={reading.axes + reading.label}
-              className="rounded-2xl border p-6 sm:p-8"
-              style={{ borderColor: `${personality.color}12`, background: 'var(--color-bg-secondary)' }}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <span
-                  className="text-[10px] tracking-[0.2em] px-2 py-1 rounded-md"
-                  style={{ fontFamily: monoFont, color: personality.color, background: `${personality.color}10` }}
-                >
-                  {reading.axes}
-                </span>
-                <span className="text-xs text-text-secondary" style={{ fontFamily: serifFont }}>
-                  {reading.title}
-                </span>
-              </div>
-
-              <h3
-                className="text-lg mb-1"
-                style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
-              >
-                {reading.label} · {reading.tagline}
-              </h3>
-
-              <p
-                className="text-sm leading-[2] text-text-secondary mb-4 font-medium"
-                style={{ fontFamily: serifFont }}
-              >
-                {reading.interpretation}
-              </p>
-
-              <div
-                className="text-xs px-4 py-3 rounded-lg"
-                style={{
-                  fontFamily: serifFont,
-                  color: personality.color,
-                  background: `${personality.color}08`,
-                  fontStyle: 'italic',
-                }}
-              >
-                你的关系模式：{reading.relationalPattern}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.section>
-
-      {/* ── Thin divider ── */}
-      <div className="max-w-xs mx-auto px-6">
-        <div className="border-t border-border-subtle/40" />
-      </div>
-
-      {/* ══════════════════════════════════════════════
-          SECTION 3: Repair Prescription
-          ⚠️ PAYMENT GATE: wrap this section when payment is enabled
-         ══════════════════════════════════════════════ */}
-      {repair && (
-        <motion.section
-          className="max-w-2xl mx-auto px-6 py-12"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-        >
-          <h2
-            className="premium-foil text-[11px] tracking-[0.3em] font-medium uppercase mb-2"
-            style={{ fontFamily: serifFont }}
-          >
-            REPAIR · 修复处方
-          </h2>
-          <p className="text-xs text-text-secondary mb-4 font-medium" style={{ fontFamily: serifFont }}>
-            基于你的蜕变轴：{repair.typeLabel}
-          </p>
-
-          <div
-            className="rounded-xl border p-5 sm:p-6 mb-8"
-            style={{ borderColor: `${personality.color}15`, background: `${personality.color}04` }}
-          >
-            <p
-              className="text-sm leading-[2] text-text-secondary"
-              style={{ fontFamily: serifFont, fontStyle: 'italic' }}
-            >
-              {repair.metaphor}
-            </p>
-          </div>
-
-          <div className="space-y-5">
-            {repair.strategies.map((strategy, i) => (
-              <motion.div
-                key={strategy.title}
-                className="rounded-2xl border p-5 sm:p-6"
-                style={{ borderColor: `${personality.color}10`, background: 'var(--color-bg-secondary)' }}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.45 + i * 0.06, duration: 0.4 }}
-              >
-                <div className="flex items-start gap-3">
-                  <span
-                    className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px]"
-                    style={{ fontFamily: monoFont, color: personality.color, background: `${personality.color}12` }}
-                  >
-                    {i + 1}
-                  </span>
-                  <div>
-                    <h4
-                      className="text-sm mb-2"
-                      style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
-                    >
-                      {strategy.title}
-                    </h4>
-                    <p
-                      className="text-[13px] leading-[2] text-text-secondary"
-                      style={{ fontFamily: serifFont }}
-                    >
-                      {strategy.description}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
-      )}
-
-      {/* ── Thin divider ── */}
-      <div className="max-w-xs mx-auto px-6">
-        <div className="border-t border-border-subtle/40" />
-      </div>
-
-      {/* ══════════════════════════════════════════════
-          SECTION 4: Soul Letter
-          ⚠️ PAYMENT GATE: wrap this section when payment is enabled
-         ══════════════════════════════════════════════ */}
-      {soulLetter && (
-        <motion.section
-          className="max-w-2xl mx-auto px-6 py-12"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-        >
-          <h2
-            className="premium-foil text-[11px] tracking-[0.3em] font-medium uppercase mb-8"
-            style={{ fontFamily: serifFont }}
-          >
-            SOUL LETTER · 写给你的信
-          </h2>
-
-          <div
-            className="rounded-2xl border p-8 sm:p-10"
-            style={{
-              borderColor: `${personality.color}18`,
-              background: 'linear-gradient(180deg, #FDFCFA 0%, #F8F5F0 100%)',
-            }}
-          >
-            <p
-              className="text-base mb-6"
-              style={{ fontFamily: serifFont, color: personality.color }}
-            >
-              {soulLetter.opening}
-            </p>
-
-            <div className="space-y-5">
-              {soulLetter.body.map((para, i) => (
-                <p
-                  key={i}
-                  className="text-[15px] leading-[2.2] text-text-secondary"
-                  style={{ fontFamily: serifFont }}
-                >
-                  {para}
-                </p>
-              ))}
-            </div>
-
-            <div className="mt-8 pt-6 border-t" style={{ borderColor: `${personality.color}15` }}>
-              <p
-                className="text-sm leading-relaxed"
-                style={{ fontFamily: serifFont, color: personality.color, fontStyle: 'italic' }}
-              >
-                {soulLetter.closing}
-              </p>
-            </div>
-          </div>
-        </motion.section>
-      )}
-
-      <BundleCta accent={personality.color} />
+      <SoultiDeepPaid personality={personality} editionNo={editionNo} issuedDate={issuedDate} />
       </PremiumPaywall>
       </div>
 
@@ -677,5 +458,238 @@ export function SoultiDeepReportContent({ personality, dimensionScores }: Props)
 
       <div className="h-16" />
     </div>
+  );
+}
+
+function SoultiDeepPaid({
+  personality,
+  editionNo,
+  issuedDate,
+}: {
+  personality: SoultiPersonalityType;
+  editionNo: string;
+  issuedDate: string;
+}) {
+  const state = useDeepPayload<SoultiDeepPayload>('soulti', { slug: personality.slug });
+  if (state.status !== 'ok') {
+    return (
+      <p data-deep-status={state.status} className="text-center text-sm text-text-secondary py-12">
+        {deepStatusText(state)}
+      </p>
+    );
+  }
+  const { crossReadings, repair, soulLetter } = state.data;
+  return (
+    <>
+      <div className="max-w-2xl mx-auto px-6 pt-10">
+        <PremiumEditionStamp editionNo={editionNo} issuedDate={issuedDate} />
+      </div>
+      <motion.section
+        className="max-w-2xl mx-auto px-6 py-12"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25, duration: 0.6 }}
+      >
+        <h2
+          className="premium-foil text-[11px] tracking-[0.3em] font-medium uppercase mb-2"
+          style={{ fontFamily: serifFont }}
+        >
+          AXIS CROSS · 轴间交叉解读
+        </h2>
+        <p className="text-xs text-text-secondary mb-10 font-medium" style={{ fontFamily: serifFont }}>
+          单一维度只能看到轮廓，交叉才能看到你的模式
+        </p>
+
+        <div className="space-y-8">
+          {crossReadings.map((reading, i) => (
+            <motion.div
+              key={reading.axes + reading.label}
+              className="rounded-2xl border p-6 sm:p-8"
+              style={{ borderColor: `${personality.color}12`, background: 'var(--color-bg-secondary)' }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <span
+                  className="text-[10px] tracking-[0.2em] px-2 py-1 rounded-md"
+                  style={{ fontFamily: monoFont, color: personality.color, background: `${personality.color}10` }}
+                >
+                  {reading.axes}
+                </span>
+                <span className="text-xs text-text-secondary" style={{ fontFamily: serifFont }}>
+                  {reading.title}
+                </span>
+              </div>
+
+              <h3
+                className="text-lg mb-1"
+                style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
+              >
+                {reading.label} · {reading.tagline}
+              </h3>
+
+              <p
+                className="text-sm leading-[2] text-text-secondary mb-4 font-medium"
+                style={{ fontFamily: serifFont }}
+              >
+                {reading.interpretation}
+              </p>
+
+              <div
+                className="text-xs px-4 py-3 rounded-lg"
+                style={{
+                  fontFamily: serifFont,
+                  color: personality.color,
+                  background: `${personality.color}08`,
+                  fontStyle: 'italic',
+                }}
+              >
+                你的关系模式：{reading.relationalPattern}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* ── Thin divider ── */}
+      <div className="max-w-xs mx-auto px-6">
+        <div className="border-t border-border-subtle/40" />
+      </div>
+
+      {/* ══════════════════════════════════════════════
+          SECTION 3: Repair Prescription
+          ⚠️ PAYMENT GATE: wrap this section when payment is enabled
+         ══════════════════════════════════════════════ */}
+      {repair && (
+        <motion.section
+          className="max-w-2xl mx-auto px-6 py-12"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+        >
+          <h2
+            className="premium-foil text-[11px] tracking-[0.3em] font-medium uppercase mb-2"
+            style={{ fontFamily: serifFont }}
+          >
+            REPAIR · 修复处方
+          </h2>
+          <p className="text-xs text-text-secondary mb-4 font-medium" style={{ fontFamily: serifFont }}>
+            基于你的蜕变轴：{repair.typeLabel}
+          </p>
+
+          <div
+            className="rounded-xl border p-5 sm:p-6 mb-8"
+            style={{ borderColor: `${personality.color}15`, background: `${personality.color}04` }}
+          >
+            <p
+              className="text-sm leading-[2] text-text-secondary"
+              style={{ fontFamily: serifFont, fontStyle: 'italic' }}
+            >
+              {repair.metaphor}
+            </p>
+          </div>
+
+          <div className="space-y-5">
+            {repair.strategies.map((strategy, i) => (
+              <motion.div
+                key={strategy.title}
+                className="rounded-2xl border p-5 sm:p-6"
+                style={{ borderColor: `${personality.color}10`, background: 'var(--color-bg-secondary)' }}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.45 + i * 0.06, duration: 0.4 }}
+              >
+                <div className="flex items-start gap-3">
+                  <span
+                    className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px]"
+                    style={{ fontFamily: monoFont, color: personality.color, background: `${personality.color}12` }}
+                  >
+                    {i + 1}
+                  </span>
+                  <div>
+                    <h4
+                      className="text-sm mb-2"
+                      style={{ fontFamily: serifFont, color: 'var(--color-text-primary)' }}
+                    >
+                      {strategy.title}
+                    </h4>
+                    <p
+                      className="text-[13px] leading-[2] text-text-secondary"
+                      style={{ fontFamily: serifFont }}
+                    >
+                      {strategy.description}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+      )}
+
+      {/* ── Thin divider ── */}
+      <div className="max-w-xs mx-auto px-6">
+        <div className="border-t border-border-subtle/40" />
+      </div>
+
+      {/* ══════════════════════════════════════════════
+          SECTION 4: Soul Letter
+          ⚠️ PAYMENT GATE: wrap this section when payment is enabled
+         ══════════════════════════════════════════════ */}
+      {soulLetter && (
+        <motion.section
+          className="max-w-2xl mx-auto px-6 py-12"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+        >
+          <h2
+            className="premium-foil text-[11px] tracking-[0.3em] font-medium uppercase mb-8"
+            style={{ fontFamily: serifFont }}
+          >
+            SOUL LETTER · 写给你的信
+          </h2>
+
+          <div
+            className="rounded-2xl border p-8 sm:p-10"
+            style={{
+              borderColor: `${personality.color}18`,
+              background: 'linear-gradient(180deg, #FDFCFA 0%, #F8F5F0 100%)',
+            }}
+          >
+            <p
+              className="text-base mb-6"
+              style={{ fontFamily: serifFont, color: personality.color }}
+            >
+              {soulLetter.opening}
+            </p>
+
+            <div className="space-y-5">
+              {soulLetter.body.map((para, i) => (
+                <p
+                  key={i}
+                  className="text-[15px] leading-[2.2] text-text-secondary"
+                  style={{ fontFamily: serifFont }}
+                >
+                  {para}
+                </p>
+              ))}
+            </div>
+
+            <div className="mt-8 pt-6 border-t" style={{ borderColor: `${personality.color}15` }}>
+              <p
+                className="text-sm leading-relaxed"
+                style={{ fontFamily: serifFont, color: personality.color, fontStyle: 'italic' }}
+              >
+                {soulLetter.closing}
+              </p>
+            </div>
+          </div>
+        </motion.section>
+      )}
+
+      <BundleCta accent={personality.color} />
+    </>
   );
 }
