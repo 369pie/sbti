@@ -7,6 +7,7 @@
  * 但卖点不同（年度产物 + PDF 合订）。
  */
 
+import { isSkuOnSale } from '@/lib/payments/on-sale';
 import { pausedButtonLabel, pausedNote, usePaymentPause } from '@/lib/payment/use-payment-pause';
 import { useCallback, useEffect, useState } from 'react';
 import {
@@ -162,6 +163,7 @@ export function SigilYearlyPaywall({ resourceId = 'yearly' }: Props) {
   }, [paymentType, resourceId]);
 
   if (unlocked) return null;
+  if (!isSkuOnSale(SKU)) return null; // paid convergence: off-sale
 
   return (
     <div

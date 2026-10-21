@@ -847,7 +847,6 @@ function MystiLandingContent() {
               { href: '/mysti/gacha/', label: '抽卡' },
               { href: '/mysti/mood/', label: '今日心情' },
               { href: '/mysti/monthly/', label: '灵魂月报' },
-              { href: '/mysti/gift/', label: '礼品卡' },
               { href: '/mysti/seasonal/', label: '节气年报' },
               { href: '/mysti/sigil/', label: '年度纪章' },
             ].map(item => (

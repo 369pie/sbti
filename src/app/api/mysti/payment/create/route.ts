@@ -3,6 +3,7 @@
  * 用户在 Paywall 点击购买 → 创建虎皮椒订单 → 返回支付 URL
  */
 
+import { isSkuOnSale } from '@/lib/payments/on-sale';
 import { NextRequest, NextResponse } from 'next/server';
 import { memberUnlocksSku } from '@/lib/member-access';
 import {
@@ -180,6 +181,10 @@ export async function POST(req: NextRequest) {
 
   if (!sku || !isPurchasableSku(sku) || !resourceId) {
     return NextResponse.json({ error: 'invalid_params' }, { status: 400 });
+  }
+  // Paid convergence: no new orders for off-sale SKUs (existing orders still verify).
+  if (!isSkuOnSale(sku)) {
+    return NextResponse.json({ error: 'sku_off_sale', message: '该内容已暂停售卖' }, { status: 410 });
   }
 
   // ¥9.9 首月 / 季卡 / 年卡 retired 2026-10-21 — rejected above by isPurchasableSku.

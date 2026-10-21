@@ -12,6 +12,7 @@
  * 视觉与 Editorial Atelier × 暮光博物笔记 体系对齐。
  */
 
+import { isSkuOnSale } from '@/lib/payments/on-sale';
 import { pausedButtonLabel, pausedNote, usePaymentPause } from '@/lib/payment/use-payment-pause';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { memberHref, trackMemberEntry } from '@/lib/member-client';
@@ -191,6 +192,7 @@ export function DecisionPackPaywall({
   if (unlocked) {
     return null;
   }
+  if (!isSkuOnSale(SKU)) return null; // paid convergence: off-sale
 
   const isBanner = variant === 'banner';
 
