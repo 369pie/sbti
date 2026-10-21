@@ -225,7 +225,7 @@ export function CptiPairEntryPanel({ personality }: Props) {
 
   const copyPairCodeText = useCallback(async () => {
     if (!pairCode) return;
-    const link = getSiteUrl(`/cpti/join/`);
+    const link = getSiteUrl(`/xpti/couple/cp/join/`);
     const text =
       `${currentScript}\n` +
       `配对码：${pairCode}\n` +

@@ -1,5 +1,5 @@
 /**
- * /cpti/theory/page.tsx — 维度白皮书
+ * /xpti/couple/page.tsx — 维度白皮书
  * ─────────────────────────────────────────────────────────────
  * Sprint 1 (2026-04-19) — anchor for "CPTI 准不准 / 怎么算的" comments.
  *
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title: 'CPTI 维度白皮书 — 5 维度 × 25 种关系',
   description:
     '5 个维度（主导力 · 表达力 · 冲突力 · 付出力 · 融合度）怎么算出 25 种关系类型？CPTI 准不准？看完这页就懂。',
-  alternates: { canonical: '/cpti/theory/' },
+  alternates: { canonical: '/xpti/couple/' },
   openGraph: {
     title: 'CPTI 维度白皮书',
     description: '5 维度 × 25 种关系类型，CPTI 是怎么算出来的？',
@@ -78,8 +78,8 @@ export default function CptiTheoryPage() {
             '@type': 'BreadcrumbList',
             itemListElement: [
               { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
-              { '@type': 'ListItem', position: 2, name: 'CPTI', item: getSiteUrl('/cpti/') },
-              { '@type': 'ListItem', position: 3, name: '维度白皮书', item: getSiteUrl('/cpti/theory/') },
+              { '@type': 'ListItem', position: 2, name: 'CPTI', item: getSiteUrl('/xpti/couple/') },
+              { '@type': 'ListItem', position: 3, name: '维度白皮书', item: getSiteUrl('/xpti/couple/') },
             ],
           }),
         }}
@@ -90,7 +90,7 @@ export default function CptiTheoryPage() {
         {/* Hero */}
         <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
           <Link
-            href="/cpti/"
+            href="/xpti/couple/"
             className="text-xs font-mono tracking-wider text-text-muted uppercase hover:text-text-primary transition-colors"
           >
             ← CPTI 关系测试
@@ -175,7 +175,7 @@ export default function CptiTheoryPage() {
                   {items.map((r) => (
                     <Link
                       key={r.slug}
-                      href={`/cpti/relationship/${r.slug}/`}
+                      href={`/xpti/couple/cp/${r.slug}/`}
                       className="group rounded-xl border border-border-subtle bg-bg-elevated p-3 text-center hover:border-accent/40 transition-all"
                     >
                       <div className="text-2xl mb-1.5">{r.emoji}</div>

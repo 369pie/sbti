@@ -175,7 +175,7 @@ export default function JoinContent() {
         // ignore storage failures
       }
 
-      router.push('/cpti/relationship/');
+      router.push('/xpti/couple/cp/');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : '直接配对失败，请改用重新测试';
       setResolvedError(message);

@@ -268,7 +268,7 @@ export function ResultClosureEngine({
         >
           <div className="grid grid-cols-2 gap-3">
             <Link
-              href="/cpti/"
+              href="/xpti/couple/"
               className="group rounded-2xl border border-border-subtle bg-bg-elevated p-4 text-center shadow-sm transition-all hover:-translate-y-px hover:shadow-md"
               style={{ backgroundImage: 'linear-gradient(180deg, rgba(192,122,142,0.10), transparent 70%)' }}
             >

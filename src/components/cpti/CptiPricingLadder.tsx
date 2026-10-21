@@ -63,7 +63,7 @@ const TIERS: Tier[] = [
       '全部 25 种关系类型深档随测随读',
     ],
     ctaLabel: '解锁年卡',
-    ctaHref: '/cpti/me/codex/?intent=upgrade',
+    ctaHref: '/xpti/couple/cp/my/codex/?intent=upgrade',
     highlight: true,
     badge: '最热',
   },

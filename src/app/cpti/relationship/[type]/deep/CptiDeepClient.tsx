@@ -201,7 +201,8 @@ export function CptiDeepClient({ relationship, tierInfo }: Props) {
       {/* ── Paywalled deep content ── */}
       <section style={{ maxWidth: 720, margin: '48px auto 0', padding: '0 24px' }}>
         <PremiumPaywall
-          sku="cpti-deep-relationship"
+          sku="xpti-couple-report"
+          legacySkus={['cpti-deep-relationship']}
           brand="cpti"
           resourceId={resourceId}
           lockedTitle={`解锁 ${relationship.name} · 8 维关系深档`}

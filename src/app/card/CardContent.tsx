@@ -378,7 +378,7 @@ function RelationshipCollection({
           </p>
           <div className="flex flex-col items-center gap-2">
             <Link
-              href="/cpti/"
+              href="/xpti/couple/"
               className="inline-flex items-center gap-1.5 text-sm text-rose-text hover:text-rose-text/75 transition-colors"
             >
               去做CPTI测试 <ArrowIcon />

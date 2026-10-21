@@ -77,14 +77,38 @@ const nextConfig: NextConfig = {
       ...['cpti/squad', 'cpti/stealth', 'cpti/gallery', 'cpti/leaderboard'].map((r) => ({
         source: `/${r}/:path*`, destination: '/xpti/couple/', permanent: true,
       })),
-      // Solo CPTI quiz → 我和他. Pair-code invites (/cpti/join → /cpti/test?pairCodeId=) keep working.
+      // Solo CPTI quiz → 我和他. Pair-code invites keep working under the new path (query is preserved).
       {
         source: '/cpti/test',
         missing: [{ type: 'query', key: 'pairCodeId' }],
         destination: '/xpti/couple/',
         permanent: true,
       },
+      // Phase 3 (2026-10-22): CPTI pairing folds into 「我和他」. Old URLs 308 to /xpti/couple/cp/…,
+      // which rewrites() serves from the existing CPTI pages — share links (?r=, ?code=, ?pairCodeId=),
+      // tokens and paid entitlements (resourceId cpti:<slug>) are unchanged.
+      { source: '/cpti', destination: '/xpti/couple/', permanent: true },
+      ...['invite', 'theory'].map((r) => ({ source: `/cpti/${r}/:path*`, destination: '/xpti/couple/', permanent: true })),
+      { source: '/cpti/test', has: [{ type: 'query', key: 'pairCodeId' }], destination: '/xpti/couple/cp/test/', permanent: true },
+      { source: '/cpti/join/:path*', destination: '/xpti/couple/cp/join/:path*', permanent: true },
+      { source: '/cpti/relationship/:path*', destination: '/xpti/couple/cp/:path*', permanent: true },
+      { source: '/cpti/result/:path*', destination: '/xpti/couple/cp/me/:path*', permanent: true },
+      { source: '/cpti/me/:path*', destination: '/xpti/couple/cp/my/:path*', permanent: true },
+      // /cpti/scenarios/* stays (SEO landing pages; CTAs point to 我和他). /cpti/admin stays.
     ];
+  },
+  async rewrites() {
+    // Serve 「我和他」 CPTI-pair URLs from the existing CPTI pages (see redirects above).
+    // `cp/` sub-paths are ordered most-specific first; `cp/:path*` is the relationship pages.
+    return {
+      beforeFiles: [
+        { source: '/xpti/couple/cp/join/:path*', destination: '/cpti/join/:path*' },
+        { source: '/xpti/couple/cp/test/:path*', destination: '/cpti/test/:path*' },
+        { source: '/xpti/couple/cp/me/:path*', destination: '/cpti/result/:path*' },
+        { source: '/xpti/couple/cp/my/:path*', destination: '/cpti/me/:path*' },
+        { source: '/xpti/couple/cp/:path*', destination: '/cpti/relationship/:path*' },
+      ],
+    };
   },
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,

@@ -3,7 +3,7 @@
  * Used for "回传链接" — so the invite sender can also see the result.
  *
  * Format: relSlug.compatibility.slugA.slugB.nicknameA.nicknameB
- * Then base64url-encoded → ?r=xxx on /cpti/relationship/
+ * Then base64url-encoded → ?r=xxx on /xpti/couple/cp/
  */
 
 import { getRelationshipBySlug, type CptiRelationshipType } from './relationships';

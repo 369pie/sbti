@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${p.code}（${p.name}）— CP角色鉴定结果`,
     description: `${p.tagline} — CPTI CP角色鉴定结果：${p.name}，五维度关系画像。`,
-    alternates: { canonical: `/cpti/result/${type}/` },
+    alternates: { canonical: `/xpti/couple/cp/me/${type}/` },
     openGraph: {
       title: `我在关系里的CP角色是 ${p.code}（${p.name}）`,
       description: p.tagline,
@@ -58,8 +58,8 @@ export default async function CptiResultPage({ params }: PageProps) {
               '@type': 'BreadcrumbList',
               itemListElement: [
                 { '@type': 'ListItem', position: 1, name: 'WTFTI', item: getSiteUrl('/') },
-                { '@type': 'ListItem', position: 2, name: 'CP角色鉴定', item: getSiteUrl('/cpti/') },
-                { '@type': 'ListItem', position: 3, name: personality.name, item: getSiteUrl(`/cpti/result/${personality.slug}/`) },
+                { '@type': 'ListItem', position: 2, name: 'CP角色鉴定', item: getSiteUrl('/xpti/couple/') },
+                { '@type': 'ListItem', position: 3, name: personality.name, item: getSiteUrl(`/xpti/couple/cp/me/${personality.slug}/`) },
               ],
             },
             {

@@ -1,5 +1,5 @@
 /**
- * /cpti/relationship/[type]/deep/page.tsx
+ * /xpti/couple/cp/[type]/deep/page.tsx
  * ─────────────────────────────────────────────────────────────
  * Light paywall deep page (W3 sprint, 2026-04-20).
  *
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${r.name}（${r.code}）— 关系深档 · CPTI`,
     description: `${r.tagline} 8 维关系雷达 × 30 条共修建议 × 12 月主题 × 雷区清单。`,
-    alternates: { canonical: `/cpti/relationship/${type}/deep/` },
+    alternates: { canonical: `/xpti/couple/cp/${type}/deep/` },
     robots: { index: false, follow: true },
   };
 }

@@ -58,6 +58,24 @@ function loadIsMine(token: string): boolean {
   }
 }
 
+/** 偷偷测: the inviter answers the 12 partner questions herself (based on her impression of him). */
+function loadIsSecret(token: string): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(`xpti.couple.secret.${token}`) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function markIsSecret(token: string) {
+  try {
+    window.localStorage.setItem(`xpti.couple.secret.${token}`, '1');
+  } catch {
+    /* ignore */
+  }
+}
+
 function markIsMine(token: string) {
   if (typeof window === 'undefined') return;
   try {
@@ -85,6 +103,8 @@ export function CoupleClient({
   const [payMode, setPayMode] = useState<PayMode>('split');
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [secretTick, setSecretTick] = useState(0);
+  const pendingSecretRef = useRef(false);
 
   // Determine inviter ownership for ?token= URLs.
   const isMine = useMemo(() => {
@@ -93,6 +113,10 @@ export function CoupleClient({
     if (!mounted) return false;
     return loadIsMine(shareToken);
   }, [mounted, shareToken, legacyInviteMode]);
+  const isSecret = useMemo(() => {
+    void secretTick;
+    return Boolean(mounted && shareToken && isMine && loadIsSecret(shareToken));
+  }, [mounted, shareToken, isMine, secretTick]);
 
   useEffect(() => {
     if (legacyInviteMode || shareToken) trackTestStart('wohe', { mode: 'partner' });
@@ -118,12 +142,13 @@ export function CoupleClient({
     if (couple && shareToken) {
       // active state — decide partner vs inviter waiting
       if (legacyInviteMode) return 'partner-quiz';
+      if (isMine && isSecret) return 'partner-quiz';
       if (isMine) return 'inviter-waiting';
       return 'partner-quiz';
     }
     // No couple yet → inviter wants to create
     return 'inviter-create';
-  }, [mounted, couple, shareToken, isMine, legacyInviteMode]);
+  }, [mounted, couple, shareToken, isMine, isSecret, legacyInviteMode]);
 
   // Fire analytics on mount.
   const firedRef = useRef(false);
@@ -158,6 +183,11 @@ export function CoupleClient({
         deviceId,
       });
       markIsMine(created.shareToken);
+      if (pendingSecretRef.current) {
+        markIsSecret(created.shareToken);
+        pendingSecretRef.current = false;
+        setSecretTick((n) => n + 1);
+      }
       setShareToken(created.shareToken);
       setCouple({
         shareToken: created.shareToken,
@@ -182,6 +212,17 @@ export function CoupleClient({
       setCreating(false);
     }
   }, [myResult, creating, router]);
+
+  const startSecret = useCallback(() => {
+    trackTestStart('wohe', { mode: 'secret' });
+    if (shareToken) {
+      markIsSecret(shareToken);
+      setSecretTick((n) => n + 1);
+      return;
+    }
+    pendingSecretRef.current = true;
+    void handleCreateInvite();
+  }, [shareToken, handleCreateInvite]);
 
   // After payment / member unlock: re-fetch so the server returns the paid part
   // (it is stripped from locked responses). Retries while the notify lands.
@@ -338,11 +379,11 @@ export function CoupleClient({
       <header style={{ maxWidth: 720, margin: '0 auto', padding: '36px 24px 12px' }}>
         <p className="s-eyebrow">我和他 · 双人</p>
         <h1 className="s-title" style={{ fontSize: 34, lineHeight: 1.2, margin: '10px 0 8px' }}>
-          {mode === 'merged' ? '你们俩的关系报告' : '先测你，再邀请他'}
+          {mode === 'merged' ? '你们俩的关系报告' : isSecret ? '偷偷测 · 他会怎么选？' : '先测你，再邀请他'}
         </h1>
         {mode !== 'merged' ? (
           <p style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--s-ink-2)', margin: 0 }}>
-            ① 你做完自己的测试 → ② 把链接发给他，他答 12 题 → ③ 看你们俩合不合。双人深度报告 ¥12.9 单买，或两人 AA 各 ¥6.9；会员免费。
+            ① 你做完自己的测试 → ② 把链接发给他答 12 题，或者「偷偷测」凭你对他的了解替他答 → ③ 看你们俩合不合。双人深度报告 ¥12.9 单买，或两人 AA 各 ¥6.9；会员免费。
           </p>
         ) : null}
       </header>
@@ -353,6 +394,7 @@ export function CoupleClient({
         <InviterCreateView
           myResult={myResult}
           onCreate={handleCreateInvite}
+          onSecret={startSecret}
           creating={creating}
           error={createError}
         />
@@ -364,6 +406,7 @@ export function CoupleClient({
           pairCode={couple.pairCode}
           partnerArrived={Boolean(couple.partner)}
           onShare={handleShareLink}
+          onSecret={startSecret}
         />
       )}
 
@@ -381,9 +424,15 @@ export function CoupleClient({
           partnerNickRef={partnerNickRef}
           submitting={submittingPartner}
           error={partnerError}
+          secret={isSecret}
         />
       )}
 
+      {mode === 'merged' && isSecret && (
+        <p data-couple-secret style={{ maxWidth: 720, margin: '0 auto', padding: '0 24px', fontSize: 13, color: 'var(--s-ink-2)' }}>
+          偷偷测 · 他那一半是你凭印象替他答的，不是他本人作答。想更准，可以之后再邀请他本人测。
+        </p>
+      )}
       {mode === 'merged' && couple?.merged && shareToken && (
         <MergedView
           merge={couple.merged}
@@ -421,11 +470,13 @@ function GateView() {
 function InviterCreateView({
   myResult,
   onCreate,
+  onSecret,
   creating,
   error,
 }: {
   myResult: ReturnType<typeof loadXptiResult>;
   onCreate: () => void;
+  onSecret: () => void;
   creating: boolean;
   error: string | null;
 }) {
@@ -458,6 +509,9 @@ function InviterCreateView({
         >
           {creating ? '正在生成…' : '生成邀请链接 →'}
         </button>
+        <button type="button" data-couple-secret-start onClick={onSecret} disabled={creating} style={ctaSecondary}>
+          偷偷测 · 不发给他
+        </button>
         <Link href={`${basePath}/xpti/result/${myResult.slug}/`} style={ctaSecondary}>
           ← 回到我的结果
         </Link>
@@ -474,11 +528,13 @@ function InviterWaitingView({
   pairCode,
   partnerArrived,
   onShare,
+  onSecret,
 }: {
   inviteLink: string | null;
   pairCode: string;
   partnerArrived: boolean;
   onShare: () => void;
+  onSecret: () => void;
 }) {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [copyOk, setCopyOk] = useState(false);
@@ -558,6 +614,14 @@ function InviterWaitingView({
             <button onClick={copyOnly} style={ctaSecondary}>{copyOk ? '已复制 ✓' : '只复制链接'}</button>
             <Link href={`${basePath}/xpti/`} style={ctaSecondary}>← 回到 XPTI</Link>
           </div>
+          {!partnerArrived && (
+            <p style={{ ...pStyle, marginTop: 14 }}>
+              不方便发给他？
+              <button type="button" data-couple-secret-start onClick={onSecret} style={{ background: 'none', border: 0, padding: 0, color: PALETTE.wine, textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit' }}>
+                偷偷测：凭你对他的了解替他答 12 题
+              </button>
+            </p>
+          )}
 
           {qrDataUrl && (
             <div
@@ -630,7 +694,9 @@ function PartnerQuizView({
   onAnswer,
   submitting,
   error,
+  secret = false,
 }: {
+  secret?: boolean;
   inviterNick?: string;
   inviterSlug: string;
   qIdx: number;
@@ -646,12 +712,16 @@ function PartnerQuizView({
   return (
     <section style={cardWrap}>
       <div style={{ fontFamily: mono, fontSize: 10, letterSpacing: '0.32em', color: PALETTE.gold, textTransform: 'uppercase' }}>
-        Partner Mini · {qIdx + 1} / {total}
+        {secret ? 'Secret' : 'Partner Mini'} · {qIdx + 1} / {total}
       </div>
+      {secret ? (
+        <p style={{ ...pStyle, marginTop: 6 }}>凭你对他的了解来答：遇到下面的情况，<b>他</b>会怎么选？他不会收到任何通知。</p>
+      ) : (
       <p style={{ ...pStyle, marginTop: 6 }}>
         {inviterNick ? `${inviterNick} ` : '你的伴侣 '} 邀请你做一份 12 题精简版（约 90 秒），合并出你们俩的亲密张力配对。
         <span style={{ color: PALETTE.gold, marginLeft: 6, fontFamily: mono, fontSize: 11 }}>{inviterSlug}</span>
       </p>
+      )}
       <div style={{ height: 4, background: PALETTE.rule, borderRadius: 999, overflow: 'hidden', margin: '20px 0 28px' }}>
         <div style={{ width: `${progress}%`, height: '100%', background: PALETTE.wine, transition: 'width .35s ease' }} />
       </div>
