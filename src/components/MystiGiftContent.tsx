@@ -143,7 +143,7 @@ export function MystiGiftContent() {
             灵魂礼品卡
           </h1>
           <p className="mt-3 text-sm" style={{ color: theme.textMuted }}>
-            ¥{SKU_PRICES['gift-card'].price.toFixed(1)} · 把灵魂内容作为礼物送给 TA
+            {GIFT_ON_SALE ? `¥${SKU_PRICES['gift-card'].price.toFixed(1)} · 把灵魂内容作为礼物送给 TA` : '礼品卡已暂停售卖 · 已购买的卡和兑换码照常可用'}
           </p>
         </div>
 
