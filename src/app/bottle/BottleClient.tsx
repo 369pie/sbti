@@ -72,6 +72,7 @@ export function BottleClient() {
 
   useEffect(() => {
     trackFunnelEvent('module_landing_view', { module: 'wtfti', source: '/bottle' });
+    enqueueProductEvent('treehole', 'treehole_view', { step: 'view' });
     queueMicrotask(() => void load());
   }, [load]);
 
@@ -103,6 +104,7 @@ export function BottleClient() {
     setDraft('');
     setLastPost(body.post ?? null);
     setLastCrisis(body.crisis ?? null);
+    enqueueProductEvent('treehole', 'treehole_write_submit', { step: 'write' });
     enqueueProductEvent('home', 'treehole_post', {
       step: 'write',
       props: { risk: body.crisis ? 'self_harm' : 'ok' },

@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
 
 import { trackFunnelEvent } from '@/lib/analytics/funnel';
+import { enqueueProductEvent } from '@/lib/analytics/product-events';
 import { getApiPath } from '@/lib/api';
 import type { PalmHand, PalmLine, PalmReadingResult } from '@/lib/mirror/palm-reading';
 
@@ -67,6 +68,7 @@ export function PalmClient() {
 
   useEffect(() => {
     trackFunnelEvent('module_landing_view', { module: 'wtfti', source: '/mirror/palm' });
+    enqueueProductEvent('mirror', 'mirror_view', { step: 'view', props: { feature: 'palm' } });
   }, []);
 
   const onFile = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
@@ -90,6 +92,7 @@ export function PalmClient() {
     setPhase('reading');
     setError(null);
     try {
+      enqueueProductEvent('mirror', 'mirror_analyze_submit', { step: 'submit', props: { feature: 'palm' } });
       const res = await fetch(getApiPath('/mirror/palm/'), {
         method: 'POST',
         credentials: 'include',
