@@ -3,11 +3,13 @@
  * 用户在 Paywall 点击购买 → 创建虎皮椒订单 → 返回支付 URL
  */
 
+import { wechatGuideUrl } from '@/lib/payment/wechat-guide';
 import { isSkuOnSale } from '@/lib/payments/on-sale';
 import { NextRequest, NextResponse } from 'next/server';
 import { memberUnlocksSku } from '@/lib/member-access';
 import {
   createXunhupayOrder,
+  detectPaymentClientKind,
   maskXunhupayAppId,
   readXunhupayConfig,
   type XunhupayPaymentChannel,
@@ -272,6 +274,7 @@ export async function POST(req: NextRequest) {
       deviceId,
       userId,
       attachJson,
+      clientKind: detectPaymentClientKind(userAgent),
     });
 
     const order = await createXunhupayOrder(cfg, {
@@ -295,8 +298,9 @@ export async function POST(req: NextRequest) {
       price: chargePrice,
       listPrice: meta.price,
       label: meta.label,
-      url: order.url,
+      url: wechatGuideUrl({ kind: 'mysti', orderId: tradeOrderId, userAgent, qrcode: order.qrcode, cashier: order.url, paymentType, back: redirect }) ?? order.url,
       qrcode: order.qrcode,
+      wechatInApp: detectPaymentClientKind(userAgent) === 'wechat-inapp',
     });
   } catch (err) {
     console.error('[mysti-payment-create] create failed', {

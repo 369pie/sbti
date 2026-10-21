@@ -79,6 +79,8 @@ export interface CreateMystiOrderInput {
   /** Logged-in user — writes mysti_orders.user_id for her_profiles sync */
   userId?: string;
   attachJson?: MystiOrderAttach;
+  /** Coarse client type (wechat-inapp / ios / android / desktop …). Column added 2026-10-21. */
+  clientKind?: string;
 }
 
 const VALID_GIFT_SKUS = new Set(GIFT_CARD_OPTIONS.map(option => option.giftSku));
@@ -276,6 +278,7 @@ export async function createPendingMystiOrder(
 ): Promise<MystiOrderRow> {
   const attachJson = sanitizeAttach(input.attachJson);
   const legacySku = getLegacyStoredSku(input.sku);
+  let includeClientKind = Boolean(input.clientKind);
   const candidates: Array<{ sku: MystiSku; includeDeviceId: boolean }> = [
     { sku: input.sku, includeDeviceId: true },
     ...(input.deviceId ? [{ sku: input.sku, includeDeviceId: false }] : []),
@@ -285,7 +288,8 @@ export async function createPendingMystiOrder(
 
   let lastError: unknown = null;
 
-  for (const candidate of candidates) {
+  for (let i = 0; i < candidates.length; i++) {
+    const candidate = candidates[i];
     const payload = {
       trade_order_id: input.tradeOrderId,
       provider: 'xunhupay',
@@ -302,6 +306,7 @@ export async function createPendingMystiOrder(
         ? { device_id: input.deviceId }
         : {}),
       ...(input.userId ? { user_id: input.userId } : {}),
+      ...(includeClientKind ? { client_kind: input.clientKind } : {}),
     };
 
     const { data, error } = await admin()
@@ -315,6 +320,12 @@ export async function createPendingMystiOrder(
     }
 
     lastError = error;
+    if (includeClientKind && isMissingColumnError(error, 'client_kind')) {
+      // Migration not applied yet — retry the same candidate without the column.
+      includeClientKind = false;
+      i--;
+      continue;
+    }
     if (
       !isMissingColumnError(error, 'device_id') &&
       !isLegacySkuConstraintError(error)
