@@ -14,18 +14,11 @@ import {
   type XunhupayPaymentChannel,
 } from '@/lib/payment/xunhupay';
 import {
-  ensureSubscriptionFromOrder,
-  getMystiOrderDeviceId,
-  getMystiOrderSku,
   markMystiOrderPaid,
   updateMystiOrderStatus,
   type MystiOrderAttach,
 } from '@/lib/mysti/payment-store';
-import {
-  markCoupleUnlocked,
-  parseCoupleResourceId,
-} from '@/lib/xpti/couple-server';
-import { syncHerMembershipFromPaidOrder } from '@/lib/her/membership';
+import { fulfillPaidOrder } from '@/lib/mysti/fulfill-paid-order';
 
 function parseAttach(raw: string | undefined): MystiOrderAttach | null {
   if (!raw) return null;
@@ -109,44 +102,9 @@ export async function POST(req: NextRequest) {
       notifyPayload: payload,
     });
 
-    // Issue / extend mysti_subscriptions for pass SKUs (server truth).
-    let subExpiresAt: number | null = null;
-    try {
-      const sub = await ensureSubscriptionFromOrder(order);
-      if (sub?.expiresAt) subExpiresAt = sub.expiresAt;
-    } catch (subErr) {
-      console.warn('[mysti.payment.notify] subscription ensure failed', subErr);
-    }
-
-    // P3: align her_profiles.is_member / member_expires_at (no auto-renew).
-    try {
-      await syncHerMembershipFromPaidOrder({
-        user_id: order.user_id,
-        device_id: getMystiOrderDeviceId(order) ?? order.device_id,
-        sku: getMystiOrderSku(order),
-        expiresAtMs: subExpiresAt,
-      });
-    } catch (memErr) {
-      console.warn('[mysti.payment.notify] her membership sync failed', memErr);
-    }
-
-    // Phase 1 hook: when an XPTI couple SKU is paid, also flip the couple
-    // record to unlocked so any holder of the share_token sees content.
-    const sku = getMystiOrderSku(order) as string | null;
-    if (sku === 'xpti-couple-report' || sku === 'xpti-couple-half') {
-      const shareToken = parseCoupleResourceId(order.resource_id);
-      if (shareToken) {
-        try {
-          await markCoupleUnlocked(shareToken, {
-            sku,
-            userId: order.user_id ?? null,
-            deviceId: order.device_id ?? null,
-          });
-        } catch (couplErr) {
-          console.warn('[mysti.payment.notify] couple unlock sync failed', couplErr);
-        }
-      }
-    }
+    // Shared idempotent fulfillment (subscription, her membership, couple unlock).
+    const f = await fulfillPaidOrder(order);
+    if (f.notes.length) console.warn('[mysti.payment.notify] fulfillment notes', f.notes.join(','));
   } catch (error) {
     console.error('[mysti.payment.notify] persist failed', error);
     return new NextResponse('persist_failed', { status: 500 });
