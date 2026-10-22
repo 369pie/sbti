@@ -40,7 +40,7 @@ export async function reconcileMystiOrderFromProvider(
     });
 
     if (providerOrder.status === 'OD') {
-      return markMystiOrderPaid({
+      const paid = await markMystiOrderPaid({
         tradeOrderId: order.trade_order_id,
         providerOrderId: providerOrder.openOrderId ?? order.provider_order_id,
         channel: order.channel,
@@ -48,6 +48,15 @@ export async function reconcileMystiOrderFromProvider(
         orderTitle: providerOrder.orderTitle ?? order.title,
         notifyPayload: stringifyProviderData(providerOrder.data),
       });
+      // Same idempotent fulfillment as the notify webhook (cron + status polling path).
+      try {
+        const { fulfillPaidOrder } = await import('./fulfill-paid-order');
+        const f = await fulfillPaidOrder(paid);
+        if (f.notes.length) console.warn('[mysti-payment-reconcile] fulfillment notes', f.notes.join(','));
+      } catch (e) {
+        console.warn('[mysti-payment-reconcile] fulfillment failed', e instanceof Error ? e.message : e);
+      }
+      return paid;
     }
 
     if (providerOrder.status === 'CD') {
